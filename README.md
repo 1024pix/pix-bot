@@ -1,0 +1,1 @@
+# scalingo-app-switch
