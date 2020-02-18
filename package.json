@@ -1,7 +1,7 @@
 {
   "name": "scalingo-app-manager",
   "version": "1.0.0",
-  "description": "",
+  "description": "Scalingo-hosted applications manager",
   "main": "index.js",
   "scripts": {
     "start": "node bin/www",
