@@ -1,11 +1,20 @@
 require('dotenv').config();
 
+const ReviewAppManager = require('scalingo-review-app-manager').ReviewAppManager;
+
 const server = require('../lib/server');
-const jobManager = require('../lib/job-manager');
 
 const init = async () => {
 
-  await jobManager.startJobs();
+  const scalingoToken = process.env.SCALINGO_TOKEN;
+  const scalingoApiUrl = process.env.SCALINGO_API_URL;
+  const stopCronTime = process.env.STOP_CRON_TIME;
+  const restartCronTime = process.env.RESTART_CRON_TIME;
+  const ignoredReviewApps = process.env.IGNORED_REVIEW_APPS ? process.env.IGNORED_REVIEW_APPS.split(',') : [];
+
+  const reviewAppManager = new ReviewAppManager(scalingoToken, scalingoApiUrl, { stopCronTime, restartCronTime, ignoredReviewApps });
+  await reviewAppManager.startEcoMode();
+
   await server.start();
   console.log('Server running on %s', server.info.uri);
 };

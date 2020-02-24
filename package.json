@@ -1,6 +1,6 @@
 {
   "name": "scalingo-app-manager",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "Scalingo-hosted applications manager",
   "main": "index.js",
   "scripts": {
@@ -19,9 +19,8 @@
   "homepage": "https://github.com/1024pix/scalingo-app-manager#readme",
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
-    "cron": "^1.8.2",
     "dotenv": "^8.2.0",
-    "scalingo": "0.0.40"
+    "scalingo-review-app-manager": "^0.1.0"
   },
   "engines": {
     "node": "12.14.1",
