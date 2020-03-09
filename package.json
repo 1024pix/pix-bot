@@ -4,6 +4,11 @@
   "description": "Scalingo-hosted applications manager",
   "main": "index.js",
   "scripts": {
+    "deploy": "npm run deploy:minor",
+    "deploy:major": "npm version major && npm run deploy:tag",
+    "deploy:minor": "npm version minor && npm run deploy:tag",
+    "deploy:patch": "npm version patch && npm run deploy:tag",
+    "deploy:tag": "git push && git push --tags",
     "start": "node bin/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
