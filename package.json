@@ -20,7 +20,7 @@
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
     "dotenv": "^8.2.0",
-    "scalingo-review-app-manager": "^0.1.0"
+    "scalingo-review-app-manager": "^0.1.2"
   },
   "engines": {
     "node": "12.14.1",
