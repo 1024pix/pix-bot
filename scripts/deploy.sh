@@ -12,7 +12,7 @@ echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa
 chmod 400 ~/.ssh/id_rsa
 
 tmp_dir=$(mktemp -d)
-echo "Created tmporary directory $tmp_dir"
+echo "Created temporary directory $tmp_dir"
 
 git clone git@github.com:1024pix/test-deploy-from-slack.git "$tmp_dir"
 echo "Cloned repository to temporary directory"
