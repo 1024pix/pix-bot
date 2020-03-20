@@ -2,6 +2,9 @@
 
 set -e
 
+version=$1
+echo "Deploying version $version…"
+
 git config --global user.name "$GIT_USER_NAME"
 git config --global user.email "$GIT_USER_EMAIL"
 echo "Set Git global user information"
