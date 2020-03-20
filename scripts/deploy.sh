@@ -6,9 +6,9 @@ git config --global user.name "$GIT_USER_NAME"
 git config --global user.email "$GIT_USER_EMAIL"
 echo "Set Git global user information"
 
-mkdir ~/.ssh
+mkdir -p ~/.ssh
 ssh-keyscan -H github.com > ~/.ssh/known_hosts
-echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa
+echo "$SSH_KEY" | base64 -d > ~/.ssh/github_rsa
 chmod 400 ~/.ssh/id_rsa
 
 tmp_dir=$(mktemp -d)
