@@ -4,6 +4,7 @@
   "description": "Scalingo-hosted applications manager",
   "main": "index.js",
   "scripts": {
+    "configure": "cp sample.env .env && npm install",
     "deploy": "npm run deploy:minor",
     "deploy:major": "npm version major && npm run deploy:tag",
     "deploy:minor": "npm version minor && npm run deploy:tag",

@@ -9,10 +9,11 @@ SAM helps developers and teams who host their applications on [Scalingo](https:/
 Services provided by SAM:
 - shut down Review Apps, at the time you want, every day of the week
 - re-start stopped Review Apps, when you want, every day of the week
+- interact with Slack
 
 ## Getting started
 
-1/ Fork the repository
+1/ Fork or clone the repository
 
 2/ Create a new Scalingo application
 
@@ -31,23 +32,16 @@ git push scalingo master
 git clone git@github.com:1024pix/scalingo-app-manager.git && cd scalingo-app-manager
 ```
 
-2/ Create a `.env` file with variables:
-
+2/ Execute the configuration script:
 ```
-JOB_START_REVIEW_APPS=0 0 8 * * 1-5 # Every day of the week at 8:00:00
-JOB_STOP_REVIEW_APPS=0 0 19 * * 1-5 # Every day of the week at 19:00:00
-SCALINGO_API_URL=https://api.osc-fr1.scalingo.com # For 3DS Outscale datacenters
-SCALINGO_TOKEN=tk-us-Dk... # Your Scalingo API token
+npm run configure
 ```
 
-3/ Fetch the project dependencies 
-```
-npm install
-```
-
-4/ Start the application
+3/ Start the application
 ```
 npm start
 ```
+
+4/ Access the application on http://localhost:3000
 
 5/ Develop and add wonderful features!
