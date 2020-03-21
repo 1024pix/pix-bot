@@ -24,6 +24,7 @@
   "homepage": "https://github.com/1024pix/scalingo-app-manager#readme",
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
+    "axios": "^0.19.2",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "scalingo-review-app-manager": "^0.1.2"
