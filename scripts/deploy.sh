@@ -5,9 +5,9 @@ set -euxo pipefail
 version=$1
 echo "Deploying version $version…"
 
-git config --global user.name "$GIT_USER_NAME"
-git config --global user.email "$GIT_USER_EMAIL"
-echo "Set Git global user information"
+git config user.name "$GIT_USER_NAME"
+git config user.email "$GIT_USER_EMAIL"
+echo "Set Git user information"
 
 mkdir -p ~/.ssh
 ssh-keyscan -H github.com > ~/.ssh/known_hosts
