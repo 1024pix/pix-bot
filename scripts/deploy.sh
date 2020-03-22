@@ -5,10 +5,6 @@ set -euxo pipefail
 version=$1
 echo "Deploying version $version…"
 
-git config user.name "$GIT_USER_NAME"
-git config user.email "$GIT_USER_EMAIL"
-echo "Set Git user information"
-
 mkdir -p ~/.ssh
 ssh-keyscan -H github.com > ~/.ssh/known_hosts
 echo "$SSH_KEY" | base64 -d > ~/.ssh/github_rsa
@@ -22,6 +18,10 @@ echo "Cloned repository to temporary directory"
 
 cd "$tmp_dir"
 echo "Moved to repository folder"
+
+git config user.name "$GIT_USER_NAME"
+git config user.email "$GIT_USER_EMAIL"
+echo "Set Git user information"
 
 git commit --allow-empty -m 'TEST'
 git push origin master
