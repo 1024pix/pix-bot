@@ -9,7 +9,8 @@ SAM helps developers and teams who host their applications on [Scalingo](https:/
 Services provided by SAM:
 - shut down Review Apps, at the time you want, every day of the week
 - re-start stopped Review Apps, when you want, every day of the week
-- interact with Slack
+- deploy a specific release into production via secured API
+- deploy a specific release into production via a Slack command or shortcut
 
 ## Getting started
 
