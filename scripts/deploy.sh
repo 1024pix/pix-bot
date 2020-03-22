@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -euxo pipefail
 
 version=$1
 echo "Deploying version $version…"
