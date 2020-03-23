@@ -4,6 +4,8 @@ set -euxo pipefail
 
 source "$(dirname $0)"/common.sh
 
+VERSION_NUMBER=$1
+
 function install_ssh_key_for_git_operations {
   mkdir -p ~/.ssh
   ssh-keyscan -H github.com > ~/.ssh/known_hosts
