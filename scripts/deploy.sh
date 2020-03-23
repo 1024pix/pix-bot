@@ -43,8 +43,11 @@ function get_release_commit_hash {
 }
 
 function update_production_branch {
-    local annotated_version="${VERSION_NUMBER}^{}"
-    local annotated_tag_hash="$(git rev-parse --quiet "${annotated_version}")"
+    local annotated_version
+    local annotated_tag_hash
+
+    annotated_version="${VERSION_NUMBER}^{}"
+    annotated_tag_hash="$(git rev-parse --quiet "${annotated_version}")"
     git push origin "$annotated_tag_hash":prod
 
     echo "Pushed changes on branch origin/prod"
@@ -66,8 +69,8 @@ install_ssh_key_for_git_operations
 clone_repository_and_move_inside
 configure_git_user_information
 get_release_commit_hash
-update_production_branch
-finalize_release_on_sentry
+#update_production_branch
+#finalize_release_on_sentry
 delete_repository_folder
 
 echo -e "Release deployment ${GREEN}succeeded${RESET_COLOR}."
