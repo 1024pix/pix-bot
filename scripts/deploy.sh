@@ -6,10 +6,12 @@ source "$(dirname $0)"/common.sh
 
 VERSION_NUMBER=$1
 
+echo "Version number ${VERSION_NUMBER}"
+
 function install_ssh_key_for_git_operations {
   mkdir -p ~/.ssh
   ssh-keyscan -H github.com > ~/.ssh/known_hosts
-  echo "$SSH_KEY" | base64 -d > ~/.ssh/github_rsa
+  echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa
   chmod 400 ~/.ssh/id_rsa
 }
 
@@ -56,7 +58,7 @@ function update_production_branch {
 }
 
 function finalize_release_on_sentry {
-    npx sentry-cli releases -o pix finalize "${VERSION_NUMBER}"
+    npx sentry-cli releases -o pix finalize "${VERSION_ NUMBER}"
     echo "Finalized release on Sentry"
 }
 
@@ -65,7 +67,7 @@ function delete_repository_folder {
   echo "Deleted temporary folder"
 }
 
-echo "Start deploying version $VERSION_NUMBER…"
+echo "Start deploying version ${VERSION_NUMBER}…"
 
 install_ssh_key_for_git_operations
 clone_repository_and_move_inside
