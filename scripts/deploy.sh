@@ -65,14 +65,14 @@ function delete_repository_folder {
   echo "Deleted temporary folder"
 }
 
-echo "Start deploying version $version…"
+echo "Start deploying version $VERSION_NUMBER…"
 
 install_ssh_key_for_git_operations
 clone_repository_and_move_inside
 configure_git_user_information
 get_release_commit_hash
-#update_production_branch
-#finalize_release_on_sentry
+update_production_branch
+finalize_release_on_sentry
 delete_repository_folder
 
 echo -e "Release deployment ${GREEN}succeeded${RESET_COLOR}."
