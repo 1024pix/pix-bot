@@ -8,30 +8,6 @@ VERSION_NUMBER=$1
 
 echo "Version number ${VERSION_NUMBER}"
 
-function install_ssh_key_for_git_operations {
-  mkdir -p ~/.ssh
-  ssh-keyscan -H github.com > ~/.ssh/known_hosts
-  echo "$SSH_KEY" | base64 -d > ~/.ssh/id_rsa
-  chmod 400 ~/.ssh/id_rsa
-}
-
-function clone_repository_and_move_inside {
-  REPOSITORY_FOLDER=$(mktemp -d)
-  echo "Created temporary directory $REPOSITORY_FOLDER"
-
-  git clone git@github.com:1024pix/pix.git "$REPOSITORY_FOLDER"
-  echo "Cloned repository to temporary directory"
-
-  cd "$REPOSITORY_FOLDER"
-  echo "Moved to repository folder"
-}
-
-function configure_git_user_information {
-  git config user.name "$GIT_USER_NAME"
-  git config user.email "$GIT_USER_EMAIL"
-  echo "Set Git user information"
-}
-
 function get_release_commit_hash {
     local commit_hash
 
@@ -62,11 +38,6 @@ function finalize_release_on_sentry {
     echo "Finalized release on Sentry"
 }
 
-function delete_repository_folder {
-  rm -rf "$REPOSITORY_FOLDER"
-  echo "Deleted temporary folder"
-}
-
 echo "Start deploying version ${VERSION_NUMBER}…"
 
 install_ssh_key_for_git_operations
@@ -75,6 +46,5 @@ configure_git_user_information
 get_release_commit_hash
 update_production_branch
 finalize_release_on_sentry
-delete_repository_folder
 
 echo -e "Release deployment ${GREEN}succeeded${RESET_COLOR}."
