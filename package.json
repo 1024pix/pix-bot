@@ -1,7 +1,7 @@
 {
-  "name": "scalingo-app-manager",
+  "name": "pix-bot",
   "version": "0.3.0",
-  "description": "Scalingo-hosted applications manager",
+  "description": "Pix Bot application",
   "main": "index.js",
   "scripts": {
     "configure": "cp sample.env .env && npm install",
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/1024pix/scalingo-app-manager.git"
+    "url": "git+https://github.com/1024pix/pix-bot.git"
   },
   "author": "Jérémy Buget",
   "license": "AGPL-3.0",
   "bugs": {
-    "url": "https://github.com/1024pix/scalingo-app-manager/issues"
+    "url": "https://github.com/1024pix/pix-bot/issues"
   },
-  "homepage": "https://github.com/1024pix/scalingo-app-manager#readme",
+  "homepage": "https://github.com/1024pix/pix-bot#readme",
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
     "@sentry/cli": "^1.51.1",
