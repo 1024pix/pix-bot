@@ -4,18 +4,18 @@ set -euxo pipefail
 
 source "$(dirname $0)"/common.sh
 
-VERSION_NUMBER=$1
+RELEASE_TAG=$1
 
-echo "Version number ${VERSION_NUMBER}"
+echo "Version number ${RELEASE_TAG}"
 
 function get_release_commit_hash {
     local commit_hash
 
-    commit_hash="$(git rev-parse --verify --quiet "${VERSION_NUMBER}")"
+    commit_hash="$(git rev-parse --verify --quiet "${RELEASE_TAG}")"
 
     if [ -z "${commit_hash}" ];
     then
-        echo -e "${RED}Version ${VERSION_NUMBER} does not exist!${RESET_COLOR}\n" >&2
+        echo -e "${RED}Version ${RELEASE_TAG} does not exist!${RESET_COLOR}\n" >&2
         exit 1
     fi
 
@@ -26,7 +26,7 @@ function update_production_branch {
     local annotated_version
     local annotated_tag_hash
 
-    annotated_version="${VERSION_NUMBER}^{}"
+    annotated_version="${RELEASE_TAG}^{}"
     annotated_tag_hash="$(git rev-parse --quiet "${annotated_version}")"
     git push origin "$annotated_tag_hash":prod
 
@@ -38,9 +38,8 @@ function finalize_release_on_sentry {
     echo "Finalized release on Sentry"
 }
 
-echo "Start deploying version ${VERSION_NUMBER}…"
+echo "Start deploying version ${RELEASE_TAG}…"
 
-install_ssh_key_for_git_operations
 clone_repository_and_move_inside
 configure_git_user_information
 get_release_commit_hash

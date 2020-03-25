@@ -104,11 +104,10 @@ function publish_release_on_sentry() {
 echo -e "Preparing a new release.\n"
 
 echo "== Clone and move into Pix repository =="
-#install_ssh_key_for_git_operations
 clone_repository_and_move_inside
 configure_git_user_information
 echo "== Validate context =="
-#ensure_no_uncommited_changes_are_present
+ensure_no_uncommited_changes_are_present
 ensure_new_version_is_either_minor_or_patch_or_major
 echo "== Package release =="
 checkout_dev
