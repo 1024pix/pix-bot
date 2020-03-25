@@ -12,16 +12,27 @@ YELLOW="\033[1;33m"
 BLUE="\033[1;34m"
 CYAN="\033[1;36m"
 
-# Common functions
-function get_package_version {
-    node -p -e "require('./package.json').version"
+function install_ssh_key_for_git_operations {
+  mkdir -p ~/.ssh
+  ssh-keyscan -H github.com > ~/.ssh/known_hosts
+  echo "${SSH_KEY}" | base64 -d > ~/.ssh/id_rsa
+  chmod 400 ~/.ssh/id_rsa
 }
 
-function checkout_dev {
-    git checkout dev >> /dev/null 2>&1
+function clone_repository_and_move_inside {
+  REPOSITORY_FOLDER=$(mktemp -d)
+  echo "Created temporary directory $REPOSITORY_FOLDER"
+
+  git clone git@github.com:1024pix/pix.git "$REPOSITORY_FOLDER"
+  echo "Cloned repository to temporary directory"
+
+  cd "$REPOSITORY_FOLDER"
+  echo "Moved to repository folder"
 }
 
-function fetch_and_rebase {
-    git fetch --tags
-    git pull --rebase
+function configure_git_user_information {
+  git config user.name "$GIT_USER_NAME"
+  git config user.email "$GIT_USER_EMAIL"
+  echo "Set Git user information"
 }
+

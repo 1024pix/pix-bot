@@ -29,6 +29,8 @@
     "axios": "^0.19.2",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
     "scalingo-review-app-manager": "^0.1.2"
   },
   "engines": {
