@@ -25,13 +25,13 @@
   "homepage": "https://github.com/1024pix/pix-bot#readme",
   "dependencies": {
     "@hapi/hapi": "^19.1.1",
-    "@sentry/cli": "^1.51.1",
+    "@sentry/cli": "^1.52.0",
     "axios": "^0.19.2",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "scalingo-review-app-manager": "^0.1.2"
+    "scalingo-review-app-manager": "^0.2.0"
   },
   "engines": {
     "node": "12.14.1",
@@ -39,6 +39,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^7.1.0"
+    "mocha": "^7.1.1",
+    "sinon": "^9.0.1"
   }
 }
