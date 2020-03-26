@@ -55,7 +55,7 @@ function update_version() {
 }
 
 function complete_change_log() {
-  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}"
+  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod_test.js" "${NEW_PACKAGE_VERSION}"
 
   echo "Updated CHANGELOG.md"
 }

@@ -11,7 +11,7 @@
     "deploy:patch": "npm version patch && npm run deploy:tag",
     "deploy:tag": "git push --tags",
     "start": "node bin/www",
-    "test": "mocha"
+    "test": "NODE_ENV=test mocha --recursive --exit --reporter dot test"
   },
   "repository": {
     "type": "git",
