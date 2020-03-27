@@ -41,12 +41,19 @@ function fetch_and_rebase() {
   git pull --rebase
 }
 
+  # TODO: rename to update_node_package_versions
 function update_version() {
+  # TODO: refacto using dynamic package.json update => find . -name package.json  ! -path '*/node_modules/*'
+  # TODO: refacto - extract to method all subpackages version update
+  (cd admin/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
   (cd api/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
+  (cd certif/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
   (cd mon-pix/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
   (cd orga/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd certif/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd admin/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
+  (cd orga/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
+  (cd high-level-tests/load-testing/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
+  (cd high-level-tests/e2e/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
+  (cd scripts/backup/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
   npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null
   NEW_PACKAGE_VERSION=$(get_package_version)
 
