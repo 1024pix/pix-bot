@@ -8,12 +8,11 @@ echo "${CWD_DIR}"
 
 source "${CWD_DIR}/scripts/common.sh"
 
+NEW_VERSION_TYPE=$1
+
 function get_package_version() {
   node -p -e "require('./package.json').version"
 }
-
-NEW_VERSION_TYPE=$1
-OLD_PACKAGE_VERSION=$(get_package_version)
 
 function ensure_no_uncommited_changes_are_present() {
   if [ -n "$(git status --porcelain)" ]; then
@@ -55,7 +54,7 @@ function update_version() {
 }
 
 function complete_change_log() {
-  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod_test.js" "${NEW_PACKAGE_VERSION}"
+  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}"
 
   echo "Updated CHANGELOG.md"
 }
@@ -63,7 +62,7 @@ function complete_change_log() {
 # Update when adding a new app
 function create_a_release_commit() {
   git add CHANGELOG.md package*.json api/package*json mon-pix/package*.json orga/package*.json certif/package*.json admin/package*.json --update
-  git commit --message "[RELEASE] A ${NEW_VERSION_TYPE} is being released from ${OLD_PACKAGE_VERSION} to ${NEW_PACKAGE_VERSION}."
+  git commit --message "[RELEASE] A ${NEW_VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."
 
   echo "Created the release commit"
 }
