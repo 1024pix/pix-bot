@@ -41,19 +41,21 @@ function fetch_and_rebase() {
   git pull --rebase
 }
 
-  # TODO: rename to update_node_package_versions
-function update_version() {
+function update_pix_module_version() {
+  (cd "${1}" && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
+}
+
+function update_all_pix_modules_version() {
   # TODO: refacto using dynamic package.json update => find . -name package.json  ! -path '*/node_modules/*'
-  # TODO: refacto - extract to method all subpackages version update
-  (cd admin/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd api/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd certif/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd mon-pix/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd orga/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd orga/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd high-level-tests/load-testing/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd high-level-tests/e2e/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
-  (cd scripts/backup/ && npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null)
+  update_pix_module_version "admin"
+  update_pix_module_version "api"
+  update_pix_module_version "certif"
+  update_pix_module_version "mon-pix"
+  update_pix_module_version "orga"
+  update_pix_module_version "high-level-tests/load-testing"
+  update_pix_module_version "high-level-tests/e2e"
+  update_pix_module_version "scripts/backup"
+
   npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null
   NEW_PACKAGE_VERSION=$(get_package_version)
 
@@ -118,7 +120,7 @@ ensure_new_version_is_either_minor_or_patch_or_major
 echo "== Package release =="
 checkout_dev
 fetch_and_rebase
-update_version
+update_all_pix_modules_version
 complete_change_log
 create_a_release_commit
 push_commit_to_remote_dev
