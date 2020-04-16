@@ -47,14 +47,14 @@ function update_pix_module_version() {
 
 function update_all_pix_modules_version() {
   # TODO: refacto using dynamic package.json update => find . -name package.json  ! -path '*/node_modules/*'
-  update_pix_module_version "admin"
-  update_pix_module_version "api"
-  update_pix_module_version "certif"
-  update_pix_module_version "mon-pix"
-  update_pix_module_version "orga"
-  update_pix_module_version "high-level-tests/load-testing"
-  update_pix_module_version "high-level-tests/e2e"
-  update_pix_module_version "scripts/backup"
+  update_pix_module_version "admin/"
+  update_pix_module_version "api/"
+  update_pix_module_version "certif/"
+  update_pix_module_version "mon-pix/"
+  update_pix_module_version "orga/"
+  update_pix_module_version "high-level-tests/load-testing/"
+  update_pix_module_version "high-level-tests/e2e/"
+  update_pix_module_version "scripts/backup/"
 
   npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null
   NEW_PACKAGE_VERSION=$(get_package_version)
@@ -70,7 +70,17 @@ function complete_change_log() {
 
 # Update when adding a new app
 function create_a_release_commit() {
-  git add CHANGELOG.md package*.json api/package*json mon-pix/package*.json orga/package*.json certif/package*.json admin/package*.json --update
+  git add  --update \
+          CHANGELOG.md \
+          package*.json \
+          api/package*json \
+          mon-pix/package*.json \
+          orga/package*.json \
+          certif/package*.json \
+          admin/package*.json \
+          high-level-tests/load-testing/package*.json \
+          high-level-tests/e2e/package*.json \
+          scripts/backup/package*.json
   git commit --message "[RELEASE] A ${NEW_VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."
 
   echo "Created the release commit"
