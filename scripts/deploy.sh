@@ -28,7 +28,7 @@ function update_production_branch {
 
     annotated_version="${RELEASE_TAG}^{}"
     annotated_tag_hash="$(git rev-parse --quiet "${annotated_version}")"
-    git push origin "$annotated_tag_hash":prod
+    git push -f origin "$annotated_tag_hash":prod
 
     echo "Pushed changes on branch origin/prod"
 }
