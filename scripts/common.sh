@@ -16,7 +16,7 @@ function clone_repository_and_move_inside {
   REPOSITORY_FOLDER=$(mktemp -d)
   echo "Created temporary directory ${REPOSITORY_FOLDER}"
 
-  git clone "https://${GITHUB_USERNAME}:${GITHUB_PERSONNAL_ACCESS_TOKEN}@github.com/1024pix/pix.git" "${REPOSITORY_FOLDER}"
+  git clone "https://${GITHUB_USERNAME}:${GITHUB_PERSONAL_ACCESS_TOKEN}@github.com/1024pix/pix.git" "${REPOSITORY_FOLDER}"
   echo "Cloned repository to temporary directory"
 
   cd "${REPOSITORY_FOLDER}" || exit 1
