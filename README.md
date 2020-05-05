@@ -17,7 +17,7 @@ Services provided by Pix Bot:
 *1/* Get the sources
 
 ```
-git clone git@github.com:1024pix/pix-botgit && cd pix-bot
+git clone git@github.com:1024pix/pix-bot.git && cd pix-bot
 ```
 
 *2/* Execute the configuration script:
