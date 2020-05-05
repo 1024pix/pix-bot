@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git+https://github.com/1024pix/pix-bot.git"
   },
-  "author": "Jérémy Buget",
+  "author": "GIP Pix",
   "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/1024pix/pix-bot/issues"
@@ -31,7 +31,7 @@
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "scalingo-review-app-manager": "^0.3.0",
+    "scalingo-review-app-manager": "^1.0.0",
     "tsscmp": "^1.0.6"
   },
   "engines": {
