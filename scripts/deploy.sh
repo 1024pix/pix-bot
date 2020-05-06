@@ -34,7 +34,7 @@ function update_production_branch {
 }
 
 function finalize_release_on_sentry {
-    npx sentry-cli releases -o pix finalize "${VERSION_ NUMBER}"
+    npx sentry-cli releases -o pix finalize "${VERSION_NUMBER}"
     echo "Finalized release on Sentry"
 }
 
