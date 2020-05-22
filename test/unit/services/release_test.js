@@ -38,7 +38,7 @@ describe('release', function() {
     describe('#createAndDeployPixSite', async function () {
         it('should call the release pix site script', async function () {
             //when
-            await releaseService.createAndDeployPixSite('minor');
+            await releaseService.releaseAndDeployPixSite('minor');
 
             // then
             sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-site.sh minor)")));
