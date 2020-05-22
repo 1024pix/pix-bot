@@ -4,7 +4,7 @@ set -euxo pipefail
 
 source "$(dirname $0)"/common.sh
 
-VERSION_TYPE=$1
+VERSION_TYPE=(${1-""})
 
 echo "Version type ${VERSION_TYPE}"
 
@@ -31,8 +31,9 @@ function install_required_packages {
 }
 
 function create_and_deploy_release {
-  npm run release:${VERSION_TYPE}
-  echo "Deploy new release"
+  npm_arg="" && [[ -n "$VERSION_TYPE" ]]  && npm_arg=":$VERSION_TYPE"
+  npm run release${npm_arg}
+  echo "Deploy new release" ${VERSION_TYPE}
 }
 
 echo "Start deploying version ${VERSION_TYPE}…"
