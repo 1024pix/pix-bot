@@ -2,7 +2,6 @@ const { describe, it } = require('mocha');
 const sinon = require('sinon');
 const proxyquire =  require('proxyquire');
 
-
 describe('release', function() {
     let exec;
     let releaseService;
@@ -36,12 +35,38 @@ describe('release', function() {
     });
 
     describe('#createAndDeployPixSite', async function () {
-        it('should call the release pix site script', async function () {
+        it('should call the release pix site script with default', async function () {
+            //when
+            await releaseService.releaseAndDeployPixSite();
+
+            // then
+            sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-repo.sh pix-site)")));
+        });
+
+        it('should call the release pix site script with \'minor\'', async function () {
             //when
             await releaseService.releaseAndDeployPixSite('minor');
 
             // then
-            sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-site.sh minor)")));
+            sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-repo.sh pix-site minor)")));
+        });
+    });
+
+    describe('#createAndDeployPro', async function () {
+        it('should call the release pix pro script with default', async function () {
+            //when
+            await releaseService.releaseAndDeployPixPro();
+
+            // then
+            sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-repo.sh pix-pro)")));
+        });
+
+        it('should call the release pix pro script with \'minor\'', async function () {
+            //when
+            await releaseService.releaseAndDeployPixPro('minor');
+
+            // then
+            sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-repo.sh pix-pro minor)")));
         });
     });
 });

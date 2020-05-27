@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euxo pipefail
+REPOSITORY_NAME=pix
 
 source "$(dirname $0)"/common.sh
 
