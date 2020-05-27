@@ -3,6 +3,7 @@
 set -euxo pipefail
 
 CWD_DIR=$(pwd)
+REPOSITORY_NAME=pix
 
 echo "${CWD_DIR}"
 
