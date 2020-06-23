@@ -135,6 +135,7 @@ update_all_pix_modules_version
 complete_change_log
 create_a_release_commit
 push_commit_to_remote_dev
+# TODO: Wait CI status here
 echo "== Publish release =="
 checkout_master
 fetch_and_rebase
