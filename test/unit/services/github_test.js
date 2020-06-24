@@ -5,12 +5,17 @@ const axios = require('axios');
 const githubService = require('../../../lib/services/github');
 
 describe('#getPullRequests', function() {
+    let axiosGetStub;
     const items = [
         { html_url: 'http://test1.fr', title: 'PR1'},
         { html_url: 'http://test2.fr', title: 'PR2'},
     ];
     before(() => {
-        sinon.stub(axios, 'get').resolves({ data: { items: items } });
+        axiosGetStub = sinon.stub(axios, 'get');
+        axiosGetStub.resolves({ data: { items: items } });
+    });
+    after(() => {
+        axiosGetStub.restore();
     });
 
     it('should return the response for slack', async function() {

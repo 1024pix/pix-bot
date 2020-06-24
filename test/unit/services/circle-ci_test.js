@@ -17,7 +17,7 @@ describe('#isDevGreen', function() {
   });
 
   afterEach(() => {
-    sinon.restore();
+    axiosGetStub.restore();
   });
 
   it('should call Circle CI to get latest dev pipeline ID', async function() {

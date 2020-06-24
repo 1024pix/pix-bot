@@ -5,6 +5,7 @@ const axios = require('axios');
 const googleSheet = require('../../../lib/services/google-sheet');
 
 describe('#getA11YTip', function() {
+    let axiosGetStub;
     const data =
         {
             "range": "tips!A1:E500",
@@ -27,7 +28,12 @@ describe('#getA11YTip', function() {
         }
     ;
     before(() => {
-        sinon.stub(axios, 'get').resolves({ data });
+        axiosGetStub = sinon.stub(axios, 'get');
+        axiosGetStub.resolves({ data });
+    });
+
+    after(() => {
+        axiosGetStub.restore();
     });
 
     it('should return the response for slack', async function() {
