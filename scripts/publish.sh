@@ -3,7 +3,7 @@
 set -euxo pipefail
 
 CWD_DIR=$(pwd)
-REPOSITORY_NAME=pix
+REPOSITORY_NAME=1024pix/pix
 
 echo "${CWD_DIR}"
 
@@ -115,7 +115,7 @@ function push_commit_and_tag_to_remote_master() {
 
 function publish_release_on_sentry() {
   npx sentry-cli releases -o pix new -p pix-api "v${NEW_PACKAGE_VERSION}"
-  npx sentry-cli releases -o pix set-commits --commit "1024pix/pix@v${NEW_PACKAGE_VERSION}" "v${NEW_PACKAGE_VERSION}"
+  npx sentry-cli releases -o pix set-commits --commit "${REPOSITORY_NAME}@v${NEW_PACKAGE_VERSION}" "v${NEW_PACKAGE_VERSION}"
 
   echo "Published release on Sentry"
 }
