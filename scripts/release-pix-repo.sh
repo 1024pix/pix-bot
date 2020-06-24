@@ -10,8 +10,8 @@ VERSION_TYPE=(${2-""})
 echo "Version type ${VERSION_TYPE} for ${REPOSITORY_NAME}"
 
 function install_required_packages {
-  npm install
   echo "Install packages"
+  npm ci
 }
 
 function create_and_deploy_release {
