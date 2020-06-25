@@ -5,8 +5,8 @@ REPOSITORY_NAME=1024pix/pix
 
 source "$(dirname $0)"/common.sh
 
-RELEASE_TAG=$1
-ENVIRONMENT=$2
+ENVIRONMENT=$1
+RELEASE_TAG=${2:-$NEW_PACKAGE_VERSION}
 
 echo "Version number ${RELEASE_TAG}"
 
