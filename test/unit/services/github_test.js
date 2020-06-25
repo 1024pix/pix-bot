@@ -1,6 +1,6 @@
 const { describe, it } = require('mocha');
 const { expect } = require('chai');
-const sinon = require('sinon');
+const { sinon } = require('../test-helper');
 const axios = require('axios');
 const githubService = require('../../../lib/services/github');
 
@@ -9,7 +9,7 @@ describe('#getPullRequests', function() {
         { html_url: 'http://test1.fr', title: 'PR1'},
         { html_url: 'http://test2.fr', title: 'PR2'},
     ];
-    before(() => {
+    beforeEach(() => {
         sinon.stub(axios, 'get').resolves({ data: { items: items } });
     });
 
