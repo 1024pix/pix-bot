@@ -102,6 +102,7 @@ function tag_release_commit() {
 function publish_release_on_sentry() {
   npx sentry-cli releases -o pix new -p pix-api "v${NEW_PACKAGE_VERSION}"
   npx sentry-cli releases -o pix set-commits --commit "${REPOSITORY_NAME}@v${NEW_PACKAGE_VERSION}" "v${NEW_PACKAGE_VERSION}"
+  npx sentry-cli releases -o pix finalize "${RELEASE_TAG}"
 
   echo "Published release on Sentry"
 }
