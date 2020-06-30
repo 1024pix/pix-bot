@@ -87,30 +87,16 @@ function create_a_release_commit() {
   echo "Created the release commit"
 }
 
-function push_commit_to_remote_dev() {
+function push_commit_and_tag_to_remote_dev() {
   git push origin dev
+  git push origin "v${NEW_PACKAGE_VERSION}"
 
   echo "Pushed release commit on branch origin/dev"
 }
 
-function checkout_master() {
-  git checkout master >>/dev/null 2>&1
-
-  echo "Checked out branch master"
-}
-
-function create_a_merge_commit_of_dev_into_master_and_tag_it() {
-  git merge dev --no-edit
+function tag_release_commit() {
   git tag --annotate "v${NEW_PACKAGE_VERSION}" --message "v${NEW_PACKAGE_VERSION}"
-
-  echo "Merged changes from dev into master and created annotated tag"
-}
-
-function push_commit_and_tag_to_remote_master() {
-  git push origin master
-  git push origin "v${NEW_PACKAGE_VERSION}"
-
-  echo "Pushed changes on branch origin/master with tag"
+  echo "Created annotated tag"
 }
 
 function publish_release_on_sentry() {
@@ -124,7 +110,6 @@ echo -e "Preparing a new release.\n"
 
 echo "== Clone and move into Pix repository =="
 clone_repository_and_move_inside
-configure_git_user_information
 echo "== Validate context =="
 ensure_no_uncommited_changes_are_present
 ensure_new_version_is_either_minor_or_patch_or_major
@@ -134,12 +119,8 @@ fetch_and_rebase
 update_all_pix_modules_version
 complete_change_log
 create_a_release_commit
-push_commit_to_remote_dev
-echo "== Publish release =="
-checkout_master
-fetch_and_rebase
-create_a_merge_commit_of_dev_into_master_and_tag_it
-push_commit_and_tag_to_remote_master
+tag_release_commit
+push_commit_and_tag_to_remote_dev
 publish_release_on_sentry
 
 echo -e "Release publication ${GREEN}succeeded${RESET_COLOR}."
