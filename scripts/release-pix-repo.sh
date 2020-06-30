@@ -11,7 +11,7 @@ echo "Version type ${VERSION_TYPE} for ${REPOSITORY_NAME}"
 
 function install_required_packages {
   echo "Install packages"
-  npm ci
+  npm ci --dev --no-optional
 }
 
 function create_and_deploy_release {
