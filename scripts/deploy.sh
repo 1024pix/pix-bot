@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -euxo pipefail
-REPOSITORY_NAME=1024pix/pix
+REPOSITORY_NAME=${REPOSITORY_NAME:-1024/pix}
 
 source "$(dirname $0)"/common.sh
 

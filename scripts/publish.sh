@@ -3,8 +3,7 @@
 set -euxo pipefail
 
 CWD_DIR=$(pwd)
-REPOSITORY_NAME=1024pix/pix
-
+REPOSITORY_NAME=${REPOSITORY_NAME:-1024/pix}
 echo "${CWD_DIR}"
 
 source "${CWD_DIR}/scripts/common.sh"
