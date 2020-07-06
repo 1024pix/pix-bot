@@ -1,4 +1,5 @@
 require('dotenv').config();
+const config = require('../lib/config');
 
 const ReviewAppManager = require('scalingo-review-app-manager').ReviewAppManager;
 
@@ -6,8 +7,8 @@ const server = require('../lib/server');
 
 const init = async () => {
 
-  const scalingoToken = process.env.SCALINGO_TOKEN;
-  const scalingoApiUrl = process.env.SCALINGO_API_URL;
+  const scalingoToken = config.scalingo.token;
+  const scalingoApiUrl = config.scalingo.apiUrl;
   const stopCronTime = process.env.STOP_CRON_TIME;
   const restartCronTime = process.env.RESTART_CRON_TIME;
   const timeZone = process.env.TIME_ZONE || 'Europe/Paris';
