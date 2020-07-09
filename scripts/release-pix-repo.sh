@@ -4,10 +4,11 @@ set -euxo pipefail
 
 source "$(dirname $0)"/common.sh
 
-REPOSITORY_NAME=(${1})
-VERSION_TYPE=(${2-""})
+GITHUB_OWNER=(${1})
+GITHUB_REPOSITORY=(${2})
+VERSION_TYPE=(${3-""})
 
-echo "Version type ${VERSION_TYPE} for ${REPOSITORY_NAME}"
+echo "Version type ${VERSION_TYPE} for ${GITHUB_OWNER}/${GITHUB_REPOSITORY}"
 
 function install_required_packages {
   echo "Install packages"
@@ -27,4 +28,4 @@ configure_git_user_information
 install_required_packages
 create_and_deploy_release
 
-echo -e "Release deployment for ${REPOSITORY_NAME} ${GREEN}succeeded${RESET_COLOR}."
+echo -e "Release deployment for ${GITHUB_OWNER}/${GITHUB_REPOSITORY} ${GREEN}succeeded${RESET_COLOR}."

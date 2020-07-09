@@ -1,7 +1,8 @@
 #!/bin/bash
 
 set -euxo pipefail
-REPOSITORY_NAME=${REPOSITORY_NAME:-1024/pix}
+GITHUB_OWNER=${GITHUB_OWNER:-1024pix}
+GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-pix}
 
 source "$(dirname $0)"/common.sh
 

@@ -3,7 +3,8 @@
 set -euxo pipefail
 
 CWD_DIR=$(pwd)
-REPOSITORY_NAME=${REPOSITORY_NAME:-1024/pix}
+GITHUB_OWNER=${GITHUB_OWNER:-1024pix}
+GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-pix}
 echo "${CWD_DIR}"
 
 source "${CWD_DIR}/scripts/common.sh"
@@ -96,7 +97,7 @@ function tag_release_commit() {
 
 function publish_release_on_sentry() {
   npx sentry-cli releases -o pix new -p pix-api "v${NEW_PACKAGE_VERSION}"
-  npx sentry-cli releases -o pix set-commits --commit "${REPOSITORY_NAME}@v${NEW_PACKAGE_VERSION}" "v${NEW_PACKAGE_VERSION}"
+  npx sentry-cli releases -o pix set-commits --commit "${GITHUB_OWNER}/${GITHUB_REPOSITORY}@v${NEW_PACKAGE_VERSION}" "v${NEW_PACKAGE_VERSION}"
   npx sentry-cli releases -o pix finalize "${RELEASE_TAG}"
 
   echo "Published release on Sentry"
@@ -117,6 +118,6 @@ complete_change_log
 create_a_release_commit
 tag_release_commit
 push_commit_and_tag_to_remote_dev
-#publish_release_on_sentry
+publish_release_on_sentry
 
 echo -e "Release publication ${GREEN}succeeded${RESET_COLOR}."

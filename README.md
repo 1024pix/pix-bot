@@ -43,12 +43,12 @@ Prerequisites: The repository shall contain `dev`, `master` and `publish` branch
 
 Command to run the `publish` script:
 ```sh
-GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# REPOSITORY_NAME=#organization_name/repository_name# scripts/publish.sh (path|minor|major)
+GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# scripts/publish.sh (path|minor|major)
 ```
 
 Command to run the `deploy` script:
 ```sh
-GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# REPOSITORY_NAME=#organization_name/repository_name# NEW_PACKAGE_VERSION=#version_to_deploy# scripts/deploy.sh (recette|production)
+GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# NEW_PACKAGE_VERSION=#version_to_deploy# scripts/deploy.sh (recette|production)
 ```
 ## License
 
