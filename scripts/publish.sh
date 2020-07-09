@@ -10,10 +10,6 @@ source "${CWD_DIR}/scripts/common.sh"
 
 NEW_VERSION_TYPE=$1
 
-function get_package_version() {
-  node -p -e "require('./package.json').version"
-}
-
 function ensure_no_uncommited_changes_are_present() {
   if [ -n "$(git status --porcelain)" ]; then
     echo -e "${RED}You have uncommitted changes!${RESET_COLOR} Please commit or stash your changes first.\n"

@@ -29,3 +29,7 @@ function configure_git_user_information {
   echo "Set Git user information"
 }
 
+function get_package_version() {
+  node -p -e "require('./package.json').version"
+}
+
