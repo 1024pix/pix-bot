@@ -118,6 +118,6 @@ complete_change_log
 create_a_release_commit
 tag_release_commit
 push_commit_and_tag_to_remote_dev
-#publish_release_on_sentry
+publish_release_on_sentry
 
 echo -e "Release publication ${GREEN}succeeded${RESET_COLOR}."
