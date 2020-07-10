@@ -11,7 +11,7 @@ describe('Scalingo client', () => {
     it('should return the Scalingo client instance for recette', async () => {
       // given
       sinon.stub(scalingo, 'clientFromToken')
-        .withArgs('tk-us-scalingo-token', { apiUrl: 'https://api.osc-fr1.scalingo.com'})
+        .withArgs('tk-us-scalingo-token-recette', { apiUrl: 'https://api.osc-fr1.scalingo.com'})
         .resolves({ apiClient: () => {} });
       // when
       const scalingoClient = await ScalingoClient.getInstance('recette');
@@ -23,7 +23,7 @@ describe('Scalingo client', () => {
     it('should return the Scalingo client instance for production', async () => {
       // given
       sinon.stub(scalingo, 'clientFromToken')
-        .withArgs('tk-us-scalingo-token', { apiUrl: 'https://api.osc-secnum-fr1.scalingo.com'})
+        .withArgs('tk-us-scalingo-token-production', { apiUrl: 'https://api.osc-secnum-fr1.scalingo.com'})
         .resolves({ apiClient: () => {} });
       // when
       const scalingoClient = await ScalingoClient.getInstance('production');
