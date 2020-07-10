@@ -2,7 +2,7 @@ const { describe, it } = require('mocha');
 const sinon = require('sinon');
 const proxyquire =  require('proxyquire');
 
-describe('release', function() {
+describe('releases', function() {
     let exec;
     let releaseService;
 
