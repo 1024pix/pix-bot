@@ -11,7 +11,7 @@ describe('Scalingo client', () => {
     it('should return the Scalingo client instance for recette', async () => {
       // given
       sinon.stub(scalingo, 'clientFromToken')
-        .withArgs('tk-us-scalingo-token-recette', { apiUrl: 'https://api.osc-fr1.scalingo.com'})
+        .withArgs('tk-us-scalingo-token-recette', { apiUrl: 'https://scalingo.recette' })
         .resolves({ apiClient: () => {} });
       // when
       const scalingoClient = await ScalingoClient.getInstance('recette');
@@ -19,11 +19,11 @@ describe('Scalingo client', () => {
       expect(scalingoClient).to.be.an.instanceof(ScalingoClient);
       expect(scalingoClient.client).to.exist;
     });
-  
+
     it('should return the Scalingo client instance for production', async () => {
       // given
       sinon.stub(scalingo, 'clientFromToken')
-        .withArgs('tk-us-scalingo-token-production', { apiUrl: 'https://api.osc-secnum-fr1.scalingo.com'})
+        .withArgs('tk-us-scalingo-token-production', { apiUrl: 'https://scalingo.production' })
         .resolves({ apiClient: () => {} });
       // when
       const scalingoClient = await ScalingoClient.getInstance('production');
@@ -31,7 +31,7 @@ describe('Scalingo client', () => {
       expect(scalingoClient).to.be.an.instanceof(ScalingoClient);
       expect(scalingoClient.client).to.exist;
     });
-  
+
     it('should throw an error when scalingo authentication failed', async () => {
       // given
       sinon.stub(scalingo, 'clientFromToken').rejects(new Error('Invalid credentials'));
@@ -43,14 +43,14 @@ describe('Scalingo client', () => {
       } catch (e) {
         expect(e.message).to.equal('Invalid credentials');
         expect(scalingoClient).to.be.undefined;
-      } 
+      }
     });
   });
 
   describe('#ScalingoClient.deployFromArchive', () => {
     let apiClientPost;
     let scalingoClient;
-  
+
     beforeEach(async () => {
       apiClientPost = sinon.stub();
       sinon.stub(scalingo, 'clientFromToken')
@@ -58,7 +58,7 @@ describe('Scalingo client', () => {
 
       scalingoClient = await ScalingoClient.getInstance('production');
     });
-  
+
     it('should not deploy without app given', async () => {
       try {
         await scalingoClient.deployFromArchive(null, 'v1.0');
@@ -76,7 +76,7 @@ describe('Scalingo client', () => {
         expect(e.message).to.equal('No release tag to deploy.');
       }
     });
-  
+
     it('should deploy an application for a given tag', async () => {
       // given
       // when
@@ -84,8 +84,8 @@ describe('Scalingo client', () => {
       // then
       sinon.assert.calledWithExactly(
         apiClientPost,
-        '/apps/pix-app-production/deployments', 
-        { 
+        '/apps/pix-app-production/deployments',
+        {
           deployment: {
             git_ref: 'v1.0',
             source_url: `https://github.com/github-owner/github-repository/archive/v1.0.tar.gz`
@@ -97,6 +97,7 @@ describe('Scalingo client', () => {
 
     it('should failed when application does not exists', async () => {
       // given
+      sinon.stub(console, 'error');
       apiClientPost.rejects(new Error());
       // when
       try {
