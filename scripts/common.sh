@@ -16,8 +16,8 @@ function clone_repository_and_move_inside {
   REPOSITORY_FOLDER=$(mktemp -d)
   echo "Created temporary directory ${REPOSITORY_FOLDER}"
 
-  git clone "https://${GITHUB_USERNAME}:${GITHUB_PERSONAL_ACCESS_TOKEN}@github.com/1024pix/${REPOSITORY_NAME}.git" "${REPOSITORY_FOLDER}"
-  echo "Cloned repository ${REPOSITORY_NAME} to temporary directory"
+  git clone "https://${GITHUB_USERNAME}:${GITHUB_PERSONAL_ACCESS_TOKEN}@github.com/${GITHUB_OWNER}/${GITHUB_REPOSITORY}.git" "${REPOSITORY_FOLDER}"
+  echo "Cloned repository ${GITHUB_OWNER}/${GITHUB_REPOSITORY} to temporary directory"
 
   cd "${REPOSITORY_FOLDER}" || exit 1
   echo "Moved to repository folder"
@@ -29,3 +29,6 @@ function configure_git_user_information {
   echo "Set Git user information"
 }
 
+function get_package_version() {
+  node -p -e "require('./package.json').version"
+}
