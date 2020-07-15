@@ -115,6 +115,7 @@ checkout_dev
 fetch_and_rebase
 update_all_pix_modules_version
 complete_change_log
+configure_git_user_information
 create_a_release_commit
 tag_release_commit
 push_commit_and_tag_to_remote_dev
