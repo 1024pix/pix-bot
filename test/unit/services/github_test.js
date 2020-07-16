@@ -48,7 +48,7 @@ describe('#getLatestReleaseTag', () => {
 
   it('should call GitHub "Tags" API', async () => {
     // given
-    const scope = nock('https://api.github.com')
+    nock('https://api.github.com')
       .get('/repos/github-owner/github-repository/tags')
       .reply(200, [
         { "name": "v2.171.0", },
@@ -57,6 +57,22 @@ describe('#getLatestReleaseTag', () => {
 
     // when
     const response = await githubService.getLatestReleaseTag();
+
+    // then
+    expect(response).to.equal('v2.171.0');
+  })
+
+  it('should call GitHub "Tags" API for the given repository', async () => {
+    // given
+    nock('https://api.github.com')
+      .get('/repos/github-owner/given-repository/tags')
+      .reply(200, [
+        { "name": "v2.171.0", },
+        { "name": "v2.170.0", },
+      ]);
+
+    // when
+    const response = await githubService.getLatestReleaseTag('given-repository');
 
     // then
     expect(response).to.equal('v2.171.0');
