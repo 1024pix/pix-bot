@@ -27,10 +27,10 @@ describe('releases', function() {
         });
     });
 
-    describe('#createAndDeployPixSite', async function () {
+    describe('#publishPixSite', async function () {
         it('should call the release pix site script with default', async function () {
             //when
-            await releasesService.releaseAndDeployPixSite();
+            await releasesService.publishPixSite();
 
             // then
             sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-repo.sh 1024pix pix-site)")));
@@ -38,10 +38,24 @@ describe('releases', function() {
 
         it('should call the release pix site script with \'minor\'', async function () {
             //when
-            await releasesService.releaseAndDeployPixSite('minor');
+            await releasesService.publishPixSite('minor');
 
             // then
             sinon.assert.calledWith(exec, sinon.match(new RegExp(".*(\/scripts\/release-pix-repo.sh 1024pix pix-site minor)")));
+        });
+    });
+
+    describe('#deployPixSite', async function() {
+        it('should deploy the default pix site', async function() {
+            // given
+            const scalingoClient = new ScalingoClient(null, 'production');
+            scalingoClient.deployFromArchive = sinon.stub();
+            scalingoClient.deployFromArchive.withArgs('pix-site', 'v1.0.0', 'pix-site').resolves('OK');
+            sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
+            // when
+            const response = await releasesService.deployPixSite('V1.0.0 ');
+            // then
+            expect(response).to.equal('OK');
         });
     });
 

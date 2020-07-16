@@ -95,6 +95,24 @@ describe('Scalingo client', () => {
       expect(result).to.be.equal('Deployed pix-app-production v1.0');
     });
 
+    it('should deploy an application for a given repository', async () => {
+      // given
+      // when
+      const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', 'given-repository');
+      // then
+      sinon.assert.calledWithExactly(
+        apiClientPost,
+        '/apps/pix-app-production/deployments',
+        {
+          deployment: {
+            git_ref: 'v1.0',
+            source_url: `https://github.com/github-owner/given-repository/archive/v1.0.tar.gz`
+          },
+        }
+      );
+      expect(result).to.be.equal('Deployed pix-app-production v1.0');
+    });
+
     it('should failed when application does not exists', async () => {
       // given
       sinon.stub(console, 'error');

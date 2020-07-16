@@ -15,10 +15,9 @@ function install_required_packages {
   npm ci --dev --no-optional
 }
 
-function create_and_deploy_release {
+function create_release {
   npm_arg="" && [[ -n "$VERSION_TYPE" ]]  && npm_arg=":$VERSION_TYPE"
   npm run release${npm_arg}
-  echo "Deploy new release" ${VERSION_TYPE}
 }
 
 echo "Start deploying version ${VERSION_TYPE}…"
@@ -26,6 +25,7 @@ echo "Start deploying version ${VERSION_TYPE}…"
 clone_repository_and_move_inside
 configure_git_user_information
 install_required_packages
-create_and_deploy_release
+create_release
+push_commit_and_tag_to_remote_dev
 
-echo -e "Release deployment for ${GITHUB_OWNER}/${GITHUB_REPOSITORY} ${GREEN}succeeded${RESET_COLOR}."
+echo -e "Release publication for ${GITHUB_OWNER}/${GITHUB_REPOSITORY} ${GREEN}succeeded${RESET_COLOR} (${VERSION_TYPE})."
