@@ -83,13 +83,6 @@ function create_a_release_commit() {
   echo "Created the release commit"
 }
 
-function push_commit_and_tag_to_remote_dev() {
-  git push origin dev
-  git push origin "v${NEW_PACKAGE_VERSION}"
-
-  echo "Pushed release commit on branch origin/dev"
-}
-
 function tag_release_commit() {
   git tag --annotate "v${NEW_PACKAGE_VERSION}" --message "v${NEW_PACKAGE_VERSION}"
   echo "Created annotated tag"
