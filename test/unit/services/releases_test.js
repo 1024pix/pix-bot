@@ -45,6 +45,20 @@ describe('releases', function() {
         });
     });
 
+    describe('#deployPixSite', async function() {
+        it('should deploy the default pix site', async function() {
+            // given
+            const scalingoClient = new ScalingoClient(null, 'production');
+            scalingoClient.deployFromArchive = sinon.stub();
+            scalingoClient.deployFromArchive.withArgs('pix-site', 'v1.0.0', 'pix-site').resolves('OK');
+            sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
+            // when
+            const response = await releasesService.deployPixSite('V1.0.0 ');
+            // then
+            expect(response).to.equal('OK');
+        });
+    });
+
     describe('#createAndDeployPro', async function () {
         it('should call the release pix pro script with default', async function () {
             //when
