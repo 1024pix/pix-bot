@@ -143,14 +143,14 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
         .resolves({ 
           data: [
             {
-              "name": "v2.173.0",
-              "zipball_url": "https://api.github.com/repos/1024pix/pix/zipball/v2.173.0",
-              "tarball_url": "https://api.github.com/repos/1024pix/pix/tarball/v2.173.0",
-              "commit": {
-                "sha": "4c3ad3d377c37023e835ad674578cf06fcb4de7a",
-                "url": "https://api.github.com/repos/1024pix/pix/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a"
+              'name': 'v2.173.0',
+              'zipball_url': 'https://api.github.com/repos/1024pix/pix/zipball/v2.173.0',
+              'tarball_url': 'https://api.github.com/repos/1024pix/pix/tarball/v2.173.0',
+              'commit': {
+                'sha': '4c3ad3d377c37023e835ad674578cf06fcb4de7a',
+                'url': 'https://api.github.com/repos/1024pix/pix/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a'
               },
-              "node_id": "MDM6UmVmMTI2ODUyMzMxOnJlZnMvdGFncy92Mi4xNzMuMA=="
+              'node_id': 'MDM6UmVmMTI2ODUyMzMxOnJlZnMvdGFncy92Mi4xNzMuMA=='
             },
           ]
         });
@@ -158,16 +158,16 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
       axiosStub.withArgs('https://api.github.com/repos/1024pix/pix/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a')
         .resolves({ 
           data: {
-            "commit": {
-              "committer": {
-                "name": "pix-bot",
-                "email": "service+pixbot@pix.fr",
-                "date": "2019-01-18T15:29:51Z"
+            'commit': {
+              'committer': {
+                'name': 'pix-bot',
+                'email': 'service+pixbot@pix.fr',
+                'date': '2019-01-18T15:29:51Z'
               }
             }
           }
         });
-    })
+    });
     it('should return the date of the last MEP commit', async () => {
       // given
       const expectedDate = '2019-01-18T15:29:51Z';
@@ -175,7 +175,7 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
       const date = await getLastMEPDate();
       // then
       expect(date).to.be.equal(expectedDate);
-    })
-  })
+    });
+  });
 
 });
