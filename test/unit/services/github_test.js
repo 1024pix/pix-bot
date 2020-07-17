@@ -36,7 +36,7 @@ describe('#getPullRequests', function() {
     const expectedUrl = 'https://api.github.com/search/issues?q=is:pr+is:open+archived:false+sort:updated-desc+user:1024pix+label:Tech%20Review%20Needed';
 
     // when
-    const response = await githubService.getPullRequests('Tech Review Needed');
+    await githubService.getPullRequests('Tech Review Needed');
 
     // then
     sinon.assert.calledWith(axios.get, expectedUrl);
@@ -51,8 +51,8 @@ describe('#getLatestReleaseTag', () => {
     nock('https://api.github.com')
       .get('/repos/github-owner/github-repository/tags')
       .reply(200, [
-        { "name": "v2.171.0", },
-        { "name": "v2.170.0", },
+        { 'name': 'v2.171.0', },
+        { 'name': 'v2.170.0', },
       ]);
 
     // when
@@ -60,15 +60,15 @@ describe('#getLatestReleaseTag', () => {
 
     // then
     expect(response).to.equal('v2.171.0');
-  })
+  });
 
   it('should call GitHub "Tags" API for the given repository', async () => {
     // given
     nock('https://api.github.com')
       .get('/repos/github-owner/given-repository/tags')
       .reply(200, [
-        { "name": "v2.171.0", },
-        { "name": "v2.170.0", },
+        { 'name': 'v2.171.0', },
+        { 'name': 'v2.170.0', },
       ]);
 
     // when
@@ -76,6 +76,6 @@ describe('#getLatestReleaseTag', () => {
 
     // then
     expect(response).to.equal('v2.171.0');
-  })
+  });
 
-})
+});

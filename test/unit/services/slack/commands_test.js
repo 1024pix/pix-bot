@@ -17,7 +17,7 @@ describe('Services | Slack | Commands', () => {
 
     // when
     await createAndDeployPixSiteRelease(payload);
-  })
+  });
 
   it('should publish a new release', () => {
     // then
@@ -33,4 +33,4 @@ describe('Services | Slack | Commands', () => {
     // then
     sinon.assert.calledWith(releasesServices.deployPixSite, 'v1.0.0');
   });
-})
+});

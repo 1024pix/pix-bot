@@ -11,7 +11,8 @@
     "deploy:patch": "npm version patch && npm run deploy:tag",
     "deploy:tag": "git push --tags",
     "start": "node bin/www",
-    "test": "NODE_ENV=test mocha --recursive --exit --reporter dot test"
+    "test": "NODE_ENV=test mocha --recursive --exit --reporter dot test",
+    "lint": "eslint lib/* test/*"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "eslint": "^7.4.0",
     "mocha": "^7.1.1",
     "nock": "^13.0.2",
     "sinon": "^9.0.1"
