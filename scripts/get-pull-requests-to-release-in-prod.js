@@ -19,6 +19,14 @@ function getTheCommitDate(RawDataCommit) {
   return RawDataCommit.commit.committer.date;
 }
 
+async function getLastMEPDate() {
+  const tags = await axios.get('https://api.github.com/repos/1024pix/pix/tags');
+  const commitUrl = tags.data[0].commit.url;
+
+  const commit = await axios.get(commitUrl);
+  return getTheCommitDate(commit.data);
+}
+
 function displayPullRequest(pr) {
   return `- [#${pr.number}](${pr.html_url}) ${pr.title}`;
 }
@@ -41,37 +49,34 @@ function getHeadOfChangelog(tagVersion) {
   return '## v' + tagVersion + date + '\n';
 }
 
-function main() {
+async function main() {
   const tagVersion = process.argv[2];
-  let dateOfLastMEP;
 
-  axios(getTheLastCommitOnMaster())
-    .then(({ data: lastCommit }) => {
-      dateOfLastMEP = getTheCommitDate(lastCommit);
-      return axios(buildRequestObject());
-    })
-    .then(({ data: pullRequests }) => {
-      const newChangeLogLines = [];
+  try {
+    const dateOfLastMEP = await getLastMEPDate();
 
-      newChangeLogLines.push(getHeadOfChangelog(tagVersion));
-      const pullRequestsSinceLastMEP = filterPullRequest(pullRequests, dateOfLastMEP);
+    const { data: pullRequests } = await axios(buildRequestObject());
 
-      const orderedPR = orderPr(pullRequestsSinceLastMEP);
-      newChangeLogLines.push(...orderedPR.map(displayPullRequest));
-      newChangeLogLines.push('');
+    const newChangeLogLines = [];
 
-      const currentChangeLog = fs.readFileSync(CHANGELOG_FILE, 'utf-8').split('\n');
+    newChangeLogLines.push(getHeadOfChangelog(tagVersion));
+    const pullRequestsSinceLastMEP = filterPullRequest(pullRequests, dateOfLastMEP);
 
-      currentChangeLog.splice(CHANGELOG_HEADER_LINES, 0, ...newChangeLogLines);
+    const orderedPR = orderPr(pullRequestsSinceLastMEP);
+    newChangeLogLines.push(...orderedPR.map(displayPullRequest));
+    newChangeLogLines.push('');
 
-      console.log(`Writing to ${CHANGELOG_FILE}`);
+    const currentChangeLog = fs.readFileSync(CHANGELOG_FILE, 'utf-8').split('\n');
 
-      fs.writeFileSync(CHANGELOG_FILE, currentChangeLog.join('\n'));
-    })
-    .catch((e)=>{
-      console.log(e);
-      process.exit(1);
-    });
+    currentChangeLog.splice(CHANGELOG_HEADER_LINES, 0, ...newChangeLogLines);
+
+    console.log(`Writing to ${CHANGELOG_FILE}`);
+
+    fs.writeFileSync(CHANGELOG_FILE, currentChangeLog.join('\n'));
+  } catch(e) {
+    console.log(e);
+    process.exit(1);
+  }
 }
 
 /*=================== tests =============================*/
@@ -85,5 +90,6 @@ if (process.env.NODE_ENV !== 'test') {
     orderPr,
     getHeadOfChangelog,
     getTheCommitDate,
+    getLastMEPDate,
   };
 }
