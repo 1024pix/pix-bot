@@ -30,30 +30,30 @@ describe('releases', function() {
   describe('#publishPixSite', async function () {
     it('should call the release pix site script with default', async function () {
       //when
-      await releasesService.publishPixSite();
+      await releasesService.publishPixSite('pix-site');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh 1024pix pix-site)')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site $')));
     });
 
-    it('should call the release pix site script with \'minor\'', async function () {
+    it('should call the release pix pro script with \'minor\'', async function () {
       //when
-      await releasesService.publishPixSite('minor');
+      await releasesService.publishPixSite('pix-site-pro', 'minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh 1024pix pix-site minor)')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site-pro minor$')));
     });
   });
 
   describe('#deployPixSite', async function() {
-    it('should deploy the default pix site', async function() {
+    it('should deploy the pix site pro', async function() {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
-      scalingoClient.deployFromArchive.withArgs('pix-site', 'v1.0.0', 'pix-site').resolves('OK');
+      scalingoClient.deployFromArchive.withArgs('app-name', 'v1.0.0', 'pix-site-pro').resolves('OK');
       sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
       // when
-      const response = await releasesService.deployPixSite('V1.0.0 ');
+      const response = await releasesService.deployPixSite('Pix-Site-Pro', 'app-name', 'V1.0.0 ');
       // then
       expect(response).to.equal('OK');
     });
@@ -93,7 +93,7 @@ describe('#deploy', async function () {
     sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-app3', 'v1.0');
     expect(response).to.deep.equal(['OK', 'OK', 'OK']);
   });
-  
+
   it('should trigger deployments of managed applications', async () => {
     // given
     const scalingoClient = new ScalingoClient(null, 'production');
