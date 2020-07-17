@@ -18,6 +18,7 @@ function install_required_packages {
 function create_release {
   npm_arg="" && [[ -n "$VERSION_TYPE" ]]  && npm_arg=":$VERSION_TYPE"
   npm run release${npm_arg}
+  NEW_PACKAGE_VERSION=$(get_package_version)
 }
 
 echo "Start deploying version ${VERSION_TYPE}…"
