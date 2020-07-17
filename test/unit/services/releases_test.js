@@ -46,14 +46,14 @@ describe('releases', function() {
   });
 
   describe('#deployPixSite', async function() {
-    it('should deploy the default pix site', async function() {
+    it('should deploy the pix site pro', async function() {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
-      scalingoClient.deployFromArchive.withArgs('pix-site', 'v1.0.0', 'pix-site').resolves('OK');
+      scalingoClient.deployFromArchive.withArgs('app-name', 'v1.0.0', 'pix-site-pro').resolves('OK');
       sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
       // when
-      const response = await releasesService.deployPixSite('V1.0.0 ');
+      const response = await releasesService.deployPixSite('Pix-Site-Pro', 'app-name', 'V1.0.0 ');
       // then
       expect(response).to.equal('OK');
     });
