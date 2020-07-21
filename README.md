@@ -50,6 +50,16 @@ Command to run the `deploy` script:
 ```sh
 GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# NEW_PACKAGE_VERSION=#version_to_deploy# scripts/deploy.sh (recette|production)
 ```
+
+A specific slack command has been created to test a release for a specific [repository](https://github.com/1024pix/pix-bot-release-test)
+
+The Url of the command is
+ 
+_/slack/commands/create-and-deploy-pix-bot-test-release_
+
+you can provide a type of release: _minor_/_major_/_bugfix_, _minor_ is the default
+
+
 ## License
 
 Copyright (c) 2020 GIP PIX.
