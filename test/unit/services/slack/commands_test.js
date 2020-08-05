@@ -15,27 +15,41 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployPixSiteRelease', () => {
-    beforeEach(async () => {
-      // given
-      const payload = { text: 'minor' };
-      // when
-      await createAndDeployPixSiteRelease(payload);
+    describe('when releaseType is set to minor', () => {
+      beforeEach(async () => {
+        // given
+        const payload = { text: 'minor' };
+        // when
+        await createAndDeployPixSiteRelease(payload);
+      });
+
+      it('should publish a new release', () => {
+        // then
+        sinon.assert.calledWith(releasesServices.publishPixSite, 'pix-site', 'minor');
+      });
+
+      it('should retrieve the last release tag from GitHub', () => {
+        // then
+        sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-site');
+      });
+
+      it('should deploy the release', () => {
+        // then
+        sinon.assert.calledWith(releasesServices.deployPixSite, 'pix-site', 'pix-site', 'v1.0.0');
+      });
     });
 
-    it('should publish a new release', () => {
-      // then
-      sinon.assert.calledWith(releasesServices.publishPixSite, 'pix-site', 'minor');
+    describe('when releaseType is not set to a valid value', () => {
+      it('should publish a new minor release', async () => {
+        // given
+        const payload = { text: '' };
+        // when
+        await createAndDeployPixSiteRelease(payload);
+        // then
+        sinon.assert.calledWith(releasesServices.publishPixSite, 'pix-site', 'minor');
+      });
     });
 
-    it('should retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-site');
-    });
-
-    it('should deploy the release', () => {
-      // then
-      sinon.assert.calledWith(releasesServices.deployPixSite, 'pix-site', 'pix-site', 'v1.0.0');
-    });
   });
 
   describe('#createAndDeployPixProRelease', () => {
