@@ -28,14 +28,6 @@ describe('releases', function() {
   });
 
   describe('#publishPixSite', async function () {
-    it('should call the release pix site script with default', async function () {
-      //when
-      await releasesService.publishPixSite('pix-site');
-
-      // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site $')));
-    });
-
     it('should call the release pix pro script with \'minor\'', async function () {
       //when
       await releasesService.publishPixSite('pix-site-pro', 'minor');
