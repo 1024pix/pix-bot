@@ -7,16 +7,20 @@ const fs = require('fs');
 const CHANGELOG_FILE = 'CHANGELOG.md';
 const CHANGELOG_HEADER_LINES = 2;
 
-function buildRequestObject(repoOwner, repoName) {
-  return `https://api.github.com/repos/${repoOwner}/${repoName}/pulls?state=closed&sort=updated&direction=desc'`
+function buildRequestObject() {
+  return 'https://api.github.com/repos/1024pix/pix/pulls?state=closed&sort=updated&direction=desc';
+}
+
+function getTheLastCommitOnMaster() {
+  return 'https://api.github.com/repos/1024pix/pix/commits/master';
 }
 
 function getTheCommitDate(RawDataCommit) {
   return RawDataCommit.commit.committer.date;
 }
 
-async function getLastMEPDate(repoOwner, repoName) {
-  const tags = await axios.get(`https://api.github.com/repos/${repoOwner}/${repoName}/tags`);
+async function getLastMEPDate() {
+  const tags = await axios.get('https://api.github.com/repos/1024pix/pix/tags');
   const commitUrl = tags.data[0].commit.url;
 
   const commit = await axios.get(commitUrl);
@@ -47,13 +51,11 @@ function getHeadOfChangelog(tagVersion) {
 
 async function main() {
   const tagVersion = process.argv[2];
-  const repoOwner = process.argv[3];
-  const repoName = process.argv[4];
 
   try {
-    const dateOfLastMEP = await getLastMEPDate(repoOwner, repoName);
+    const dateOfLastMEP = await getLastMEPDate();
 
-    const { data: pullRequests } = await axios(buildRequestObject(repoOwner, repoName));
+    const { data: pullRequests } = await axios(buildRequestObject());
 
     const newChangeLogLines = [];
 
