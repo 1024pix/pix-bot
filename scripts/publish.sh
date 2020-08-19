@@ -60,7 +60,7 @@ function update_all_pix_modules_version() {
 }
 
 function complete_change_log() {
-  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}"
+  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}"
 
   echo "Updated CHANGELOG.md"
 }
