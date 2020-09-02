@@ -136,26 +136,29 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
   });
 
   describe('getLastMEPDate', () => {
+    const repoOwner = '1024pix';
+    const repoName = 'pix';
+
     beforeEach(() => {
       const axiosStub = sinon.stub(axios, 'get');
-      
-      axiosStub.withArgs('https://api.github.com/repos/1024pix/pix/tags')
+
+      axiosStub.withArgs(`https://api.github.com/repos/${repoOwner}/${repoName}/tags`)
         .resolves({ 
           data: [
             {
               'name': 'v2.173.0',
-              'zipball_url': 'https://api.github.com/repos/1024pix/pix/zipball/v2.173.0',
-              'tarball_url': 'https://api.github.com/repos/1024pix/pix/tarball/v2.173.0',
+              'zipball_url': `https://api.github.com/repos/${repoOwner}/${repoName}/zipball/v2.173.0`,
+              'tarball_url': `https://api.github.com/repos/${repoOwner}/${repoName}/tarball/v2.173.0`,
               'commit': {
                 'sha': '4c3ad3d377c37023e835ad674578cf06fcb4de7a',
-                'url': 'https://api.github.com/repos/1024pix/pix/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a'
+                'url': `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`
               },
               'node_id': 'MDM6UmVmMTI2ODUyMzMxOnJlZnMvdGFncy92Mi4xNzMuMA=='
             },
           ]
         });
       
-      axiosStub.withArgs('https://api.github.com/repos/1024pix/pix/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a')
+      axiosStub.withArgs(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`)
         .resolves({ 
           data: {
             'commit': {
@@ -168,11 +171,12 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
           }
         });
     });
+    
     it('should return the date of the last MEP commit', async () => {
       // given
       const expectedDate = '2019-01-18T15:29:51Z';
       // when
-      const date = await getLastMEPDate();
+      const date = await getLastMEPDate(repoOwner, repoName);
       // then
       expect(date).to.be.equal(expectedDate);
     });
