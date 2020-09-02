@@ -1,7 +1,7 @@
 const { describe, it } = require('mocha');
 const axios = require('axios');
 const { sinon } = require('../../test-helper');
-const { createAndDeployPixSiteRelease, createAndDeployPixProRelease } = require('../../../../lib/services/slack/commands');
+const { createAndDeployPixSiteRelease, createAndDeployPixProRelease, createAndDeployPixUI } = require('../../../../lib/services/slack/commands');
 const releasesServices = require('../../../../lib/services/releases');
 const githubServices = require('../../../../lib/services/github');
 
@@ -9,8 +9,9 @@ describe('Services | Slack | Commands', () => {
   beforeEach(() => {
     // given
     sinon.stub(axios, 'post');
-    sinon.stub(releasesServices, 'publishPixSite').resolves();
+    sinon.stub(releasesServices, 'publishPixRepo').resolves();
     sinon.stub(releasesServices, 'deployPixSite').resolves();
+    sinon.stub(releasesServices, 'deployPixUI').resolves();
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
   });
 
@@ -25,7 +26,7 @@ describe('Services | Slack | Commands', () => {
 
       it('should publish a new release', () => {
         // then
-        sinon.assert.calledWith(releasesServices.publishPixSite, 'pix-site', 'minor');
+        sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site', 'minor');
       });
 
       it('should retrieve the last release tag from GitHub', () => {
@@ -46,7 +47,7 @@ describe('Services | Slack | Commands', () => {
         // when
         await createAndDeployPixSiteRelease(payload);
         // then
-        sinon.assert.calledWith(releasesServices.publishPixSite, 'pix-site', 'minor');
+        sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site', 'minor');
       });
     });
 
@@ -62,7 +63,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should publish a new release', () => {
       // then
-      sinon.assert.calledWith(releasesServices.publishPixSite, 'pix-site-pro', 'minor');
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site-pro', 'minor');
     });
 
     it('should retrieve the last release tag from GitHub', () => {
@@ -73,6 +74,30 @@ describe('Services | Slack | Commands', () => {
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixSite, 'pix-site-pro', 'pix-pro', 'v1.0.0');
+    });
+  });
+
+  describe('#createAndDeployPixUI', () => {
+    beforeEach(async () => {
+      // given
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPixUI(payload);
+    });
+
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-ui', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', () => {
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-ui');
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.deployPixUI);
     });
   });
 });
