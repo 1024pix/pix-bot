@@ -27,10 +27,10 @@ describe('releases', function() {
     });
   });
 
-  describe('#publishPixSite', async function () {
+  describe('#publishPixRepo', async function () {
     it('should call the release pix pro script with \'minor\'', async function () {
       //when
-      await releasesService.publishPixSite('pix-site-pro', 'minor');
+      await releasesService.publishPixRepo('pix-site-pro', 'minor');
 
       // then
       sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site-pro minor$')));
@@ -99,5 +99,26 @@ describe('#deploy', async function () {
     } catch (e) {
       expect(e.message).to.equal('KO');
     }
+  });
+
+  describe('#deployPixUI', async function () {
+    let exec, releasesService;
+
+    before(() => {
+      exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
+      releasesService = proxyquire('../../../lib/services/releases', {
+        'child_process': {exec},
+        util: {promisify: fn => fn}
+      });
+    });
+
+    it('should call the deploy Pix-UI script with default', async function () {
+      //when
+      await releasesService.deployPixUI('pix-ui');
+
+      // then
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/deploy-pix-ui.sh)')));
+    });
+
   });
 });
