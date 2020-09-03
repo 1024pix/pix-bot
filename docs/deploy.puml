@@ -1,0 +1,16 @@
+@startuml
+actor PO #blue
+participant Slack
+participant api.slack.com
+participant pix_bot
+participant Scalingo
+participant application
+participant GitHub
+PO -> Slack : shortcut "Mise en production"
+Slack -> api.slack.com : ?
+api.slack.com -> pix_bot : POST /slack/interactive-endpoint \ntype=release-deployment-confirmation
+pix_bot -> Scalingo: POST /apps/<APPLICATION_NAME>/deployments \n { source_url : 'https://github.com/1024pix/pix/archive/<VERSION_NUMBER>.tar.gz' }
+Scalingo -> GitHub: GET source_url
+GitHub -> Scalingo : <VERSION_NUMBER>.tar.gz
+Scalingo -> application: build + deployment
+@enduml

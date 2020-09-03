@@ -36,8 +36,8 @@ npm start
 
 *5/* Develop and add wonderful features!
 
-*6/* Testing `publish` and `deploy` scripts
-You can specify the repository you want to use for `publish` and `deploy` on any GitHub repository.
+*6/* Testing `publish` script
+You can specify the repository you want to use for `publish` on any GitHub repository.
 
 Prerequisites: The repository shall contain `dev`, `master` and `publish` branches.
 
@@ -45,20 +45,6 @@ Command to run the `publish` script:
 ```sh
 GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# scripts/publish.sh (path|minor|major)
 ```
-
-Command to run the `deploy` script:
-```sh
-GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# NEW_PACKAGE_VERSION=#version_to_deploy# scripts/deploy.sh (recette|production)
-```
-
-A specific slack command has been created to test a release for a specific [repository](https://github.com/1024pix/pix-bot-release-test)
-
-The Url of the command is
- 
-_/slack/commands/create-and-deploy-pix-bot-test-release_
-
-you can provide a type of release: _minor_/_major_/_bugfix_, _minor_ is the default
-
 
 ## License
 
