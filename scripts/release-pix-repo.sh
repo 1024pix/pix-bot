@@ -16,12 +16,6 @@ function install_required_packages {
   npm ci --dev --no-optional
 }
 
-function complete_change_log() {
-  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}"
-
-  echo "Updated CHANGELOG.md"
-}
-
 function create_release {
   npm_arg="" && [[ -n "$VERSION_TYPE" ]]  && npm_arg="$VERSION_TYPE"
   npm version ${npm_arg} --no-git-tag-version
@@ -35,11 +29,6 @@ function create_a_release_commit() {
   git commit --message "[RELEASE] A ${VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."
 
   echo "Created the release commit"
-}
-
-function tag_release_commit() {
-  git tag --annotate "v${NEW_PACKAGE_VERSION}" --message "v${NEW_PACKAGE_VERSION}"
-  echo "Created annotated tag"
 }
 
 echo "Start deploying version ${VERSION_TYPE}…"

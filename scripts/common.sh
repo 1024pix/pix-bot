@@ -40,3 +40,13 @@ function push_commit_and_tag_to_remote_dev() {
   echo "Pushed release commit on branch origin/dev"
 }
 
+function complete_change_log() {
+  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}"
+
+  echo "Updated CHANGELOG.md"
+}
+
+function tag_release_commit() {
+  git tag --annotate "v${NEW_PACKAGE_VERSION}" --message "v${NEW_PACKAGE_VERSION}"
+  echo "Created annotated tag"
+}
