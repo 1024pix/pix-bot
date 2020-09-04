@@ -57,7 +57,7 @@ describe('releases', function() {
       await releasesService.releaseAndDeployPixPro();
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh 1024pix pix-pro)')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh github-owner pix-pro)')));
     });
 
     it('should call the release pix pro script with \'minor\'', async function () {
@@ -65,7 +65,7 @@ describe('releases', function() {
       await releasesService.releaseAndDeployPixPro('minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh 1024pix pix-pro minor)')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh github-owner pix-pro minor)')));
     });
   });
 });
