@@ -1,26 +1,17 @@
 #! /usr/bin/env node
-const axios = require('axios');
 const moment = require('moment');
 const _ = require('lodash');
 const fs = require('fs');
+const github = require('../lib/services/github');
 
 const CHANGELOG_FILE = 'CHANGELOG.md';
 const CHANGELOG_HEADER_LINES = 2;
 
-function buildRequestObject(repoOwner, repoName) {
-  return `https://api.github.com/repos/${repoOwner}/${repoName}/pulls?state=closed&sort=updated&direction=desc'`
-}
-
-function getTheCommitDate(RawDataCommit) {
-  return RawDataCommit.commit.committer.date;
-}
-
 async function getLastMEPDate(repoOwner, repoName) {
-  const tags = await axios.get(`https://api.github.com/repos/${repoOwner}/${repoName}/tags`);
-  const commitUrl = tags.data[0].commit.url;
+  const latestTagUrl = await github.getLatestReleaseTagUrl(repoName);
 
-  const commit = await axios.get(commitUrl);
-  return getTheCommitDate(commit.data);
+  const commit = await github.getCommitAtURL(latestTagUrl);
+  return commit.committer.date;
 }
 
 function displayPullRequest(pr) {
@@ -53,7 +44,7 @@ async function main() {
   try {
     const dateOfLastMEP = await getLastMEPDate(repoOwner, repoName);
 
-    const { data: pullRequests } = await axios(buildRequestObject(repoOwner, repoName));
+    const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName);
 
     const newChangeLogLines = [];
 
@@ -94,7 +85,6 @@ if (process.env.NODE_ENV !== 'test') {
     filterPullRequest,
     orderPr,
     getHeadOfChangelog,
-    getTheCommitDate,
     getLastMEPDate,
   };
 }

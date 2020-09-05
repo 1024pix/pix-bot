@@ -1,8 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const axios = require('axios');
+const github = require('../lib/services/github');
 
-const { displayPullRequest, filterPullRequest, getHeadOfChangelog, orderPr, getTheCommitDate, getLastMEPDate } = require('../scripts/get-pull-requests-to-release-in-prod');
+const { displayPullRequest, filterPullRequest, getHeadOfChangelog, orderPr, getLastMEPDate } = require('../scripts/get-pull-requests-to-release-in-prod');
 
 describe('Unit | Script | GET Pull Request to release in Prod', () => {
 
@@ -104,74 +104,20 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
     });
   });
 
-  describe('getTheCommitDate', () => {
-
-    it('should return the date of the commit', () => {
-      // given
-      const RawDataCommit = {
-        'sha': 'ada4',
-        'node_id': 'MDY6Q29',
-        'commit': {
-          'author': {
-            'name': 'petitPix',
-            'email': 'petit.pix@gexample.net',
-            'date': '2019-01-18T15:29:51Z'
-          },
-          'committer': {
-            'name': 'petitPix',
-            'email': 'petit.pix@gexample.net',
-            'date': '2019-01-18T15:29:51Z'
-          }
-        }
-      };
-
-      const expectedDate = '2019-01-18T15:29:51Z';
-
-      // when
-      const result = getTheCommitDate(RawDataCommit);
-
-      // then
-      expect(result).to.equal(expectedDate);
-    });
-  });
-
   describe('getLastMEPDate', () => {
     const repoOwner = '1024pix';
     const repoName = 'pix';
 
     beforeEach(() => {
-      const axiosStub = sinon.stub(axios, 'get');
+      sinon.stub(github, 'getLatestReleaseTagUrl')
+        .withArgs(repoName)
+        .resolves(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`);
 
-      axiosStub.withArgs(`https://api.github.com/repos/${repoOwner}/${repoName}/tags`)
-        .resolves({ 
-          data: [
-            {
-              'name': 'v2.173.0',
-              'zipball_url': `https://api.github.com/repos/${repoOwner}/${repoName}/zipball/v2.173.0`,
-              'tarball_url': `https://api.github.com/repos/${repoOwner}/${repoName}/tarball/v2.173.0`,
-              'commit': {
-                'sha': '4c3ad3d377c37023e835ad674578cf06fcb4de7a',
-                'url': `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`
-              },
-              'node_id': 'MDM6UmVmMTI2ODUyMzMxOnJlZnMvdGFncy92Mi4xNzMuMA=='
-            },
-          ]
-        });
-      
-      axiosStub.withArgs(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`)
-        .resolves({ 
-          data: {
-            'commit': {
-              'committer': {
-                'name': 'pix-bot',
-                'email': 'service+pixbot@pix.fr',
-                'date': '2019-01-18T15:29:51Z'
-              }
-            }
-          }
-        });
+      sinon.stub(github, 'getCommitAtURL')
+        .withArgs(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`)
+        .resolves({ committer: { date: '2019-01-18T15:29:51Z' } });
     });
-    
+
     it('should return the date of the last MEP commit', async () => {
       // given
       const expectedDate = '2019-01-18T15:29:51Z';
