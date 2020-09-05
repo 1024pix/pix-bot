@@ -13,18 +13,18 @@ echo "Version type ${VERSION_TYPE} for ${GITHUB_OWNER}/${GITHUB_REPOSITORY}"
 
 function install_required_packages {
   echo "Install packages"
-  npm ci --dev --no-optional
+  find . -name package.json -type f ! -path '*/node_modules/*' -execdir npm ci --dev --no-optional \;
 }
 
 function create_release {
   npm_arg="" && [[ -n "$VERSION_TYPE" ]]  && npm_arg="$VERSION_TYPE"
-  npm version ${npm_arg} --no-git-tag-version
+  find . -name package.json -type f ! -path '*/node_modules/*' -execdir npm version ${npm_arg} --no-git-tag-version \;
   NEW_PACKAGE_VERSION=$(get_package_version)
 }
 
 function create_a_release_commit() {
   git add  --update CHANGELOG.md
-  git add  --update package*.json
+  find . -name package.json -type f ! -path '*/node_modules/*' -execdir git add --update package*.json \;
 
   git commit --message "[RELEASE] A ${VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."
 
