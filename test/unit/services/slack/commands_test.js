@@ -1,7 +1,12 @@
 const { describe, it } = require('mocha');
 const axios = require('axios');
 const { sinon } = require('../../test-helper');
-const { createAndDeployPixSiteRelease, createAndDeployPixProRelease, createAndDeployPixUI } = require('../../../../lib/services/slack/commands');
+const {
+  createAndDeployPixSiteRelease,
+  createAndDeployPixProRelease,
+  createAndDeployPixUI,
+  createAndDeployPixLCMS
+} = require('../../../../lib/services/slack/commands');
 const releasesServices = require('../../../../lib/services/releases');
 const githubServices = require('../../../../lib/services/github');
 
@@ -10,7 +15,7 @@ describe('Services | Slack | Commands', () => {
     // given
     sinon.stub(axios, 'post');
     sinon.stub(releasesServices, 'publishPixRepo').resolves();
-    sinon.stub(releasesServices, 'deployPixSite').resolves();
+    sinon.stub(releasesServices, 'deployPixRepo').resolves();
     sinon.stub(releasesServices, 'deployPixUI').resolves();
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
   });
@@ -36,7 +41,7 @@ describe('Services | Slack | Commands', () => {
 
       it('should deploy the release', () => {
         // then
-        sinon.assert.calledWith(releasesServices.deployPixSite, 'pix-site', 'pix-site', 'v1.0.0');
+        sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
       });
     });
 
@@ -73,7 +78,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should deploy the release', () => {
       // then
-      sinon.assert.calledWith(releasesServices.deployPixSite, 'pix-site-pro', 'pix-pro', 'v1.0.0');
+      sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site-pro', 'pix-pro', 'v1.0.0');
     });
   });
 
@@ -98,6 +103,30 @@ describe('Services | Slack | Commands', () => {
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixUI);
+    });
+  });
+
+  describe('#createAndDeployPixLCMS', () => {
+    beforeEach(async () => {
+      // given
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPixLCMS(payload);
+    });
+
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-editor', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', () => {
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-editor');
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.deployPixRepo);
     });
   });
 });
