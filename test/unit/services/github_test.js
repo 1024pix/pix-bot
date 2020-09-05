@@ -79,3 +79,45 @@ describe('#getLatestReleaseTag', () => {
   });
 
 });
+
+
+describe('#getMergedPullRequestsSortedByDescendingDate', () => {
+
+  it('should call GitHub "Pulls" API', async () => {
+    // given
+    const pullRequests = [
+      { merged_at: '2020-09-02T12:26:47Z' },
+      { merged_at: '2020-09-01T12:26:47Z' }
+    ];
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc')
+      .reply(200, pullRequests);
+
+    // when
+    const response = await githubService.getMergedPullRequestsSortedByDescendingDate('github-owner', 'github-repository');
+
+    // then
+    expect(response).to.deep.equal(pullRequests);
+  });
+
+});
+
+describe('#getCommitAtURL', () => {
+
+  it('should call Github "Request" API', async () => {
+    // given
+    nock('https://commit-url.github.com')
+      .get('/')
+      .reply(200, {
+        commit: 'some data'
+      });
+
+    // when
+    const response = await githubService.getCommitAtURL('https://commit-url.github.com');
+
+    // then
+    expect(response).to.deep.equal({ commit: 'some data' });
+
+  });
+});
+
