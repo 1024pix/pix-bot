@@ -1,5 +1,5 @@
 const { describe, it } = require('mocha');
-const sinon = require('sinon');
+const { sinon } = require('../test-helper');
 const scalingo = require('scalingo');
 
 const ScalingoClient = require('../../../lib/services/scalingo-client');
@@ -88,7 +88,7 @@ describe('Scalingo client', () => {
         {
           deployment: {
             git_ref: 'v1.0',
-            source_url: 'https://github.com/github-owner/github-repository/archive/v1.0.tar.gz'
+            source_url: 'https://github-personal-access-token@github.com/github-owner/github-repository/archive/v1.0.tar.gz'
           },
         }
       );
@@ -106,7 +106,7 @@ describe('Scalingo client', () => {
         {
           deployment: {
             git_ref: 'v1.0',
-            source_url: 'https://github.com/github-owner/given-repository/archive/v1.0.tar.gz'
+            source_url: 'https://github-personal-access-token@github.com/github-owner/given-repository/archive/v1.0.tar.gz'
           },
         }
       );
