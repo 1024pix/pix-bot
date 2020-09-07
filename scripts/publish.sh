@@ -59,12 +59,6 @@ function update_all_pix_modules_version() {
   echo "Bumped versions in package files"
 }
 
-function complete_change_log() {
-  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}"
-
-  echo "Updated CHANGELOG.md"
-}
-
 # Update when adding a new app
 function create_a_release_commit() {
   git add  --update \
@@ -81,11 +75,6 @@ function create_a_release_commit() {
   git commit --message "[RELEASE] A ${NEW_VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."
 
   echo "Created the release commit"
-}
-
-function tag_release_commit() {
-  git tag --annotate "v${NEW_PACKAGE_VERSION}" --message "v${NEW_PACKAGE_VERSION}"
-  echo "Created annotated tag"
 }
 
 function publish_release_on_sentry() {
