@@ -8,7 +8,7 @@ const CHANGELOG_FILE = 'CHANGELOG.md';
 const CHANGELOG_HEADER_LINES = 2;
 
 async function getLastMEPDate(repoOwner, repoName) {
-  const latestTagUrl = await github.getLatestReleaseTagUrl(repoName);
+  const latestTagUrl = await github.getLatestReleaseTagUrl(repoOwner, repoName);
 
   const commit = await github.getCommitAtURL(latestTagUrl);
   return commit.committer.date;

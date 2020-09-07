@@ -110,7 +110,7 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
 
     beforeEach(() => {
       sinon.stub(github, 'getLatestReleaseTagUrl')
-        .withArgs(repoName)
+        .withArgs(repoOwner, repoName)
         .resolves(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`);
 
       sinon.stub(github, 'getCommitAtURL')
