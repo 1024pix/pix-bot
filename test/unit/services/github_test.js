@@ -116,7 +116,7 @@ describe('#getCommitAtURL', () => {
     const response = await githubService.getCommitAtURL('https://commit-url.github.com');
 
     // then
-    expect(response).to.deep.equal({ commit: 'some data' });
+    expect(response).to.deep.equal('some data');
 
   });
 });
