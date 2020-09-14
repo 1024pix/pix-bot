@@ -27,7 +27,7 @@ function create_release {
 }
 
 function create_a_release_commit {
-  git add  --update CHANGELOG.md
+  git add CHANGELOG.md
   executeCommandRecursivelyInPackageJsonDir "git add --update package*.json"
 
   git commit --message "[RELEASE] A ${VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."

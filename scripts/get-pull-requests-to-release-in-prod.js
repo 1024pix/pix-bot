@@ -62,6 +62,7 @@ async function main() {
       currentChangeLog = fs.readFileSync(CHANGELOG_FILE, 'utf-8').split('\n');
     } catch(error) {
       console.log('Changelog file does not exist. It will be created.');
+      currentChangeLog = [`# ${repoName} Changelog\n`, '\n'];
     }
 
     currentChangeLog.splice(CHANGELOG_HEADER_LINES, 0, ...newChangeLogLines);
