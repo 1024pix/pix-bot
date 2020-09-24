@@ -58,30 +58,6 @@ describe('Services | Slack | Commands', () => {
 
   });
 
-  describe('#createAndDeployPixProRelease', () => {
-    beforeEach(async () => {
-      // given
-      const payload = { text: 'minor' };
-      // when
-      await createAndDeployPixProRelease(payload);
-    });
-
-    it('should publish a new release', () => {
-      // then
-      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site-pro', 'minor');
-    });
-
-    it('should retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-site-pro');
-    });
-
-    it('should deploy the release', () => {
-      // then
-      sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site-pro', 'pix-pro', 'v1.0.0');
-    });
-  });
-
   describe('#createAndDeployPixUI', () => {
     beforeEach(async () => {
       // given

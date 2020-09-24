@@ -28,44 +28,26 @@ describe('releases', function() {
   });
 
   describe('#publishPixRepo', async function () {
-    it('should call the release pix pro script with \'minor\'', async function () {
+    it('should call the release pix script with \'minor\'', async function () {
       //when
-      await releasesService.publishPixRepo('pix-site-pro', 'minor');
+      await releasesService.publishPixRepo('pix-site', 'minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site-pro minor$')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor$')));
     });
   });
 
   describe('#deployPixRepo', async function() {
-    it('should deploy the pix site pro', async function() {
+    it('should deploy the pix site', async function() {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
-      scalingoClient.deployFromArchive.withArgs('app-name', 'v1.0.0', 'pix-site-pro').resolves('OK');
+      scalingoClient.deployFromArchive.withArgs('app-name', 'v1.0.0', 'pix-site').resolves('OK');
       sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
       // when
-      const response = await releasesService.deployPixRepo('Pix-Site-Pro', 'app-name', 'V1.0.0 ');
+      const response = await releasesService.deployPixRepo('Pix-Site', 'app-name', 'V1.0.0 ');
       // then
       expect(response).to.equal('OK');
-    });
-  });
-
-  describe('#createAndDeployPro', async function () {
-    it('should call the release pix pro script with default', async function () {
-      //when
-      await releasesService.releaseAndDeployPixPro();
-
-      // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh github-owner pix-pro)')));
-    });
-
-    it('should call the release pix pro script with \'minor\'', async function () {
-      //when
-      await releasesService.releaseAndDeployPixPro('minor');
-
-      // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh github-owner pix-pro minor)')));
     });
   });
 });
