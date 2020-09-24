@@ -3,7 +3,6 @@ const axios = require('axios');
 const { sinon } = require('../../test-helper');
 const {
   createAndDeployPixSiteRelease,
-  createAndDeployPixProRelease,
   createAndDeployPixUI,
   createAndDeployPixLCMS
 } = require('../../../../lib/services/slack/commands');
@@ -39,9 +38,10 @@ describe('Services | Slack | Commands', () => {
         sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-site');
       });
 
-      it('should deploy the release', () => {
+      it('should deploy the release for pix-site and pix-pro', () => {
         // then
         sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
+        sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-pro', 'v1.0.0');
       });
     });
 
