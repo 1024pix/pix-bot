@@ -123,7 +123,7 @@ describe('#getCommitAtURL', () => {
 
 describe('#isBuildStatusOK', () => {
 
-  it('should call Github "Request" API', async () => {
+  it('should call Github "branches" API', async () => {
     // given
     const branchName = 'branch-name';
     nock('https://api.github.com')
@@ -140,11 +140,40 @@ describe('#isBuildStatusOK', () => {
       });
 
     // when
-    const response = await githubService.isBuildStatusOK(branchName);
+    const response = await githubService.isBuildStatusOK({ branchName });
 
     // then
     expect(response).to.equal(true);
 
+  });
+
+  it('should call Github "tags" API', async () => {
+    // given
+    const tagName = 'v1.0.9';
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/tags')
+      .reply(200, [{
+        name: 'v1.0.10',
+        commit: {
+          url: 'https://api.github.com/repos/github-owner/github-repository/commits/v1.0.10SHA1'
+        },
+      }, {
+        name: 'v1.0.9',
+        commit: {
+          url: 'https://api.github.com/repos/github-owner/github-repository/commits/v1.0.9SHA1'
+        },
+      }]);
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/commits/v1.0.9SHA1/check-runs')
+      .reply(200, {
+        'check_runs': [{ name: 'build-test-and-deploy', status: 'completed', conclusion: 'success' }]
+      });
+
+    // when
+    const response = await githubService.isBuildStatusOK({ tagName });
+
+    // then
+    expect(response).to.equal(true);
   });
 });
 
