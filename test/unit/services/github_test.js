@@ -121,3 +121,30 @@ describe('#getCommitAtURL', () => {
   });
 });
 
+describe('#isBuildStatusOK', () => {
+
+  it('should call Github "Request" API', async () => {
+    // given
+    const branchName = 'branch-name';
+    nock('https://api.github.com')
+      .get(`/repos/github-owner/github-repository/branches/${branchName}`)
+      .reply(200, {
+        commit: {
+          url: 'https://api.github.com/repos/github-owner/github-repository/commits/commitSHA1'
+        }
+      });
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/commits/commitSHA1/check-runs')
+      .reply(200, {
+        'check_runs': [{ name: 'build-test-and-deploy', status: 'completed', conclusion: 'success' }]
+      });
+
+    // when
+    const response = await githubService.isBuildStatusOK(branchName);
+
+    // then
+    expect(response).to.equal(true);
+
+  });
+});
+
