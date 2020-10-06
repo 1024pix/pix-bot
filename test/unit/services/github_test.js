@@ -6,8 +6,8 @@ const githubService = require('../../../lib/services/github');
 
 describe('#getPullRequests', function() {
   const items = [
-    { html_url: 'http://test1.fr', title: 'PR1' },
-    { html_url: 'http://test2.fr', title: 'PR2' },
+    { html_url: 'http://test1.fr', title: 'PR1', labels: [ { name: 'team certif'} ]},
+    { html_url: 'http://test2.fr', title: 'PR2', labels: [ { name: ':construction: toto'}, { name: ':idea: team certif'}] },
   ];
   beforeEach(() => {
     sinon.stub(axios, 'get').resolves({ data: { items: items } });
@@ -19,8 +19,8 @@ describe('#getPullRequests', function() {
       response_type: 'in_channel',
       text: 'PRs à review pour team-certif',
       attachments: [
-        { color: '#B7CEF5', pretext: '', fields: [{ value: '<http://test1.fr|PR1>', short: false }] },
-        { color: '#B7CEF5', pretext: '', fields: [{ value: '<http://test2.fr|PR2>', short: false }] }
+        { color: '#B7CEF5', pretext: '', fields: [{ value: ':construction: :idea:<http://test2.fr|PR2>', short: false }] },
+        { color: '#B7CEF5', pretext: '', fields: [{ value: '<http://test1.fr|PR1>', short: false }] }
       ]
     };
 
