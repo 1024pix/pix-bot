@@ -3,7 +3,6 @@ const axios = require('axios');
 const { sinon } = require('../../test-helper');
 const {
   createAndDeployPixSiteRelease,
-  createAndDeployPixProRelease,
   createAndDeployPixUI,
   createAndDeployPixLCMS
 } = require('../../../../lib/services/slack/commands');
@@ -39,9 +38,10 @@ describe('Services | Slack | Commands', () => {
         sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-site');
       });
 
-      it('should deploy the release', () => {
+      it('should deploy the release for pix-site and pix-pro', () => {
         // then
         sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
+        sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-pro', 'v1.0.0');
       });
     });
 
@@ -56,30 +56,6 @@ describe('Services | Slack | Commands', () => {
       });
     });
 
-  });
-
-  describe('#createAndDeployPixProRelease', () => {
-    beforeEach(async () => {
-      // given
-      const payload = { text: 'minor' };
-      // when
-      await createAndDeployPixProRelease(payload);
-    });
-
-    it('should publish a new release', () => {
-      // then
-      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site-pro', 'minor');
-    });
-
-    it('should retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-site-pro');
-    });
-
-    it('should deploy the release', () => {
-      // then
-      sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site-pro', 'pix-pro', 'v1.0.0');
-    });
   });
 
   describe('#createAndDeployPixUI', () => {
