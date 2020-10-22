@@ -79,6 +79,7 @@ function create_a_release_commit() {
 
 function publish_release_on_sentry() {
   npx sentry-cli releases -o pix new -p pix-api "v${NEW_PACKAGE_VERSION}"
+  npx sentry-cli releases -o pix new -p pix-app "v${NEW_PACKAGE_VERSION}"
   npx sentry-cli releases -o pix set-commits --commit "${GITHUB_OWNER}/${GITHUB_REPOSITORY}@v${NEW_PACKAGE_VERSION}" "v${NEW_PACKAGE_VERSION}"
   npx sentry-cli releases -o pix finalize "v${NEW_PACKAGE_VERSION}"
 
