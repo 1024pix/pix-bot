@@ -4,6 +4,8 @@ const ReviewAppManager = require('scalingo-review-app-manager').ReviewAppManager
 
 const config = require('../lib/config');
 const server = require('../lib/server');
+const { createCronJob } = require('../lib/services/cron-job');
+const sendInBlueReport = require('../lib/services/sendinblue-report');
 
 const init = async () => {
 
@@ -16,6 +18,8 @@ const init = async () => {
 
   const reviewAppManager = new ReviewAppManager(scalingoToken, scalingoApiUrl, { stopCronTime, restartCronTime, timeZone, ignoredReviewApps });
   await reviewAppManager.startEcoMode();
+
+  createCronJob('SendInBlue Report', sendInBlueReport.getReport, config.thirdServicesUsageReport.schedule);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);
