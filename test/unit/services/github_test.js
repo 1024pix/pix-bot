@@ -90,7 +90,10 @@ describe('#getMergedPullRequestsSortedByDescendingDate', () => {
       { merged_at: '2020-09-01T12:26:47Z' }
     ];
     nock('https://api.github.com')
-      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc')
+      .get('/repos/github-owner/github-repository')
+      .reply(200, { default_branch: 'dev' });
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=dev')
       .reply(200, pullRequests);
 
     // when
