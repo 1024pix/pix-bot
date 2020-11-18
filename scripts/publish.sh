@@ -69,8 +69,7 @@ function create_a_release_commit() {
           certif/package*.json \
           admin/package*.json \
           high-level-tests/load-testing/package*.json \
-          high-level-tests/e2e/package*.json \
-          scripts/backup/package*.json
+          high-level-tests/e2e/package*.json
   git commit --message "[RELEASE] A ${NEW_VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."
 
   echo "Created the release commit"
