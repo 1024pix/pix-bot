@@ -51,7 +51,6 @@ function update_all_pix_modules_version() {
   update_pix_module_version "orga/"
   update_pix_module_version "high-level-tests/load-testing/"
   update_pix_module_version "high-level-tests/e2e/"
-  update_pix_module_version "scripts/backup/"
 
   npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null
   NEW_PACKAGE_VERSION=$(get_package_version)
