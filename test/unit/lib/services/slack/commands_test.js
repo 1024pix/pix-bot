@@ -1,13 +1,13 @@
 const { describe, it } = require('mocha');
 const axios = require('axios');
-const { sinon } = require('../../test-helper');
+const { sinon } = require('../../../test-helper');
 const {
   createAndDeployPixSiteRelease,
   createAndDeployPixUI,
   createAndDeployPixLCMS
-} = require('../../../../lib/services/slack/commands');
-const releasesServices = require('../../../../lib/services/releases');
-const githubServices = require('../../../../lib/services/github');
+} = require('../../../../../lib/services/slack/commands');
+const releasesServices = require('../../../../../lib/services/releases');
+const githubServices = require('../../../../../lib/services/github');
 
 describe('Services | Slack | Commands', () => {
   beforeEach(() => {

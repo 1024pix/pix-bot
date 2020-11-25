@@ -1,10 +1,10 @@
 const { describe, it } = require('mocha');
-const { sinon } = require('../test-helper');
+const { sinon } = require('../../test-helper');
 
-const config = require('../../../lib/config');
+const config = require('../../../../lib/config');
 const axios = require('axios');
 const SibApiV3Sdk = require('sib-api-v3-sdk');
-const sendinblueReport = require('../../../lib/services/sendinblue-report');
+const sendinblueReport = require('../../../../lib/services/sendinblue-report');
 
 describe('Unit | SendInBlue Report', () => {
   describe('#getReport', () => {
