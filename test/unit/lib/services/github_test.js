@@ -80,7 +80,6 @@ describe('#getLatestReleaseTag', () => {
 
 });
 
-
 describe('#getMergedPullRequestsSortedByDescendingDate', () => {
 
   it('should call GitHub "Pulls" API', async () => {
