@@ -1,8 +1,8 @@
 const { describe, it } = require('mocha');
 const { expect } = require('chai');
-const { sinon } = require('../test-helper');
+const { sinon } = require('../../test-helper');
 const axios = require('axios');
-const googleSheet = require('../../../lib/services/google-sheet');
+const googleSheet = require('../../../../lib/services/google-sheet');
 
 describe('#getA11YTip', function() {
   const data =

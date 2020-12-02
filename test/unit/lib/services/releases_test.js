@@ -2,8 +2,8 @@ const { describe, it } = require('mocha');
 const sinon = require('sinon');
 const proxyquire =  require('proxyquire');
 const { expect } = require('chai');
-const releasesService = require('../../../lib/services/releases');
-const ScalingoClient = require('../../../lib/services/scalingo-client');
+const releasesService = require('../../../../lib/services/releases');
+const ScalingoClient = require('../../../../lib/services/scalingo-client');
 
 describe('releases', function() {
   let exec;
@@ -11,7 +11,7 @@ describe('releases', function() {
 
   before(() => {
     exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
-    releasesService = proxyquire('../../../lib/services/releases', {
+    releasesService = proxyquire('../../../../lib/services/releases', {
       'child_process': {exec},
       util: {promisify: fn => fn}
     });
@@ -88,7 +88,7 @@ describe('#deploy', async function () {
 
     before(() => {
       exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
-      releasesService = proxyquire('../../../lib/services/releases', {
+      releasesService = proxyquire('../../../../lib/services/releases', {
         'child_process': {exec},
         util: {promisify: fn => fn}
       });

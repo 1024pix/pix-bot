@@ -1,8 +1,8 @@
 const { describe, it } = require('mocha');
 const { expect } = require('chai');
-const { sinon, nock } = require('../test-helper');
+const { sinon, nock } = require('../../test-helper');
 const axios = require('axios');
-const githubService = require('../../../lib/services/github');
+const githubService = require('../../../../lib/services/github');
 
 describe('#getPullRequests', function() {
   const items = [
@@ -80,6 +80,51 @@ describe('#getLatestReleaseTag', () => {
 
 });
 
+describe('#getChangelogSinceLatestRelease', () => {
+
+  it('should return the list of PR titles since latest release', async () => {
+    // given
+    const latestTagDate = new Date('2020-04-01T15:29:51Z');
+    const afterTag1Date = new Date('2020-06-01T15:29:51Z');
+    const afterTag2Date = new Date('2020-05-01T15:29:51Z');
+    const beforeTagDate = new Date('2020-02-01T15:29:51Z');
+    const repoOwner = 'repo-owner';
+    const repoName = 'repo-name';
+    nock('https://api.github.com')
+      .get(`/repos/${repoOwner}/${repoName}/tags`)
+      .reply(200, [
+        {commit: {url: '/latest_tag_commit_url'},},
+        {commit: {url: '/some_tag_commit_url'},},
+        {commit: {url: '/some_other_tag_commit_url'},},
+      ]);
+    nock('https://api.github.com')
+      .get('/latest_tag_commit_url')
+      .reply(200, {commit: {committer: {date: latestTagDate}}});
+    nock('https://api.github.com')
+      .get(`/repos/${repoOwner}/${repoName}`)
+      .reply(200, {default_branch: 'my_default_branch'});
+    nock('https://api.github.com')
+      .get(`/repos/${repoOwner}/${repoName}/pulls`)
+      .query({
+        base: 'my_default_branch',
+        state: 'closed',
+        sort: 'updated',
+        direction: 'desc'
+      })
+      .reply(200, [
+        {merged_at: afterTag1Date, title: 'PR Protéines'},
+        {merged_at: afterTag2Date, title: 'PR Légumes'},
+        {merged_at: beforeTagDate, title: 'PR Fruit'},
+      ]);
+
+    // when
+    const response = await githubService.getChangelogSinceLatestRelease(repoOwner, repoName);
+
+    // then
+    expect(response).to.deep.equal(['PR Protéines', 'PR Légumes']);
+  });
+
+});
 
 describe('#getMergedPullRequestsSortedByDescendingDate', () => {
 
