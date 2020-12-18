@@ -1,5 +1,5 @@
 const { describe, it } = require('mocha');
-const { sinon } = require('../../test-helper');
+const { sinon } = require('../../../test-helper');
 const scalingo = require('scalingo');
 
 const ScalingoClient = require('../../../../lib/services/scalingo-client');
