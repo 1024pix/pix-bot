@@ -1,17 +1,17 @@
 {
   "name": "pix-bot",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "Pix Bot application",
   "main": "index.js",
   "scripts": {
-    "configure": "cp sample.env .env && npm install",
+    "configure": "cp sample.env .env && npm ci",
     "deploy": "npm run deploy:minor",
     "deploy:major": "npm version major && npm run deploy:tag",
     "deploy:minor": "npm version minor && npm run deploy:tag",
     "deploy:patch": "npm version patch && npm run deploy:tag",
     "deploy:tag": "git push --tags",
     "start": "node bin/www",
-    "test": "NODE_ENV=test mocha --recursive --exit --reporter dot test",
+    "test": "NODE_ENV=test mocha --recursive --exit test",
     "lint": "eslint lib/* test/*"
   },
   "repository": {
