@@ -1,4 +1,3 @@
-const { describe, it } = require('mocha');
 const axios = require('axios');
 const { sinon } = require('../../../test-helper');
 const {

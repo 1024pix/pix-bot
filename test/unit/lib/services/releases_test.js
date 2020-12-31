@@ -1,4 +1,3 @@
-const { describe, it } = require('mocha');
 const sinon = require('sinon');
 const proxyquire =  require('proxyquire');
 const { expect } = require('chai');
