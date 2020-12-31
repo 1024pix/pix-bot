@@ -4,7 +4,8 @@ const { sinon } = require('../../../test-helper');
 const {
   createAndDeployPixSiteRelease,
   createAndDeployPixUI,
-  createAndDeployPixLCMS
+  createAndDeployPixLCMS,
+  createAndDeployPixDatawarehouse,
 } = require('../../../../../lib/services/slack/commands');
 const releasesServices = require('../../../../../lib/services/releases');
 const githubServices = require('../../../../../lib/services/github');
@@ -98,6 +99,30 @@ describe('Services | Slack | Commands', () => {
     it('should retrieve the last release tag from GitHub', () => {
       // then
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-editor');
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.deployPixRepo);
+    });
+  });
+
+  describe('#createAndDeployPixDatawarehouse', () => {
+    beforeEach(async () => {
+      // given
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPixDatawarehouse(payload);
+    });
+
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-replication', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', () => {
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-db-replication');
     });
 
     it('should deploy the release', () => {
