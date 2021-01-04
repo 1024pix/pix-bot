@@ -24,7 +24,7 @@ describe('Services | Slack | Commands', () => {
     describe('when releaseType is set to minor', () => {
       beforeEach(async () => {
         // given
-        const payload = { text: 'minor' };
+        const payload = { text: 'minor', response_url: 'http://example.net/callback' };
         // when
         await createAndDeployPixSiteRelease(payload);
       });
@@ -44,6 +44,10 @@ describe('Services | Slack | Commands', () => {
         sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
         sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-pro', 'v1.0.0');
       });
+
+      it('should inform the user of the progress', () => {
+        sinon.assert.calledWith(axios.post, 'http://example.net/callback', { text: 'Le script de déploiement de la release \'v1.0.0\' pour pix-site, pix-pro en production s\'est déroulé avec succès. En attente de l\'installation des applications sur Scalingo…' });
+      });
     });
 
     describe('when releaseType is not set to a valid value', () => {
@@ -57,6 +61,17 @@ describe('Services | Slack | Commands', () => {
       });
     });
 
+    describe('when something fails', () => {
+      it('should inform the user', async () => {
+        // given
+        const payload = { response_url: 'http://example.net/callback' };
+        releasesServices.publishPixRepo.rejects();
+        // when
+        await createAndDeployPixSiteRelease(payload);
+        // then
+        sinon.assert.calledWith(axios.post, 'http://example.net/callback', { text: 'Erreur lors du déploiement de pix-site, pix-pro en production.' });
+      });
+    });
   });
 
   describe('#createAndDeployPixUI', () => {
