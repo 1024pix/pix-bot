@@ -1,6 +1,6 @@
 const { describe, it } = require('mocha');
 const { expect } = require('chai');
-const { sinon, nock } = require('../../test-helper');
+const { sinon, nock } = require('../../../test-helper');
 const axios = require('axios');
 const githubService = require('../../../../lib/services/github');
 
