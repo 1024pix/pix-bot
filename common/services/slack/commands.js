@@ -4,8 +4,6 @@ const githubServices = require('../github');
 const axios = require('axios');
 const postSlackMessage = require('./surfaces/messages/post-message');
 
-const PIX_SITE_REPO_NAME = 'pix-site';
-const PIX_SITE_APPS = ['pix-site', 'pix-pro'];
 const PIX_UI_REPO_NAME = 'pix-ui';
 const PIX_LCMS_REPO_NAME = 'pix-editor';
 const PIX_LCMS_APP_NAME = 'pix-lcms';
@@ -74,16 +72,12 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
 
 module.exports = {
 
-  async createAndDeployPixSiteRelease(payload) {
-    await publishAndDeployRelease(PIX_SITE_REPO_NAME, PIX_SITE_APPS, payload.text, payload.response_url);
+  async createAndDeployPixLCMS(payload) {
+    await publishAndDeployRelease(PIX_LCMS_REPO_NAME, [PIX_LCMS_APP_NAME], payload.text, payload.response_url);
   },
 
   async createAndDeployPixUI(payload) {
     await publishAndDeployPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
-  },
-
-  async createAndDeployPixLCMS(payload) {
-    await publishAndDeployRelease(PIX_LCMS_REPO_NAME, [PIX_LCMS_APP_NAME], payload.text, payload.response_url);
   },
 
   async createAndDeployPixDatawarehouse(payload) {

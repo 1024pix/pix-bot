@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const proxyquire =  require('proxyquire');
 const { expect } = require('chai');
 const releasesService = require('../../../../lib/services/releases');
-const ScalingoClient = require('../../../../lib/services/scalingo-client');
+const ScalingoClient = require('../../../../common/services/scalingo-client');
 
 describe('releases', function() {
   let exec;
@@ -37,19 +37,6 @@ describe('releases', function() {
     });
   });
 
-  describe('#deployPixRepo', async function() {
-    it('should deploy the pix site', async function() {
-      // given
-      const scalingoClient = new ScalingoClient(null, 'production');
-      scalingoClient.deployFromArchive = sinon.stub();
-      scalingoClient.deployFromArchive.withArgs('app-name', 'v1.0.0', 'pix-site').resolves('OK');
-      sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
-      // when
-      const response = await releasesService.deployPixRepo('Pix-Site', 'app-name', 'V1.0.0 ');
-      // then
-      expect(response).to.equal('OK');
-    });
-  });
 });
 
 describe('#deploy', async function () {

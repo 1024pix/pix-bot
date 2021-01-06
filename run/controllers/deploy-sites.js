@@ -1,5 +1,5 @@
 const githubServices = require('../../common/services/github');
-const releasesService = require('../services/releases');
+const releasesService = require('../../run/services/releases');
 const config = require('../../config');
 const Boom = require('@hapi/boom');
 
