@@ -16,4 +16,10 @@ module.exports = [
     handler: slackbotController.getPullRequests,
     config: slackConfig
   },
+  {
+    method: 'POST',
+    path: '/slack/commands/changelog',
+    handler: slackbotController.getChangelogSinceLatestRelease,
+    config: slackConfig
+  },
 ];
