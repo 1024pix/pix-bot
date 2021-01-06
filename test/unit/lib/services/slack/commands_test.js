@@ -6,7 +6,7 @@ const {
   createAndDeployPixUI,
   createAndDeployPixLCMS,
   createAndDeployPixDatawarehouse,
-} = require('../../../../../lib/services/slack/commands');
+} = require('../../../../../common/services/slack/commands');
 const releasesServices = require('../../../../../lib/services/releases');
 const githubServices = require('../../../../../lib/services/github');
 

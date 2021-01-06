@@ -1,8 +1,8 @@
-const { releaseAndDeployPixBotTest } = require('../releases');
-const releasesService = require('../releases');
-const githubServices = require('../github');
+const { releaseAndDeployPixBotTest } = require('../../../lib/services/releases');
+const releasesService = require('../../../lib/services/releases');
+const githubServices = require('../../../lib/services/github');
 const axios = require('axios');
-const postSlackMessage = require('../../services/slack/surfaces/messages/post-message');
+const postSlackMessage = require('./surfaces/messages/post-message');
 
 const PIX_SITE_REPO_NAME = 'pix-site';
 const PIX_SITE_APPS = ['pix-site', 'pix-pro'];
