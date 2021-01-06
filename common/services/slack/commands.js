@@ -1,6 +1,6 @@
 const { releaseAndDeployPixBotTest } = require('../../../lib/services/releases');
 const releasesService = require('../../../lib/services/releases');
-const githubServices = require('../../../lib/services/github');
+const githubServices = require('../github');
 const axios = require('axios');
 const postSlackMessage = require('./surfaces/messages/post-message');
 
