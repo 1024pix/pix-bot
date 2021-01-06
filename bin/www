@@ -5,7 +5,7 @@ const ReviewAppManager = require('scalingo-review-app-manager').ReviewAppManager
 const config = require('../config');
 const server = require('../server');
 const { createCronJob } = require('../common/services/cron-job');
-const sendInBlueReport = require('../lib/services/sendinblue-report');
+const sendInBlueReport = require('../run/services/sendinblue-report');
 
 const init = async () => {
 

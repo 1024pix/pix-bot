@@ -4,7 +4,7 @@ const { sinon } = require('../../../test-helper');
 const config = require('../../../../config');
 const axios = require('axios');
 const SibApiV3Sdk = require('sib-api-v3-sdk');
-const sendinblueReport = require('../../../../lib/services/sendinblue-report');
+const sendinblueReport = require('../../../../run/services/sendinblue-report');
 
 describe('Unit | SendInBlue Report', () => {
   describe('#getReport', () => {

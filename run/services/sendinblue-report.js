@@ -3,7 +3,7 @@ const SibApiV3Sdk = require('sib-api-v3-sdk');
 const dayjs = require('dayjs');
 const config = require('../../config');
 
-function _instanciateSendInBlueTransactionalEmailsAPi() {
+function _instantiateSendInBlueTransactionalEmailsApi() {
   const defaultClient = SibApiV3Sdk.ApiClient.instance;
   defaultClient.authentications['api-key'].apiKey = config.sendInBlue.apiKey;
   return new SibApiV3Sdk.TransactionalEmailsApi();
@@ -64,7 +64,7 @@ function _generateAndReturnFilledSlackBlocks({
 }
 
 async function getReport() {
-  const sendInBlueApi = _instanciateSendInBlueTransactionalEmailsAPi();
+  const sendInBlueApi = _instantiateSendInBlueTransactionalEmailsApi();
 
   const currentDate = dayjs();
   const firstDayOfThisMonth = dayjs().startOf('month');
