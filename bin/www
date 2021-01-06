@@ -2,8 +2,8 @@ require('dotenv').config();
 
 const ReviewAppManager = require('scalingo-review-app-manager').ReviewAppManager;
 
-const config = require('../lib/config');
-const server = require('../lib/server');
+const config = require('../config');
+const server = require('../server');
 const { createCronJob } = require('../lib/services/cron-job');
 const sendInBlueReport = require('../lib/services/sendinblue-report');
 

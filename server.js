@@ -10,7 +10,7 @@ const server = Hapi.server({
   port: config.port,
 });
 
-const routesDir = path.join(__dirname, 'routes');
+const routesDir = path.join(__dirname, '/lib/routes');
 require('fs').readdirSync(routesDir)
   .filter((file) => path.extname(file) === '.js')
   .forEach((file) => server.route(require(path.join(routesDir, file))));

@@ -1,8 +1,8 @@
 const axios = require('axios');
 const { describe, it } = require('mocha');
 const { expect, sinon } = require('../../../test-helper');
-const server = require('../../../../lib/server');
-const config = require('../../../../lib/config');
+const server = require('../../../../server');
+const config = require('../../../../config');
 
 describe('Integration | Applications', () => {
   describe('#invalidateCdnCache', () => {

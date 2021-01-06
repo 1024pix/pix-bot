@@ -1,6 +1,6 @@
 const { describe, it } = require('mocha');
 const { catchErr, expect, nock } = require('../../../test-helper');
-const config = require('../../../../lib/config');
+const config = require('../../../../config');
 
 const cdn = require('../../../../lib/services/cdn');
 
