@@ -8,7 +8,7 @@ describe('releases', function() {
 
   before(() => {
     exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
-    releasesService = proxyquire('../../../../lib/services/releases', {
+    releasesService = proxyquire('../../../../build/services/releases', {
       'child_process': {exec},
       util: {promisify: fn => fn}
     });
@@ -33,5 +33,4 @@ describe('releases', function() {
       sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor$')));
     });
   });
-
 });

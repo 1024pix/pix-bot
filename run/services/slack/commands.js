@@ -1,5 +1,5 @@
 const releasesService = require('../releases');
-const releasesServiceFromBuild = require('../releases');
+const releasesServiceFromBuild = require('../../../build/services/releases');
 const githubServices = require('../../../common/services/github');
 const axios = require('axios');
 const postSlackMessage = require('../../../common/services/slack/surfaces/messages/post-message');
@@ -42,9 +42,9 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
     releaseType = 'minor';
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
-  await releasesService.publishPixRepo(repoName, releaseType);
+  await releasesServiceFromBuild.publishPixRepo(repoName, releaseType);
   const releaseTagAfterRelease = await githubServices.getLatestReleaseTag(repoName);
-  await releasesServiceFromBuild.deployPixUI();
+  await releasesService.deployPixUI();
 
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
@@ -59,7 +59,7 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
-    await releasesService.publishPixRepo(repoName, releaseType);
+    await releasesServiceFromBuild.publishPixRepo(repoName, releaseType);
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
 
     await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag)));

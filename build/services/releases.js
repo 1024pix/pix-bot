@@ -1,8 +1,7 @@
-const process = require('process');
 const util = require('util');
-const config = require('../../config');
-const ScalingoClient = require('../../common/services/scalingo-client');
 const exec = util.promisify(require('child_process').exec);
+
+const config = require('../../config');
 
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 
@@ -13,25 +12,29 @@ module.exports = {
     production: 'production'
   },
 
-  async deployPixRepo(repoName, appName, releaseTag) {
-    const sanitizedReleaseTag = _sanitizedArgument(releaseTag);
-    const sanitizedRepoName = _sanitizedArgument(repoName);
-    const sanitizedAppName = _sanitizedArgument(appName);
-
-    const client = await ScalingoClient.getInstance('production');
-    return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
+  async publish(releaseType) {
+    const scriptFileName = 'publish.sh';
+    try {
+      const sanitizedReleaseType = _sanitizedArgument(releaseType);
+      await _runScriptWithArgument(scriptFileName, sanitizedReleaseType);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   },
 
-  async releaseAndDeployPixBotTest(versionType) {
+  async publishPixRepo(repoName, releaseType) {
     try {
-      const releaseType = _sanitizedArgument(versionType);
-      const args = [config.github.owner, 'pix-bot-release-test', releaseType];
+      const sanitizedReleaseType = _sanitizedArgument(releaseType);
+      const sanitizedRepoName = _sanitizedArgument(repoName);
+      const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType];
       await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
     } catch (err) {
       console.error(err);
       throw err;
     }
-  }
+  },
+
 };
 
 async function _runScriptWithArgument (scriptFileName, ...args) {

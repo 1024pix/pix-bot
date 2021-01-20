@@ -1,5 +1,6 @@
 const { releaseAndDeployPixBotTest } = require('../../../lib/services/releases');
-const releasesService = require('../../../lib/services/releases');
+const releasesServiceFromBuild = require('../../../build/services/releases');
+const releasesServiceFromRun = require('../../../run/services/releases');
 const githubServices = require('../github');
 const axios = require('axios');
 
@@ -34,10 +35,10 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
-    await releasesService.publishPixRepo(repoName, releaseType);
+    await releasesServiceFromBuild.publishPixRepo(repoName, releaseType);
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
 
-    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag)));
+    await Promise.all(appNamesList.map((appName) => releasesServiceFromRun.deployPixRepo(repoName, appName, releaseTag)));
 
     sendResponse(responseUrl, getSuccessMessage(releaseTag, appNamesList.join(', ')));
   } catch (e) {

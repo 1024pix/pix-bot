@@ -4,7 +4,6 @@ const exec = util.promisify(require('child_process').exec);
 const config = require('../../config');
 const ScalingoClient = require('../../common/services/scalingo-client');
 
-const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 const DEPLOY_PIX_UI_SCRIPT = 'deploy-pix-ui.sh';
 
 
@@ -22,18 +21,6 @@ module.exports = {
 
     const client = await ScalingoClient.getInstance('production');
     return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
-  },
-
-  async publishPixRepo(repoName, releaseType) {
-    try {
-      const sanitizedReleaseType = _sanitizedArgument(releaseType);
-      const sanitizedRepoName = _sanitizedArgument(repoName);
-      const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType];
-      await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
   },
 
   async deploy(environment, releaseTag) {

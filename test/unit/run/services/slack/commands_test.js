@@ -6,16 +6,17 @@ const {
   createAndDeployPixUI,
   createAndDeployPixSiteRelease,
 } = require('../../../../../run/services/slack/commands');
-const releasesServices = require('../../../../../run/services/releases');
+const releasesServicesFromRun = require('../../../../../run/services/releases');
+const releasesServicesFromBuild = require('../../../../../build/services/releases');
 const githubServices = require('../../../../../common/services/github');
 
 describe('Services | Slack | Commands', () => {
   beforeEach(() => {
     // given
     sinon.stub(axios, 'post');
-    sinon.stub(releasesServices, 'deployPixRepo').resolves();
-    sinon.stub(releasesServices, 'publishPixRepo').resolves();
-    sinon.stub(releasesServices, 'deployPixUI').resolves();
+    sinon.stub(releasesServicesFromRun, 'deployPixRepo').resolves();
+    sinon.stub(releasesServicesFromRun, 'deployPixUI').resolves();
+    sinon.stub(releasesServicesFromBuild, 'publishPixRepo').resolves();
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
   });
 
@@ -30,7 +31,7 @@ describe('Services | Slack | Commands', () => {
 
       it('should publish a new release', () => {
         // then
-        sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site', 'minor');
+        sinon.assert.calledWith(releasesServicesFromBuild.publishPixRepo, 'pix-site', 'minor');
       });
 
       it('should retrieve the last release tag from GitHub', () => {
@@ -40,8 +41,8 @@ describe('Services | Slack | Commands', () => {
 
       it('should deploy the release for pix-site and pix-pro', () => {
         // then
-        sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
-        sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-pro', 'v1.0.0');
+        sinon.assert.calledWith(releasesServicesFromRun.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
+        sinon.assert.calledWith(releasesServicesFromRun.deployPixRepo, 'pix-site', 'pix-pro', 'v1.0.0');
       });
 
       it('should inform the user of the progress', () => {
@@ -56,7 +57,7 @@ describe('Services | Slack | Commands', () => {
         // when
         await createAndDeployPixSiteRelease(payload);
         // then
-        sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site', 'minor');
+        sinon.assert.calledWith(releasesServicesFromBuild.publishPixRepo, 'pix-site', 'minor');
       });
     });
 
@@ -64,7 +65,7 @@ describe('Services | Slack | Commands', () => {
       it('should inform the user', async () => {
         // given
         const payload = { response_url: 'http://example.net/callback' };
-        releasesServices.publishPixRepo.rejects();
+        releasesServicesFromBuild.publishPixRepo.rejects();
         // when
         await createAndDeployPixSiteRelease(payload);
         // then
@@ -83,7 +84,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should publish a new release', () => {
       // then
-      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-ui', 'minor');
+      sinon.assert.calledWith(releasesServicesFromBuild.publishPixRepo, 'pix-ui', 'minor');
     });
 
     it('should retrieve the last release tag from GitHub', () => {
@@ -93,7 +94,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should deploy the release', () => {
       // then
-      sinon.assert.calledWith(releasesServices.deployPixUI);
+      sinon.assert.calledWith(releasesServicesFromRun.deployPixUI);
     });
   });
 
@@ -107,7 +108,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should publish a new release', () => {
       // then
-      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-editor', 'minor');
+      sinon.assert.calledWith(releasesServicesFromBuild.publishPixRepo, 'pix-editor', 'minor');
     });
 
     it('should retrieve the last release tag from GitHub', () => {
@@ -117,7 +118,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should deploy the release', () => {
       // then
-      sinon.assert.calledWith(releasesServices.deployPixRepo);
+      sinon.assert.calledWith(releasesServicesFromRun.deployPixRepo);
     });
   });
 
