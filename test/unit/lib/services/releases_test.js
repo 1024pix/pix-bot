@@ -35,27 +35,3 @@ describe('releases', function() {
   });
 
 });
-
-describe('#deploy', async function () {
-
-  describe('#deployPixUI', async function () {
-    let exec, releasesService;
-
-    before(() => {
-      exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
-      releasesService = proxyquire('../../../../lib/services/releases', {
-        'child_process': {exec},
-        util: {promisify: fn => fn}
-      });
-    });
-
-    it('should call the deploy Pix-UI script with default', async function () {
-      //when
-      await releasesService.deployPixUI('pix-ui');
-
-      // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/deploy-pix-ui.sh)')));
-    });
-
-  });
-});

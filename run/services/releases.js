@@ -1,8 +1,19 @@
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+
+const config = require('../../config');
 const ScalingoClient = require('../../common/services/scalingo-client');
 
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
+const DEPLOY_PIX_UI_SCRIPT = 'deploy-pix-ui.sh';
+
 
 module.exports = {
+
+  environments: {
+    recette: 'recette',
+    production: 'production'
+  },
 
   async deployPixRepo(repoName, appName, releaseTag) {
     const sanitizedReleaseTag = _sanitizedArgument(releaseTag);
@@ -23,6 +34,24 @@ module.exports = {
       console.error(err);
       throw err;
     }
+  },
+
+  async deploy(environment, releaseTag) {
+    const sanitizedEnvironment = _sanitizedArgument(environment);
+    const sanitizedReleaseTag = _sanitizedArgument(releaseTag);
+
+    const client = await ScalingoClient.getInstance(sanitizedEnvironment);
+
+    const results = await Promise.all(config.pixApps.map(pixApp => {
+      return client.deployFromArchive(pixApp, sanitizedReleaseTag);
+    }));
+
+    return results;
+  },
+
+  async deployPixUI() {
+    const args = [config.github.owner, 'pix-ui'];
+    await _runScriptWithArgument(DEPLOY_PIX_UI_SCRIPT, ...args);
   },
 
 };
