@@ -1,4 +1,4 @@
-const { name, version, description } = require('../../package');
+const { name, version, description } = require('../../package.json');
 
 module.exports = {
 
