@@ -4,7 +4,7 @@ const { expect, sinon } = require('../../../test-helper');
 const server = require('../../../../server');
 const config = require('../../../../config');
 
-describe('Integration | Applications', () => {
+describe('Integration | Run | Applications', () => {
   describe('#invalidateCdnCache', () => {
     it('should throw unauthorized error when api key provide are bad', async () => {
       // given
