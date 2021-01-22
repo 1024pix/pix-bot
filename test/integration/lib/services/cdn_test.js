@@ -28,7 +28,7 @@ function _stubInvalidationCachePost(namespaceKey) {
       'Cookie': `baleen-namespace=${namespaceKey}`
     }
   })
-    .post('/cache/invalidations')
+    .post('/cache/invalidations', { patterns: ['.']})
     .reply(200);
 }
 
