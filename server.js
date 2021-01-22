@@ -10,7 +10,7 @@ const server = Hapi.server({
   port: config.port,
 });
 
-['/lib', '/build', '/run', '/common'].forEach(subDir => {
+['/build', '/run', '/common'].forEach(subDir => {
   const routesDir = path.join(__dirname, subDir, '/routes');
   require('fs').readdirSync(routesDir)
     .filter((file) => path.extname(file) === '.js')

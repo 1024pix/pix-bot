@@ -1,4 +1,3 @@
-const { releaseAndDeployPixBotTest } = require('../../../lib/services/releases');
 const releasesServiceFromBuild = require('../../../build/services/releases');
 const releasesServiceFromRun = require('../../../run/services/releases');
 const githubServices = require('../github');
@@ -51,10 +50,4 @@ module.exports = {
   async createAndDeployPixDatawarehouse(payload) {
     await publishAndDeployRelease(PIX_DATAWAREHOUSE_REPO_NAME, PIX_DATAWAREHOUSE_APPS_NAME, payload.text, payload.response_url);
   },
-
-  async createAndDeployPixBotTestRelease(payload) {
-    await releaseAndDeployPixBotTest(payload.text);
-    const release = payload.text || 'defaut';
-    sendResponse(payload, getSuccessMessage(release, 'PIX TEST (repo de test)'));
-  }
 };

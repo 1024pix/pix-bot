@@ -1,7 +1,8 @@
 const openModalReleasePublicationConfirmation = require('./surfaces/modals/publish-release/release-publication-confirmation');
 const openModalReleaseDeploymentConfirmation = require('./surfaces/modals/deploy-release/release-deployment-confirmation');
 const postSlackMessage = require('./surfaces/messages/post-message');
-const { environments, deploy, publish } = require('../../../lib/services/releases');
+const { environments, deploy } = require('../../../run/services/releases');
+const { publish } = require('../../../build/services/releases');
 const githubService = require('../github');
 
 module.exports = {

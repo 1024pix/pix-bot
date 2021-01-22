@@ -1,8 +1,9 @@
-const commands = require('../../common/services/slack/commands');
-const shortcuts = require('../../common/services/slack/shortcuts');
-const viewSubmissions = require('../../common/services/slack/view-submissions');
-const github = require('../../common/services/github');
-const postSlackMessage = require('../../common/services/slack/surfaces/messages/post-message');
+const commandsFromRun = require('../../run/services/slack/commands');
+const commands = require('../services/slack/commands');
+const shortcuts = require('../services/slack/shortcuts');
+const viewSubmissions = require('../services/slack/view-submissions');
+const github = require('../services/github');
+const postSlackMessage = require('../services/slack/surfaces/messages/post-message');
 
 function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
@@ -12,7 +13,7 @@ module.exports = {
 
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
-    commands.createAndDeployPixSiteRelease(payload);
+    commandsFromRun.createAndDeployPixSiteRelease(payload);
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX site and pro')
@@ -30,7 +31,7 @@ module.exports = {
 
   createAndDeployPixUIRelease(request) {
     const payload = request.pre.payload;
-    commands.createAndDeployPixUI(payload);
+    commandsFromRun.createAndDeployPixUI(payload);
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX UI')
@@ -39,7 +40,7 @@ module.exports = {
 
   createAndDeployPixLCMSRelease(request) {
     const payload = request.pre.payload;
-    commands.createAndDeployPixLCMS(payload);
+    commandsFromRun.createAndDeployPixLCMS(payload);
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX LCMS')
@@ -95,8 +96,6 @@ module.exports = {
       return null;
     }
   },
-
-
 
   _interruptRelease() {
     postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
