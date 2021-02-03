@@ -9,6 +9,8 @@ const PIX_LCMS_APP_NAME = 'pix-lcms';
 const PIX_UI_REPO_NAME = 'pix-ui';
 const PIX_SITE_REPO_NAME = 'pix-site';
 const PIX_SITE_APPS = ['pix-site', 'pix-pro'];
+const PIX_DATAWAREHOUSE_REPO_NAME = 'pix-db-replication';
+const PIX_DATAWAREHOUSE_APPS_NAME = ['pix-datawarehouse', 'pix-datawarehouse-ex'];
 
 function sendResponse(responseUrl, text) {
   axios.post(responseUrl,
@@ -81,6 +83,10 @@ module.exports = {
   
   async createAndDeployPixSiteRelease(payload) {
     await publishAndDeployRelease(PIX_SITE_REPO_NAME, PIX_SITE_APPS, payload.text, payload.response_url);
+  },
+
+  async createAndDeployPixDatawarehouse(payload) {
+    await publishAndDeployRelease(PIX_DATAWAREHOUSE_REPO_NAME, PIX_DATAWAREHOUSE_APPS_NAME, payload.text, payload.response_url);
   },
 
 };

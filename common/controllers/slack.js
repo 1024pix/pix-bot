@@ -1,5 +1,4 @@
 const commandsFromRun = require('../../run/services/slack/commands');
-const commands = require('../services/slack/commands');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const github = require('../services/github');
@@ -22,7 +21,7 @@ module.exports = {
 
   createAndDeployPixBotTestRelease(request) {
     const payload = request.pre.payload;
-    commands.createAndDeployPixBotTestRelease(payload);
+    commandsFromRun.createAndDeployPixBotTestRelease(payload);
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX bot test (repo vide)')
@@ -49,7 +48,7 @@ module.exports = {
 
   createAndDeployPixDatawarehouseRelease(request) {
     const payload = request.pre.payload;
-    commands.createAndDeployPixDatawarehouse(payload);
+    commandsFromRun.createAndDeployPixDatawarehouse(payload);
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX Datawarehouse')
