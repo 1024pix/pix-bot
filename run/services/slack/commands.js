@@ -1,4 +1,4 @@
-const releasesService = require('../releases');
+const releasesService = require('../../../common/services/releases');
 const releasesServiceFromBuild = require('../../../build/services/releases');
 const githubServices = require('../../../common/services/github');
 const axios = require('axios');

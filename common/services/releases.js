@@ -2,7 +2,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 const config = require('../../config');
-const ScalingoClient = require('../../common/services/scalingo-client');
+const ScalingoClient = require('./scalingo-client');
 
 const DEPLOY_PIX_UI_SCRIPT = 'deploy-pix-ui.sh';
 

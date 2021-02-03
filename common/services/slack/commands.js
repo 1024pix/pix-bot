@@ -1,5 +1,5 @@
 const releasesServiceFromBuild = require('../../../build/services/releases');
-const releasesServiceFromRun = require('../../../run/services/releases');
+const releasesService = require('../releases');
 const githubServices = require('../github');
 const axios = require('axios');
 
@@ -37,7 +37,7 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     await releasesServiceFromBuild.publishPixRepo(repoName, releaseType);
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
 
-    await Promise.all(appNamesList.map((appName) => releasesServiceFromRun.deployPixRepo(repoName, appName, releaseTag)));
+    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag)));
 
     sendResponse(responseUrl, getSuccessMessage(releaseTag, appNamesList.join(', ')));
   } catch (e) {

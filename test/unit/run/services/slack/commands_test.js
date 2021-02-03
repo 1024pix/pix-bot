@@ -6,7 +6,7 @@ const {
   createAndDeployPixUI,
   createAndDeployPixSiteRelease,
 } = require('../../../../../run/services/slack/commands');
-const releasesServicesFromRun = require('../../../../../run/services/releases');
+const releasesServicesFromRun = require('../../../../../common/services/releases');
 const releasesServicesFromBuild = require('../../../../../build/services/releases');
 const githubServices = require('../../../../../common/services/github');
 

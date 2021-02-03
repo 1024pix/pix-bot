@@ -5,7 +5,7 @@ const {
   createAndDeployPixDatawarehouse,
 } = require('../../../../../common/services/slack/commands');
 const releasesServicesFromBuild = require('../../../../../build/services/releases');
-const releasesServicesFromRun = require('../../../../../run/services/releases');
+const releasesServicesFromRun = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
 
 describe('Services | Slack | Commands', () => {

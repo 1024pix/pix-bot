@@ -10,7 +10,7 @@ describe('releases', function() {
 
   before(() => {
     exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
-    releasesService = proxyquire('../../../../run/services/releases', {
+    releasesService = proxyquire('../../../../common/services/releases', {
       'child_process': {exec},
       util: {promisify: fn => fn}
     });
@@ -66,7 +66,7 @@ describe('releases', function() {
 
       before(() => {
         exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
-        releasesService = proxyquire('../../../../run/services/releases', {
+        releasesService = proxyquire('../../../../common/services/releases', {
           'child_process': {exec},
           util: {promisify: fn => fn}
         });
