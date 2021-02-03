@@ -5,7 +5,7 @@ const config = require('../../config');
 const ScalingoClient = require('./scalingo-client');
 
 const DEPLOY_PIX_UI_SCRIPT = 'deploy-pix-ui.sh';
-
+const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 
 module.exports = {
 
@@ -39,6 +39,29 @@ module.exports = {
   async deployPixUI() {
     const args = [config.github.owner, 'pix-ui'];
     await _runScriptWithArgument(DEPLOY_PIX_UI_SCRIPT, ...args);
+  },
+
+  async publish(releaseType) {
+    const scriptFileName = 'publish.sh';
+    try {
+      const sanitizedReleaseType = _sanitizedArgument(releaseType);
+      await _runScriptWithArgument(scriptFileName, sanitizedReleaseType);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  },
+
+  async publishPixRepo(repoName, releaseType) {
+    try {
+      const sanitizedReleaseType = _sanitizedArgument(releaseType);
+      const sanitizedRepoName = _sanitizedArgument(repoName);
+      const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType];
+      await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   },
 
 };

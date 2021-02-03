@@ -83,4 +83,24 @@ describe('releases', function() {
     });
   });
 
+  describe('#publish', async function () {
+    it('should call the publish script', async function () {
+      //when
+      await releasesService.publish('minor');
+
+      // then
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/publish.sh minor)')));
+    });
+  });
+
+  describe('#publishPixRepo', async function () {
+    it('should call the release pix script with \'minor\'', async function () {
+      //when
+      await releasesService.publishPixRepo('pix-site', 'minor');
+
+      // then
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor$')));
+    });
+  });
+
 });
