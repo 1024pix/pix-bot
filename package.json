@@ -29,7 +29,7 @@
     "@octokit/core": "^3.1.1",
     "@octokit/rest": "18.0.5",
     "@sentry/cli": "^1.55.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "cron": "^1.8.2",
     "crypto": "^1.0.1",
     "dayjs": "^1.9.4",
