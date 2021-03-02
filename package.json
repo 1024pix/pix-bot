@@ -12,7 +12,7 @@
     "deploy:tag": "git push --tags",
     "start": "node bin/www",
     "test": "NODE_ENV=test mocha --recursive --exit test",
-    "lint": "eslint lib/* test/*"
+    "lint": "eslint common/* run/* build/* bin/* test/*"
   },
   "repository": {
     "type": "git",

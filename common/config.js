@@ -10,4 +10,4 @@ module.exports = {
       {method: verifySignatureAndParseBody, assign: 'payload'}
     ]
   },
-}
+};
