@@ -11,6 +11,7 @@ const PIX_SITE_REPO_NAME = 'pix-site';
 const PIX_SITE_APPS = ['pix-site', 'pix-pro'];
 const PIX_DATAWAREHOUSE_REPO_NAME = 'pix-db-replication';
 const PIX_DATAWAREHOUSE_APPS_NAME = ['pix-datawarehouse', 'pix-datawarehouse-ex'];
+const PIX_BOT_REPO_TEST = 'pix-bot-release-test';
 
 function sendResponse(responseUrl, text) {
   axios.post(responseUrl,
@@ -87,6 +88,10 @@ module.exports = {
 
   async createAndDeployPixDatawarehouse(payload) {
     await publishAndDeployRelease(PIX_DATAWAREHOUSE_REPO_NAME, PIX_DATAWAREHOUSE_APPS_NAME, payload.text, payload.response_url);
+  },
+
+  async createAndDeployPixBotTestRelease(payload) {
+    await publishAndDeployRelease(PIX_BOT_REPO_TEST, [PIX_BOT_REPO_TEST], payload.text, payload.response_url);
   },
 
 };
