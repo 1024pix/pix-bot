@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const github = require('../../../lib/services/github');
+const github = require('../../../common/services/github');
 
 const { displayPullRequest, filterPullRequest, getHeadOfChangelog, orderPr, getLastMEPDate } = require('../../../scripts/get-pull-requests-to-release-in-prod');
 

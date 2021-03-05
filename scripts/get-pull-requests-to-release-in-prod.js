@@ -2,7 +2,7 @@
 const moment = require('moment');
 const _ = require('lodash');
 const fs = require('fs');
-const github = require('../lib/services/github');
+const github = require('../common/services/github');
 
 const CHANGELOG_FILE = 'CHANGELOG.md';
 const CHANGELOG_HEADER_LINES = 2;

@@ -1,23 +1,13 @@
 require('dotenv').config();
 
-const ReviewAppManager = require('scalingo-review-app-manager').ReviewAppManager;
-
-const config = require('../lib/config');
-const server = require('../lib/server');
-const { createCronJob } = require('../lib/services/cron-job');
-const sendInBlueReport = require('../lib/services/sendinblue-report');
+const config = require('../config');
+const server = require('../server');
+const { createCronJob } = require('../common/services/cron-job');
+const sendInBlueReport = require('../run/services/sendinblue-report');
+const ecoModeService = require('../build/services/eco-mode-service');
 
 const init = async () => {
-
-  const scalingoToken = config.scalingo.reviewApps.token;
-  const scalingoApiUrl = config.scalingo.reviewApps.apiUrl;
-  const stopCronTime = process.env.STOP_CRON_TIME;
-  const restartCronTime = process.env.RESTART_CRON_TIME;
-  const timeZone = process.env.TIME_ZONE || 'Europe/Paris';
-  const ignoredReviewApps = process.env.IGNORED_REVIEW_APPS ? process.env.IGNORED_REVIEW_APPS.split(',') : [];
-
-  const reviewAppManager = new ReviewAppManager(scalingoToken, scalingoApiUrl, { stopCronTime, restartCronTime, timeZone, ignoredReviewApps });
-  await reviewAppManager.startEcoMode();
+  await ecoModeService.start();
 
   createCronJob('SendInBlue Report', sendInBlueReport.getReport, config.thirdServicesUsageReport.schedule);
 
