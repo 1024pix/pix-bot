@@ -60,27 +60,6 @@ describe('releases', function() {
         expect(e.message).to.equal('KO');
       }
     });
-
-    describe('#deployPixUI', async function () {
-      let exec, releasesService;
-
-      before(() => {
-        exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
-        releasesService = proxyquire('../../../../common/services/releases', {
-          'child_process': {exec},
-          util: {promisify: fn => fn}
-        });
-      });
-
-      it('should call the deploy Pix-UI script with default', async function () {
-        //when
-        await releasesService.deployPixUI('pix-ui');
-
-        // then
-        sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/deploy-pix-ui.sh)')));
-      });
-
-    });
   });
 
   describe('#publish', async function () {

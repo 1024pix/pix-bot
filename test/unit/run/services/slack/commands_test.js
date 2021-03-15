@@ -15,7 +15,6 @@ describe('Services | Slack | Commands', () => {
     // given
     sinon.stub(axios, 'post');
     sinon.stub(releasesServices, 'deployPixRepo').resolves();
-    sinon.stub(releasesServices, 'deployPixUI').resolves();
     sinon.stub(releasesServices, 'publishPixRepo').resolves();
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
   });
@@ -90,11 +89,6 @@ describe('Services | Slack | Commands', () => {
     it('should retrieve the last release tag from GitHub', () => {
       // then
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-ui');
-    });
-
-    it('should deploy the release', () => {
-      // then
-      sinon.assert.calledWith(releasesServices.deployPixUI);
     });
   });
 

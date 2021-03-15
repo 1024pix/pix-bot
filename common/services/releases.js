@@ -4,7 +4,6 @@ const exec = util.promisify(require('child_process').exec);
 const config = require('../../config');
 const ScalingoClient = require('./scalingo-client');
 
-const DEPLOY_PIX_UI_SCRIPT = 'deploy-pix-ui.sh';
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 
 module.exports = {
@@ -34,11 +33,6 @@ module.exports = {
     }));
 
     return results;
-  },
-
-  async deployPixUI() {
-    const args = [config.github.owner, 'pix-ui'];
-    await _runScriptWithArgument(DEPLOY_PIX_UI_SCRIPT, ...args);
   },
 
   async publish(releaseType) {
