@@ -95,6 +95,14 @@ describe('Scalingo client', () => {
       expect(result).to.be.equal('Deployed pix-app-production v1.0');
     });
 
+    it('should deploy an application without the environment suffix', async () => {
+      // given
+      // when
+      const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', undefined, { withEnvSuffix: false });
+      // then
+      expect(result).to.be.equal('Deployed pix-app v1.0');
+    });
+
     it('should deploy an application for a given repository', async () => {
       // given
       // when
