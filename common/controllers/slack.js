@@ -37,6 +37,15 @@ module.exports = {
     };
   },
 
+  createAndDeployPixBotRelease(request) {
+    const payload = request.pre.payload;
+    commandsFromRun.createAndDeployPixBotRelease(payload);
+
+    return {
+      'text': _getDeployStartedMessage(payload.text, 'PIX Bot')
+    };
+  },
+
   createAndDeployPixLCMSRelease(request) {
     const payload = request.pre.payload;
     commandsFromRun.createAndDeployPixLCMS(payload);
