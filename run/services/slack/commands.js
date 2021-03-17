@@ -46,7 +46,6 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
   await releasesService.publishPixRepo(repoName, releaseType);
   const releaseTagAfterRelease = await githubServices.getLatestReleaseTag(repoName);
-  await releasesService.deployPixUI();
 
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
