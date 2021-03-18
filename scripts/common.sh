@@ -33,11 +33,11 @@ function get_package_version() {
   node -p -e "require('./package.json').version"
 }
 
-function push_commit_and_tag_to_remote_dev() {
-  git push origin dev
+function push_commit_and_tag_to_remote() {
+  git push origin
   git push origin "v${NEW_PACKAGE_VERSION}"
 
-  echo "Pushed release commit on branch origin/dev"
+  echo "Pushed release commit on branch origin"
 }
 
 function complete_change_log() {
