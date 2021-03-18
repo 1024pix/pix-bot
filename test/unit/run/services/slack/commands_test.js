@@ -6,9 +6,11 @@ const {
   createAndDeployPixUI,
   createAndDeployPixSiteRelease,
   createAndDeployPixDatawarehouse,
+  createAndDeployPixBotRelease,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
+const ScalingoClient = require('../../../../../common/services/scalingo-client');
 
 describe('Services | Slack | Commands', () => {
   beforeEach(() => {
@@ -113,6 +115,38 @@ describe('Services | Slack | Commands', () => {
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixRepo);
+    });
+  });
+
+  describe('#createAndDeployPixBotRelease', () => {
+    let client;
+    beforeEach(async () => {
+      // given
+      client = { deployFromArchive: sinon.spy() };
+      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPixBotRelease(payload);
+    });
+
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-bot', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', () => {
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-bot');
+    });
+
+    it('should deploy the release for pix-bot-build', () => {
+      // then
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build');
+    });
+
+    it('should deploy the release for pix-bot-run', () => {
+      // then
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-run');
     });
   });
 

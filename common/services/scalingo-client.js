@@ -1,6 +1,8 @@
 const scalingo = require('scalingo');
 const config = require('../../config');
 
+const DEFAULT_OPTS = { withEnvSuffix: true };
+
 class ScalingoClient {
   constructor(client, environment) {
     this.client = client;
@@ -13,7 +15,7 @@ class ScalingoClient {
     return new ScalingoClient(client, environment);
   }
 
-  async deployFromArchive(pixApp, releaseTag, repository = config.github.repository) {
+  async deployFromArchive(pixApp, releaseTag, repository = config.github.repository, options = DEFAULT_OPTS) {
     if (!pixApp) {
       throw new Error('No application to deploy.');
     }
@@ -21,7 +23,7 @@ class ScalingoClient {
       throw new Error('No release tag to deploy.');
     }
 
-    const scalingoApp = `${pixApp}-${this.environment}`;
+    const scalingoApp = options.withEnvSuffix ? `${pixApp}-${this.environment}` : pixApp;
 
     try {
       await this.client.apiClient().post(

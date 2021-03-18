@@ -1,9 +1,10 @@
 const releasesService = require('../../../common/services/releases');
+const ScalingoClient = require('../../../common/services/scalingo-client');
 const githubServices = require('../../../common/services/github');
 const axios = require('axios');
 const postSlackMessage = require('../../../common/services/slack/surfaces/messages/post-message');
 
-
+const PIX_BOT_REPO_NAME = 'pix-bot';
 const PIX_LCMS_REPO_NAME = 'pix-editor';
 const PIX_LCMS_APP_NAME = 'pix-lcms';
 const PIX_UI_REPO_NAME = 'pix-ui';
@@ -71,6 +72,22 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
   }
 }
 
+async function publishAndDeployPixBot(repoName, releaseType, responseUrl) {
+  if (_isReleaseTypeInvalid(releaseType)) {
+    releaseType = 'minor';
+  }
+  await releasesService.publishPixRepo(repoName, releaseType);
+  const releaseTag = await githubServices.getLatestReleaseTag(repoName);
+  
+  const recette = await ScalingoClient.getInstance('recette');
+  await recette.deployFromArchive('pix-bot-build', releaseTag, repoName, { withEnvSuffix: false });
+
+  const production = await ScalingoClient.getInstance('production');
+  await production.deployFromArchive('pix-bot-run', releaseTag, repoName);
+  
+  sendResponse(responseUrl, `Pix Bot deployed (${releaseTag})`);
+}
+
 module.exports = {
 
   async createAndDeployPixLCMS(payload) {
@@ -87,6 +104,10 @@ module.exports = {
 
   async createAndDeployPixDatawarehouse(payload) {
     await publishAndDeployRelease(PIX_DATAWAREHOUSE_REPO_NAME, PIX_DATAWAREHOUSE_APPS_NAME, payload.text, payload.response_url);
+  },
+
+  async createAndDeployPixBotRelease(payload) {
+    await publishAndDeployPixBot(PIX_BOT_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createAndDeployPixBotTestRelease(payload) {

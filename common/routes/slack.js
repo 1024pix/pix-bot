@@ -38,6 +38,12 @@ module.exports = [
   },
   {
     method: 'POST',
+    path: '/slack/commands/create-and-deploy-pix-bot-release',
+    handler: slackbotController.createAndDeployPixBotRelease,
+    config: slackConfig
+  },
+  {
+    method: 'POST',
     path: '/slack/commands/create-and-deploy-pix-datawarehouse-release',
     handler: slackbotController.createAndDeployPixDatawarehouseRelease,
     config: slackConfig
