@@ -1,3 +1,4 @@
+const axios = require('axios');
 const scalingo = require('scalingo');
 const config = require('../../config');
 
@@ -41,7 +42,37 @@ class ScalingoClient {
 
     return `Deployed ${scalingoApp} ${releaseTag}`;
   }
+
+  async getAppInfo(appName) {
+    try {
+      const { name, url, last_deployment_id } = await this.client.Apps.find(appName);
+      const { created_at, git_ref, pusher } = await this.client.Deployments.find(appName, last_deployment_id);
+      const isUp = await _isUrlReachable(url);
+      
+      return {
+        name,
+        url,
+        isUp,
+        lastDeployementAt: created_at,
+        lastDeployedBy: pusher.username,
+        lastDeployedVersion: git_ref
+      };
+    } catch (err) {
+      if (err.status === 404) {
+        throw new Error(`Impossible to get info for ${appName}`);
+      }
+      throw err;
+    }
+  }
 }
 
+async function _isUrlReachable(url) {
+  try {
+    await axios.get(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 module.exports = ScalingoClient;
