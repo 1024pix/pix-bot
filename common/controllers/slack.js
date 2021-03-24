@@ -1,4 +1,5 @@
 const commandsFromRun = require('../../run/services/slack/commands');
+const { getAppStatus } = require('../../run/services/slack/app-status');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const github = require('../services/github');
@@ -62,6 +63,11 @@ module.exports = {
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX Datawarehouse')
     };
+  },
+
+  getAppStatus(request) {
+    const appName= request.pre.payload.text;
+    return getAppStatus(appName);
   },
 
   interactiveEndpoint(request) {
