@@ -1,6 +1,7 @@
 const { describe, it } = require('mocha');
 const { sinon } = require('../../../test-helper');
 const scalingo = require('scalingo');
+const axios = require('axios');
 
 const ScalingoClient = require('../../../../common/services/scalingo-client');
 const { expect } = require('chai');
@@ -131,6 +132,111 @@ describe('Scalingo client', () => {
         expect.fail('Should throw an error when application doesnt exists');
       } catch (e) {
         expect(e.message).to.equal('Impossible to deploy unknown-app-production v1.0');
+      }
+    });
+  });
+
+  describe('#Scalingo.getAppInfo', () => {
+    let clientAppsFind;
+    let clientDeploymentsFind;
+    let scalingoClient;
+    let axiosGet;
+
+    beforeEach(async () => {
+      clientAppsFind = sinon.stub();
+      clientDeploymentsFind = sinon.stub();
+      sinon.stub(scalingo, 'clientFromToken').resolves({
+        Apps: { find: clientAppsFind },
+        Deployments: { find: clientDeploymentsFind },
+      });
+
+      axiosGet = sinon.stub(axios, 'get');
+
+      scalingoClient = await ScalingoClient.getInstance('production');
+    });
+
+    it('should return app info', async () => {
+      // given
+      clientAppsFind.withArgs('pix-app-production').resolves({
+        id: '5e6660f0623d3a000f479124',
+        name: 'pix-app-production',
+        url: 'https://app.pix.fr',
+        status: 'running',
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({ pusher: {} });
+
+
+      // when
+      const info = await scalingoClient.getAppInfo('pix-app-production');
+
+      // then
+      expect(info.name).to.equal('pix-app-production');
+      expect(info.url).to.equal('https://app.pix.fr');
+    });
+
+    it('should return last deployment info', async () => {
+      // given
+      clientAppsFind.withArgs('pix-app-production').resolves({
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({
+        created_at: '2021-03-23T11:02:20.955Z',
+        git_ref: 'v1.1.1',
+        pusher: { username: 'Bob' },
+      });
+
+      // when
+      const info = await scalingoClient.getAppInfo('pix-app-production');
+
+      // then
+      expect(info.lastDeployementAt).to.equal('2021-03-23T11:02:20.955Z');
+      expect(info.lastDeployedBy).to.equal('Bob');
+      expect(info.lastDeployedVersion).to.equal('v1.1.1');
+    });
+
+    it('should return application status when UP', async () => {
+      // given
+      clientAppsFind.withArgs('pix-app-production').resolves({
+        url: 'https://app.pix.fr',
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({ pusher: {} });
+      axiosGet.withArgs('https://app.pix.fr').resolves();
+
+      // when
+      const info = await scalingoClient.getAppInfo('pix-app-production');
+
+      // then
+      expect(info.isUp).to.equal(true);
+    });
+
+    it('should return application status when DOWN', async () => {
+      // given
+      clientAppsFind.withArgs('pix-app-production').resolves({
+        url: 'https://app.pix.fr',
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({ pusher: {} });
+      axiosGet.withArgs('https://app.pix.fr').rejects();
+
+      // when
+      const info = await scalingoClient.getAppInfo('pix-app-production');
+
+      // then
+      expect(info.isUp).to.equal(false);
+    });
+
+    it('should throw an error if app does not exist', async () => {
+      // given
+      clientAppsFind.withArgs('pix-toto-production').rejects({ status: 404 });
+
+      // when / then
+      try {
+        await scalingoClient.getAppInfo('pix-toto-production');
+        expect.fail('Should throw an error when application does not exists');
+      } catch (e) {
+        expect(e.message).to.equal('Impossible to get info for pix-toto-production');
       }
     });
   });

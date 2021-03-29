@@ -50,6 +50,12 @@ module.exports = [
   },
   {
     method: 'POST',
+    path: '/slack/commands/app-status',
+    handler: slackbotController.getAppStatus,
+    config: slackConfig
+  },
+  {
+    method: 'POST',
     path: '/slack/interactive-endpoint',
     handler: slackbotController.interactiveEndpoint,
     config: slackConfig
