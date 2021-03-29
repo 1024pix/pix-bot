@@ -73,8 +73,14 @@ class ScalingoClient {
 }
 
 async function _isUrlReachable(url) {
+
+  let pingUrl = url;
+  if (url.includes('api')) {
+    pingUrl = url + '/api';
+  }
+
   try {
-    await axios.get(url, {
+    await axios.get(pingUrl, {
       timeout: 2500,
     });
     return true;
