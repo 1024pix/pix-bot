@@ -48,7 +48,7 @@ class ScalingoClient {
       const { name, url, last_deployment_id } = await this.client.Apps.find(appName);
       const { created_at, git_ref, pusher } = await this.client.Deployments.find(appName, last_deployment_id);
       const isUp = await _isUrlReachable(url);
-      
+
       return {
         name,
         url,
@@ -68,7 +68,9 @@ class ScalingoClient {
 
 async function _isUrlReachable(url) {
   try {
-    await axios.get(url);
+    await axios.get(url, {
+      timeout: 2500,
+    });
     return true;
   } catch (e) {
     return false;
