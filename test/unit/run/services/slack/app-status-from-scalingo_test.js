@@ -128,14 +128,14 @@ describe('#getAppStatusFromScalingo', () => {
 
   it('returns a production app status when the appName is not the full app name', async () => {
     // given
-    const getAppInfo = sinon.stub().resolves({
+    const getAppInfo = sinon.stub().resolves([{
       name: 'pix-app-production',
       url: 'https://app.pix.fr',
       isUp: true,
       lastDeployementAt: '2021-03-24T08:37:18.611Z',
       lastDeployedBy: 'Bob',
       lastDeployedVersion: 'v1.0.0',
-    });
+    }]);
     const scalingoClientSpy = sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves({ getAppInfo });
 
     // when

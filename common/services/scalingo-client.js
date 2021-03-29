@@ -43,11 +43,24 @@ class ScalingoClient {
     return `Deployed ${scalingoApp} ${releaseTag}`;
   }
 
-  async getAppInfo(appName) {
+  async getAppInfo(target) {
+    if (['production', 'integration', 'recette'].includes(target)) {
+      return await this._getAllAppsInfo(target);
+    }
 
+    return [await this._getSingleAppInfo(target)];
+  }
+
+  async _getAllAppsInfo(environement) {
+    const apps = ['api', 'app', 'orga', 'certif', 'admin'];
+    const promises = apps.map(appName => this._getSingleAppInfo(appName, environement));
+    return Promise.all(promises);
+  }
+
+  async _getSingleAppInfo(appName, environment = 'production') {
     let scalingoAppName = appName;
     if (!appName.match(/^pix-[a-z0-9-]*$/g)) {
-      scalingoAppName = `pix-${appName}-production`;
+      scalingoAppName = `pix-${appName}-${environment}`;
     }
 
     try {
