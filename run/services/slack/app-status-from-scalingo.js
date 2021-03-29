@@ -1,6 +1,10 @@
 const ScalingoClient = require('../../../common/services/scalingo-client');
 
 async function getAppStatusFromScalingo(appName) {
+  if (!appName) {
+    return { text: 'Un nom d\'application est attendu en paramètre (ex: pix-app-production)' } ;
+  }
+
   const environment = appName.endsWith('production') ? 'production' : 'recette';
 
   try {

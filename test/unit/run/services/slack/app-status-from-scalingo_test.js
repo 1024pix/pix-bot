@@ -7,6 +7,14 @@ const ScalingoClient = require('../../../../../common/services/scalingo-client')
 
 describe('#getAppStatusFromScalingo', () => {
 
+  it('returns a message when no app is specified in command line', async () => {
+    // when
+    const response = await getAppStatusFromScalingo();
+
+    // then
+    expect(response.text).equals('Un nom d\'application est attendu en paramètre (ex: pix-app-production)');
+  });
+
   it('returns a production app status for slack', async () => {
     // given
     const getAppInfo = sinon.stub().resolves({
