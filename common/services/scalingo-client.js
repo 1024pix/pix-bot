@@ -44,9 +44,15 @@ class ScalingoClient {
   }
 
   async getAppInfo(appName) {
+
+    let scalingoAppName = appName;
+    if (!appName.match(/^pix-[a-z0-9-]*$/g)) {
+      scalingoAppName = `pix-${appName}-production`;
+    }
+
     try {
-      const { name, url, last_deployment_id } = await this.client.Apps.find(appName);
-      const { created_at, git_ref, pusher } = await this.client.Deployments.find(appName, last_deployment_id);
+      const { name, url, last_deployment_id } = await this.client.Apps.find(scalingoAppName);
+      const { created_at, git_ref, pusher } = await this.client.Deployments.find(scalingoAppName, last_deployment_id);
       const isUp = await _isUrlReachable(url);
 
       return {

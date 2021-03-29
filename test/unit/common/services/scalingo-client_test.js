@@ -179,6 +179,7 @@ describe('Scalingo client', () => {
       // given
       clientAppsFind.withArgs('pix-app-production').resolves({
         last_deployment_id: 'deployment-id-1',
+        url: 'https://app.pix.fr',
       });
       clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({
         created_at: '2021-03-23T11:02:20.955Z',
@@ -225,6 +226,61 @@ describe('Scalingo client', () => {
 
       // then
       expect(info.isUp).to.equal(false);
+    });
+
+    it('should return production info by default with short name', async () => {
+      // given
+      clientAppsFind.withArgs('pix-app-production').resolves({
+        id: '5e6660f0623d3a000f479124',
+        name: 'pix-app-production',
+        url: 'https://app.pix.fr',
+        status: 'running',
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({ pusher: {} });
+
+      // when
+      const info = await scalingoClient.getAppInfo('app');
+
+      // then
+      expect(info.name).to.equal('pix-app-production');
+      expect(info.url).to.equal('https://app.pix.fr');
+    });
+
+    it('should return correct app with full name', async () => {
+      // given
+      clientAppsFind.withArgs('pix-app-recette').resolves({
+        id: '5e6660f0623d3a000f479124',
+        name: 'pix-app-recette',
+        url: 'https://app.recette.pix.fr',
+        status: 'running',
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientDeploymentsFind.withArgs('pix-app-recette', 'deployment-id-1').resolves({ pusher: {} });
+
+      // when
+      const info = await scalingoClient.getAppInfo('pix-app-recette');
+
+      // then
+      expect(info.name).to.equal('pix-app-recette');
+      expect(info.url).to.equal('https://app.recette.pix.fr');
+    });
+
+    it('should suffix api url with /api', async () => {
+      // given
+      clientAppsFind.withArgs('pix-api-production').resolves({
+        url: 'https://api.pix.fr',
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientDeploymentsFind.withArgs('pix-api-production', 'deployment-id-1').resolves({ pusher: {} });
+      const axiosSpy = axiosGet.withArgs('https://api.pix.fr/api').resolves();
+
+      // when
+      const info = await scalingoClient.getAppInfo('pix-api-production');
+
+      // then
+      expect(info.isUp).to.equal(true);
+      expect(axiosSpy.called).to.equal(true);
     });
 
     it('should throw an error if app does not exist', async () => {
