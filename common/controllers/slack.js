@@ -1,5 +1,5 @@
 const commandsFromRun = require('../../run/services/slack/commands');
-const { getAppStatus } = require('../../run/services/slack/app-status');
+const { getAppStatusFromScalingo } = require('../../run/services/slack/app-status-from-scalingo');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const github = require('../services/github');
@@ -67,7 +67,7 @@ module.exports = {
 
   getAppStatus(request) {
     const appName= request.pre.payload.text;
-    return getAppStatus(appName);
+    return getAppStatusFromScalingo(appName);
   },
 
   interactiveEndpoint(request) {

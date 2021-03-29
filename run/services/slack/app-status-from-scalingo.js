@@ -1,6 +1,6 @@
 const ScalingoClient = require('../../../common/services/scalingo-client');
 
-async function getAppStatus(appName) {
+async function getAppStatusFromScalingo(appName) {
   const environment = appName.endsWith('production') ? 'production' : 'recette';
 
   try {
@@ -59,4 +59,4 @@ async function getAppStatus(appName) {
   }
 }
 
-module.exports = { getAppStatus };
+module.exports = { getAppStatusFromScalingo };

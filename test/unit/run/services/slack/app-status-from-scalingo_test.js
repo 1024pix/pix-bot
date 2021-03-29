@@ -2,10 +2,10 @@ const { describe, it } = require('mocha');
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { getAppStatus } = require('../../../../../run/services/slack/app-status');
+const { getAppStatusFromScalingo } = require('../../../../../run/services/slack/app-status-from-scalingo');
 const ScalingoClient = require('../../../../../common/services/scalingo-client');
 
-describe('#getAppStatus', () => {
+describe('#getAppStatusFromScalingo', () => {
 
   it('returns a production app status for slack', async () => {
     // given
@@ -20,7 +20,7 @@ describe('#getAppStatus', () => {
     sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves({ getAppInfo });
 
     // when
-    const response = await getAppStatus('pix-app-production');
+    const response = await getAppStatusFromScalingo('pix-app-production');
 
     // then
     expect(response).to.deep.equal({
@@ -81,7 +81,7 @@ describe('#getAppStatus', () => {
     sinon.stub(ScalingoClient, 'getInstance').withArgs('recette').resolves({ getAppInfo });
 
     // when
-    const response = await getAppStatus('pix-app-recette');
+    const response = await getAppStatusFromScalingo('pix-app-recette');
 
     // then
     expect(response.blocks).is.not.empty;
@@ -100,7 +100,7 @@ describe('#getAppStatus', () => {
     sinon.stub(ScalingoClient, 'getInstance').withArgs('recette').resolves({ getAppInfo });
 
     // when
-    const response = await getAppStatus('pix-app-recette');
+    const response = await getAppStatusFromScalingo('pix-app-recette');
 
     // then
     expect(response.blocks[0].text.text).equals('*pix-app-recette* is down 🛑');
@@ -112,7 +112,7 @@ describe('#getAppStatus', () => {
     sinon.stub(ScalingoClient, 'getInstance').withArgs('recette').resolves({ getAppInfo });
 
     // when
-    const response = await getAppStatus('pix-app-recette');
+    const response = await getAppStatusFromScalingo('pix-app-recette');
 
     // then
     expect(response.text).equals('Une erreur est survenue : "message erreur"');
