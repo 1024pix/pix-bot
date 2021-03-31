@@ -5,7 +5,7 @@ async function getAppStatusFromScalingo(appName) {
     return { text: 'Un nom d\'application est attendu en paramètre (ex: pix-app-production)' } ;
   }
 
-  const environment = appName.endsWith('production') ? 'production' : 'recette';
+  const environment = appName.endsWith('recette') ? 'recette' : 'production';
 
   try {
     const client = await ScalingoClient.getInstance(environment);
