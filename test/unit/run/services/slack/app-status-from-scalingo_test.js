@@ -126,4 +126,66 @@ describe('#getAppStatusFromScalingo', () => {
     expect(response.text).equals('Une erreur est survenue : "message erreur"');
   });
 
+  it('returns a production app status when the appName is not the full app name', async () => {
+    // given
+    const getAppInfo = sinon.stub().resolves({
+      name: 'pix-app-production',
+      url: 'https://app.pix.fr',
+      isUp: true,
+      lastDeployementAt: '2021-03-24T08:37:18.611Z',
+      lastDeployedBy: 'Bob',
+      lastDeployedVersion: 'v1.0.0',
+    });
+    const scalingoClientSpy = sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves({ getAppInfo });
+
+    // when
+    const response = await getAppStatusFromScalingo('app');
+
+    // then
+    expect(scalingoClientSpy.called).to.equal(true);
+    expect(response).to.deep.equal({
+      'response_type': 'in_channel',
+      'blocks': [
+        {
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': '*pix-app-production* is up 💚'
+          }
+        },
+        {
+          'type': 'context',
+          'elements': [
+            {
+              'type': 'mrkdwn',
+              'text': 'Version *v1.0.0*'
+            }
+          ]
+        },
+        {
+          'type': 'context',
+          'elements': [
+            {
+              'type': 'mrkdwn',
+              'text': 'Deployée par *Bob* à 2021-03-24T08:37:18.611Z.'
+            }
+          ]
+        },
+        {
+          'type': 'actions',
+          'elements': [
+            {
+              'type': 'button',
+              'text': {
+                'type': 'plain_text',
+                'text': 'Application'
+              },
+              'url': 'https://app.pix.fr'
+            }
+          ]
+        }
+      ]
+    });
+  });
+
 });

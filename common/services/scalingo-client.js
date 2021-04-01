@@ -65,7 +65,7 @@ class ScalingoClient {
       };
     } catch (err) {
       if (err.status === 404) {
-        throw new Error(`Impossible to get info for ${appName}`);
+        throw new Error(`Impossible to get info for ${scalingoAppName}`);
       }
       throw err;
     }
