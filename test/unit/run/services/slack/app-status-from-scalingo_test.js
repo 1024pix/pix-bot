@@ -17,14 +17,14 @@ describe('#getAppStatusFromScalingo', () => {
 
   it('returns a production app status for slack', async () => {
     // given
-    const getAppInfo = sinon.stub().resolves({
+    const getAppInfo = sinon.stub().resolves([{
       name: 'pix-app-production',
       url: 'https://app.pix.fr',
       isUp: true,
       lastDeployementAt: '2021-03-24T08:37:18.611Z',
       lastDeployedBy: 'Bob',
       lastDeployedVersion: 'v1.0.0',
-    });
+    }]);
     sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves({ getAppInfo });
 
     // when
@@ -38,39 +38,8 @@ describe('#getAppStatusFromScalingo', () => {
           'type': 'section',
           'text': {
             'type': 'mrkdwn',
-            'text': '*pix-app-production* is up 💚'
+            'text': '· *pix-app-production* is up 💚 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z',
           }
-        },
-        {
-          'type': 'context',
-          'elements': [
-            {
-              'type': 'mrkdwn',
-              'text': 'Version *v1.0.0*'
-            }
-          ]
-        },
-        {
-          'type': 'context',
-          'elements': [
-            {
-              'type': 'mrkdwn',
-              'text': 'Deployée par *Bob* à 2021-03-24T08:37:18.611Z.'
-            }
-          ]
-        },
-        {
-          'type': 'actions',
-          'elements': [
-            {
-              'type': 'button',
-              'text': {
-                'type': 'plain_text',
-                'text': 'Application'
-              },
-              'url': 'https://app.pix.fr'
-            }
-          ]
         }
       ]
     });
@@ -78,14 +47,14 @@ describe('#getAppStatusFromScalingo', () => {
 
   it('returns a recette app status for slack', async () => {
     // given
-    const getAppInfo = sinon.stub().resolves({
+    const getAppInfo = sinon.stub().resolves([{
       name: 'pix-app-recette',
       url: 'https://app.recette.pix.fr',
       isUp: true,
       lastDeployementAt: '2021-03-24T08:37:18.611Z',
       lastDeployedBy: 'Bob',
       lastDeployedVersion: 'v1.0.0',
-    });
+    }]);
     sinon.stub(ScalingoClient, 'getInstance').withArgs('recette').resolves({ getAppInfo });
 
     // when
@@ -95,23 +64,65 @@ describe('#getAppStatusFromScalingo', () => {
     expect(response.blocks).is.not.empty;
   });
 
+  it('returns status for all production apps for slack', async () => {
+    // given
+    const getAppInfo = sinon.stub().resolves([
+      {
+        name: 'pix-app-production',
+        url: 'https://app.pix.fr',
+        isUp: true,
+        lastDeployementAt: '2021-03-24T08:37:18.611Z',
+        lastDeployedBy: 'Bob',
+        lastDeployedVersion: 'v1.0.0',
+      },
+      {
+        name: 'pix-api-production',
+        url: 'https://api.pix.fr',
+        isUp: true,
+        lastDeployementAt: '2021-03-25T08:37:18.611Z',
+        lastDeployedBy: 'Bob',
+        lastDeployedVersion: 'v1.1.0',
+      }
+    ]);
+    sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves({ getAppInfo });
+
+    // when
+    const response = await getAppStatusFromScalingo('production');
+
+    // then
+    expect(response).to.deep.equal(
+      {
+        'response_type': 'in_channel',
+        'blocks': [
+          {
+            'type': 'section',
+            'text': {
+              'type': 'mrkdwn',
+              'text': '· *pix-app-production* is up 💚 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z\n· *pix-api-production* is up 💚 - v1.1.0 deployed at 2021-03-25T08:37:18.611Z',
+            }
+          }
+        ]
+      }
+    );
+  });
+
   it('returns a different status message when app is down', async () => {
     // given
-    const getAppInfo = sinon.stub().resolves({
+    const getAppInfo = sinon.stub().resolves([{
       name: 'pix-app-recette',
       url: 'https://app.recette.pix.fr',
       isUp: false,
       lastDeployementAt: '2021-03-24T08:37:18.611Z',
       lastDeployedBy: 'Bob',
       lastDeployedVersion: 'v1.0.0',
-    });
+    }]);
     sinon.stub(ScalingoClient, 'getInstance').withArgs('recette').resolves({ getAppInfo });
 
     // when
     const response = await getAppStatusFromScalingo('pix-app-recette');
 
     // then
-    expect(response.blocks[0].text.text).equals('*pix-app-recette* is down 🛑');
+    expect(response.blocks[0].text.text).equals('· *pix-app-recette* is down 🛑 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z');
   });
 
   it('returns an error response if an error occured', async () => {
@@ -150,40 +161,9 @@ describe('#getAppStatusFromScalingo', () => {
           'type': 'section',
           'text': {
             'type': 'mrkdwn',
-            'text': '*pix-app-production* is up 💚'
+            'text': '· *pix-app-production* is up 💚 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z'
           }
         },
-        {
-          'type': 'context',
-          'elements': [
-            {
-              'type': 'mrkdwn',
-              'text': 'Version *v1.0.0*'
-            }
-          ]
-        },
-        {
-          'type': 'context',
-          'elements': [
-            {
-              'type': 'mrkdwn',
-              'text': 'Deployée par *Bob* à 2021-03-24T08:37:18.611Z.'
-            }
-          ]
-        },
-        {
-          'type': 'actions',
-          'elements': [
-            {
-              'type': 'button',
-              'text': {
-                'type': 'plain_text',
-                'text': 'Application'
-              },
-              'url': 'https://app.pix.fr'
-            }
-          ]
-        }
       ]
     });
   });

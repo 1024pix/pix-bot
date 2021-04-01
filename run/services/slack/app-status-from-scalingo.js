@@ -9,54 +9,26 @@ async function getAppStatusFromScalingo(appName) {
 
   try {
     const client = await ScalingoClient.getInstance(environment);
-    const { name, url, isUp, lastDeployementAt, lastDeployedBy, lastDeployedVersion } = await client.getAppInfo(
+    const appInfos = await client.getAppInfo(
       appName
     );
 
-    const appStatus = isUp ? `*${name}* is up 💚` : `*${name}* is down 🛑`;
+    const text = appInfos.map((appInfo) => {
+      const appStatus = appInfo.isUp ? `*${appInfo.name}* is up 💚` : `*${appInfo.name}* is down 🛑`;
+      return `· ${appStatus} - ${appInfo.lastDeployedVersion} deployed at ${appInfo.lastDeployementAt}`;
+    });
 
     return {
       response_type: 'in_channel',
       blocks: [
         {
-          type: 'section',
-          text: {
-            type: 'mrkdwn',
-            text: appStatus,
-          },
-        },
-        {
-          type: 'context',
-          elements: [
-            {
-              type: 'mrkdwn',
-              text: `Version *${lastDeployedVersion}*`,
-            },
-          ],
-        },
-        {
-          type: 'context',
-          elements: [
-            {
-              type: 'mrkdwn',
-              text: `Deployée par *${lastDeployedBy}* à ${lastDeployementAt}.`,
-            },
-          ],
-        },
-        {
-          type: 'actions',
-          elements: [
-            {
-              type: 'button',
-              text: {
-                type: 'plain_text',
-                text: 'Application',
-              },
-              url: url,
-            },
-          ],
-        },
-      ],
+          'type': 'section',
+          'text': {
+            'type': 'mrkdwn',
+            'text': text.join('\n'),
+          }
+        }
+      ]
     };
   } catch (error) {
     return { text: `Une erreur est survenue : "${error.message}"` } ;
