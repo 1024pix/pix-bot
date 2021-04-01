@@ -20,15 +20,6 @@ module.exports = {
     };
   },
 
-  createAndDeployPixBotTestRelease(request) {
-    const payload = request.pre.payload;
-    commandsFromRun.createAndDeployPixBotTestRelease(payload);
-
-    return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX bot test (repo vide)')
-    };
-  },
-
   createAndDeployPixUIRelease(request) {
     const payload = request.pre.payload;
     commandsFromRun.createAndDeployPixUI(payload);
