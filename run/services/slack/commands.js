@@ -12,7 +12,6 @@ const PIX_SITE_REPO_NAME = 'pix-site';
 const PIX_SITE_APPS = ['pix-site', 'pix-pro'];
 const PIX_DATAWAREHOUSE_REPO_NAME = 'pix-db-replication';
 const PIX_DATAWAREHOUSE_APPS_NAME = ['pix-datawarehouse', 'pix-datawarehouse-ex'];
-const PIX_BOT_REPO_TEST = 'pix-bot-release-test';
 
 function sendResponse(responseUrl, text) {
   axios.post(responseUrl,
@@ -78,13 +77,13 @@ async function publishAndDeployPixBot(repoName, releaseType, responseUrl) {
   }
   await releasesService.publishPixRepo(repoName, releaseType);
   const releaseTag = await githubServices.getLatestReleaseTag(repoName);
-  
+
   const recette = await ScalingoClient.getInstance('recette');
   await recette.deployFromArchive('pix-bot-build', releaseTag, repoName, { withEnvSuffix: false });
 
   const production = await ScalingoClient.getInstance('production');
   await production.deployFromArchive('pix-bot-run', releaseTag, repoName);
-  
+
   sendResponse(responseUrl, `Pix Bot deployed (${releaseTag})`);
 }
 
@@ -97,7 +96,7 @@ module.exports = {
   async createAndDeployPixUI(payload) {
     await publishAndDeployPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
   },
-  
+
   async createAndDeployPixSiteRelease(payload) {
     await publishAndDeployRelease(PIX_SITE_REPO_NAME, PIX_SITE_APPS, payload.text, payload.response_url);
   },
@@ -108,10 +107,6 @@ module.exports = {
 
   async createAndDeployPixBotRelease(payload) {
     await publishAndDeployPixBot(PIX_BOT_REPO_NAME, payload.text, payload.response_url);
-  },
-
-  async createAndDeployPixBotTestRelease(payload) {
-    await publishAndDeployRelease(PIX_BOT_REPO_TEST, [PIX_BOT_REPO_TEST], payload.text, payload.response_url);
   },
 
 };
