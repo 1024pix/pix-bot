@@ -5,7 +5,7 @@ async function getAppStatusFromScalingo(appName) {
     return { text: 'Un nom d\'application est attendu en paramètre (ex: pix-app-production)' } ;
   }
 
-  const environment = appName.endsWith('recette') ? 'recette' : 'production';
+  const environment = _getEnvironmentFrom({ appName });
 
   try {
     const client = await ScalingoClient.getInstance(environment);
@@ -15,12 +15,13 @@ async function getAppStatusFromScalingo(appName) {
 
     const blocks = appInfos.map((appInfo) => {
       const appStatus = appInfo.isUp ? '💚' : '🛑';
+      const lastVersionDisplayed = environment === 'integration' ? '' : ` - ${appInfo.lastDeployedVersion}`;
       return {
         'type': 'section',
         'text': {
           'type': 'mrkdwn',
-          'text': `*${appInfo.name}* ${appStatus} - ${appInfo.lastDeployedVersion}\n${appInfo.lastDeployementAt}`,
-        }
+          'text': `*${appInfo.name}* ${appStatus}${lastVersionDisplayed}\n${appInfo.lastDeployementAt}`,
+        },
       };
     });
 
@@ -31,6 +32,15 @@ async function getAppStatusFromScalingo(appName) {
   } catch (error) {
     return { text: `Une erreur est survenue : "${error.message}"` } ;
   }
+}
+
+function _getEnvironmentFrom({ appName }) {
+  if (appName.endsWith('integration')) {
+    return 'integration';
+  } else if (appName.endsWith('recette')) {
+    return 'recette';
+  }
+  return 'production';
 }
 
 module.exports = { getAppStatusFromScalingo };
