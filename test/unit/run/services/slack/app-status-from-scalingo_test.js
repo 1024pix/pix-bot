@@ -38,7 +38,7 @@ describe('#getAppStatusFromScalingo', () => {
           'type': 'section',
           'text': {
             'type': 'mrkdwn',
-            'text': '· *pix-app-production* is up 💚 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z',
+            'text': '*pix-app-production* 💚 - v1.0.0\n2021-03-24T08:37:18.611Z',
           }
         }
       ]
@@ -98,7 +98,13 @@ describe('#getAppStatusFromScalingo', () => {
             'type': 'section',
             'text': {
               'type': 'mrkdwn',
-              'text': '· *pix-app-production* is up 💚 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z\n· *pix-api-production* is up 💚 - v1.1.0 deployed at 2021-03-25T08:37:18.611Z',
+              'text': '*pix-app-production* 💚 - v1.0.0\n2021-03-24T08:37:18.611Z',
+            }
+          }, {
+            'type': 'section',
+            'text': {
+              'type': 'mrkdwn',
+              'text': '*pix-api-production* 💚 - v1.1.0\n2021-03-25T08:37:18.611Z',
             }
           }
         ]
@@ -122,7 +128,7 @@ describe('#getAppStatusFromScalingo', () => {
     const response = await getAppStatusFromScalingo('pix-app-recette');
 
     // then
-    expect(response.blocks[0].text.text).equals('· *pix-app-recette* is down 🛑 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z');
+    expect(response.blocks[0].text.text).equals('*pix-app-recette* 🛑 - v1.0.0\n2021-03-24T08:37:18.611Z');
   });
 
   it('returns an error response if an error occured', async () => {
@@ -161,7 +167,7 @@ describe('#getAppStatusFromScalingo', () => {
           'type': 'section',
           'text': {
             'type': 'mrkdwn',
-            'text': '· *pix-app-production* is up 💚 - v1.0.0 deployed at 2021-03-24T08:37:18.611Z'
+            'text': '*pix-app-production* 💚 - v1.0.0\n2021-03-24T08:37:18.611Z'
           }
         },
       ]

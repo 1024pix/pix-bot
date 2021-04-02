@@ -13,22 +13,20 @@ async function getAppStatusFromScalingo(appName) {
       appName
     );
 
-    const text = appInfos.map((appInfo) => {
-      const appStatus = appInfo.isUp ? `*${appInfo.name}* is up 💚` : `*${appInfo.name}* is down 🛑`;
-      return `· ${appStatus} - ${appInfo.lastDeployedVersion} deployed at ${appInfo.lastDeployementAt}`;
+    const blocks = appInfos.map((appInfo) => {
+      const appStatus = appInfo.isUp ? '💚' : '🛑';
+      return {
+        'type': 'section',
+        'text': {
+          'type': 'mrkdwn',
+          'text': `*${appInfo.name}* ${appStatus} - ${appInfo.lastDeployedVersion}\n${appInfo.lastDeployementAt}`,
+        }
+      };
     });
 
     return {
       response_type: 'in_channel',
-      blocks: [
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': text.join('\n'),
-          }
-        }
-      ]
+      blocks,
     };
   } catch (error) {
     return { text: `Une erreur est survenue : "${error.message}"` } ;
