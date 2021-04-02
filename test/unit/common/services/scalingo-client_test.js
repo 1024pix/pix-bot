@@ -168,11 +168,12 @@ describe('Scalingo client', () => {
 
 
       // when
-      const info = await scalingoClient.getAppInfo('pix-app-production');
+      const appInfos = await scalingoClient.getAppInfo('pix-app-production');
 
       // then
-      expect(info.name).to.equal('pix-app-production');
-      expect(info.url).to.equal('https://app.pix.fr');
+      expect(appInfos.length).to.equal(1);
+      expect(appInfos[0].name).to.equal('pix-app-production');
+      expect(appInfos[0].url).to.equal('https://app.pix.fr');
     });
 
     it('should return last deployment info', async () => {
@@ -188,12 +189,13 @@ describe('Scalingo client', () => {
       });
 
       // when
-      const info = await scalingoClient.getAppInfo('pix-app-production');
+      const appInfos = await scalingoClient.getAppInfo('pix-app-production');
 
       // then
-      expect(info.lastDeployementAt).to.equal('2021-03-23T11:02:20.955Z');
-      expect(info.lastDeployedBy).to.equal('Bob');
-      expect(info.lastDeployedVersion).to.equal('v1.1.1');
+      expect(appInfos.length).to.equal(1);
+      expect(appInfos[0].lastDeployementAt).to.equal('2021-03-23T11:02:20.955Z');
+      expect(appInfos[0].lastDeployedBy).to.equal('Bob');
+      expect(appInfos[0].lastDeployedVersion).to.equal('v1.1.1');
     });
 
     it('should return application status when UP', async () => {
@@ -206,10 +208,11 @@ describe('Scalingo client', () => {
       axiosGet.withArgs('https://app.pix.fr').resolves();
 
       // when
-      const info = await scalingoClient.getAppInfo('pix-app-production');
+      const appInfos = await scalingoClient.getAppInfo('pix-app-production');
 
       // then
-      expect(info.isUp).to.equal(true);
+      expect(appInfos.length).to.equal(1);
+      expect(appInfos[0].isUp).to.equal(true);
     });
 
     it('should return application status when DOWN', async () => {
@@ -222,10 +225,11 @@ describe('Scalingo client', () => {
       axiosGet.withArgs('https://app.pix.fr').rejects();
 
       // when
-      const info = await scalingoClient.getAppInfo('pix-app-production');
+      const appInfos = await scalingoClient.getAppInfo('pix-app-production');
 
       // then
-      expect(info.isUp).to.equal(false);
+      expect(appInfos.length).to.equal(1);
+      expect(appInfos[0].isUp).to.equal(false);
     });
 
     it('should return production info by default with short name', async () => {
@@ -240,11 +244,12 @@ describe('Scalingo client', () => {
       clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({ pusher: {} });
 
       // when
-      const info = await scalingoClient.getAppInfo('app');
+      const appInfos = await scalingoClient.getAppInfo('app');
 
       // then
-      expect(info.name).to.equal('pix-app-production');
-      expect(info.url).to.equal('https://app.pix.fr');
+      expect(appInfos.length).to.equal(1);
+      expect(appInfos[0].name).to.equal('pix-app-production');
+      expect(appInfos[0].url).to.equal('https://app.pix.fr');
     });
 
     it('should return correct app with full name', async () => {
@@ -259,11 +264,11 @@ describe('Scalingo client', () => {
       clientDeploymentsFind.withArgs('pix-app-recette', 'deployment-id-1').resolves({ pusher: {} });
 
       // when
-      const info = await scalingoClient.getAppInfo('pix-app-recette');
+      const appInfos = await scalingoClient.getAppInfo('pix-app-recette');
 
       // then
-      expect(info.name).to.equal('pix-app-recette');
-      expect(info.url).to.equal('https://app.recette.pix.fr');
+      expect(appInfos[0].name).to.equal('pix-app-recette');
+      expect(appInfos[0].url).to.equal('https://app.recette.pix.fr');
     });
 
     it('should suffix api url with /api', async () => {
@@ -276,11 +281,62 @@ describe('Scalingo client', () => {
       const axiosSpy = axiosGet.withArgs('https://api.pix.fr/api').resolves();
 
       // when
-      const info = await scalingoClient.getAppInfo('pix-api-production');
+      const appInfos = await scalingoClient.getAppInfo('pix-api-production');
 
       // then
-      expect(info.isUp).to.equal(true);
+      expect(appInfos.length).to.equal(1);
+      expect(appInfos[0].isUp).to.equal(true);
       expect(axiosSpy.called).to.equal(true);
+    });
+
+    it('should return all production app info', async () => {
+      // given
+      clientAppsFind.withArgs('pix-api-production').resolves({
+        url: 'https://api.pix.fr',
+        last_deployment_id: 'deployment-id-1',
+      });
+      clientAppsFind.withArgs('pix-app-production').resolves({
+        url: 'https://app.pix.fr',
+        last_deployment_id: 'deployment-id-2',
+      });
+      clientAppsFind.withArgs('pix-orga-production').resolves({
+        url: 'https://orga.pix.fr',
+        last_deployment_id: 'deployment-id-3',
+      });
+      clientAppsFind.withArgs('pix-certif-production').resolves({
+        url: 'https://certif.pix.fr',
+        last_deployment_id: 'deployment-id-4',
+      });
+      clientAppsFind.withArgs('pix-admin-production').resolves({
+        url: 'https://admin.pix.fr',
+        last_deployment_id: 'deployment-id-5',
+      });
+      clientDeploymentsFind.withArgs('pix-api-production', 'deployment-id-1').resolves({ pusher: {} });
+      clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-2').resolves({ pusher: {} });
+      clientDeploymentsFind.withArgs('pix-orga-production', 'deployment-id-3').resolves({ pusher: {} });
+      clientDeploymentsFind.withArgs('pix-certif-production', 'deployment-id-4').resolves({ pusher: {} });
+      clientDeploymentsFind.withArgs('pix-admin-production', 'deployment-id-5').resolves({ pusher: {} });
+      const apiPing = axiosGet.withArgs('https://api.pix.fr/api').resolves();
+      const appPing = axiosGet.withArgs('https://app.pix.fr').resolves();
+      const orgaPing = axiosGet.withArgs('https://orga.pix.fr').resolves();
+      const adminPing = axiosGet.withArgs('https://admin.pix.fr').resolves();
+      const certifPing = axiosGet.withArgs('https://certif.pix.fr').resolves();
+
+      // when
+      const appInfos = await scalingoClient.getAppInfo('production');
+
+      // then
+      expect(appInfos.length).to.equal(5);
+      expect(appInfos[0].isUp).to.equal(true);
+      expect(appInfos[1].isUp).to.equal(true);
+      expect(appInfos[2].isUp).to.equal(true);
+      expect(appInfos[3].isUp).to.equal(true);
+      expect(appInfos[4].isUp).to.equal(true);
+      expect(apiPing.called).to.equal(true);
+      expect(appPing.called).to.equal(true);
+      expect(orgaPing.called).to.equal(true);
+      expect(adminPing.called).to.equal(true);
+      expect(certifPing.called).to.equal(true);
     });
 
     it('should throw an error if app does not exist', async () => {
