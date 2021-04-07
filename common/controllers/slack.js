@@ -4,6 +4,7 @@ const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const github = require('../services/github');
 const postSlackMessage = require('../services/slack/surfaces/messages/post-message');
+const sendSlackBlockMessage = require('../services/slack/surfaces/messages/block-message');
 
 function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
@@ -59,6 +60,18 @@ module.exports = {
   getAppStatus(request) {
     const appName= request.pre.payload.text;
     return getAppStatusFromScalingo(appName);
+  },
+
+  async deployLastVersion(request) {
+    const appName = request.pre.payload.text;
+
+    try {
+      await commandsFromRun.getAndDeployLastVersion({ appName });
+    } catch(e) {
+      return sendSlackBlockMessage(e.message);
+    }
+
+    return sendSlackBlockMessage(`Re-déploiement de ${appName} déclenché`);
   },
 
   interactiveEndpoint(request) {
