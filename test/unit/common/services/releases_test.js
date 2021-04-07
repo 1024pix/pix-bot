@@ -22,9 +22,11 @@ describe('releases', function() {
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
       scalingoClient.deployFromArchive.withArgs('app-name', 'v1.0.0', 'pix-site').resolves('OK');
-      sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
+      sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves(scalingoClient);
+
       // when
-      const response = await releasesService.deployPixRepo('Pix-Site', 'app-name', 'V1.0.0 ');
+      const response = await releasesService.deployPixRepo('Pix-Site', 'app-name', 'V1.0.0 ', 'production');
+
       // then
       expect(response).to.equal('OK');
     });

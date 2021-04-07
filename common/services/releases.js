@@ -13,12 +13,12 @@ module.exports = {
     production: 'production'
   },
 
-  async deployPixRepo(repoName, appName, releaseTag) {
+  async deployPixRepo(repoName, appName, releaseTag, environment) {
     const sanitizedReleaseTag = _sanitizedArgument(releaseTag);
     const sanitizedRepoName = _sanitizedArgument(repoName);
     const sanitizedAppName = _sanitizedArgument(appName);
+    const client = await ScalingoClient.getInstance(environment);
 
-    const client = await ScalingoClient.getInstance('production');
     return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
   },
 

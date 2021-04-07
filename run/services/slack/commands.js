@@ -62,8 +62,9 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     }
     await releasesService.publishPixRepo(repoName, releaseType);
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
+    const environment = 'production';
 
-    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag)));
+    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment)));
 
     sendResponse(responseUrl, getSuccessMessage(releaseTag, appNamesList.join(', ')));
   } catch (e) {

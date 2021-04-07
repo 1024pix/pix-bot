@@ -15,7 +15,8 @@ module.exports = {
     }
 
     const releaseTag = await githubServices.getLatestReleaseTag(PIX_SITE_REPO_NAME);
-    await Promise.all(PIX_SITE_APPS.map((appName) => releasesService.deployPixRepo(PIX_SITE_REPO_NAME, appName, releaseTag)));
+    const environment = 'production';
+    await Promise.all(PIX_SITE_APPS.map((appName) => releasesService.deployPixRepo(PIX_SITE_REPO_NAME, appName, releaseTag, environment)));
 
     return `pix.fr and pro.pix.fr deployments ${releaseTag} are in progress. Check deployment status on Scalingo`;
   },
