@@ -4,6 +4,7 @@ const githubServices = require('../../../common/services/github');
 const axios = require('axios');
 const postSlackMessage = require('../../../common/services/slack/surfaces/messages/post-message');
 
+const PIX_REPO_NAME = 'pix';
 const PIX_BOT_REPO_NAME = 'pix-bot';
 const PIX_LCMS_REPO_NAME = 'pix-editor';
 const PIX_LCMS_APP_NAME = 'pix-lcms';
@@ -62,8 +63,9 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     }
     await releasesService.publishPixRepo(repoName, releaseType);
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
+    const environment = 'production';
 
-    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag)));
+    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment)));
 
     sendResponse(responseUrl, getSuccessMessage(releaseTag, appNamesList.join(', ')));
   } catch (e) {
@@ -87,6 +89,21 @@ async function publishAndDeployPixBot(repoName, releaseType, responseUrl) {
   sendResponse(responseUrl, `Pix Bot deployed (${releaseTag})`);
 }
 
+async function getAndDeployLastVersion({ appName }) {
+  const lastReleaseTag = await githubServices.getLatestReleaseTag(PIX_REPO_NAME);
+  const sanitizedAppName = appName.trim().toLowerCase();
+
+  const appNameParts = sanitizedAppName.split('-');
+  const environment = appNameParts[appNameParts.length - 1];
+
+  if (appNameParts.length!=3 || !['integration', 'recette', 'production'].includes(environment)) {
+    throw Error('Nom de l‘application incorrect');
+  }
+
+  const shortAppName = appNameParts[0] + '-' + appNameParts[1];
+  await releasesService.deployPixRepo(PIX_REPO_NAME, shortAppName, lastReleaseTag, environment);
+}
+
 module.exports = {
 
   async createAndDeployPixLCMS(payload) {
@@ -108,5 +125,9 @@ module.exports = {
   async createAndDeployPixBotRelease(payload) {
     await publishAndDeployPixBot(PIX_BOT_REPO_NAME, payload.text, payload.response_url);
   },
+
+  async getAndDeployLastVersion({ appName }) {
+    await getAndDeployLastVersion({ appName });
+  }
 
 };

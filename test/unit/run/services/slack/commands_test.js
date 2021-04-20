@@ -1,12 +1,14 @@
 const { describe, it } = require('mocha');
+const { expect } = require('chai');
 const axios = require('axios');
-const { sinon } = require('../../../../test-helper');
+const { catchErr, sinon } = require('../../../../test-helper');
 const {
   createAndDeployPixLCMS,
   createAndDeployPixUI,
   createAndDeployPixSiteRelease,
   createAndDeployPixDatawarehouse,
   createAndDeployPixBotRelease,
+  getAndDeployLastVersion,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
@@ -171,6 +173,30 @@ describe('Services | Slack | Commands', () => {
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixRepo);
+    });
+  });
+
+  describe('#getAndDeployLastVersion', () => {
+    it('should redeploy last version of an app', async () => {
+      // given
+      const appName = 'pix-admin-integration';
+
+      // when
+      await getAndDeployLastVersion({ appName });
+
+      // then
+      sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix', 'pix-admin', 'v1.0.0', 'integration');
+    });
+
+    it('should throw an error if appName is incorrect', async () => {
+      // given
+      const appName = 'pix-admin';
+
+      // when
+      const response = await catchErr(getAndDeployLastVersion)({ appName });
+
+      // then
+      expect(response).to.be.instanceOf(Error);
     });
   });
 });
