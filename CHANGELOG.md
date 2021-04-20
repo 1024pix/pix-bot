@@ -1,5 +1,10 @@
 # pix-bot Changelog
 
+## v1.5.0 (20/04/2021)
+
+- [#72](https://github.com/1024pix/pix-bot/pull/72) Redéployer une application via Slack
+- [#71](https://github.com/1024pix/pix-bot/pull/71) Affichage des statuts des app en intégration
+
 ## v1.4.0 (06/04/2021)
 
 - [#68](https://github.com/1024pix/pix-bot/pull/68) [FEATURE] Obtenir le statut de toutes les apps plutôt qu'une seule
