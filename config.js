@@ -36,6 +36,10 @@ module.exports = (function() {
         token: process.env.SCALINGO_TOKEN_REVIEW_APPS,
         apiUrl: process.env.SCALINGO_API_URL_REVIEW_APPS || 'https://api.osc-fr1.scalingo.com',
       },
+      integration: {
+        token: process.env.SCALINGO_TOKEN_INTEGRATION,
+        apiUrl: process.env.SCALINGO_API_URL_INTEGRATION || 'https://api.osc-fr1.scalingo.com',
+      },
       recette: {
         token: process.env.SCALINGO_TOKEN_RECETTE,
         apiUrl: process.env.SCALINGO_API_URL_RECETTE,

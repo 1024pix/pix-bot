@@ -5,7 +5,7 @@ async function getAppStatusFromScalingo(appName) {
     return { text: 'Un nom d\'application est attendu en paramètre (ex: pix-app-production)' } ;
   }
 
-  const environment = appName.endsWith('recette') ? 'recette' : 'production';
+  const environment = _getEnvironmentFrom({ appName });
 
   try {
     const client = await ScalingoClient.getInstance(environment);
@@ -13,26 +13,34 @@ async function getAppStatusFromScalingo(appName) {
       appName
     );
 
-    const text = appInfos.map((appInfo) => {
-      const appStatus = appInfo.isUp ? `*${appInfo.name}* is up 💚` : `*${appInfo.name}* is down 🛑`;
-      return `· ${appStatus} - ${appInfo.lastDeployedVersion} deployed at ${appInfo.lastDeployementAt}`;
+    const blocks = appInfos.map((appInfo) => {
+      const appStatus = appInfo.isUp ? '💚' : '🛑';
+      const lastVersionDisplayed = environment === 'integration' ? '' : ` - ${appInfo.lastDeployedVersion}`;
+      return {
+        'type': 'section',
+        'text': {
+          'type': 'mrkdwn',
+          'text': `*${appInfo.name}* ${appStatus}${lastVersionDisplayed}\n${appInfo.lastDeployementAt}`,
+        },
+      };
     });
 
     return {
       response_type: 'in_channel',
-      blocks: [
-        {
-          'type': 'section',
-          'text': {
-            'type': 'mrkdwn',
-            'text': text.join('\n'),
-          }
-        }
-      ]
+      blocks,
     };
   } catch (error) {
     return { text: `Une erreur est survenue : "${error.message}"` } ;
   }
+}
+
+function _getEnvironmentFrom({ appName }) {
+  if (appName.endsWith('integration')) {
+    return 'integration';
+  } else if (appName.endsWith('recette')) {
+    return 'recette';
+  }
+  return 'production';
 }
 
 module.exports = { getAppStatusFromScalingo };
