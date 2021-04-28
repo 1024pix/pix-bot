@@ -7,9 +7,10 @@ GITHUB_OWNER=${GITHUB_OWNER:-1024pix}
 GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-pix}
 echo "${CWD_DIR}"
 
-source "${CWD_DIR}/scripts/common.sh"
-
 NEW_VERSION_TYPE=$1
+BRANCH_NAME=${2:-dev}
+
+source "${CWD_DIR}/scripts/common.sh"
 
 function ensure_no_uncommited_changes_are_present() {
   if [ -n "$(git status --porcelain)" ]; then
@@ -29,8 +30,8 @@ function ensure_new_version_is_either_minor_or_patch_or_major() {
   echo "Version type OK"
 }
 
-function checkout_dev() {
-  git checkout dev >>/dev/null 2>&1
+function checkout() {
+  git checkout "${BRANCH_NAME}" >>/dev/null 2>&1
 }
 
 function fetch_and_rebase() {
@@ -92,7 +93,7 @@ echo "== Validate context =="
 ensure_no_uncommited_changes_are_present
 ensure_new_version_is_either_minor_or_patch_or_major
 echo "== Package release =="
-checkout_dev
+checkout
 fetch_and_rebase
 update_all_pix_modules_version
 complete_change_log
