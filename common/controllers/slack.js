@@ -2,6 +2,7 @@ const commandsFromRun = require('../../run/services/slack/commands');
 const { getAppStatusFromScalingo } = require('../../run/services/slack/app-status-from-scalingo');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
+const { environments, deploy, publish } = require('../services/releases');
 const github = require('../services/github');
 const postSlackMessage = require('../services/slack/surfaces/messages/post-message');
 const sendSlackBlockMessage = require('../services/slack/surfaces/messages/block-message');
@@ -54,6 +55,20 @@ module.exports = {
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX Datawarehouse')
+    };
+  },
+
+  createAndDeployPixHotfix(request) {
+    const payload = request.pre.payload;
+
+    publish('patch', payload.text).then(async () => {
+      const latestReleaseTag = await github.getLatestReleaseTag();
+      await deploy(environments.recette, latestReleaseTag);
+    });
+
+
+    return {
+      'text': 'Commande de déploiement de hotfix de PIX en recette.'
     };
   },
 

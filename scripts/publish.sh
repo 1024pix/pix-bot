@@ -104,3 +104,4 @@ push_commit_and_tag_to_remote
 publish_release_on_sentry
 
 echo -e "Release publication ${GREEN}succeeded${RESET_COLOR}."
+echo "${NEW_PACKAGE_VERSION}"
