@@ -1,26 +1,35 @@
 const { describe, it } = require('mocha');
 const { expect } = require('chai');
-const { sinon, nock } = require('../../../test-helper');
-const axios = require('axios');
+const { nock } = require('../../../test-helper');
 const githubService = require('../../../../common/services/github');
 
 describe('#getPullRequests', function() {
-  const items = [
-    { html_url: 'http://test1.fr', title: 'PR1', labels: [ { name: 'team certif'} ]},
-    { html_url: 'http://test2.fr', title: 'PR2', labels: [ { name: ':construction: toto'}, { name: ':idea: team certif'}] },
-  ];
-  beforeEach(() => {
-    sinon.stub(axios, 'get').resolves({ data: { items: items } });
-  });
+
 
   it('should return the response for slack', async function() {
     // given
+    const items = [
+      { html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [ { name: 'team certif'} ]},
+      { html_url: 'http://test2.fr', number: 1, title: 'PR2', labels: [ { name: ':construction: toto'}, { name: ':idea: team certif'}] },
+    ];
+
+    nock('https://api.github.com')
+        .get(`/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+user%3Agithub-owner+label%3Ateam-certif&sort=updated&order=desc`)
+        .reply(200, {items})
+
+    nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/pulls/0/reviews')
+        .reply(200, [{state: 'COMMENTED'}, {state: 'APPROVED'}]);
+    nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/pulls/1/reviews')
+        .reply(200, [{state: 'CHANGES_REQUESTED'}]);
+
     const expectedResponse = {
       response_type: 'in_channel',
       text: 'PRs à review pour team-certif',
       attachments: [
-        { color: '#B7CEF5', pretext: '', fields: [{ value: ':construction: :idea:<http://test2.fr|PR2>', short: false }] },
-        { color: '#B7CEF5', pretext: '', fields: [{ value: '<http://test1.fr|PR1>', short: false }] }
+        { color: '#B7CEF5', pretext: '', fields: [{ value: '[❌x1]:construction: :idea:<http://test2.fr|PR2>', short: false }] },
+        { color: '#B7CEF5', pretext: '', fields: [{ value: '[💬x1|✅x1]<http://test1.fr|PR1>', short: false }] }
       ]
     };
 
@@ -33,13 +42,24 @@ describe('#getPullRequests', function() {
 
   it('should call the Github API with the label without space', async function() {
     // given
-    const expectedUrl = 'https://api.github.com/search/issues?q=is:pr+is:open+archived:false+sort:updated-desc+user:1024pix+label:Tech%20Review%20Needed';
+    let scopePr, scopeReview;
+    const items = [
+      { html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [ { name: 'team certif'} ]},
+    ];
+    scopePr = nock('https://api.github.com')
+        .get(`/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+user%3Agithub-owner+label%3ATech%2520Review%2520Needed&sort=updated&order=desc`)
+        .reply(200, {items})
+
+    scopeReview = nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/pulls/0/reviews')
+        .reply(200, []);
 
     // when
     await githubService.getPullRequests('Tech Review Needed');
 
     // then
-    sinon.assert.calledWith(axios.get, expectedUrl);
+    expect(scopePr.isDone());
+    expect(scopeReview.isDone());
   });
 
 });

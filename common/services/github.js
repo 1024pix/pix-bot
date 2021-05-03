@@ -1,6 +1,7 @@
 const { Octokit } = require('@octokit/rest');
 const axios = require('axios');
 const settings = require('../../config');
+const { zipWith, countBy, entries, noop } = require('lodash');
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -10,26 +11,42 @@ const color = {
   'team-acces': '#A2DCC1',
 };
 
-function getUrlForGithub(label) {
-  label = label.replace(/ /g, '%20');
-  return `https://api.github.com/search/issues?q=is:pr+is:open+archived:false+sort:updated-desc+user:1024pix+label:${label}`;
+function createOctokit() {
+  return new Octokit({
+    auth: settings.github.token,
+    log: {
+      debug: noop,
+      info: noop,
+      warn: console.warn,
+      error: console.error
+    },
+  });
 }
 
-async function getDataFromGithub(label) {
-  const url = getUrlForGithub(label);
-  const githubToken = settings.github.token;
-  const config = {
-    headers: {
-      'Authorization': 'token ' + githubToken
-    }
-  };
-  return axios.get(url, config)
-    .then(response => {
-      return response.data.items;
-    })
-    .catch(error => {
-      console.log(error);
-    });
+async function getPullReviewsFromGithub(label){
+  const owner = settings.github.owner;
+
+  label = label.replace(/ /g, '%20');
+  const octokit = createOctokit();
+  const { data } = await octokit.search.issuesAndPullRequests({
+    q: `is:pr+is:open+archived:false+user:${owner}+label:${label}`,
+    sort: 'updated',
+    order: 'desc'
+  });
+
+  return data.items;
+}
+
+async function getReviewsFromGithub(pull_number){
+  const owner = settings.github.owner;
+  const repo = settings.github.repository;
+  const octokit = createOctokit();
+  const { data } = await octokit.pulls.listReviews({
+    owner,
+    repo,
+    pull_number
+  });
+  return data;
 }
 
 function getEmojis(pullRequests) {
@@ -40,20 +57,33 @@ function getEmojis(pullRequests) {
   return labelsEmojis.filter(Boolean).join(' ');
 }
 
-function createResponseForSlack(pullRequests, label) {
-  const attachments = pullRequests.map((pullRequests) => {
-    const emojis = getEmojis(pullRequests);
+function getReviewsLabel(reviews) {
+  const countByState = countBy(reviews, 'state');
+  return entries(countByState)
+    .map(([label, times]) => {
+      switch(label) {
+      case 'COMMENTED': return `💬x${times}`;
+      case 'APPROVED': return `✅x${times}`;
+      case 'CHANGES_REQUESTED': return `❌x${times}`;
+      }
+    }).join('|');
+}
+
+function createResponseForSlack(data, label) {
+  const attachments = data.map(({pullRequest, reviews}) => {
+    const emojis = getEmojis(pullRequest);
+    const reviewsLabel = getReviewsLabel(reviews);
     return {
       color: color[label],
       pretext: '',
-      fields:[ {value: `${emojis}<${pullRequests.html_url}|${pullRequests.title}>`, short: false},],
+      fields:[ {value: `[${reviewsLabel}]${emojis}<${pullRequest.html_url}|${pullRequest.title}>`, short: false},],
     };
-  }).sort().reverse();
+  });
 
   const response = {
     response_type: 'in_channel',
     text: 'PRs à review pour ' + label,
-    attachments
+    attachments: attachments.sort().reverse()
   };
 
   return response;
@@ -69,7 +99,7 @@ async function getLastCommitUrl({ branchName, tagName }) {
 async function getBranchLastCommitUrl(branch) {
   const owner = settings.github.owner;
   const repo = settings.github.repository;
-  const octokit = new Octokit({ auth: settings.github.token });
+  const octokit = createOctokit();
   const { data } = await octokit.repos.getBranch({
     owner,
     repo,
@@ -92,7 +122,7 @@ async function getLatestRelease(repoOwner, repoName) {
 }
 
 async function getTags(repoOwner, repoName) {
-  const { repos } = new Octokit({ auth: settings.github.token });
+  const { repos } = createOctokit();
   const { data } = await repos.listTags({
     owner: repoOwner,
     repo: repoName,
@@ -101,7 +131,7 @@ async function getTags(repoOwner, repoName) {
 }
 
 async function getDefaultBranch(repoOwner, repoName) {
-  const { repos } = new Octokit({ auth: settings.github.token });
+  const { repos } = createOctokit();
   const { data } = await repos.get({
     owner: repoOwner,
     repo: repoName,
@@ -111,7 +141,7 @@ async function getDefaultBranch(repoOwner, repoName) {
 
 async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName) {
   const defaultBranch = await getDefaultBranch(repoOwner, repoName);
-  const { pulls } = new Octokit({ auth: settings.github.token });
+  const { pulls } = createOctokit();
   const { data } = await pulls.list({
     owner: repoOwner,
     repo: repoName,
@@ -134,7 +164,7 @@ async function _getLatestReleaseTagName(repoOwner, repoName) {
 }
 
 async function _getCommitAtURL(commitUrl) {
-  const { request } = new Octokit({ auth: settings.github.token });
+  const { request } = createOctokit();
   const { data } = await request(commitUrl);
   return data.commit;
 }
@@ -149,8 +179,19 @@ async function _getLatestReleaseDate(repoOwner, repoName) {
 module.exports = {
 
   async getPullRequests(label) {
-    const pullRequests = await getDataFromGithub(label);
-    return createResponseForSlack(pullRequests, label);
+    const pullRequests = await getPullReviewsFromGithub(label);
+    const reviewsByPR = await Promise.all(
+      pullRequests.map(({number}) => getReviewsFromGithub(number))
+    );
+
+    const data = zipWith(pullRequests, reviewsByPR, (pullRequest, reviews) => {
+      return {
+        pullRequest,
+        reviews,
+      };
+    });
+
+    return createResponseForSlack(data, label);
   },
 
   async getLatestReleaseTag(repoName = settings.github.repository) {
@@ -173,7 +214,7 @@ module.exports = {
     const githubCICheckName = 'build-test-and-deploy';
     const commitUrl = await getLastCommitUrl({ branchName, tagName });
     const commitStatusUrl = commitUrl + '/check-runs';
-    const octokit = new Octokit({ auth: settings.github.token });
+    const octokit = createOctokit();
     const { data } = await octokit.request(commitStatusUrl);
     const runs = data.check_runs;
     const ciRuns = runs.filter((run) => run.name === githubCICheckName);
