@@ -1,5 +1,4 @@
 const { Octokit } = require('@octokit/rest');
-const axios = require('axios');
 const settings = require('../../config');
 const { zipWith, countBy, entries, noop } = require('lodash');
 
@@ -66,27 +65,41 @@ function getReviewsLabel(reviews) {
       case 'APPROVED': return `✅x${times}`;
       case 'CHANGES_REQUESTED': return `❌x${times}`;
       }
-    }).join('|');
+    }).join(' ');
 }
 
 function createResponseForSlack(data, label) {
   const attachments = data.map(({pullRequest, reviews}) => {
     const emojis = getEmojis(pullRequest);
     const reviewsLabel = getReviewsLabel(reviews);
+    const link = `<${pullRequest.html_url}|${pullRequest.title}>`;
+    const message = [reviewsLabel, emojis, link].filter(Boolean).join(' | ');
     return {
       color: color[label],
       pretext: '',
-      fields:[ {value: `[${reviewsLabel}]${emojis}<${pullRequest.html_url}|${pullRequest.title}>`, short: false},],
+      fields:[ {value: message, short: false},],
     };
-  });
+  }).sort(sortWithInProgressLast);
 
   const response = {
     response_type: 'in_channel',
     text: 'PRs à review pour ' + label,
-    attachments: attachments.sort().reverse()
+    attachments
   };
 
   return response;
+}
+
+function sortWithInProgressLast(prA, prB) {
+  const fieldA = prA.fields[0].value;
+  const fieldB = prB.fields[0].value;
+  const inProgressIcon = ':construction:';
+  const isAinProgress = fieldA.indexOf(inProgressIcon) !== -1;
+  const isBinProgress = fieldB.indexOf(inProgressIcon) !== -1;
+
+  if(isAinProgress && !isBinProgress) return 1;
+  if(!isAinProgress && isBinProgress) return -1;
+  return fieldA.localeCompare(fieldB);
 }
 
 async function getLastCommitUrl({ branchName, tagName }) {
