@@ -67,7 +67,7 @@ async function _runScriptWithArgument (scriptFileName, ...args) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
   const {stdout, stderr} = await exec(`${scriptsDirectory}/${scriptFileName} ${args.join(' ')}`);
   console.log(`stdout: ${stdout}`);
-  const lastLine = stdout.split('\n').reverse()[1];
+  const lastLine = stdout.split('\n').slice(-2, -1).pop();
   console.error(`stderr: ${stderr}`);
   return lastLine;
 }
