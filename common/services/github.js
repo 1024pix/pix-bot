@@ -81,13 +81,11 @@ function _createResponseForSlack(data, label) {
     };
   }).sort(_sortWithInProgressLast);
 
-  const response = {
+  return {
     response_type: 'in_channel',
     text: 'PRs à review pour ' + label,
     attachments
   };
-
-  return response;
 }
 
 function _sortWithInProgressLast(prA, prB) {
