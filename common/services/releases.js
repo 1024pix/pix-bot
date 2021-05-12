@@ -13,13 +13,17 @@ module.exports = {
     production: 'production'
   },
 
-  async deployPixRepo(repoName, appName, releaseTag, environment) {
-    const sanitizedReleaseTag = _sanitizedArgument(releaseTag);
-    const sanitizedRepoName = _sanitizedArgument(repoName);
-    const sanitizedAppName = _sanitizedArgument(appName);
-    const client = await ScalingoClient.getInstance(environment);
-
-    return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
+  async publish(releaseType, branchName) {
+    const scriptFileName = 'publish.sh';
+    try {
+      const sanitizedReleaseType = _sanitizedArgument(releaseType);
+      const sanitizedBranchName = _sanitizedArgument(branchName);
+      const newPackageVersion = await _runScriptWithArgument(scriptFileName, sanitizedReleaseType, sanitizedBranchName);
+      return newPackageVersion;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   },
 
   async deploy(environment, releaseTag) {
@@ -35,17 +39,6 @@ module.exports = {
     return results;
   },
 
-  async publish(releaseType) {
-    const scriptFileName = 'publish.sh';
-    try {
-      const sanitizedReleaseType = _sanitizedArgument(releaseType);
-      await _runScriptWithArgument(scriptFileName, sanitizedReleaseType);
-    } catch (err) {
-      console.error(err);
-      throw err;
-    }
-  },
-
   async publishPixRepo(repoName, releaseType) {
     try {
       const sanitizedReleaseType = _sanitizedArgument(releaseType);
@@ -58,13 +51,25 @@ module.exports = {
     }
   },
 
+  async deployPixRepo(repoName, appName, releaseTag, environment) {
+    const sanitizedReleaseTag = _sanitizedArgument(releaseTag);
+    const sanitizedRepoName = _sanitizedArgument(repoName);
+    const sanitizedAppName = _sanitizedArgument(appName);
+    const client = await ScalingoClient.getInstance(environment);
+
+    return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
+  },
+
+  _runScriptWithArgument,
 };
 
 async function _runScriptWithArgument (scriptFileName, ...args) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
   const {stdout, stderr} = await exec(`${scriptsDirectory}/${scriptFileName} ${args.join(' ')}`);
   console.log(`stdout: ${stdout}`);
+  const lastLine = stdout.split('\n').slice(-2, -1).pop();
   console.error(`stderr: ${stderr}`);
+  return lastLine;
 }
 
 function _sanitizedArgument(param) {

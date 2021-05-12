@@ -9,7 +9,7 @@ describe('releases', function() {
   let releasesService;
 
   before(() => {
-    exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: '', stderr: ''}));
+    exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: 'some heavy logs\n3.14.0\n', stderr: ''}));
     releasesService = proxyquire('../../../../common/services/releases', {
       'child_process': {exec},
       util: {promisify: fn => fn}
@@ -71,6 +71,13 @@ describe('releases', function() {
 
       // then
       sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/publish.sh minor)')));
+    });
+    it('should retrieve new package version', async function () {
+      //when
+      const newPackageVersion = await releasesService.publish('minor');
+
+      // then
+      expect(newPackageVersion).to.equal('3.14.0');
     });
   });
 
