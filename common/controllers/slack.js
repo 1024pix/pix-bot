@@ -60,12 +60,11 @@ module.exports = {
 
   createAndDeployPixHotfix(request) {
     const payload = request.pre.payload;
+    const branchName = payload.text;
 
-    publish('patch', payload.text).then(async () => {
-      const latestReleaseTag = await github.getLatestReleaseTag();
+    publish('patch', branchName).then(async (latestReleaseTag) => {
       await deploy(environments.recette, latestReleaseTag);
     });
-
 
     return {
       'text': 'Commande de déploiement de hotfix de PIX en recette.'

@@ -156,8 +156,8 @@ async function _getDefaultBranch(repoOwner, repoName) {
   return data.default_branch;
 }
 
-async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName) {
-  const defaultBranch = await _getDefaultBranch(repoOwner, repoName);
+async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
+  const defaultBranch = branchName || await _getDefaultBranch(repoOwner, repoName);
   const { pulls } = _createOctokit();
   const { data } = await pulls.list({
     owner: repoOwner,
@@ -223,8 +223,8 @@ module.exports = {
     return _getCommitAtURL(commitUrl);
   },
 
-  async getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName) {
-    return _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName);
+  async getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
+    return _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
   },
 
   async isBuildStatusOK({ branchName, tagName }) {

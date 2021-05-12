@@ -168,6 +168,23 @@ describe('#getMergedPullRequestsSortedByDescendingDate', () => {
     expect(response).to.deep.equal(pullRequests);
   });
 
+  it('should call GitHub "Pulls" API with given branch name', async () => {
+    // given
+    const pullRequests = [
+      { merged_at: '2020-09-02T12:26:47Z' },
+      { merged_at: '2020-09-01T12:26:47Z' }
+    ];
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=toto')
+      .reply(200, pullRequests);
+
+    // when
+    const response = await githubService.getMergedPullRequestsSortedByDescendingDate('github-owner', 'github-repository', 'toto');
+
+    // then
+    expect(response).to.deep.equal(pullRequests);
+  });
+
 });
 
 describe('#getCommitAtURL', () => {
