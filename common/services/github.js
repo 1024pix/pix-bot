@@ -10,7 +10,7 @@ const color = {
   'team-acces': '#A2DCC1',
 };
 
-function createOctokit() {
+function _createOctokit() {
   return new Octokit({
     auth: settings.github.token,
     log: {
@@ -22,11 +22,11 @@ function createOctokit() {
   });
 }
 
-async function getPullReviewsFromGithub(label){
+async function _getPullReviewsFromGithub(label){
   const owner = settings.github.owner;
 
   label = label.replace(/ /g, '%20');
-  const octokit = createOctokit();
+  const octokit = _createOctokit();
   const { data } = await octokit.search.issuesAndPullRequests({
     q: `is:pr+is:open+archived:false+user:${owner}+label:${label}`,
     sort: 'updated',
@@ -36,10 +36,10 @@ async function getPullReviewsFromGithub(label){
   return data.items;
 }
 
-async function getReviewsFromGithub(pull_number){
+async function _getReviewsFromGithub(pull_number){
   const owner = settings.github.owner;
   const repo = settings.github.repository;
-  const octokit = createOctokit();
+  const octokit = _createOctokit();
   const { data } = await octokit.pulls.listReviews({
     owner,
     repo,
@@ -48,7 +48,7 @@ async function getReviewsFromGithub(pull_number){
   return data;
 }
 
-function getEmojis(pullRequests) {
+function _getEmojis(pullRequests) {
   const labelsEmojis = pullRequests.labels.map(label => {
     const match = label.name.match(/^:[A-z,_,-]*:/);
     return match ? match[0] : '';
@@ -56,7 +56,7 @@ function getEmojis(pullRequests) {
   return labelsEmojis.filter(Boolean).join(' ');
 }
 
-function getReviewsLabel(reviews) {
+function _getReviewsLabel(reviews) {
   const countByState = countBy(reviews, 'state');
   return entries(countByState)
     .map(([label, times]) => {
@@ -68,10 +68,10 @@ function getReviewsLabel(reviews) {
     }).join(' ');
 }
 
-function createResponseForSlack(data, label) {
+function _createResponseForSlack(data, label) {
   const attachments = data.map(({pullRequest, reviews}) => {
-    const emojis = getEmojis(pullRequest);
-    const reviewsLabel = getReviewsLabel(reviews);
+    const emojis = _getEmojis(pullRequest);
+    const reviewsLabel = _getReviewsLabel(reviews);
     const link = `<${pullRequest.html_url}|${pullRequest.title}>`;
     const message = [reviewsLabel, emojis, link].filter(Boolean).join(' | ');
     return {
@@ -79,7 +79,7 @@ function createResponseForSlack(data, label) {
       pretext: '',
       fields:[ {value: message, short: false},],
     };
-  }).sort(sortWithInProgressLast);
+  }).sort(_sortWithInProgressLast);
 
   const response = {
     response_type: 'in_channel',
@@ -90,7 +90,7 @@ function createResponseForSlack(data, label) {
   return response;
 }
 
-function sortWithInProgressLast(prA, prB) {
+function _sortWithInProgressLast(prA, prB) {
   const fieldA = prA.fields[0].value;
   const fieldB = prB.fields[0].value;
   const inProgressIcon = ':construction:';
@@ -104,15 +104,15 @@ function sortWithInProgressLast(prA, prB) {
 
 async function getLastCommitUrl({ branchName, tagName }) {
   if (branchName) {
-    return await getBranchLastCommitUrl(branchName);
+    return await _getBranchLastCommitUrl(branchName);
   }
-  return getTagCommitUrl(tagName);
+  return _getTagCommitUrl(tagName);
 }
 
-async function getBranchLastCommitUrl(branch) {
+async function _getBranchLastCommitUrl(branch) {
   const owner = settings.github.owner;
   const repo = settings.github.repository;
-  const octokit = createOctokit();
+  const octokit = _createOctokit();
   const { data } = await octokit.repos.getBranch({
     owner,
     repo,
@@ -121,21 +121,21 @@ async function getBranchLastCommitUrl(branch) {
   return data.commit.url;
 }
 
-async function getTagCommitUrl(tagName) {
+async function _getTagCommitUrl(tagName) {
   const owner = settings.github.owner;
   const repo = settings.github.repository;
-  const tags = await getTags(owner, repo);
+  const tags = await _getTags(owner, repo);
   const tag = tags.find((tag) => tag.name === tagName);
   return tag.commit.url;
 }
 
 async function getLatestRelease(repoOwner, repoName) {
-  const tags = await getTags(repoOwner, repoName);
+  const tags = await _getTags(repoOwner, repoName);
   return tags[0];
 }
 
-async function getTags(repoOwner, repoName) {
-  const { repos } = createOctokit();
+async function _getTags(repoOwner, repoName) {
+  const { repos } = _createOctokit();
   const { data } = await repos.listTags({
     owner: repoOwner,
     repo: repoName,
@@ -143,8 +143,8 @@ async function getTags(repoOwner, repoName) {
   return data;
 }
 
-async function getDefaultBranch(repoOwner, repoName) {
-  const { repos } = createOctokit();
+async function _getDefaultBranch(repoOwner, repoName) {
+  const { repos } = _createOctokit();
   const { data } = await repos.get({
     owner: repoOwner,
     repo: repoName,
@@ -153,8 +153,8 @@ async function getDefaultBranch(repoOwner, repoName) {
 }
 
 async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName) {
-  const defaultBranch = await getDefaultBranch(repoOwner, repoName);
-  const { pulls } = createOctokit();
+  const defaultBranch = await _getDefaultBranch(repoOwner, repoName);
+  const { pulls } = _createOctokit();
   const { data } = await pulls.list({
     owner: repoOwner,
     repo: repoName,
@@ -177,7 +177,7 @@ async function _getLatestReleaseTagName(repoOwner, repoName) {
 }
 
 async function _getCommitAtURL(commitUrl) {
-  const { request } = createOctokit();
+  const { request } = _createOctokit();
   const { data } = await request(commitUrl);
   return data.commit;
 }
@@ -192,9 +192,9 @@ async function _getLatestReleaseDate(repoOwner, repoName) {
 module.exports = {
 
   async getPullRequests(label) {
-    const pullRequests = await getPullReviewsFromGithub(label);
+    const pullRequests = await _getPullReviewsFromGithub(label);
     const reviewsByPR = await Promise.all(
-      pullRequests.map(({number}) => getReviewsFromGithub(number))
+      pullRequests.map(({number}) => _getReviewsFromGithub(number))
     );
 
     const data = zipWith(pullRequests, reviewsByPR, (pullRequest, reviews) => {
@@ -204,7 +204,7 @@ module.exports = {
       };
     });
 
-    return createResponseForSlack(data, label);
+    return _createResponseForSlack(data, label);
   },
 
   async getLatestReleaseTag(repoName = settings.github.repository) {
@@ -227,7 +227,7 @@ module.exports = {
     const githubCICheckName = 'build-test-and-deploy';
     const commitUrl = await getLastCommitUrl({ branchName, tagName });
     const commitStatusUrl = commitUrl + '/check-runs';
-    const octokit = createOctokit();
+    const octokit = _createOctokit();
     const { data } = await octokit.request(commitStatusUrl);
     const runs = data.check_runs;
     const ciRuns = runs.filter((run) => run.name === githubCICheckName);
