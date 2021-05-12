@@ -1,5 +1,8 @@
 # pix-bot Changelog
 
+## v1.8.0 (12/05/2021)
+
+
 ## v1.7.0 (12/05/2021)
 
 - [#77](https://github.com/1024pix/pix-bot/pull/77) [TECH] Corriger l'utilisation de la variable BRANCH_NAME dans common.sh
