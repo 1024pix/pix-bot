@@ -36,6 +36,19 @@ function getHeadOfChangelog(tagVersion) {
   return '## v' + tagVersion + date + '\n';
 }
 
+function generateChangeLogContent({ currentChangelogContent, changes }) {
+  const header = '# PIX Changelog\n';
+  let newChangelogContent = currentChangelogContent;
+
+  if(newChangelogContent.length === 0){
+    newChangelogContent = [header,'\n'];
+  }
+
+  newChangelogContent.splice(CHANGELOG_HEADER_LINES, 0, ...changes);
+  return newChangelogContent;
+
+}
+
 async function main() {
   const tagVersion = process.argv[2];
   const repoOwner = process.argv[3];
@@ -85,8 +98,10 @@ if (process.env.NODE_ENV !== 'test') {
   module.exports = {
     displayPullRequest,
     filterPullRequest,
-    orderPr,
+    generateChangeLogContent,
     getHeadOfChangelog,
     getLastMEPDate,
+    orderPr,
   };
 }
+
