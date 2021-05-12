@@ -1,4 +1,5 @@
 #! /usr/bin/env node
+
 const moment = require('moment');
 const _ = require('lodash');
 const fs = require('fs');
@@ -40,13 +41,12 @@ function generateChangeLogContent({ currentChangelogContent, changes }) {
   const header = '# PIX Changelog\n';
   let newChangelogContent = currentChangelogContent;
 
-  if(newChangelogContent.length === 0){
+  if (newChangelogContent.length === 0) {
     newChangelogContent = [header,'\n'];
   }
 
   newChangelogContent.splice(CHANGELOG_HEADER_LINES, 0, ...changes);
   return newChangelogContent;
-
 }
 
 async function main() {
@@ -69,7 +69,6 @@ async function main() {
     newChangeLogLines.push(...orderedPR.map(displayPullRequest));
     newChangeLogLines.push('');
 
-
     let currentChangeLog = '';
 
     try {
@@ -79,11 +78,13 @@ async function main() {
       currentChangeLog = [`# ${repoName} Changelog\n`, '\n'];
     }
 
-    currentChangeLog.splice(CHANGELOG_HEADER_LINES, 0, ...newChangeLogLines);
+    const changeLogContent = generateChangeLogContent({
+      currentChangelogContent: currentChangeLog,
+      changes: newChangeLogLines
+    });
 
     console.log(`Writing to ${CHANGELOG_FILE}`);
-
-    fs.writeFileSync(CHANGELOG_FILE, currentChangeLog.join('\n'));
+    fs.writeFileSync(CHANGELOG_FILE, changeLogContent.join('\n'));
   } catch(e) {
     console.log(e);
     process.exit(1);
@@ -104,4 +105,3 @@ if (process.env.NODE_ENV !== 'test') {
     orderPr,
   };
 }
-
