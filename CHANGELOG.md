@@ -1,5 +1,10 @@
 # pix-bot Changelog
 
+## v1.7.0 (12/05/2021)
+
+- [#77](https://github.com/1024pix/pix-bot/pull/77) [TECH] Corriger l'utilisation de la variable BRANCH_NAME dans common.sh
+- [#76](https://github.com/1024pix/pix-bot/pull/76) [TECH] Correction de la commande de hotfix Slack
+
 ## v1.6.0 (12/05/2021)
 
 - [#73](https://github.com/1024pix/pix-bot/pull/73) [FEATURE] Ajoute la commande de création, publication et déploiement en recette d'un patch (hotfix).
