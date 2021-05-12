@@ -1,6 +1,6 @@
 {
   "name": "pix-bot",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "Pix Bot application",
   "main": "index.js",
   "scripts": {
