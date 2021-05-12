@@ -7,7 +7,7 @@ CWD_DIR=$(pwd)
 GITHUB_OWNER=(${1})
 GITHUB_REPOSITORY=(${2})
 VERSION_TYPE=(${3-""})
-BRANCH_NAME=""
+BRANCH_NAME=(${4})
 
 source "$(dirname $0)"/common.sh
 

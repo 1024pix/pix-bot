@@ -227,6 +227,10 @@ module.exports = {
     return _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
   },
 
+  async getDefaultBranch(repoOwner, repoName) {
+    return _getDefaultBranch(repoOwner, repoName);
+  },
+
   async isBuildStatusOK({ branchName, tagName }) {
     const githubCICheckName = 'build-test-and-deploy';
     const commitUrl = await getLastCommitUrl({ branchName, tagName });

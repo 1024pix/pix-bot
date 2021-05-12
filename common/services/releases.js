@@ -2,6 +2,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
 const config = require('../../config');
+const github = require('./github');
 const ScalingoClient = require('./scalingo-client');
 
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
@@ -43,7 +44,8 @@ module.exports = {
     try {
       const sanitizedReleaseType = _sanitizedArgument(releaseType);
       const sanitizedRepoName = _sanitizedArgument(repoName);
-      const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType];
+      const branchName = await github.getDefaultBranch(config.github.owner, sanitizedRepoName);
+      const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType, branchName];
       await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
     } catch (err) {
       console.error(err);

@@ -3,6 +3,7 @@ const sinon = require('sinon');
 const proxyquire =  require('proxyquire');
 const { expect } = require('chai');
 const ScalingoClient = require('../../../../common/services/scalingo-client');
+const github = require('../../../../common/services/github');
 
 describe('releases', function() {
   let exec;
@@ -83,11 +84,14 @@ describe('releases', function() {
 
   describe('#publishPixRepo', async function () {
     it('should call the release pix script with \'minor\'', async function () {
+      // given
+      sinon.stub(github, 'getDefaultBranch').resolves('dev');
+
       //when
       await releasesService.publishPixRepo('pix-site', 'minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor$')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor dev$')));
     });
   });
 
