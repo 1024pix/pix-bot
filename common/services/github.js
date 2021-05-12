@@ -27,13 +27,19 @@ async function _getPullReviewsFromGithub(label){
 
   label = label.replace(/ /g, '%20');
   const octokit = _createOctokit();
-  const { data } = await octokit.search.issuesAndPullRequests({
-    q: `is:pr+is:open+archived:false+user:${owner}+label:${label}`,
-    sort: 'updated',
-    order: 'desc'
-  });
 
-  return data.items;
+  try {
+    const { data } = await octokit.search.issuesAndPullRequests({
+      q: `is:pr+is:open+archived:false+user:${owner}+label:${label}`,
+      sort: 'updated',
+      order: 'desc'
+    });
+
+    return data.items;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 async function _getReviewsFromGithub(pull_number){
