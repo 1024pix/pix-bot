@@ -1,5 +1,10 @@
 # pix-bot Changelog
 
+## v1.6.0 (12/05/2021)
+
+- [#73](https://github.com/1024pix/pix-bot/pull/73) [FEATURE] Ajoute la commande de création, publication et déploiement en recette d'un patch (hotfix).
+- [#74](https://github.com/1024pix/pix-bot/pull/74) [Feature] Ajout d'info dans les message slack de PRs
+
 ## v1.5.0 (20/04/2021)
 
 - [#72](https://github.com/1024pix/pix-bot/pull/72) Redéployer une application via Slack
