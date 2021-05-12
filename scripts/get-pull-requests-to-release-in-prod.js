@@ -40,11 +40,12 @@ async function main() {
   const tagVersion = process.argv[2];
   const repoOwner = process.argv[3];
   const repoName = process.argv[4];
+  const branchName = process.argv[5];
 
   try {
     const dateOfLastMEP = await getLastMEPDate(repoOwner, repoName);
 
-    const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName);
+    const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
 
     const newChangeLogLines = [];
 
