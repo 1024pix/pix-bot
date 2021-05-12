@@ -2,12 +2,14 @@
 
 set -euxo pipefail
 
-source "$(dirname $0)"/common.sh
 
 CWD_DIR=$(pwd)
 GITHUB_OWNER=(${1})
 GITHUB_REPOSITORY=(${2})
 VERSION_TYPE=(${3-""})
+BRANCH_NAME=""
+
+source "$(dirname $0)"/common.sh
 
 echo "Version type ${VERSION_TYPE} for ${GITHUB_OWNER}/${GITHUB_REPOSITORY}"
 
