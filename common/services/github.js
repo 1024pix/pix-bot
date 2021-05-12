@@ -50,7 +50,7 @@ async function _getReviewsFromGithub(pull_number){
 
 function _getEmojis(pullRequests) {
   const labelsEmojis = pullRequests.labels.map(label => {
-    const match = label.name.match(/^:[A-z,_,-]*:/);
+    const match = label.name.match(/^:[A-z,_-]*:/);
     return match ? match[0] : '';
   });
   return labelsEmojis.filter(Boolean).join(' ');
