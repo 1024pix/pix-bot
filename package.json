@@ -10,7 +10,7 @@
     "deploy:minor": "npm version minor && npm run deploy:tag",
     "deploy:patch": "npm version patch && npm run deploy:tag",
     "deploy:tag": "git push --tags && git push",
-    "start": "node bin/www",
+    "start": "node bin/www | sed \"s/$GITHUB_PERSONAL_ACCESS_TOKEN/**TOKEN**/\"",
     "test": "NODE_ENV=test mocha --recursive --exit test",
     "lint": "eslint common/* run/* build/* bin/* test/*"
   },
