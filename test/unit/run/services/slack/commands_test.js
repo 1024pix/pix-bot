@@ -198,5 +198,16 @@ describe('Services | Slack | Commands', () => {
       // then
       expect(response).to.be.instanceOf(Error);
     });
+
+    it('should throw an error if appName is not from pix repo', async () => {
+      // given
+      const appName = 'pix-site-production';
+
+      // when
+      const response = await catchErr(getAndDeployLastVersion)({ appName });
+
+      // then
+      expect(response).to.be.instanceOf(Error);
+    });
   });
 });
