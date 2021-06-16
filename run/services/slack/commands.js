@@ -13,6 +13,8 @@ const PIX_SITE_REPO_NAME = 'pix-site';
 const PIX_SITE_APPS = ['pix-site', 'pix-pro'];
 const PIX_DATAWAREHOUSE_REPO_NAME = 'pix-db-replication';
 const PIX_DATAWAREHOUSE_APPS_NAME = ['pix-datawarehouse', 'pix-datawarehouse-ex'];
+const PIX_APPS = ['app', 'certif', 'admin', 'orga', 'api'];
+const PIX_APPS_ENVIRONMENTS = ['integration', 'recette', 'production'];
 
 function sendResponse(responseUrl, text) {
   axios.post(responseUrl,
@@ -96,12 +98,26 @@ async function getAndDeployLastVersion({ appName }) {
   const appNameParts = sanitizedAppName.split('-');
   const environment = appNameParts[appNameParts.length - 1];
 
-  if (appNameParts.length!=3 || !['integration', 'recette', 'production'].includes(environment)) {
-    throw Error('Nom de l‘application incorrect');
+  if (!_isAppFromPixRepo({ appName: sanitizedAppName })) {
+    throw Error('L‘application doit faire partie du repo Pix');
   }
 
   const shortAppName = appNameParts[0] + '-' + appNameParts[1];
   await releasesService.deployPixRepo(PIX_REPO_NAME, shortAppName, lastReleaseTag, environment);
+}
+
+function _isAppFromPixRepo({ appName }) {
+  const appNameParts = appName.split('-');
+
+  if(appNameParts.length != 3) {
+    return false;
+  }
+
+  const [appNamePrefix, shortAppName, environment] = appName.split('-');
+
+  return appNamePrefix === 'pix'
+    && PIX_APPS.includes(shortAppName)
+    && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
 module.exports = {
