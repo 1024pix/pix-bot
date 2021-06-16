@@ -1,5 +1,9 @@
 # pix-bot Changelog
 
+## v1.8.2 (16/06/2021)
+
+- [#80](https://github.com/1024pix/pix-bot/pull/80) [BUGFIX] Empêcher le run de /deploy-last-version sur une application autre que celle du repo Pix
+
 ## v1.8.1 (12/05/2021)
 
 
