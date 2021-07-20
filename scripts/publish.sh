@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euxo pipefail
+set -euo pipefail
 
 CWD_DIR=$(pwd)
 GITHUB_OWNER=${GITHUB_OWNER:-1024pix}
