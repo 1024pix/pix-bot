@@ -17,8 +17,12 @@ const PIX_APPS = ['app', 'certif', 'admin', 'orga', 'api'];
 const PIX_APPS_ENVIRONMENTS = ['integration', 'recette', 'production'];
 
 function sendResponse(responseUrl, text) {
+  let body = { text };
+  if (typeof text === 'object') {
+    body = text;
+  }
   axios.post(responseUrl,
-    { text },
+    body,
     {
       headers: {
         'content-type': 'application/json',
@@ -58,20 +62,103 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   }
 }
 
+function _waitForDeploymentFinished(appName, deploymentId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const deployment = await releasesService.getDeploymentStatus(appName, deploymentId);
+      if (!['queued', 'building', 'starting'].includes(deployment.status)) {
+        resolve(deployment);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, responseUrl) {
+  let newDeployments = [...deployments];
+  appNames.forEach(async (appName, index) => {
+    const deploymentFinished = await _waitForAllDeploymentsFinished(appName, deployments[index]);
+    newDeployments[index] = deploymentFinished;
+    sendResponse(responseUrl, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
+  });
+}
+
+function formatMessage(appNames, releaseType, { releaseTag, published, deployments } = { releaseTag: '', published: false, deployments: []}) {
+  const versionMessage = releaseTag ? `${releaseTag} (${releaseType})` : releaseType;
+  return {
+    replace_original: 'true',
+    blocks: [
+      {
+	type: 'header',
+	text: {
+	  type: 'plain_text',
+	  text: `Publication de ${versionMessage} et mise en production de ${appNames.join(', ')}`
+	}
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `${published ? ':white_check_mark:' : ':hourglass:'} Publication de la nouvelle version`
+        }
+      },
+      ...appNames.map((appName, index) => {
+        return {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `${deployments && deployments[index] ? deployments[index].status : ':hourglass:'} Déploiement de ${appName}`
+          }
+        }
+      })
+    ]
+  };
+}
+
 async function publishAndDeployRelease(repoName, appNamesList = [], releaseType, responseUrl) {
   try {
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
+    sendResponse(responseUrl, formatMessage(appNamesList, releaseType));
+
     await releasesService.publishPixRepo(repoName, releaseType);
+    sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true }));
+
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
     const environment = 'production';
 
-    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment)));
+    sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
 
-    sendResponse(responseUrl, getSuccessMessage(releaseTag, appNamesList.join(', ')));
+    const deployments = appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment));
+
+    await Promise.all(deployments);
+
+    sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
+
+    await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, responseUrl)
   } catch (e) {
-    sendResponse(responseUrl, getErrorAppMessage(appNamesList.join(', ')));
+    console.log(e);
+    sendResponse(responseUrl, {
+      replace_original: 'true',
+      blocks: [
+	{
+	  type: 'header',
+	  text: {
+	    type: 'plain_text',
+	    text: `Publication ${releaseType} et mise en production de ${appNamesList.join(', ')}`
+	  }
+	},
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: ':x: Erreur'
+          }
+        }
+      ]
+    });
   }
 }
 

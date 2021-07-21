@@ -20,6 +20,7 @@ describe('Services | Slack | Commands', () => {
     sinon.stub(axios, 'post');
     sinon.stub(releasesServices, 'deployPixRepo').resolves();
     sinon.stub(releasesServices, 'publishPixRepo').resolves();
+    sinon.stub(releasesServices, 'getDeploymentStatus').resolves();
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
   });
 
@@ -162,6 +163,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should publish a new release', () => {
       // then
+      sinon.assert.called(releasesServices.publishPixRepo);
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-replication', 'minor');
     });
 

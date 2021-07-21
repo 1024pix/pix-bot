@@ -62,6 +62,13 @@ module.exports = {
     return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
   },
 
+  async getDeploymentStatus(appName, deploymentId) {
+    const client = await ScalingoClient.getInstance(environment);
+    const sanitizedAppName = _sanitizedArgument(appName);
+
+    return client.deploymentStatus(sanitizedAppName, deploymentId);
+  },
+
   _runScriptWithArgument,
 };
 

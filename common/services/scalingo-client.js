@@ -27,20 +27,19 @@ class ScalingoClient {
     const scalingoApp = options.withEnvSuffix ? `${pixApp}-${this.environment}` : pixApp;
 
     try {
-      await this.client.apiClient().post(
-        `/apps/${scalingoApp}/deployments`,
-        {
-          deployment: {
-            git_ref: releaseTag,
-            source_url: `https://${config.github.token}@github.com/${config.github.owner}/${repository}/archive/${releaseTag}.tar.gz`
-          }
-        });
+      const deployment = await this.client.Deployments.create(scalingoApp, {
+        git_ref: releaseTag,
+        source_url: `https://${config.github.token}@github.com/${config.github.owner}/${repository}/archive/${releaseTag}.tar.gz`
+      });
+      return deployment;
     } catch (e) {
       console.error(e);
       throw new Error(`Impossible to deploy ${scalingoApp} ${releaseTag}`);
     }
+  }
 
-    return `Deployed ${scalingoApp} ${releaseTag}`;
+  deploymentStatus(appName, deploymentId) {
+    return this.client.Deployments.find(appName, deploymentId);
   }
 
   async getAppInfo(target) {
