@@ -65,10 +65,10 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   }
 }
 
-function _waitForDeploymentFinished(appName, deploymentId) {
+function _waitForDeploymentFinished(appName, deploymentId, environment) {
   return new Promise(async (resolve, reject) => {
     try {
-      const deployment = await releasesService.getDeploymentStatus(appName, deploymentId);
+      const deployment = await releasesService.getDeploymentStatus(appName, deploymentId, environment);
       if (!['queued', 'building', 'starting'].includes(deployment.status)) {
         resolve(deployment);
       }
@@ -78,10 +78,10 @@ function _waitForDeploymentFinished(appName, deploymentId) {
   });
 }
 
-async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, responseUrl) {
+async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, environment, responseUrl) {
   let newDeployments = [...deployments];
   appNames.forEach(async (appName, index) => {
-    const deploymentFinished = await _waitForAllDeploymentsFinished(appName, deployments[index]);
+    const deploymentFinished = await _waitForAllDeploymentsFinished(appName, deployments[index], environment);
     newDeployments[index] = deploymentFinished;
     sendResponse(responseUrl, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
   });
@@ -140,7 +140,7 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
 
     sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
 
-    await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, responseUrl)
+    await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, environment, responseUrl)
   } catch (e) {
     console.log(e);
     sendResponse(responseUrl, {
