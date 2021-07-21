@@ -1,5 +1,10 @@
 # pix-bot Changelog
 
+## v1.9.0 (21/07/2021)
+
+- [#81](https://github.com/1024pix/pix-bot/pull/81) Ne pas afficher les commandes exécutés dans les scripts de publication pour ne pas afficher les tokens en prod
+- [#75](https://github.com/1024pix/pix-bot/pull/75) Bump lodash from 4.17.19 to 4.17.21
+
 ## v1.8.2 (16/06/2021)
 
 - [#80](https://github.com/1024pix/pix-bot/pull/80) [BUGFIX] Empêcher le run de /deploy-last-version sur une application autre que celle du repo Pix
