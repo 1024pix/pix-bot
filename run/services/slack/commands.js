@@ -16,6 +16,9 @@ const PIX_DATAWAREHOUSE_APPS_NAME = ['pix-datawarehouse', 'pix-datawarehouse-ex'
 const PIX_APPS = ['app', 'certif', 'admin', 'orga', 'api'];
 const PIX_APPS_ENVIRONMENTS = ['integration', 'recette', 'production'];
 
+const PIX_TEST_REPO_NAME = 'test-deploy-from-slack';
+const PIX_TEST_APPS_NAME = ['pix-test'];
+
 function sendResponse(responseUrl, text) {
   let body = { text };
   if (typeof text === 'object') {
@@ -227,6 +230,10 @@ module.exports = {
 
   async createAndDeployPixBotRelease(payload) {
     await publishAndDeployPixBot(PIX_BOT_REPO_NAME, payload.text, payload.response_url);
+  },
+
+  async createAndDeployPixTest(payload) {
+    await publishAndDeployRelease(PIX_TEST_REPO_NAME, PIX_TEST_APPS_NAME, payload.text, payload.response_url);
   },
 
   async getAndDeployLastVersion({ appName }) {

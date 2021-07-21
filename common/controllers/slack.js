@@ -58,6 +58,15 @@ module.exports = {
     };
   },
 
+  createAndDeployPixTest(request) {
+    const payload = request.pre.payload;
+    commandsFromRun.createAndDeployPixTest(payload);
+
+    return {
+      'text': _getDeployStartedMessage(payload.text, 'PIX Test')
+    };
+  },
+
   createAndDeployPixHotfix(request) {
     const payload = request.pre.payload;
     const branchName = payload.text;
