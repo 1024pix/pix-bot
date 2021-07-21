@@ -44,6 +44,12 @@ module.exports = [
   },
   {
     method: 'POST',
+    path: '/slack/commands/create-and-deploy-pix-test-release',
+    handler: slackbotController.createAndDeployPixTest,
+    config: slackConfig
+  },
+  {
+    method: 'POST',
     path: '/slack/commands/create-and-deploy-pix-hotfix',
     handler: slackbotController.createAndDeployPixHotfix,
     config: slackConfig
