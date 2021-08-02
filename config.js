@@ -84,6 +84,10 @@ module.exports = (function() {
       secret: process.env.PRISMIC_SECRET,
     },
 
+    pixSiteDeploy: {
+      schedule: process.env.PIX_SITE_DEPLOY_SCHEDULE,
+    },
+
     PIX_REPO_NAME: 'pix',
     PIX_BOT_REPO_NAME: 'pix-bot',
     PIX_LCMS_REPO_NAME: 'pix-editor',
