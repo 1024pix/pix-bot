@@ -3,6 +3,7 @@ const ScalingoClient = require('../../../common/services/scalingo-client');
 const githubServices = require('../../../common/services/github');
 const axios = require('axios');
 const postSlackMessage = require('../../../common/services/slack/surfaces/messages/post-message');
+const updateSlackMessage = require('../../../common/services/slack/surfaces/messages/update-message');
 
 const PIX_REPO_NAME = 'pix';
 const PIX_BOT_REPO_NAME = 'pix-bot';
@@ -78,20 +79,18 @@ function _waitForDeploymentFinished(appName, deploymentId, environment) {
   });
 }
 
-async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, environment, responseUrl) {
+async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, environment, ts) {
   let newDeployments = [...deployments];
   appNames.forEach(async (appName, index) => {
     const deploymentFinished = await _waitForAllDeploymentsFinished(appName, deployments[index], environment);
     newDeployments[index] = deploymentFinished;
-    sendResponse(responseUrl, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
+    updateSlackMessage(ts, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
   });
 }
 
 function formatMessage(appNames, releaseType, { releaseTag, published, deployments } = { releaseTag: '', published: false, deployments: []}) {
   const versionMessage = releaseTag ? `${releaseTag} (${releaseType})` : releaseType;
   return {
-    response_type: 'in_channel',
-    replace_original: 'true',
     blocks: [
       {
 	type: 'header',
@@ -125,24 +124,23 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
-    const response = await sendResponse(responseUrl, formatMessage(appNamesList, releaseType));
-    console.log(response.body);
+    const ts = (await postSlackMessage(formatMessage(appNamesList, releaseType))).data.ts;
 
     await releasesService.publishPixRepo(repoName, releaseType);
-    await sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true }));
+    await updateSlackMessage(ts, formatMessage(appNamesList, releaseType, { published: true }));
 
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
     const environment = 'production';
 
-    await sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
+    await updateSlackMessage(ts, responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
 
     const deployments = appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment));
 
     await Promise.all(deployments);
 
-    await sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
+    await updateSlackMessage(ts, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
 
-    await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, environment, responseUrl)
+    await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, environment, ts);
   } catch (e) {
     console.log(e);
     sendResponse(responseUrl, {
