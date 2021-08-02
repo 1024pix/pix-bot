@@ -24,7 +24,7 @@ function sendResponse(responseUrl, text) {
   if (typeof text === 'object') {
     body = text;
   }
-  axios.post(responseUrl,
+  return axios.post(responseUrl,
     body,
     {
       headers: {
@@ -90,6 +90,7 @@ async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames,
 function formatMessage(appNames, releaseType, { releaseTag, published, deployments } = { releaseTag: '', published: false, deployments: []}) {
   const versionMessage = releaseTag ? `${releaseTag} (${releaseType})` : releaseType;
   return {
+    response_type: 'in_channel',
     replace_original: 'true',
     blocks: [
       {
@@ -124,26 +125,28 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
-    sendResponse(responseUrl, formatMessage(appNamesList, releaseType));
+    const response = await sendResponse(responseUrl, formatMessage(appNamesList, releaseType));
+    console.log(response.body);
 
     await releasesService.publishPixRepo(repoName, releaseType);
-    sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true }));
+    await sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true }));
 
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
     const environment = 'production';
 
-    sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
+    await sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
 
     const deployments = appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment));
 
     await Promise.all(deployments);
 
-    sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
+    await sendResponse(responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
 
     await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, environment, responseUrl)
   } catch (e) {
     console.log(e);
     sendResponse(responseUrl, {
+      response_type: 'in_channel',
       replace_original: 'true',
       blocks: [
 	{
