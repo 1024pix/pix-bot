@@ -17,7 +17,7 @@ const PIX_DATAWAREHOUSE_APPS_NAME = ['pix-datawarehouse', 'pix-datawarehouse-ex'
 const PIX_APPS = ['app', 'certif', 'admin', 'orga', 'api'];
 const PIX_APPS_ENVIRONMENTS = ['integration', 'recette', 'production'];
 
-const PIX_TEST_REPO_NAME = 'test-deploy-from-slack';
+const PIX_TEST_REPO_NAME = 'pix-bot-release-test';
 const PIX_TEST_APPS_NAME = ['pix-test'];
 
 function sendResponse(responseUrl, text) {
