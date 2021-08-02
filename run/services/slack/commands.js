@@ -79,12 +79,12 @@ function _waitForDeploymentFinished(appName, deploymentId, environment) {
   });
 }
 
-async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, environment, ts) {
+async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, environment, channel, ts) {
   let newDeployments = [...deployments];
   appNames.forEach(async (appName, index) => {
     const deploymentFinished = await _waitForAllDeploymentsFinished(appName, deployments[index], environment);
     newDeployments[index] = deploymentFinished;
-    updateSlackMessage(ts, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
+    updateSlackMessage(channel, ts, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
   });
 }
 
@@ -124,28 +124,26 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
-    const ts = (await postSlackMessage(formatMessage(appNamesList, releaseType))).data.ts;
+    const { channel, ts } = (await postSlackMessage(formatMessage(appNamesList, releaseType))).data;
 
     await releasesService.publishPixRepo(repoName, releaseType);
-    await updateSlackMessage(ts, formatMessage(appNamesList, releaseType, { published: true }));
+    const response2 = await updateSlackMessage(channel, ts, formatMessage(appNamesList, releaseType, { published: true }));
 
     const releaseTag = await githubServices.getLatestReleaseTag(repoName);
     const environment = 'production';
 
-    await updateSlackMessage(ts, responseUrl, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
+    await updateSlackMessage(channel, ts, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
 
     const deployments = appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment));
 
     await Promise.all(deployments);
 
-    await updateSlackMessage(ts, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
+    await updateSlackMessage(channel, ts, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
 
-    await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, environment, ts);
+    await _waitForAllDeploymentsFinished(releaseTag, releaseType, appNamesList, deployments, environment, channel, ts);
   } catch (e) {
     console.log(e);
     sendResponse(responseUrl, {
-      response_type: 'in_channel',
-      replace_original: 'true',
       blocks: [
 	{
 	  type: 'header',

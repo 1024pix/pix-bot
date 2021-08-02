@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../../../../../config');
 
-module.exports = (ts, data) => {
+module.exports = (channel, ts, data) => {
   const options = {
     method: 'POST',
     url: 'https://slack.com/api/chat.update',
@@ -10,7 +10,7 @@ module.exports = (ts, data) => {
       'authorization': `Bearer ${config.slack.botToken}`
     },
     data: {
-      'channel': '#tech-releases',
+      channel,
       ts,
       ...data
     }
