@@ -1,21 +1,22 @@
 const { deploy } = require('../deploy');
+const {
+  PIX_REPO_NAME,
+  PIX_APPS,
+  PIX_APPS_ENVIRONMENTS,
+  PIX_SITE_REPO_NAME,
+  PIX_SITE_APPS,
+  PIX_BOT_REPO_NAME,
+  PIX_DATAWAREHOUSE_REPO_NAME,
+  PIX_DATAWAREHOUSE_APPS_NAME,
+  PIX_LCMS_REPO_NAME,
+  PIX_LCMS_APP_NAME,
+  PIX_UI_REPO_NAME,
+} = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const githubServices = require('../../../common/services/github');
 const axios = require('axios');
 const postSlackMessage = require('../../../common/services/slack/surfaces/messages/post-message');
-
-const PIX_REPO_NAME = 'pix';
-const PIX_BOT_REPO_NAME = 'pix-bot';
-const PIX_LCMS_REPO_NAME = 'pix-editor';
-const PIX_LCMS_APP_NAME = 'pix-lcms';
-const PIX_UI_REPO_NAME = 'pix-ui';
-const PIX_SITE_REPO_NAME = 'pix-site';
-const PIX_SITE_APPS = ['pix-site', 'pix-pro'];
-const PIX_DATAWAREHOUSE_REPO_NAME = 'pix-db-replication';
-const PIX_DATAWAREHOUSE_APPS_NAME = ['pix-datawarehouse', 'pix-datawarehouse-ex'];
-const PIX_APPS = ['app', 'certif', 'admin', 'orga', 'api'];
-const PIX_APPS_ENVIRONMENTS = ['integration', 'recette', 'production'];
 
 function sendResponse(responseUrl, text) {
   axios.post(responseUrl,
