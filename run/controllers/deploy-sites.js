@@ -1,6 +1,6 @@
-const githubServices = require('../../common/services/github');
-const releasesService = require('../../common/services/releases');
 const config = require('../../config');
+const { deploy } = require('../services/deploy');
+
 const Boom = require('@hapi/boom');
 
 const PIX_SITE_REPO_NAME = 'pix-site';
@@ -14,9 +14,7 @@ module.exports = {
       throw Boom.unauthorized('Secret is missing or is incorrect');
     }
 
-    const releaseTag = await githubServices.getLatestReleaseTag(PIX_SITE_REPO_NAME);
-    const environment = 'production';
-    await Promise.all(PIX_SITE_APPS.map((appName) => releasesService.deployPixRepo(PIX_SITE_REPO_NAME, appName, releaseTag, environment)));
+    const releaseTag = await deploy(PIX_SITE_REPO_NAME, PIX_SITE_APPS);
 
     return `pix.fr and pro.pix.fr deployments ${releaseTag} are in progress. Check deployment status on Scalingo`;
   },

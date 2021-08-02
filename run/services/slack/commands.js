@@ -1,3 +1,4 @@
+const { deploy } = require('../deploy');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const githubServices = require('../../../common/services/github');
@@ -64,10 +65,7 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
       releaseType = 'minor';
     }
     await releasesService.publishPixRepo(repoName, releaseType);
-    const releaseTag = await githubServices.getLatestReleaseTag(repoName);
-    const environment = 'production';
-
-    await Promise.all(appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment)));
+    const releaseTag = await deploy(repoName, appNamesList);
 
     sendResponse(responseUrl, getSuccessMessage(releaseTag, appNamesList.join(', ')));
   } catch (e) {
