@@ -61,7 +61,7 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
     sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
-    postSlackMessage(`[PIX-UI] App deployed (${releaseTagAfterRelease})`);
+    postSlackMessage({ text: `[PIX-UI] App deployed (${releaseTagAfterRelease})` });
   }
 }
 

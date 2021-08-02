@@ -139,7 +139,7 @@ module.exports = {
   },
 
   _interruptRelease() {
-    postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
+    postSlackMessage({ text: 'MER bloquée. Etat de l‘environnement d‘intégration à vérifier.' });
     return {
       'response_action': 'clear'
     };
