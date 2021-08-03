@@ -51,9 +51,9 @@ class ScalingoClient {
     return [await this._getSingleAppInfo(target)];
   }
 
-  async _getAllAppsInfo(environement) {
+  async _getAllAppsInfo(environment) {
     const apps = ['api', 'app', 'orga', 'certif', 'admin'];
-    const promises = apps.map(appName => this._getSingleAppInfo(appName, environement));
+    const promises = apps.map(appName => this._getSingleAppInfo(appName, environment));
     return Promise.all(promises);
   }
 
