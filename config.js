@@ -83,6 +83,22 @@ module.exports = (function() {
     prismic: {
       secret: process.env.PRISMIC_SECRET,
     },
+
+    pixSiteDeploy: {
+      schedule: process.env.PIX_SITE_DEPLOY_SCHEDULE,
+    },
+
+    PIX_REPO_NAME: 'pix',
+    PIX_BOT_REPO_NAME: 'pix-bot',
+    PIX_LCMS_REPO_NAME: 'pix-editor',
+    PIX_LCMS_APP_NAME: 'pix-lcms',
+    PIX_UI_REPO_NAME: 'pix-ui',
+    PIX_SITE_REPO_NAME: 'pix-site',
+    PIX_SITE_APPS: ['pix-site', 'pix-pro'],
+    PIX_DATAWAREHOUSE_REPO_NAME: 'pix-db-replication',
+    PIX_DATAWAREHOUSE_APPS_NAME: ['pix-datawarehouse', 'pix-datawarehouse-ex'],
+    PIX_APPS: ['app', 'certif', 'admin', 'orga', 'api'],
+    PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
   };
 
   if (process.env.NODE_ENV === 'test') {
