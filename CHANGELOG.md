@@ -1,5 +1,10 @@
 # pix-bot Changelog
 
+## v1.10.0 (09/08/2021)
+
+- [#83](https://github.com/1024pix/pix-bot/pull/83) [TECH] Corrige une typo
+- [#82](https://github.com/1024pix/pix-bot/pull/82) [FEAT] Ajout d'un CRON pour déployer Pix site tous les mois pour maintenir les statistiques à jour (PIX-2939).
+
 ## v1.9.0 (21/07/2021)
 
 - [#81](https://github.com/1024pix/pix-bot/pull/81) Ne pas afficher les commandes exécutés dans les scripts de publication pour ne pas afficher les tokens en prod
