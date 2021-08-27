@@ -1,5 +1,9 @@
 # pix-bot Changelog
 
+## v1.11.0 (27/08/2021)
+
+- [#84](https://github.com/1024pix/pix-bot/pull/84) [TECH] Ne pas permettre de faire de release Pix-UI sans donner de version
+
 ## v1.10.0 (09/08/2021)
 
 - [#83](https://github.com/1024pix/pix-bot/pull/83) [TECH] Corrige une typo
