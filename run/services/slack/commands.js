@@ -46,8 +46,8 @@ function _isReleaseTypeInvalid(releaseType) {
 }
 async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    postSlackMessage('Erreur lors du choix de la nouvelle version de Pix-UI. Veuillez indiquer "major", "minor" ou "patch".');
-    throw new Error('Erreur lors du choix de la nouvelle version de Pix-UI. Veuillez indiquer "major", "minor" ou "patch".');
+    postSlackMessage('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
+    throw new Error('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
   await releasesService.publishPixRepo(repoName, releaseType);
