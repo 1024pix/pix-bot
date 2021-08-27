@@ -78,21 +78,38 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployPixUI', () => {
-    beforeEach(async () => {
+
+    it('should publish a new release', async () => {
       // given
       const payload = { text: 'minor' };
+
       // when
       await createAndDeployPixUI(payload);
-    });
 
-    it('should publish a new release', () => {
       // then
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-ui', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', () => {
+    it('should retrieve the last release tag from GitHub', async () => {
+      // given
+      const payload = { text: 'minor' };
+
+      // when
+      await createAndDeployPixUI(payload);
+
       // then
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-ui');
+    });
+
+    it('should stop release if no version is given', async () => {
+      // given
+      const payload = { text: '' };
+
+      // when
+      const response = await catchErr(createAndDeployPixUI)(payload);
+
+      // then
+      expect(response).to.be.instanceOf(Error);
     });
   });
 
