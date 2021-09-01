@@ -80,6 +80,9 @@ describe('Scalingo client', () => {
 
     it('should deploy an application for a given tag', async () => {
       // given
+      const expectedDeployment = Symbol('deployment');
+      createDeploymentStub.resolves(expectedDeployment);
+
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0');
       // then
@@ -91,19 +94,25 @@ describe('Scalingo client', () => {
           source_url: 'https://github-personal-access-token@github.com/github-owner/github-repository/archive/v1.0.tar.gz'
         }
       );
-      expect(result).to.be.equal('Deployed pix-app-production v1.0');
+      expect(result).to.be.equal(expectedDeployment);
     });
 
     it('should deploy an application without the environment suffix', async () => {
       // given
+      const expectedDeployment = Symbol('deployment');
+      createDeploymentStub.resolves(expectedDeployment);
+
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', undefined, { withEnvSuffix: false });
       // then
-      expect(result).to.be.equal('Deployed pix-app v1.0');
+      expect(result).to.be.equal(expectedDeployment);
     });
 
     it('should deploy an application for a given repository', async () => {
       // given
+      const expectedDeployment = Symbol('deployment');
+      createDeploymentStub.resolves(expectedDeployment);
+
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', 'given-repository');
       // then
@@ -115,7 +124,7 @@ describe('Scalingo client', () => {
           source_url: 'https://github-personal-access-token@github.com/github-owner/given-repository/archive/v1.0.tar.gz'
         }
       );
-      expect(result).to.be.equal('Deployed pix-app-production v1.0');
+      expect(result).to.be.equal(expectedDeployment);
     });
 
     it('should failed when application does not exists', async () => {

@@ -27,16 +27,15 @@ class ScalingoClient {
     const scalingoApp = options.withEnvSuffix ? `${pixApp}-${this.environment}` : pixApp;
 
     try {
-      await this.client.Deployments.create(scalingoApp, {
+      const deployment = await this.client.Deployments.create(scalingoApp, {
         git_ref: releaseTag,
         source_url: `https://${config.github.token}@github.com/${config.github.owner}/${repository}/archive/${releaseTag}.tar.gz`
       });
+      return deployment;
     } catch (e) {
       console.error(e);
       throw new Error(`Impossible to deploy ${scalingoApp} ${releaseTag}`);
     }
-
-    return `Deployed ${scalingoApp} ${releaseTag}`;
   }
 
   async getAppInfo(target) {
