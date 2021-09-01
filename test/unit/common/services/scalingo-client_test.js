@@ -49,13 +49,13 @@ describe('Scalingo client', () => {
   });
 
   describe('#ScalingoClient.deployFromArchive', () => {
-    let apiClientPost;
+    let createDeploymentStub;
     let scalingoClient;
 
     beforeEach(async () => {
-      apiClientPost = sinon.stub();
+      createDeploymentStub = sinon.stub();
       sinon.stub(scalingo, 'clientFromToken')
-        .resolves({ apiClient: () => ({ post: apiClientPost }) });
+        .resolves({ Deployments: { create: createDeploymentStub } });
 
       scalingoClient = await ScalingoClient.getInstance('production');
     });
@@ -84,13 +84,11 @@ describe('Scalingo client', () => {
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0');
       // then
       sinon.assert.calledWithExactly(
-        apiClientPost,
-        '/apps/pix-app-production/deployments',
+        createDeploymentStub,
+        'pix-app-production',
         {
-          deployment: {
-            git_ref: 'v1.0',
-            source_url: 'https://github-personal-access-token@github.com/github-owner/github-repository/archive/v1.0.tar.gz'
-          },
+          git_ref: 'v1.0',
+          source_url: 'https://github-personal-access-token@github.com/github-owner/github-repository/archive/v1.0.tar.gz'
         }
       );
       expect(result).to.be.equal('Deployed pix-app-production v1.0');
@@ -110,13 +108,11 @@ describe('Scalingo client', () => {
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', 'given-repository');
       // then
       sinon.assert.calledWithExactly(
-        apiClientPost,
-        '/apps/pix-app-production/deployments',
+        createDeploymentStub,
+        'pix-app-production',
         {
-          deployment: {
-            git_ref: 'v1.0',
-            source_url: 'https://github-personal-access-token@github.com/github-owner/given-repository/archive/v1.0.tar.gz'
-          },
+          git_ref: 'v1.0',
+          source_url: 'https://github-personal-access-token@github.com/github-owner/given-repository/archive/v1.0.tar.gz'
         }
       );
       expect(result).to.be.equal('Deployed pix-app-production v1.0');
@@ -125,7 +121,7 @@ describe('Scalingo client', () => {
     it('should failed when application does not exists', async () => {
       // given
       sinon.stub(console, 'error');
-      apiClientPost.rejects(new Error());
+      createDeploymentStub.rejects(new Error());
       // when
       try {
         await scalingoClient.deployFromArchive('unknown-app', 'v1.0');
