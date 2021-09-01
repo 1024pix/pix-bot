@@ -1,7 +1,7 @@
 const axios = require('axios');
 const config = require('../../../../../config');
 
-module.exports = (message) => {
+module.exports = (data) => {
   const options = {
     method: 'POST',
     url: 'https://slack.com/api/chat.postMessage',
@@ -11,7 +11,7 @@ module.exports = (message) => {
     },
     data: {
       'channel': '#tech-releases',
-      'text': message,
+      ...data
     }
   };
   return axios(options);

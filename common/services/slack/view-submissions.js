@@ -38,7 +38,7 @@ module.exports = {
   submitReleaseDeploymentConfirmation(payload) {
     const releaseTag = payload.view.private_metadata;
     if(!githubService.isBuildStatusOK({ tagName: releaseTag.trim().toLowerCase() })) {
-      postSlackMessage('MEP bloquée. Etat de l‘environnement de recette à vérifier.');
+      postSlackMessage({ text: 'MEP bloquée. Etat de l‘environnement de recette à vérifier.' });
     }
     else {
       deploy(environments.production, releaseTag);
