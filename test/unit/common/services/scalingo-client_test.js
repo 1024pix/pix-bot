@@ -141,6 +141,35 @@ describe('Scalingo client', () => {
     });
   });
 
+  describe('#Scalingo.getDeployment', () => {
+    let findDeploymentStub;
+    let scalingoClient;
+
+    beforeEach(async () => {
+      findDeploymentStub = sinon.stub();
+      sinon.stub(scalingo, 'clientFromToken')
+        .resolves({ Deployments: { find: findDeploymentStub } });
+
+      scalingoClient = await ScalingoClient.getInstance('production');
+    });
+
+    it('should return the deployment', async () => {
+      // given
+      const expectedDeployment = Symbol('deployment');
+      findDeploymentStub.resolves(expectedDeployment);
+
+      // when
+      const result = await scalingoClient.getDeployment('pix-app', '1');
+      // then
+      sinon.assert.calledWithExactly(
+        findDeploymentStub,
+        'pix-app-production',
+        '1'
+      );
+      expect(result).to.be.equal(expectedDeployment);
+    });
+  });
+
   describe('#Scalingo.getAppInfo', () => {
     let clientAppsFind;
     let clientDeploymentsFind;

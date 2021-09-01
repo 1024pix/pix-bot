@@ -38,6 +38,12 @@ class ScalingoClient {
     }
   }
 
+  getDeployment(pixApp, deploymentId, options = DEFAULT_OPTS) {
+    const scalingoApp = options.withEnvSuffix ? `${pixApp}-${this.environment}` : pixApp;
+
+    return this.client.Deployments.find(scalingoApp, deploymentId);
+  }
+
   async getAppInfo(target) {
     if (['production', 'integration', 'recette'].includes(target)) {
       return await this._getAllAppsInfo(target);
