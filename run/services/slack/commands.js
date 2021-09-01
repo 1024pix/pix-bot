@@ -66,13 +66,21 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   }
 }
 
-function _waitForDeploymentFinished(appName, deploymentId, environment) {
+function _waitForDeploymentFinished(appName, deployment, environment, status) {
   return new Promise(async (resolve, reject) => {
     try {
-      const deployment = await releasesService.getDeploymentStatus(appName, deploymentId, environment);
-      if (!['queued', 'building', 'starting'].includes(deployment.status)) {
-        resolve(deployment);
+      async function pollDeploymentStatus() {
+        const deploymentStatusResponse = await releasesService.getDeploymentStatus(appName, deployment.id, environment);
+        if (!['queued', 'building', 'pushing', 'starting'].includes(deploymentStatusResponse.status)) {
+          resolve(deploymentStatusResponse);
+        } else {
+          status(deploymentStatusResponse);
+          setTimeout(() => {
+            pollDeploymentStatus();
+          }, 1000)
+        }
       }
+      pollDeploymentStatus();
     } catch (e) {
       reject(e);
     }
@@ -80,16 +88,32 @@ function _waitForDeploymentFinished(appName, deploymentId, environment) {
 }
 
 async function _waitForAllDeploymentsFinished(releaseTag, releaseType, appNames, deployments, environment, channel, ts) {
-  let newDeployments = [...deployments];
-  appNames.forEach(async (appName, index) => {
-    const deploymentFinished = await _waitForAllDeploymentsFinished(appName, deployments[index], environment);
+  const newDeployments = [...deployments];
+  const promises = appNames.map(async (appName, index) => {
+    const deploymentFinished = await _waitForDeploymentFinished(appName, deployments[index], environment, (deploymentStatus) => {
+      newDeployments[index] = deploymentStatus;
+      updateSlackMessage(channel, ts, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
+    });
     newDeployments[index] = deploymentFinished;
     updateSlackMessage(channel, ts, formatMessage(appNames, releaseType, { published: true, releaseTag, deployments: newDeployments }));
   });
+  return Promise.all(promises);
 }
 
 function formatMessage(appNames, releaseType, { releaseTag, published, deployments } = { releaseTag: '', published: false, deployments: []}) {
   const versionMessage = releaseTag ? `${releaseTag} (${releaseType})` : releaseType;
+  const scalingoStatus2emoji = {
+    queued: ':hourglass:',
+    building: ':hammer:',
+    pushing: ':incoming_envelope:',
+    starting: ':car:',
+    success: ':white_check_mark:',
+    aborted: ':x: (aborted)',
+    'build-error': ':x: build-error',
+    'crashed-error': ':x: crashed-error',
+    'timeout-error': ':x: timeout-error',
+    'hook-error': ':x:x hook-error'
+  };
   return {
     blocks: [
       {
@@ -111,7 +135,7 @@ function formatMessage(appNames, releaseType, { releaseTag, published, deploymen
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `${deployments && deployments[index] ? deployments[index].status : ':hourglass:'} Déploiement de ${appName}`
+            text: `${deployments && deployments[index] ? scalingoStatus2emoji[deployments[index].status] : ':hourglass:'} Déploiement de ${appName}`
           }
         }
       })
@@ -134,9 +158,9 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
 
     await updateSlackMessage(channel, ts, formatMessage(appNamesList, releaseType, { published: true, releaseTag }));
 
-    const deployments = appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment));
+    const deploymentsPromise = appNamesList.map((appName) => releasesService.deployPixRepo(repoName, appName, releaseTag, environment));
 
-    await Promise.all(deployments);
+    const deployments = await Promise.all(deploymentsPromise);
 
     await updateSlackMessage(channel, ts, formatMessage(appNamesList, releaseType, { published: true, releaseTag, deployments }));
 

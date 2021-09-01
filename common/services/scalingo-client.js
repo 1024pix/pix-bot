@@ -38,8 +38,10 @@ class ScalingoClient {
     }
   }
 
-  deploymentStatus(appName, deploymentId) {
-    return this.client.Deployments.find(appName, deploymentId);
+  deploymentStatus(pixApp, deploymentId, options = DEFAULT_OPTS) {
+    const scalingoApp = options.withEnvSuffix ? `${pixApp}-${this.environment}` : pixApp;
+
+    return this.client.Deployments.find(scalingoApp, deploymentId);
   }
 
   async getAppInfo(target) {
