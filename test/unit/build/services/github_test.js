@@ -262,3 +262,60 @@ describe('#isBuildStatusOK', () => {
   });
 });
 
+describe('#hasConfigFileChangedSinceLatestRelease', () => {
+  const latestReleaseDate= '2020-08-13T04:45:06Z';
+  const repoOwner = 'github-owner';
+  const repoName = 'github-repository';
+
+  context('should return true when config file has been changed', ()=> {
+    it('should call Github "commits list" API', async () => {
+      // given
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/commits')
+        .query({ since: latestReleaseDate, path: 'api/lib/config.js' })
+        .reply(200, 
+          [{
+            sha: '5ec2f42',
+          }]
+        );
+  
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/tags')
+        .reply(200, [{commit: {url: '/latest_tag_commit_url',},}]);
+
+      nock('https://api.github.com')
+        .get('/latest_tag_commit_url')
+        .reply(200, {commit: {committer: {date: latestReleaseDate}}});
+  
+      // when
+      const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+      // then
+      expect(response).to.be.true;
+    });
+  });
+
+  context('should return false when config file did not changed changed', ()=> {
+    it('should call Github "commits list" API', async () => {
+      // given
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/commits')
+        .query({ since: latestReleaseDate, path: 'api/lib/config.js' })
+        .reply(200, 
+          []
+        );
+  
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/tags')
+        .reply(200, [{commit: {url: '/latest_tag_commit_url',},}]);
+
+      nock('https://api.github.com')
+        .get('/latest_tag_commit_url')
+        .reply(200, {commit: {committer: {date: latestReleaseDate}}});
+  
+      // when
+      const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+      // then
+      expect(response).to.be.false;
+    });
+  });
+});
