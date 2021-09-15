@@ -8,9 +8,10 @@ module.exports = {
 
   // Release publication
 
-  submitReleaseTypeSelection(payload) {
+  async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
-    return openModalReleasePublicationConfirmation(releaseType);
+    const hasConfigFileChanged = await githubService.hasConfigFileChangedSinceLatestRelease();
+    return openModalReleasePublicationConfirmation(releaseType, hasConfigFileChanged);
   },
 
   submitReleasePublicationConfirmation(payload) {
