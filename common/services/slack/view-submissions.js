@@ -31,9 +31,10 @@ module.exports = {
 
   // Release deployment
 
-  submitReleaseTagSelection(payload) {
+  async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-    return openModalReleaseDeploymentConfirmation(releaseTag);
+    const hasConfigFileChanged = await githubService.hasConfigFileChangedSinceLatestRelease();
+    return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 
   submitReleaseDeploymentConfirmation(payload) {
