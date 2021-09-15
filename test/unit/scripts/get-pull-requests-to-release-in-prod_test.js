@@ -16,7 +16,6 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
 
   describe('#displayPullRequest', () => {
 
-    const expectedLine = '- [#111](http://git/111) [BUGFIX] Résolution du problème de surestimation du niveau (US-389).';
 
     it('should return a line with correct format from correct PR name', () => {
       // given
@@ -25,6 +24,7 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
         number: 111,
         html_url: 'http://git/111'
       };
+      const expectedLine = '- [#111](http://git/111) [BUGFIX] Résolution du problème de surestimation du niveau (US-389).';
 
       // when
       const result = displayPullRequest(pullRequest);
@@ -245,8 +245,8 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
           title: '[BUGFIX] PIX-3',
         },
         {
-          htmlUrl: 'https://github.com/foo/foo/pull/103',
-          number: 103,
+          htmlUrl: 'https://github.com/foo/foo/pull/104',
+          number: 104,
           title: 'Foo PIX-4',
         }
       ];
@@ -264,7 +264,7 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
         '- [#102](https://github.com/foo/foo/pull/102) [BUGFIX] PIX-3',
         '',
         '### :coffee: Various',
-        '- [#103](https://github.com/foo/foo/pull/103) Foo PIX-4',
+        '- [#104](https://github.com/foo/foo/pull/104) Foo PIX-4',
         '',
       ];
 

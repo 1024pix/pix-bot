@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 const moment = require('moment');
-const _ = require('lodash');
+const { sortBy, indexOf } = require('lodash');
 const fs = require('fs');
 const github = require('../common/services/github');
 
@@ -25,9 +25,9 @@ function displayPullRequest(pr) {
 
 function orderPr(listPR) {
   const typeOrder = ['FEATURE', 'QUICK WIN', 'BUGFIX', 'TECH'];
-  return _.sortBy(listPR, (pr) => {
+  return sortBy(listPR, (pr) => {
     const typeOfPR = pr.title.substring(1, pr.title.indexOf(']'));
-    const typeIndex = _.indexOf(typeOrder, typeOfPR);
+    const typeIndex = indexOf(typeOrder, typeOfPR);
     return typeIndex < 0 ? Number.MAX_VALUE : typeIndex;
   });
 }
@@ -76,14 +76,12 @@ async function main() {
 
     const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
 
-    const newChangeLogLines = [];
-
-    newChangeLogLines.push(getHeadOfChangelog(tagVersion));
     const pullRequestsSinceLastMEP = filterPullRequest(pullRequests, dateOfLastMEP);
 
-    const orderedPR = orderPr(pullRequestsSinceLastMEP);
-    newChangeLogLines.push(...orderedPR.map(displayPullRequest));
-    newChangeLogLines.push('');
+    const newChangeLogLines = getNewChangeLogLines({
+      headOfChangelogTitle: getHeadOfChangelog(tagVersion),
+      pullRequests: pullRequestsSinceLastMEP,
+    });
 
     let currentChangeLog = '';
 
