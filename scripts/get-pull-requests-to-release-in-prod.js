@@ -5,6 +5,10 @@ const _ = require('lodash');
 const fs = require('fs');
 const github = require('../common/services/github');
 
+const PartialChangeLogGenerator = require('./models/PartialChangeLogGenerator');
+const PullRequest = require('./models/PullRequest');
+const PullRequestGroupFactory = require('./models/PullRequestGroupFactory');
+
 const CHANGELOG_FILE = 'CHANGELOG.md';
 const CHANGELOG_HEADER_LINES = 2;
 
@@ -42,11 +46,23 @@ function generateChangeLogContent({ currentChangelogContent, changes }) {
   let newChangelogContent = currentChangelogContent;
 
   if (newChangelogContent.length === 0) {
-    newChangelogContent = [header,'\n'];
+    newChangelogContent = [header, '\n'];
   }
 
   newChangelogContent.splice(CHANGELOG_HEADER_LINES, 0, ...changes);
   return newChangelogContent;
+}
+
+function getNewChangeLogLines({ headOfChangelogTitle, pullRequests }) {
+  const partialChangeLogGenerator = new PartialChangeLogGenerator({
+    headOfChangelogTitle,
+    pullRequestGroups: PullRequestGroupFactory.build(),
+  });
+
+  partialChangeLogGenerator.grabPullRequestsByTag(
+    pullRequests.map((item) => new PullRequest(item))
+  );
+  return partialChangeLogGenerator.getLinesToDisplay();
 }
 
 async function main() {
@@ -102,6 +118,7 @@ if (process.env.NODE_ENV !== 'test') {
     generateChangeLogContent,
     getHeadOfChangelog,
     getLastMEPDate,
+    getNewChangeLogLines,
     orderPr,
   };
 }

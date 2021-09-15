@@ -8,6 +8,7 @@ const {
   generateChangeLogContent,
   getHeadOfChangelog,
   getLastMEPDate,
+  getNewChangeLogLines,
   orderPr,
 } = require('../../../scripts/get-pull-requests-to-release-in-prod');
 
@@ -218,6 +219,63 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
         // then
         expect(changeLogContent).to.deep.equal(expectedChangelog);
       });
+    });
+  });
+
+  describe('#getNewChangeLogLines', () => {
+
+    it('should return head of Changelog title and corresponding lines of pull requests grouped by type', () => {
+      // given
+      const headOfChangelogTitle = '## v3.55.0 (12/05/2021)';
+
+      const pullRequests = [
+        {
+          htmlUrl: 'https://github.com/foo/foo/pull/100',
+          number: 100,
+          title: '[FEATURE] PIX-1',
+        },
+        {
+          htmlUrl: 'https://github.com/foo/foo/pull/101',
+          number: 101,
+          title: '[TECH] PIX-2',
+        },
+        {
+          htmlUrl: 'https://github.com/foo/foo/pull/102',
+          number: 102,
+          title: '[BUGFIX] PIX-3',
+        },
+        {
+          htmlUrl: 'https://github.com/foo/foo/pull/103',
+          number: 103,
+          title: 'Foo PIX-4',
+        }
+      ];
+
+      const expectedNewChangeLogLines = [
+        '## v3.55.0 (12/05/2021)',
+        '',
+        '### :rocket: Enhancement',
+        '- [#100](https://github.com/foo/foo/pull/100) [FEATURE] PIX-1',
+        '',
+        '### :building_construction: Tech',
+        '- [#101](https://github.com/foo/foo/pull/101) [TECH] PIX-2',
+        '',
+        '### :bug: Bug fix',
+        '- [#102](https://github.com/foo/foo/pull/102) [BUGFIX] PIX-3',
+        '',
+        '### :coffee: Various',
+        '- [#103](https://github.com/foo/foo/pull/103) Foo PIX-4',
+        '',
+      ];
+
+      // when
+      const result = getNewChangeLogLines({
+        headOfChangelogTitle,
+        pullRequests,
+      });
+
+      // then
+      expect(result).to.deep.equal(expectedNewChangeLogLines);
     });
   });
 });
