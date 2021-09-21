@@ -193,6 +193,18 @@ async function _getLatestReleaseDate(repoOwner, repoName) {
   return commit.committer.date;
 }
 
+async function _getCommitsWhereConfigFileHasChangedSinceDate(repoOwner, repoName, date) {
+  const { repos } = _createOctokit();
+  const { data } = await repos.listCommits({
+    owner: repoOwner,
+    repo: repoName,
+    since: date,
+    path: 'api/lib/config.js',
+  });
+  
+  return data;
+}
+
 module.exports = {
 
   async getPullRequests(label) {
@@ -250,5 +262,11 @@ module.exports = {
 
     return pullRequestsSinceLatestRelease.map((PR) => `${PR.title}`);
   },
+
+  async hasConfigFileChangedSinceLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
+    const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
+    const commits = await _getCommitsWhereConfigFileHasChangedSinceDate(repoOwner, repoName, latestReleaseDate);
+    return commits.length > 0;
+  }
 
 };

@@ -1,5 +1,5 @@
-module.exports = (releaseType) => {
-  return {
+module.exports = (releaseType, hasConfigFileChanged) => {
+  const modalReleasePublicationConfirmation = {
     'response_action': 'push',
     'view': {
       'type': 'modal',
@@ -30,4 +30,16 @@ module.exports = (releaseType) => {
       ]
     }
   };
+
+  if (hasConfigFileChanged) {
+    modalReleasePublicationConfirmation.view.blocks.unshift({
+      'type': 'section',
+      'text': {
+        'type': 'mrkdwn',
+        'text': ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo RECETTE*.'
+      },
+    });
+  }
+
+  return modalReleasePublicationConfirmation;
 };
