@@ -1,8 +1,13 @@
 #! /usr/bin/env node
+
 const moment = require('moment');
-const _ = require('lodash');
+const { sortBy, indexOf } = require('lodash');
 const fs = require('fs');
 const github = require('../common/services/github');
+
+const PartialChangeLogGenerator = require('./models/PartialChangeLogGenerator');
+const PullRequest = require('./models/PullRequest');
+const PullRequestGroupFactory = require('./models/PullRequestGroupFactory');
 
 const CHANGELOG_FILE = 'CHANGELOG.md';
 const CHANGELOG_HEADER_LINES = 2;
@@ -20,9 +25,9 @@ function displayPullRequest(pr) {
 
 function orderPr(listPR) {
   const typeOrder = ['FEATURE', 'QUICK WIN', 'BUGFIX', 'TECH'];
-  return _.sortBy(listPR, (pr) => {
+  return sortBy(listPR, (pr) => {
     const typeOfPR = pr.title.substring(1, pr.title.indexOf(']'));
-    const typeIndex = _.indexOf(typeOrder, typeOfPR);
+    const typeIndex = indexOf(typeOrder, typeOfPR);
     return typeIndex < 0 ? Number.MAX_VALUE : typeIndex;
   });
 }
@@ -36,6 +41,30 @@ function getHeadOfChangelog(tagVersion) {
   return '## v' + tagVersion + date + '\n';
 }
 
+function generateChangeLogContent({ currentChangelogContent, changes }) {
+  const header = '# PIX Changelog\n';
+  let newChangelogContent = currentChangelogContent;
+
+  if (newChangelogContent.length === 0) {
+    newChangelogContent = [header, '\n'];
+  }
+
+  newChangelogContent.splice(CHANGELOG_HEADER_LINES, 0, ...changes);
+  return newChangelogContent;
+}
+
+function getNewChangeLogLines({ headOfChangelogTitle, pullRequests }) {
+  const partialChangeLogGenerator = new PartialChangeLogGenerator({
+    headOfChangelogTitle,
+    pullRequestGroups: PullRequestGroupFactory.build(),
+  });
+
+  partialChangeLogGenerator.grabPullRequestsByTag(
+    pullRequests.map((item) => new PullRequest(item))
+  );
+  return partialChangeLogGenerator.getLinesToDisplay();
+}
+
 async function main() {
   const tagVersion = process.argv[2];
   const repoOwner = process.argv[3];
@@ -47,15 +76,12 @@ async function main() {
 
     const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
 
-    const newChangeLogLines = [];
-
-    newChangeLogLines.push(getHeadOfChangelog(tagVersion));
     const pullRequestsSinceLastMEP = filterPullRequest(pullRequests, dateOfLastMEP);
 
-    const orderedPR = orderPr(pullRequestsSinceLastMEP);
-    newChangeLogLines.push(...orderedPR.map(displayPullRequest));
-    newChangeLogLines.push('');
-
+    const newChangeLogLines = getNewChangeLogLines({
+      headOfChangelogTitle: getHeadOfChangelog(tagVersion),
+      pullRequests: pullRequestsSinceLastMEP,
+    });
 
     let currentChangeLog = '';
 
@@ -66,11 +92,13 @@ async function main() {
       currentChangeLog = [`# ${repoName} Changelog\n`, '\n'];
     }
 
-    currentChangeLog.splice(CHANGELOG_HEADER_LINES, 0, ...newChangeLogLines);
+    const changeLogContent = generateChangeLogContent({
+      currentChangelogContent: currentChangeLog,
+      changes: newChangeLogLines
+    });
 
     console.log(`Writing to ${CHANGELOG_FILE}`);
-
-    fs.writeFileSync(CHANGELOG_FILE, currentChangeLog.join('\n'));
+    fs.writeFileSync(CHANGELOG_FILE, changeLogContent.join('\n'));
   } catch(e) {
     console.log(e);
     process.exit(1);
@@ -85,8 +113,10 @@ if (process.env.NODE_ENV !== 'test') {
   module.exports = {
     displayPullRequest,
     filterPullRequest,
-    orderPr,
+    generateChangeLogContent,
     getHeadOfChangelog,
     getLastMEPDate,
+    getNewChangeLogLines,
+    orderPr,
   };
 }
