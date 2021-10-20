@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.12.0 (20/10/2021)
+
+- [#87](https://github.com/1024pix/pix-bot/pull/87) [FEATURE] Générer le contenu du Changelog.md en regroupant les pull requests par type (PIX-2593).
+- [#85](https://github.com/1024pix/pix-bot/pull/85) [TECH] Mise à jour du client scalingo
+- [#86](https://github.com/1024pix/pix-bot/pull/86) [TECH] Notifier s'il y a eu des changements de variables d'environnement lors d'une mise en recette ou d'une mise en production.
+
 ## v1.11.0 (27/08/2021)
 
 - [#84](https://github.com/1024pix/pix-bot/pull/84) [TECH] Ne pas permettre de faire de release Pix-UI sans donner de version
