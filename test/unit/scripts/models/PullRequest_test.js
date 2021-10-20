@@ -10,7 +10,7 @@ describe('Unit | Script | Models | PullRequest', () => {
     it('should create an instance of PullRequest', () => {
       // given
       const properties = {
-        htmlUrl: 'url',
+        html_url: 'url',
         number: 1,
         title: 'title',
       };
@@ -25,7 +25,7 @@ describe('Unit | Script | Models | PullRequest', () => {
     it('should have title, number and htmlUrl properties', () => {
       // given
       const properties = {
-        htmlUrl: 'url',
+        html_url: 'url',
         number: 1,
         title: 'title',
       };
@@ -34,7 +34,7 @@ describe('Unit | Script | Models | PullRequest', () => {
       const createdInstance = new PullRequest(properties);
 
       // then
-      expect(createdInstance.htmlUrl).to.equal(properties.htmlUrl);
+      expect(createdInstance.htmlUrl).to.equal(properties.html_url);
       expect(createdInstance.number).to.equal(properties.number);
       expect(createdInstance.title).to.equal(properties.title);
     });
@@ -43,7 +43,7 @@ describe('Unit | Script | Models | PullRequest', () => {
       // given
       sinon.spy(Tags, 'getTagByTitle');
       const properties = {
-        htmlUrl: 'url',
+        html_url: 'url',
         number: 1,
         title: 'title',
       };
@@ -58,7 +58,7 @@ describe('Unit | Script | Models | PullRequest', () => {
     it('should have a tag property', () => {
       // given
       const properties = {
-        htmlUrl: 'url',
+        html_url: 'url',
         number: 1,
         title: 'title',
       };
@@ -75,12 +75,12 @@ describe('Unit | Script | Models | PullRequest', () => {
 
     it('should return a string with properties', () => {
       // given
-      const htmlUrl = 'https://github.com/1024pix/pix/pull/2971';
+      const html_url = 'https://github.com/1024pix/pix/pull/2971';
       const number = 2971;
       const title = '[FEATURE] Passer les sessions assignées comme sessions "à traiter" (PIX-2571).';
-      const properties = { htmlUrl, number, title };
+      const properties = { html_url, number, title };
 
-      const expectedString = `- [#${number}](${htmlUrl}) ${title}`;
+      const expectedString = `- [#${number}](${html_url}) ${title}`;
 
       // when
       const createdInstance = new PullRequest(properties);
