@@ -230,22 +230,22 @@ describe('Unit | Script | GET Pull Request to release in Prod', () => {
 
       const pullRequests = [
         {
-          htmlUrl: 'https://github.com/foo/foo/pull/100',
+          html_url: 'https://github.com/foo/foo/pull/100',
           number: 100,
           title: '[FEATURE] PIX-1',
         },
         {
-          htmlUrl: 'https://github.com/foo/foo/pull/101',
+          html_url: 'https://github.com/foo/foo/pull/101',
           number: 101,
           title: '[TECH] PIX-2',
         },
         {
-          htmlUrl: 'https://github.com/foo/foo/pull/102',
+          html_url: 'https://github.com/foo/foo/pull/102',
           number: 102,
           title: '[BUGFIX] PIX-3',
         },
         {
-          htmlUrl: 'https://github.com/foo/foo/pull/104',
+          html_url: 'https://github.com/foo/foo/pull/104',
           number: 104,
           title: 'Foo PIX-4',
         }
