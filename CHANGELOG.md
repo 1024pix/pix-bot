@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.12.1 (21/10/2021)
+
+
+### :bug: Bug fix
+- [#88](undefined) [BUGFIX] Utiliser la bon attribut comme lien vers les PR dans le changelog. 
+
 ## v1.12.0 (20/10/2021)
 
 - [#87](https://github.com/1024pix/pix-bot/pull/87) [FEATURE] Générer le contenu du Changelog.md en regroupant les pull requests par type (PIX-2593).
