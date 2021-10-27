@@ -31,6 +31,15 @@ module.exports = {
     };
   },
 
+  createAndDeployEmberTestingLibraryRelease(request) {
+    const payload = request.pre.payload;
+    commandsFromRun.createAndDeployEmberTestingLibrary(payload);
+
+    return {
+      'text': _getDeployStartedMessage(payload.text, 'EMBER-TESTING-LIBRARY')
+    };
+  },
+
   createAndDeployPixBotRelease(request) {
     const payload = request.pre.payload;
     commandsFromRun.createAndDeployPixBotRelease(payload);

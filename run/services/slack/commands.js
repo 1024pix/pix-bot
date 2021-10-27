@@ -11,6 +11,7 @@ const {
   PIX_LCMS_REPO_NAME,
   PIX_LCMS_APP_NAME,
   PIX_UI_REPO_NAME,
+  PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -57,6 +58,23 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
     postSlackMessage(`[PIX-UI] App deployed (${releaseTagAfterRelease})`);
+    sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
+  }
+}
+
+async function publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
+  if (_isReleaseTypeInvalid(releaseType)) {
+    postSlackMessage('Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".');
+    throw new Error('Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".');
+  }
+  const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
+  await releasesService.publishPixRepo(repoName, releaseType);
+  const releaseTagAfterRelease = await githubServices.getLatestReleaseTag(repoName);
+
+  if (releaseTagBeforeRelease === releaseTagAfterRelease) {
+    sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
+  } else {
+    postSlackMessage(`[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`);
     sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
   }
 }
@@ -128,6 +146,10 @@ module.exports = {
 
   async createAndDeployPixUI(payload) {
     await publishAndDeployPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
+  },
+
+  async createAndDeployEmberTestingLibrary(payload) {
+    await publishAndDeployEmberTestingLibrary(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createAndDeployPixSiteRelease(payload) {

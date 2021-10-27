@@ -5,6 +5,7 @@ const { catchErr, sinon } = require('../../../../test-helper');
 const {
   createAndDeployPixLCMS,
   createAndDeployPixUI,
+  createAndDeployEmberTestingLibrary,
   createAndDeployPixSiteRelease,
   createAndDeployPixDatawarehouse,
   createAndDeployPixBotRelease,
@@ -107,6 +108,42 @@ describe('Services | Slack | Commands', () => {
 
       // when
       const response = await catchErr(createAndDeployPixUI)(payload);
+
+      // then
+      expect(response).to.be.instanceOf(Error);
+    });
+  });
+
+  describe('#createAndDeployEmberTestingLibrary', () => {
+
+    it('should publish a new release', async () => {
+      // given
+      const payload = { text: 'minor' };
+
+      // when
+      await createAndDeployEmberTestingLibrary(payload);
+
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'ember-testing-library', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', async () => {
+      // given
+      const payload = { text: 'minor' };
+
+      // when
+      await createAndDeployEmberTestingLibrary(payload);
+
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'ember-testing-library');
+    });
+
+    it('should stop release if no version is given', async () => {
+      // given
+      const payload = { text: '' };
+
+      // when
+      const response = await catchErr(createAndDeployEmberTestingLibrary)(payload);
 
       // then
       expect(response).to.be.instanceOf(Error);
