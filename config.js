@@ -93,6 +93,7 @@ module.exports = (function() {
     PIX_LCMS_REPO_NAME: 'pix-editor',
     PIX_LCMS_APP_NAME: 'pix-lcms',
     PIX_UI_REPO_NAME: 'pix-ui',
+    PIX_EMBER_TESTING_LIBRARY_REPO_NAME: 'ember-testing-library',
     PIX_SITE_REPO_NAME: 'pix-site',
     PIX_SITE_APPS: ['pix-site', 'pix-pro'],
     PIX_DATAWAREHOUSE_REPO_NAME: 'pix-db-replication',

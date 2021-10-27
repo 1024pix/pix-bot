@@ -32,6 +32,12 @@ module.exports = [
   },
   {
     method: 'POST',
+    path: '/slack/commands/create-and-deploy-ember-testing-library-release',
+    handler: slackbotController.createAndDeployEmberTestingLibraryRelease,
+    config: slackConfig
+  },
+  {
+    method: 'POST',
     path: '/slack/commands/create-and-deploy-pix-bot-release',
     handler: slackbotController.createAndDeployPixBotRelease,
     config: slackConfig
