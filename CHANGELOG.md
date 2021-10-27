@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.13.0 (27/10/2021)
+
+
+### :rocket: Enhancement
+- [#90](https://github.com/1024pix/pix-bot/pull/90) [FEATURE] Ajout du support d'ember-testing-library
+
+### :building_construction: Tech
+- [#89](https://github.com/1024pix/pix-bot/pull/89) [TECH] Avoir le même workflow de merge que sur les autres repositories.
+
 ## v1.12.1 (21/10/2021)
 
 
