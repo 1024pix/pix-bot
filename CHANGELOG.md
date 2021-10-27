@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.13.1 (27/10/2021)
+
+
+### :bug: Bug fix
+- [#91](https://github.com/1024pix/pix-bot/pull/91) [BUGFIX] Meilleur message de succès lors du déploiement d'ember-testing-library
+
 ## v1.13.0 (27/10/2021)
 
 
