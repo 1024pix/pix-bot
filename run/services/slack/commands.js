@@ -38,6 +38,10 @@ function getSuccessMessage(release, appName) {
   return `Le script de déploiement de la release '${release}' pour ${appName} en production s'est déroulé avec succès. En attente de l'installation des applications sur Scalingo…`;
 }
 
+function getSuccessReleaseMessage(release, libName) {
+  return `Le script de déploiement de la release '${release}' pour ${libName} s'est déroulé avec succès.`;
+}
+
 function getErrorAppMessage(appName) {
   return `Erreur lors du déploiement de ${appName} en production.`;
 }
@@ -75,7 +79,7 @@ async function publishAndDeployEmberTestingLibrary(repoName, releaseType, respon
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
     postSlackMessage(`[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`);
-    sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
+    sendResponse(responseUrl, getSuccessReleaseMessage(releaseTagAfterRelease, repoName));
   }
 }
 
