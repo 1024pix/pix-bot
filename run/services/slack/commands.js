@@ -11,7 +11,9 @@ const {
   PIX_LCMS_REPO_NAME,
   PIX_LCMS_APP_NAME,
   PIX_UI_REPO_NAME,
+  PIX_UI_APP_NAME,
   PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
+  PIX_EMBER_TESTING_LIBRARY_APP_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -133,15 +135,13 @@ module.exports = {
   },
 
   async createPixUIRelease(payload) {
-    const appName = 'PIX-UI';
     const typeErrorMessage = 'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".';
-    await _createRelease(PIX_UI_REPO_NAME, appName, payload.text, payload.response_url, typeErrorMessage);
+    await _createRelease(PIX_UI_REPO_NAME, PIX_UI_APP_NAME, payload.text, payload.response_url, typeErrorMessage);
   },
 
   async createEmberTestingLibraryRelease(payload) {
-    const appName = 'EMBER-TESTING-LIBRARY';
     const typeErrorMessage = 'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".';
-    await _createRelease(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, appName, payload.text, payload.response_url, typeErrorMessage);
+    await _createRelease(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, PIX_EMBER_TESTING_LIBRARY_APP_NAME, payload.text, payload.response_url, typeErrorMessage);
   },
 
   async createAndDeployPixSiteRelease(payload) {
