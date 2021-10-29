@@ -50,10 +50,10 @@ function _isReleaseTypeInvalid(releaseType) {
   return !['major', 'minor', 'patch'].includes(releaseType);
 }
 
-async function createPixUIGitHubRelease(repoName, releaseType, responseUrl) {
+async function createPixUIGitHubRelease(repoName, releaseType, responseUrl, typeErrorMessage) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    postSlackMessage('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
-    throw new Error('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
+    postSlackMessage(typeErrorMessage);
+    throw new Error(typeErrorMessage);
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
   await releasesService.publishPixRepo(repoName, releaseType);
@@ -150,7 +150,8 @@ module.exports = {
   },
 
   async createPixUIRelease(payload) {
-    await createPixUIGitHubRelease(PIX_UI_REPO_NAME, payload.text, payload.response_url);
+    const typeErrorMessage = 'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".';
+    await createPixUIGitHubRelease(PIX_UI_REPO_NAME, payload.text, payload.response_url, typeErrorMessage);
   },
 
   async createEmberTestingLibraryRelease(payload) {
