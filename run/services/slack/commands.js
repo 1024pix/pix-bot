@@ -50,24 +50,7 @@ function _isReleaseTypeInvalid(releaseType) {
   return !['major', 'minor', 'patch'].includes(releaseType);
 }
 
-async function createPixUIGitHubRelease(repoName, appName, releaseType, responseUrl, typeErrorMessage) {
-  if (_isReleaseTypeInvalid(releaseType)) {
-    postSlackMessage(typeErrorMessage);
-    throw new Error(typeErrorMessage);
-  }
-  const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
-  await releasesService.publishPixRepo(repoName, releaseType);
-  const releaseTagAfterRelease = await githubServices.getLatestReleaseTag(repoName);
-
-  if (releaseTagBeforeRelease === releaseTagAfterRelease) {
-    sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
-  } else {
-    postSlackMessage(`[${appName}] App deployed (${releaseTagAfterRelease})`);
-    sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
-  }
-}
-
-async function createEmberTestingLibraryGitHubRelease(repoName, appName, releaseType, responseUrl, typeErrorMessage) {
+async function _createRelease(repoName, appName, releaseType, responseUrl, typeErrorMessage) {
   if (_isReleaseTypeInvalid(releaseType)) {
     postSlackMessage(typeErrorMessage);
     throw new Error(typeErrorMessage);
@@ -152,13 +135,13 @@ module.exports = {
   async createPixUIRelease(payload) {
     const appName = 'PIX-UI';
     const typeErrorMessage = 'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".';
-    await createPixUIGitHubRelease(PIX_UI_REPO_NAME, appName, payload.text, payload.response_url, typeErrorMessage);
+    await _createRelease(PIX_UI_REPO_NAME, appName, payload.text, payload.response_url, typeErrorMessage);
   },
 
   async createEmberTestingLibraryRelease(payload) {
     const appName = 'EMBER-TESTING-LIBRARY';
     const typeErrorMessage = 'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".';
-    await createEmberTestingLibraryGitHubRelease(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, appName, payload.text, payload.response_url, typeErrorMessage);
+    await _createRelease(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, appName, payload.text, payload.response_url, typeErrorMessage);
   },
 
   async createAndDeployPixSiteRelease(payload) {
