@@ -11,6 +11,10 @@ function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
 }
 
+function _getPublishStartedMessage(release, appName) {
+  return `Commande de création de la release "${release}" pour ${appName}s bien reçue.`;
+}
+
 module.exports = {
 
   createAndDeployPixSiteRelease(request) {
@@ -27,7 +31,7 @@ module.exports = {
     commandsFromRun.createPixUIRelease(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX UI')
+      'text': _getPublishStartedMessage(payload.text, 'PIX UI')
     };
   },
 
@@ -36,7 +40,7 @@ module.exports = {
     commandsFromRun.createEmberTestingLibraryRelease(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'EMBER-TESTING-LIBRARY')
+      'text': _getPublishStartedMessage(payload.text, 'EMBER-TESTING-LIBRARY')
     };
   },
 
