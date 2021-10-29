@@ -24,7 +24,7 @@ module.exports = {
 
   createAndDeployPixUIRelease(request) {
     const payload = request.pre.payload;
-    commandsFromRun.createAndDeployPixUI(payload);
+    commandsFromRun.createPixUIRelease(payload);
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'PIX UI')

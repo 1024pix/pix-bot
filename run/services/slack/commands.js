@@ -148,7 +148,7 @@ module.exports = {
     await publishAndDeployRelease(PIX_LCMS_REPO_NAME, [PIX_LCMS_APP_NAME], payload.text, payload.response_url);
   },
 
-  async createAndDeployPixUI(payload) {
+  async createPixUIRelease(payload) {
     await publishAndDeployPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
   },
 

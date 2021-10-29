@@ -4,7 +4,7 @@ const axios = require('axios');
 const { catchErr, sinon } = require('../../../../test-helper');
 const {
   createAndDeployPixLCMS,
-  createAndDeployPixUI,
+  createPixUIRelease,
   createEmberTestingLibraryRelease,
   createAndDeployPixSiteRelease,
   createAndDeployPixDatawarehouse,
@@ -78,14 +78,14 @@ describe('Services | Slack | Commands', () => {
     });
   });
 
-  describe('#createAndDeployPixUI', () => {
+  describe('#createPixUIRelease', () => {
 
     it('should publish a new release', async () => {
       // given
       const payload = { text: 'minor' };
 
       // when
-      await createAndDeployPixUI(payload);
+      await createPixUIRelease(payload);
 
       // then
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-ui', 'minor');
@@ -96,7 +96,7 @@ describe('Services | Slack | Commands', () => {
       const payload = { text: 'minor' };
 
       // when
-      await createAndDeployPixUI(payload);
+      await createPixUIRelease(payload);
 
       // then
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-ui');
@@ -107,7 +107,7 @@ describe('Services | Slack | Commands', () => {
       const payload = { text: '' };
 
       // when
-      const response = await catchErr(createAndDeployPixUI)(payload);
+      const response = await catchErr(createPixUIRelease)(payload);
 
       // then
       expect(response).to.be.instanceOf(Error);
