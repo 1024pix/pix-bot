@@ -67,7 +67,7 @@ async function createPixUIGitHubRelease(repoName, releaseType, responseUrl, type
   }
 }
 
-async function createEmberTestingLibraryGitHubRelease(repoName, releaseType, responseUrl, typeErrorMessage) {
+async function createEmberTestingLibraryGitHubRelease(repoName, appName, releaseType, responseUrl, typeErrorMessage) {
   if (_isReleaseTypeInvalid(releaseType)) {
     postSlackMessage(typeErrorMessage);
     throw new Error(typeErrorMessage);
@@ -79,7 +79,7 @@ async function createEmberTestingLibraryGitHubRelease(repoName, releaseType, res
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
-    postSlackMessage(`[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`);
+    postSlackMessage(`[${appName}] Lib deployed (${releaseTagAfterRelease})`);
     sendResponse(responseUrl, getSuccessReleaseMessage(releaseTagAfterRelease, repoName));
   }
 }
@@ -155,8 +155,9 @@ module.exports = {
   },
 
   async createEmberTestingLibraryRelease(payload) {
+    const appName = 'EMBER-TESTING-LIBRARY';
     const typeErrorMessage = 'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".';
-    await createEmberTestingLibraryGitHubRelease(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url, typeErrorMessage);
+    await createEmberTestingLibraryGitHubRelease(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, appName, payload.text, payload.response_url, typeErrorMessage);
   },
 
   async createAndDeployPixSiteRelease(payload) {
