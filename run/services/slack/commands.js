@@ -49,7 +49,8 @@ function getErrorAppMessage(appName) {
 function _isReleaseTypeInvalid(releaseType) {
   return !['major', 'minor', 'patch'].includes(releaseType);
 }
-async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
+
+async function createPixUIGitHubRelease(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     postSlackMessage('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
     throw new Error('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
@@ -149,7 +150,7 @@ module.exports = {
   },
 
   async createPixUIRelease(payload) {
-    await publishAndDeployPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
+    await createPixUIGitHubRelease(PIX_UI_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createEmberTestingLibraryRelease(payload) {
