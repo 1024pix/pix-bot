@@ -152,7 +152,7 @@ module.exports = {
     await publishAndDeployPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
   },
 
-  async createAndDeployEmberTestingLibrary(payload) {
+  async createEmberTestingLibraryRelease(payload) {
     await publishAndDeployEmberTestingLibrary(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
   },
 

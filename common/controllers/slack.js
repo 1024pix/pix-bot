@@ -33,7 +33,7 @@ module.exports = {
 
   createAndDeployEmberTestingLibraryRelease(request) {
     const payload = request.pre.payload;
-    commandsFromRun.createAndDeployEmberTestingLibrary(payload);
+    commandsFromRun.createEmberTestingLibraryRelease(payload);
 
     return {
       'text': _getDeployStartedMessage(payload.text, 'EMBER-TESTING-LIBRARY')

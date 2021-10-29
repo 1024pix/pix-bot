@@ -5,7 +5,7 @@ const { catchErr, sinon } = require('../../../../test-helper');
 const {
   createAndDeployPixLCMS,
   createAndDeployPixUI,
-  createAndDeployEmberTestingLibrary,
+  createEmberTestingLibraryRelease,
   createAndDeployPixSiteRelease,
   createAndDeployPixDatawarehouse,
   createAndDeployPixBotRelease,
@@ -114,14 +114,14 @@ describe('Services | Slack | Commands', () => {
     });
   });
 
-  describe('#createAndDeployEmberTestingLibrary', () => {
+  describe('#createEmberTestingLibraryRelease', () => {
 
     it('should publish a new release', async () => {
       // given
       const payload = { text: 'minor' };
 
       // when
-      await createAndDeployEmberTestingLibrary(payload);
+      await createEmberTestingLibraryRelease(payload);
 
       // then
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'ember-testing-library', 'minor');
@@ -132,7 +132,7 @@ describe('Services | Slack | Commands', () => {
       const payload = { text: 'minor' };
 
       // when
-      await createAndDeployEmberTestingLibrary(payload);
+      await createEmberTestingLibraryRelease(payload);
 
       // then
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'ember-testing-library');
@@ -143,7 +143,7 @@ describe('Services | Slack | Commands', () => {
       const payload = { text: '' };
 
       // when
-      const response = await catchErr(createAndDeployEmberTestingLibrary)(payload);
+      const response = await catchErr(createEmberTestingLibraryRelease)(payload);
 
       // then
       expect(response).to.be.instanceOf(Error);
