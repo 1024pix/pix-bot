@@ -67,7 +67,7 @@ async function createPixUIGitHubRelease(repoName, releaseType, responseUrl) {
   }
 }
 
-async function publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
+async function createEmberTestingLibraryGitHubRelease(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     postSlackMessage('Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".');
     throw new Error('Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".');
@@ -154,7 +154,7 @@ module.exports = {
   },
 
   async createEmberTestingLibraryRelease(payload) {
-    await publishAndDeployEmberTestingLibrary(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
+    await createEmberTestingLibraryGitHubRelease(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createAndDeployPixSiteRelease(payload) {
