@@ -47,6 +47,6 @@ function complete_change_log() {
 }
 
 function tag_release_commit() {
-  git tag --annotate "v${NEW_PACKAGE_VERSION}" --message "v${NEW_PACKAGE_VERSION}"
+  git tag --annotate "v${NEW_PACKAGE_VERSION}" --message "See CHANGELOG file to see what's changed in new release."
   echo "Created annotated tag"
 }
