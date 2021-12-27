@@ -17,11 +17,6 @@ function executeCommandRecursivelyInPackageJsonDir {
   find . -name package.json -type f ! -path '*/node_modules/*' -execdir ${1} \;
 }
 
-function install_required_packages {
-  echo "Install packages"
-  executeCommandRecursivelyInPackageJsonDir "npm ci --dev --no-optional"
-}
-
 function create_release {
   npm_arg="" && [[ -n "$VERSION_TYPE" ]]  && npm_arg="$VERSION_TYPE"
   executeCommandRecursivelyInPackageJsonDir "npm version ${npm_arg} --no-git-tag-version"
@@ -41,7 +36,6 @@ echo "Start deploying version ${VERSION_TYPE}…"
 
 clone_repository_and_move_inside
 configure_git_user_information
-install_required_packages
 create_release
 complete_change_log
 create_a_release_commit
