@@ -15,11 +15,11 @@ describe('Unit | Script | Models | PartialChangeLogGenerator', () => {
       const pullRequestGroups = [
         new PullRequestGroup({
           tagToGrab: Tag.FEATURE,
-          groupTitle: '### :rocket: Enhancement',
+          groupTitle: '### :rocket: Amélioration',
         }),
         new PullRequestGroup({
           tagToGrab: Tag.BUGFIX,
-          groupTitle: '### :bug: Bug fix',
+          groupTitle: '### :bug: Correction',
         }),
       ];
 
@@ -42,11 +42,11 @@ describe('Unit | Script | Models | PartialChangeLogGenerator', () => {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
-        groupTitle: '### :rocket: Enhancement',
+        groupTitle: '### :rocket: Amélioration',
       });
       const bugfixPullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.BUGFIX,
-        groupTitle: '### :bug: Bug fix',
+        groupTitle: '### :bug: Correction',
       });
       const pullRequestGroups = [featurePullRequestGroup, bugfixPullRequestGroup];
 
@@ -70,11 +70,11 @@ describe('Unit | Script | Models | PartialChangeLogGenerator', () => {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
-        groupTitle: '### :rocket: Enhancement',
+        groupTitle: '### :rocket: Amélioration',
       });
       const bugfixPullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.BUGFIX,
-        groupTitle: '### :bug: Bug fix',
+        groupTitle: '### :bug: Correction',
       });
       const pullRequestGroups = [featurePullRequestGroup, bugfixPullRequestGroup];
 
@@ -98,11 +98,11 @@ describe('Unit | Script | Models | PartialChangeLogGenerator', () => {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
-        groupTitle: '### :rocket: Enhancement',
+        groupTitle: '### :rocket: Amélioration',
       });
       const bugfixPullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.BUGFIX,
-        groupTitle: '### :bug: Bug fix',
+        groupTitle: '### :bug: Correction',
       });
       const pullRequestGroups = [featurePullRequestGroup, bugfixPullRequestGroup];
 
@@ -132,11 +132,11 @@ describe('Unit | Script | Models | PartialChangeLogGenerator', () => {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
-        groupTitle: '### :rocket: Enhancement',
+        groupTitle: '### :rocket: Amélioration',
       });
       const bugfixPullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.BUGFIX,
-        groupTitle: '### :bug: Bug fix',
+        groupTitle: '### :bug: Correction',
       });
       const pullRequestGroups = [featurePullRequestGroup, bugfixPullRequestGroup];
 
@@ -158,11 +158,11 @@ describe('Unit | Script | Models | PartialChangeLogGenerator', () => {
 
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
-        groupTitle: '### :rocket: Enhancement',
+        groupTitle: '### :rocket: Amélioration',
       });
       const bugfixPullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.BUGFIX,
-        groupTitle: '### :bug: Bug fix',
+        groupTitle: '### :bug: Correction',
       });
       const pullRequestGroups = [featurePullRequestGroup, bugfixPullRequestGroup];
 

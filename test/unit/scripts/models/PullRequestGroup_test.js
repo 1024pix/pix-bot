@@ -12,7 +12,7 @@ describe('Unit | Script | Models | PullRequestGroup', () => {
     it('should not create an instance if parameter tag to grab is not valid', () => {
       // given
       const wrongTag = 'wrongTag';
-      const groupTitle = '### :bug: Bug fix';
+      const groupTitle = '### :bug: Correction';
 
       // when
       const instantiate = () => new PullRequestGroup({ tagToGrab: wrongTag, groupTitle });
@@ -24,7 +24,7 @@ describe('Unit | Script | Models | PullRequestGroup', () => {
     it('should create an instance if parameter tag is valid', () => {
       // given
       const validTag = Tag.FEATURE;
-      const groupTitle = '### :rocket: Enhancement';
+      const groupTitle = '### :rocket: Amélioration';
 
       // when
       const createdInstance = new PullRequestGroup({ tagToGrab: validTag, groupTitle });
@@ -42,7 +42,7 @@ describe('Unit | Script | Models | PullRequestGroup', () => {
     it('should return the initial Pull Request array if no Pull Request is grabbed', () => {
       // given
       const featureTag = Tag.FEATURE;
-      const groupTitle = '### :rocket: Enhancement';
+      const groupTitle = '### :rocket: Amélioration';
       const pullRequestGroup = new PullRequestGroup({ tagToGrab: featureTag, groupTitle });
       const initialPullRequests = [new PullRequest({ title: '' })];
 
@@ -57,7 +57,7 @@ describe('Unit | Script | Models | PullRequestGroup', () => {
     it('should return an empty array if all Pull Requests are grabbed', () => {
       // given
       const featureTag = Tag.FEATURE;
-      const groupTitle = '### :rocket: Enhancement';
+      const groupTitle = '### :rocket: Amélioration';
       const pullRequestGroup = new PullRequestGroup({ tagToGrab: featureTag, groupTitle });
 
       const initialPullRequests = [
@@ -76,7 +76,7 @@ describe('Unit | Script | Models | PullRequestGroup', () => {
     it('should return the initial Pull Requests array minus Pull Requests grabbed', () => {
       // given
       const featureTag = Tag.FEATURE;
-      const groupTitle = '### :rocket: Enhancement';
+      const groupTitle = '### :rocket: Amélioration';
       const pullRequestGroup = new PullRequestGroup({ tagToGrab: featureTag, groupTitle });
 
       const featurePullRequest = new PullRequest({ title: '[FEATURE] PIX-1' });
@@ -100,7 +100,7 @@ describe('Unit | Script | Models | PullRequestGroup', () => {
     it('should return empty array if if no Pull Request is grabbed', () => {
       // given
       const featureTag = Tag.FEATURE;
-      const groupTitle = '### :rocket: Enhancement';
+      const groupTitle = '### :rocket: Amélioration';
       const pullRequestGroup = new PullRequestGroup({ tagToGrab: featureTag, groupTitle });
 
       // when
@@ -113,7 +113,7 @@ describe('Unit | Script | Models | PullRequestGroup', () => {
     it('should return group title and list of Pull Requests grabbed', () => {
       // given
       const featureTag = Tag.FEATURE;
-      const groupTitle = '### :rocket: Enhancement';
+      const groupTitle = '### :rocket: Amélioration';
       const pullRequestGroup = new PullRequestGroup({ tagToGrab: featureTag, groupTitle });
 
       const featurePullRequest = new PullRequest({
