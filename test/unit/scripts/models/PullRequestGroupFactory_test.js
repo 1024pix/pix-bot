@@ -14,7 +14,7 @@ describe('Unit | Script | Models | PullRequestGroupFactory', () => {
       const expectedPullRequestGroups = [
         new PullRequestGroup({
           tagToGrab: Tag.FEATURE,
-          groupTitle: '### :rocket: Enhancement',
+          groupTitle: '### :rocket: Amélioration',
         }),
         new PullRequestGroup({
           tagToGrab: Tag.TECH,
@@ -22,11 +22,11 @@ describe('Unit | Script | Models | PullRequestGroupFactory', () => {
         }),
         new PullRequestGroup({
           tagToGrab: Tag.BUGFIX,
-          groupTitle: '### :bug: Bug fix',
+          groupTitle: '### :bug: Correction',
         }),
         new PullRequestGroup({
           tagToGrab: Tag.OTHERS,
-          groupTitle: '### :coffee: Various',
+          groupTitle: '### :coffee: Autre',
         }),
       ];
 
