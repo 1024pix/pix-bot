@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.14.0 (23/02/2022)
+
+
+### :building_construction: Tech
+- [#93](https://github.com/1024pix/pix-bot/pull/93) [TECH] Documenter l'accès aux changements d'une release d'un projet Pix
+
+### :bug: Bug fix
+- [#96](https://github.com/1024pix/pix-bot/pull/96) [BUGFIX] Utiliser le français dans les titres de groupe des changelogs
+- [#94](https://github.com/1024pix/pix-bot/pull/94) [BUGFIX] Suppression de l'étape d'installation des packages npm lors de la release
+
 ## v1.13.1 (27/10/2021)
 
 

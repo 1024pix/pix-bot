@@ -1,6 +1,6 @@
 {
   "name": "pix-bot",
-  "version": "1.13.1",
+  "version": "1.14.0",
   "description": "Pix Bot application",
   "engines": {
     "node": "14.16.0",
