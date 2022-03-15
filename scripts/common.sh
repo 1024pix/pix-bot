@@ -34,10 +34,9 @@ function get_package_version() {
 }
 
 function push_commit_and_tag_to_remote() {
-  git push origin
-  git push origin "v${NEW_PACKAGE_VERSION}"
+  git push --follow-tags origin
 
-  echo "Pushed release commit on branch origin"
+  echo "Pushed release commit to the origin"
 }
 
 function complete_change_log() {
