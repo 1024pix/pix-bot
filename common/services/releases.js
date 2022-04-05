@@ -19,7 +19,8 @@ module.exports = {
     try {
       const sanitizedReleaseType = _sanitizedArgument(releaseType);
       const sanitizedBranchName = _sanitizedArgument(branchName);
-      const newPackageVersion = await _runScriptWithArgument(scriptFileName, sanitizedReleaseType, sanitizedBranchName);
+      const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${config.github.repository}.git`;
+      const newPackageVersion = await _runScriptWithArgument(scriptFileName, sanitizedReleaseType, repositoryURL, sanitizedBranchName);
       return newPackageVersion;
     } catch (err) {
       console.error(err);
@@ -45,7 +46,8 @@ module.exports = {
       const sanitizedReleaseType = _sanitizedArgument(releaseType);
       const sanitizedRepoName = _sanitizedArgument(repoName);
       const branchName = await github.getDefaultBranch(config.github.owner, sanitizedRepoName);
-      const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType, branchName];
+      const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${sanitizedRepoName}.git`;
+      const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType, branchName, repositoryURL];
       await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
     } catch (err) {
       console.error(err);

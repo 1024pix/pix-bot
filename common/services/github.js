@@ -11,8 +11,12 @@ const color = {
 };
 
 function _createOctokit() {
+  const authCredentials = {};
+  if (settings.github.token) {
+    authCredentials.auth = settings.github.token;
+  }
   return new Octokit({
-    auth: settings.github.token,
+    ...authCredentials,
     log: {
       debug: noop,
       info: noop,

@@ -15,8 +15,7 @@ CYAN="\033[1;36m"
 function clone_repository_and_move_inside {
   REPOSITORY_FOLDER=$(mktemp -d)
   echo "Created temporary directory ${REPOSITORY_FOLDER}"
-
-  git clone --depth 1 --branch "${BRANCH_NAME}" "https://${GITHUB_USERNAME}:${GITHUB_PERSONAL_ACCESS_TOKEN}@github.com/${GITHUB_OWNER}/${GITHUB_REPOSITORY}.git" "${REPOSITORY_FOLDER}"
+  git clone --depth 1 --branch "${BRANCH_NAME}" "${REPOSITORY_URL}" "${REPOSITORY_FOLDER}"
   echo "Cloned repository ${GITHUB_OWNER}/${GITHUB_REPOSITORY} to temporary directory"
 
   cd "${REPOSITORY_FOLDER}" || exit 1
