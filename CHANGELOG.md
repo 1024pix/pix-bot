@@ -1,5 +1,12 @@
 # pix-bot Changelog
 
+## v1.15.0 (05/04/2022)
+
+
+### :building_construction: Tech
+- [#98](https://github.com/1024pix/pix-bot/pull/98) [TECH] Monter de version node vers la 16.14
+- [#95](https://github.com/1024pix/pix-bot/pull/95) [TECH] Simplifie le push du tag
+
 ## v1.14.0 (23/02/2022)
 
 
