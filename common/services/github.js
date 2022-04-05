@@ -164,12 +164,12 @@ async function _getDefaultBranch(repoOwner, repoName) {
 }
 
 async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
-  const defaultBranch = branchName || await _getDefaultBranch(repoOwner, repoName);
+  const baseBranch = branchName || await _getDefaultBranch(repoOwner, repoName);
   const { pulls } = _createOctokit();
   const { data } = await pulls.list({
     owner: repoOwner,
     repo: repoName,
-    base: defaultBranch,
+    base: baseBranch,
     state: 'closed',
     sort: 'updated',
     direction: 'desc'
