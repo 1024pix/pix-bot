@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.16.0 (06/04/2022)
+
+
+### :coffee: Autre
+- [#99](https://github.com/1024pix/pix-bot/pull/99) Revert "[TECH] Monter de version node vers la 16.14 "
+
 ## v1.15.0 (05/04/2022)
 
 
