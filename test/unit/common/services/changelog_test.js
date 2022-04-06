@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const github = require('../../../common/services/github');
+const github = require('../../../../common/services/github');
 
 const {
   displayPullRequest,
@@ -10,9 +10,9 @@ const {
   getLastMEPDate,
   getNewChangeLogLines,
   orderPr,
-} = require('../../../scripts/get-pull-requests-to-release-in-prod');
+} = require('../../../../common/services/changelog');
 
-describe('Unit | Script | GET Pull Request to release in Prod', () => {
+describe('Unit | Common | Services | Changelog', () => {
 
   describe('#displayPullRequest', () => {
 
