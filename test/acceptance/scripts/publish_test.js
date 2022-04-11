@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const os = require('os');
 const simpleGit = require('simple-git');
+const dayjs = require('dayjs');
 
 async function _runScriptWithArgument (scriptFileName, args=[], options={}) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
@@ -108,8 +109,9 @@ describe('Acceptance | Scripts | publish.sh', function() {
     const tags = await git.tag();
     expect(tags).to.eql('v0.1.0\nv0.1.1\nv0.2.0\n');
     const changelog = await git.show('dev:CHANGELOG.md');
+    const now = dayjs().format('DD/MM/YYYY');
     expect(changelog).to.eql(`
-## v0.2.0 (06/04/2022)
+## v0.2.0 (${now})
 
 
 ### :rocket: Amélioration
