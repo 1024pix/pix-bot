@@ -1,15 +1,5 @@
-const { verifySignatureAndParseBody } = require('../services/slack/security');
+const { slackConfig } = require('../config');
 const slackbotController = require('../controllers/slack');
-
-const slackConfig = {
-  payload: {
-    allow: ['application/json', 'application/x-www-form-urlencoded'],
-    parse: false
-  },
-  pre: [
-    { method: verifySignatureAndParseBody, assign: 'payload' }
-  ]
-};
 
 module.exports = [
   {
