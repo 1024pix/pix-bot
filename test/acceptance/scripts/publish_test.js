@@ -80,8 +80,6 @@ describe('Acceptance | Scripts | publish.sh', function() {
       'Git changes status OK',
       'Version type OK',
       '== Package release ==',
-      'Already up to date.',
-      'Current branch dev is up to date.',
       'Bumped versions in package files',
       'Writing to CHANGELOG.md',
       'Updated CHANGELOG.md',

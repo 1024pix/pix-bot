@@ -36,8 +36,8 @@ function checkout() {
 }
 
 function fetch_and_rebase() {
-  git fetch --tags
-  git pull --rebase
+  git fetch --tags --quiet
+  git pull --rebase --quiet
 }
 
 function update_pix_module_version() {
