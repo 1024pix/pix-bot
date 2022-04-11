@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const os = require('os');
 const simpleGit = require('simple-git');
 
@@ -34,18 +34,17 @@ function expectLines(expectedLines, lines) {
 // Have a nice day
 describe('Acceptance | Scripts | publish.sh', function() {
   this.timeout(30000);
-  let tmpDir;
   let testRepositoryPath;
 
   beforeEach(async () => {
     const originRepositoryPath = path.join(__dirname, 'data', 'clean_repository.git');
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'clean-repository'));
-    await exec(`cp -r ${originRepositoryPath} ${tmpDir}`);
-    testRepositoryPath = path.join(tmpDir, 'clean_repository.git');
+    testRepositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'clean-repository'));
+
+    await fs.copy(originRepositoryPath, testRepositoryPath);
   });
 
   afterEach(async () => {
-    await fs.rmSync(tmpDir, { force: true, recursive: true });
+    await fs.rm(testRepositoryPath, { force: true, recursive: true });
   });
 
   it('Update package version, generate changelog, commit, tag and push', async () => {
@@ -98,7 +97,7 @@ describe('Acceptance | Scripts | publish.sh', function() {
       /^Cloning into/,
       'warning: --depth is ignored in local clones; use file:// instead.',
       'done.',
-      /To (.+)clean_repository.git/,
+      /To (.+)/,
       /dev -> dev/,
       /v0.2.0 -> v0.2.0/,
       ''
