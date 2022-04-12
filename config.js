@@ -112,6 +112,8 @@ module.exports = (function() {
     config.github.owner = 'github-owner';
     config.github.repository = 'github-repository';
 
+    config.slack.requestSigningSecret = 'slack-super-signing-secret';
+
     config.openApi.authorizationToken = 'open-api-token';
 
     config.scalingo.recette.token = 'tk-us-scalingo-token-recette';
