@@ -2,6 +2,8 @@ const chai = require('chai');
 const { expect } = chai;
 const sinon = require('sinon');
 const nock = require('nock');
+const crypto = require('crypto');
+const config = require('../config');
 
 chai.use(require('sinon-chai'));
 
@@ -24,9 +26,19 @@ function catchErr(promiseFn, ctx) {
   };
 }
 
+function createGithubWebhookSignatureHeader(body) {
+  const hmac = crypto.createHmac('sha256', config.github.webhookSecret);
+  hmac.update(body);
+
+  return {
+    'x-hub-signature-256': 'sha256='+ hmac.digest('hex'),
+  };
+}
+
 module.exports = {
   catchErr,
   expect,
   nock,
   sinon,
+  createGithubWebhookSignatureHeader,
 };

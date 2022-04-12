@@ -1,6 +1,9 @@
 const { Octokit } = require('@octokit/rest');
-const settings = require('../../config');
 const { zipWith, countBy, entries, noop } = require('lodash');
+const crypto = require('crypto');
+const tsscmp = require('tsscmp');
+const Boom = require('@hapi/boom');
+const settings = require('../../config');
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -209,6 +212,19 @@ async function _getCommitsWhereConfigFileHasChangedSinceDate(repoOwner, repoName
   return data;
 }
 
+function _verifyRequestSignature(webhookSecret, body, signature) {
+  if (!signature) {
+    throw Boom.unauthorized('Github signature is empty.');
+  }
+  const [, hash] = signature.split('=');
+  const hmac = crypto.createHmac('sha256', webhookSecret);
+  hmac.update(body);
+
+  if (!tsscmp(hash, hmac.digest('hex'))) {
+    throw Boom.unauthorized('Github signature verification failed. Signature mismatch.');
+  }
+}
+
 module.exports = {
 
   async getPullRequests(label) {
@@ -271,6 +287,20 @@ module.exports = {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const commits = await _getCommitsWhereConfigFileHasChangedSinceDate(repoOwner, repoName, latestReleaseDate);
     return commits.length > 0;
-  }
+  },
 
+  verifyWebhookSignature(request) {
+    const { headers, payload } = request;
+
+    const webhookSecret = settings.github.webhookSecret;
+    const signature = headers['x-hub-signature-256'];
+    const stringBody = payload ? JSON.stringify(payload) : '';
+
+    try {
+      _verifyRequestSignature(webhookSecret, stringBody, signature);
+    } catch (error) {
+      return error;
+    }
+    return true;
+  }
 };

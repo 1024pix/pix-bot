@@ -64,6 +64,7 @@ module.exports = (function() {
       token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
       owner: process.env.GITHUB_OWNER,
       repository: process.env.GITHUB_REPOSITORY,
+      webhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
     },
 
     googleSheet: {
@@ -110,6 +111,7 @@ module.exports = (function() {
 
     config.github.owner = 'github-owner';
     config.github.repository = 'github-repository';
+    config.github.webhookSecret = 'github-webhook-secret';
 
     config.slack.requestSigningSecret = 'slack-super-signing-secret';
 
