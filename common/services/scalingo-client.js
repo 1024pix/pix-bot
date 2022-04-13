@@ -47,6 +47,10 @@ class ScalingoClient {
     return [await this._getSingleAppInfo(target)];
   }
 
+  deployReviewApp(appName, prId) {
+    return this.client.SCMRepoLinks.manualReviewApp(appName, prId);
+  }
+
   async _getAllAppsInfo(environment) {
     const apps = ['api', 'app', 'orga', 'certif', 'admin'];
     const promises = apps.map(appName => this._getSingleAppInfo(appName, environment));
