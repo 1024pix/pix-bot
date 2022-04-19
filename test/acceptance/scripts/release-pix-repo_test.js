@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-
 const path = require('path');
 const fs = require('fs-extra');
 const os = require('os');
@@ -8,7 +7,7 @@ const dayjs = require('dayjs');
 
 const { runScriptWithArgument, expectLines } = require('./script-helpers');
 
-const scriptName = 'publish.sh';
+const scriptName = 'release-pix-repo.sh';
 
 // You are entering a world of pain
 // To update this test you need to update the github repository https://github.com/1024pix/pix-bot-publish-test
@@ -17,7 +16,7 @@ const scriptName = 'publish.sh';
 // git clone --bare https://github.com/1024pix/pix-bot-publish-test data/clean_repository.git
 // Make sure that empty folders on the bare git repostory have a .gitkeep file
 // Have a nice day
-describe('Acceptance | Scripts | publish.sh', function() {
+describe('Acceptance | Scripts | release-pix-repo.sh', function() {
   this.timeout(30000);
   let testRepositoryPath;
 
@@ -44,38 +43,35 @@ describe('Acceptance | Scripts | publish.sh', function() {
       ...process.env,
       GIT_USER_NAME: gitUser,
       GIT_USER_EMAIL: gitEmail,
-      GITHUB_OWNER: githubOwner,
-      GITHUB_REPOSITORY: githubRepository,
     };
 
     // when
-    const { stdout, stderr } = await runScriptWithArgument(scriptName, [versionType, testRepositoryPath, branchName], { env });
+    const { stdout, stderr } = await runScriptWithArgument(scriptName, [githubOwner, githubRepository, versionType, branchName, testRepositoryPath], { env });
 
     // then
     const expectedStdout = [
-      /\//,
-      'Preparing a new release.',
-      '',
-      '== Clone and move into Pix repository ==',
+      'Version type minor for 1024pix/pix-bot-publish-test',
+      'Start deploying version minor…',
       /^Created temporary directory/,
       'Cloned repository 1024pix/pix-bot-publish-test to temporary directory',
       'Moved to repository folder',
-      '== Validate context ==',
-      'Git changes status OK',
-      'Version type OK',
-      '== Package release ==',
-      'Bumped versions in package files',
+      'Set Git user information',
+      'v0.2.0',
+      'v0.2.0',
+      'v0.2.0',
+      'v0.2.0',
+      'v0.2.0',
+      'v0.2.0',
+      'v0.2.0',
+      'v0.2.0',
       'Writing to CHANGELOG.md',
       'Updated CHANGELOG.md',
-      'Set Git user information',
       /A minor is being released to 0.2.0.$/,
       ' 9 files changed, 14 insertions(+), 8 deletions(-)',
       'Created the release commit',
       'Created annotated tag',
       'Pushed release commit to the origin',
-      'Ignoring sentry in tests.',
-      'Release publication \u001b[1;32msucceeded\u001b[0m.',
-      'v0.2.0',
+      'Release publication for 1024pix/pix-bot-publish-test \x1B[1;32msucceeded\x1B[0m (minor).',
       '',
     ];
     const expectedStderr = [
