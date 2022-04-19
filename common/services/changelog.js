@@ -1,4 +1,4 @@
-const moment = require('moment');
+const dayjs = require('dayjs');
 const { sortBy, indexOf } = require('lodash');
 const github = require('./github');
 
@@ -33,7 +33,7 @@ function filterPullRequest(pullrequests, dateOfLastMEP) {
 }
 
 function getHeadOfChangelog(tagVersion) {
-  const date = ' (' + moment().format('DD/MM/YYYY') + ')';
+  const date = ' (' + dayjs().format('DD/MM/YYYY') + ')';
   return '## v' + tagVersion + date + '\n';
 }
 
