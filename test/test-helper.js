@@ -13,6 +13,7 @@ beforeEach(() => {
 
 afterEach(function () {
   sinon.restore();
+  nock.cleanAll();
 });
 
 function catchErr(promiseFn, ctx) {
