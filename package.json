@@ -30,7 +30,7 @@
   "homepage": "https://github.com/1024pix/pix-bot#readme",
   "dependencies": {
     "@hapi/hapi": "^20.2.1",
-    "@octokit/core": "^3.1.1",
+    "@octokit/core": "^3.6.0",
     "@octokit/rest": "18.0.5",
     "@sentry/cli": "^1.55.0",
     "axios": "^0.21.1",
