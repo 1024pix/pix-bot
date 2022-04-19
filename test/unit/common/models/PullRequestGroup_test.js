@@ -1,11 +1,11 @@
 const { expect } = require('../../../test-helper');
 
-const PullRequest = require('../../../../scripts/models/PullRequest');
-const { Tag } = require('../../../../scripts/models/Tags');
+const PullRequest = require('../../../../common/models/PullRequest');
+const { Tag } = require('../../../../common/models/Tags');
 
-const PullRequestGroup = require('../../../../scripts/models/PullRequestGroup');
+const PullRequestGroup = require('../../../../common/models/PullRequestGroup');
 
-describe('Unit | Script | Models | PullRequestGroup', () => {
+describe('Unit | Common | Models | PullRequestGroup', () => {
 
   describe('#constructor', () => {
 

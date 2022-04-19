@@ -1,8 +1,8 @@
 const { expect } = require('../../../test-helper');
 
-const { Tag, Tags } = require('../../../../scripts/models/Tags');
+const { Tag, Tags } = require('../../../../common/models/Tags');
 
-describe('Unit | Script | Models | Tags', () => {
+describe('Unit | Common | Models | Tags', () => {
 
   describe('#getTagByTitle', () => {
 

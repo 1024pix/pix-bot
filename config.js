@@ -108,7 +108,6 @@ module.exports = (function() {
     config.baleen.pat = 'baleen-pat';
     config.baleen.appNamespaces = _getJSON('{"Pix_Test":"Pix_Namespace","Pix_Test_2":"Pix Namespace 2"}');
 
-    config.github.token = 'github-personal-access-token';
     config.github.owner = 'github-owner';
     config.github.repository = 'github-repository';
 

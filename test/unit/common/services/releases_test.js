@@ -9,7 +9,7 @@ describe('releases', function() {
   let exec;
   let releasesService;
 
-  before(() => {
+  beforeEach(() => {
     exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: 'some heavy logs\n3.14.0\n', stderr: ''}));
     releasesService = proxyquire('../../../../common/services/releases', {
       'child_process': {exec},
@@ -71,8 +71,17 @@ describe('releases', function() {
       await releasesService.publish('minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/publish.sh minor)')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git )$')));
     });
+
+    it('should call the publish script with the branch name', async function () {
+      //when
+      await releasesService.publish('minor', 'hotfix');
+
+      // then
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git hotfix)$')));
+    });
+
     it('should retrieve new package version', async function () {
       //when
       const newPackageVersion = await releasesService.publish('minor');
@@ -91,7 +100,7 @@ describe('releases', function() {
       await releasesService.publishPixRepo('pix-site', 'minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor dev$')));
+      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor dev https://undefined@github.com/github-owner/pix-site.git$')));
     });
   });
 

@@ -8,6 +8,7 @@ GITHUB_OWNER=(${1})
 GITHUB_REPOSITORY=(${2})
 VERSION_TYPE=(${3-""})
 BRANCH_NAME=(${4})
+REPOSITORY_URL=(${5})
 
 source "$(dirname $0)"/common.sh
 

@@ -1,9 +1,9 @@
 const { expect, sinon } = require('../../../test-helper');
 
-const { Tag, Tags } = require('../../../../scripts/models/Tags');
-const PullRequest = require('../../../../scripts/models/PullRequest');
+const { Tag, Tags } = require('../../../../common/models/Tags');
+const PullRequest = require('../../../../common/models/PullRequest');
 
-describe('Unit | Script | Models | PullRequest', () => {
+describe('Unit | Common | Models | PullRequest', () => {
 
   describe('#constructor', () => {
 

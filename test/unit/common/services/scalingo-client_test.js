@@ -2,11 +2,20 @@ const { describe, it } = require('mocha');
 const { sinon } = require('../../../test-helper');
 const scalingo = require('scalingo');
 const axios = require('axios');
+const config = require('../../../../config');
 
 const ScalingoClient = require('../../../../common/services/scalingo-client');
 const { expect } = require('chai');
 
 describe('Scalingo client', () => {
+  beforeEach(() => {
+    config.github.token = 'github-personal-access-token';
+  });
+
+  afterEach(() => {
+    config.github.token = null;
+  });
+
   describe('#ScalingoClient.getInstance', () => {
 
     it('should return the Scalingo client instance for recette', async () => {

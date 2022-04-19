@@ -1,11 +1,11 @@
 const { expect } = require('../../../test-helper');
 
-const { Tag } = require('../../../../scripts/models/Tags');
-const PullRequest = require('../../../../scripts/models/PullRequest');
-const PullRequestGroup = require('../../../../scripts/models/PullRequestGroup');
-const PartialChangeLogGenerator = require('../../../../scripts/models/PartialChangeLogGenerator');
+const { Tag } = require('../../../../common/models/Tags');
+const PullRequest = require('../../../../common/models/PullRequest');
+const PullRequestGroup = require('../../../../common/models/PullRequestGroup');
+const PartialChangeLogGenerator = require('../../../../common/models/PartialChangeLogGenerator');
 
-describe('Unit | Script | Models | PartialChangeLogGenerator', () => {
+describe('Unit | Common | Models | PartialChangeLogGenerator', () => {
 
   describe('#constructor', () => {
 

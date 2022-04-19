@@ -49,7 +49,7 @@ Prerequisites: The repository shall contain `dev`, `master` and `publish` branch
 
 Command to run the `publish` script:
 ```sh
-GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_USERNAME=#github_username# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# scripts/publish.sh (path|minor|major)
+GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# scripts/publish.sh (path|minor|major)
 ```
 
 ### Test the endpoint on Slack

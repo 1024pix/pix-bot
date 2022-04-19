@@ -8,7 +8,8 @@ GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-pix}
 echo "${CWD_DIR}"
 
 NEW_VERSION_TYPE=$1
-BRANCH_NAME=${2:-dev}
+REPOSITORY_URL=(${2})
+BRANCH_NAME=${3:-dev}
 
 source "${CWD_DIR}/scripts/common.sh"
 
@@ -35,8 +36,8 @@ function checkout() {
 }
 
 function fetch_and_rebase() {
-  git fetch --tags
-  git pull --rebase
+  git fetch --tags --quiet
+  git pull --rebase --quiet
 }
 
 function update_pix_module_version() {
@@ -101,7 +102,12 @@ configure_git_user_information
 create_a_release_commit
 tag_release_commit
 push_commit_and_tag_to_remote
-publish_release_on_sentry
+if [ "${NODE_ENV}" != "test" ];
+then
+    publish_release_on_sentry
+else
+    echo "Ignoring sentry in tests."
+fi
 
 echo -e "Release publication ${GREEN}succeeded${RESET_COLOR}."
 echo "v${NEW_PACKAGE_VERSION}"
