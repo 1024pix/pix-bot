@@ -1,10 +1,9 @@
 const { describe, it } = require('mocha');
 const { expect } = require('chai');
-const { nock } = require('../../../test-helper');
+const { nock, createGithubWebhookSignatureHeader } = require('../../../test-helper');
 const githubService = require('../../../../common/services/github');
 
 describe('#getPullRequests', function() {
-
 
   it('should return the response for slack', async function() {
     // given
@@ -273,12 +272,12 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
         .query({ since: latestReleaseDate, path: 'api/lib/config.js' })
-        .reply(200, 
+        .reply(200,
           [{
             sha: '5ec2f42',
           }]
         );
-  
+
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/tags')
         .reply(200, [{commit: {url: '/latest_tag_commit_url',},}]);
@@ -286,7 +285,7 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
       nock('https://api.github.com')
         .get('/latest_tag_commit_url')
         .reply(200, {commit: {committer: {date: latestReleaseDate}}});
-  
+
       // when
       const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
       // then
@@ -300,10 +299,10 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
         .query({ since: latestReleaseDate, path: 'api/lib/config.js' })
-        .reply(200, 
+        .reply(200,
           []
         );
-  
+
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/tags')
         .reply(200, [{commit: {url: '/latest_tag_commit_url',},}]);
@@ -311,11 +310,42 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
       nock('https://api.github.com')
         .get('/latest_tag_commit_url')
         .reply(200, {commit: {committer: {date: latestReleaseDate}}});
-  
+
       // when
       const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
       // then
       expect(response).to.be.false;
     });
+  });
+});
+
+describe('#verifyWebhookSignature', function() {
+  it('return true when the signature match', function() {
+    const body = {};
+    const request = {
+      headers: createGithubWebhookSignatureHeader(JSON.stringify(body)),
+      payload: body,
+    };
+    expect(githubService.verifyWebhookSignature(request)).to.be.true;
+  });
+
+  it('return error when the signature dont match', function() {
+    const body = {};
+    const request = {
+      headers: { 'x-hub-signature-256': 'sha256=test' },
+      payload: body,
+    };
+
+    expect(githubService.verifyWebhookSignature(request).output.payload.message).to.eql('Github signature verification failed. Signature mismatch.');
+  });
+
+  it('return error when not signature is present', function() {
+    const body = {};
+    const request = {
+      headers: {},
+      payload: body,
+    };
+
+    expect(githubService.verifyWebhookSignature(request).output.payload.message).to.eql('Github signature is empty.');
   });
 });

@@ -357,4 +357,31 @@ describe('Scalingo client', () => {
       }
     });
   });
+
+  describe('#Scalingo.deployReviewApp', () => {
+    let manualReviewApp;
+    let scalingoClient;
+
+    beforeEach(async () => {
+      manualReviewApp = sinon.stub();
+      sinon.stub(scalingo, 'clientFromToken').resolves({
+        SCMRepoLinks: {
+          manualReviewApp
+        }
+      });
+
+      scalingoClient = await ScalingoClient.getInstance('reviewApps');
+    });
+
+    it('should call manualReviewApp', async () => {
+      // given
+      manualReviewApp.withArgs('pix-app-review', 1).resolves();
+
+      // when
+      await scalingoClient.deployReviewApp('pix-app-review', 1);
+
+      // then
+      expect(manualReviewApp.called).to.be.true;
+    });
+  });
 });
