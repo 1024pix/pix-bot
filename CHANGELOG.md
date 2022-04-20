@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.17.0 (20/04/2022)
+
+
+### :rocket: Amélioration
+- [#104](https://github.com/1024pix/pix-bot/pull/104) [FEATURE] Gérer le déploiement des review app sur scalingo
+
+### :coffee: Autre
+- [#107](https://github.com/1024pix/pix-bot/pull/107) [CLEANUP] Supprimer l'utilisation de moment.js et nettoyage des dépendances
+- [#100](https://github.com/1024pix/pix-bot/pull/100) [CLEANUP] Ajout de tests unitaires sur le script publish.sh
+- [#102](https://github.com/1024pix/pix-bot/pull/102) [CLEANUP] Supprimer de la duplication sur le webhook Slack
+- [#103](https://github.com/1024pix/pix-bot/pull/103) [CLEANUP] Supprimer le package inutile npm crypto
+
 ## v1.16.0 (06/04/2022)
 
 
