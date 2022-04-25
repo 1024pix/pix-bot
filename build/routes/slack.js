@@ -1,7 +1,6 @@
 const { slackConfig } = require('../../common/config');
-const googleSheet = require('../../build/services/google-sheet');
-const slackbotController = require('../../build/controllers/slack');
-
+const googleSheet = require('../services/google-sheet');
+const slackbotController = require('../controllers/slack');
 
 module.exports = [
   {
@@ -20,6 +19,12 @@ module.exports = [
     method: 'POST',
     path: '/slack/commands/changelog',
     handler: slackbotController.getChangelogSinceLatestRelease,
+    config: slackConfig
+  },
+  {
+    method: 'POST',
+    path: '/slack/commands/create-and-deploy-pix-hotfix',
+    handler: slackbotController.createAndDeployPixHotfix,
     config: slackConfig
   },
 ];

@@ -1,23 +1,9 @@
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
-const { environments, deploy, publish } = require('../services/releases');
 const github = require('../services/github');
 const postSlackMessage = require('../services/slack/surfaces/messages/post-message');
 
 module.exports = {
-
-  createAndDeployPixHotfix(request) {
-    const payload = request.pre.payload;
-    const branchName = payload.text;
-
-    publish('patch', branchName).then(async (latestReleaseTag) => {
-      await deploy(environments.recette, latestReleaseTag);
-    });
-
-    return {
-      'text': 'Commande de déploiement de hotfix de PIX en recette.'
-    };
-  },
 
   interactiveEndpoint(request) {
     const payload = request.pre.payload;
