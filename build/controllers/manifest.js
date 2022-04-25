@@ -1,3 +1,5 @@
+const manifest = require('../manifest');
+
 module.exports = {
   async get(request) {
     const protocol = request.headers['x-forwarded-proto'] ? request.headers['x-forwarded-proto'] : 'http';
@@ -5,11 +7,11 @@ module.exports = {
     const url = `${protocol}://${host}`;
     return {
       display_information: {
-        name: 'Pix Bot Build'
+        name: manifest.name
       },
       features: {
         bot_user: {
-          display_name: 'Pix Bot Build',
+          display_name: manifest.name,
           always_online: false
         },
         shortcuts: [
@@ -20,34 +22,15 @@ module.exports = {
             description: 'Publie une nouvelle version et la déploie sur l\'environnement de recette'
           }
         ],
-        slash_commands: [
-          {
-            command: '/pr-pix',
-            url: `${url}/slack/commands/pull-requests`,
-            description: 'Afficher les PR à review de l\'application Pix',
-            usage_hint: '[cross-team|team-acces|team-evaluation|team-certif|team-prescription]',
-            should_escape: false
-          },
-          {
-            command: '/tips-a11y',
-            url: `${url}/slack/commands/accessibility-tip`,
-            description: 'Je veux un tips sur l\'accessibilité !',
-            should_escape: false
-          },
-          {
-            command: '/changelog',
-            url: `${url}/slack/commands/changelog`,
-            description: 'Afficher le changelog depuis la dernière release',
-            should_escape: false
-          },
-          {
-            command: '/hotfix',
-            url: `${url}/slack/commands/create-and-deploy-pix-hotfix`,
-            description: 'Créer une version patch à partir d\'une branche et la déployer en recette',
-            usage_hint: '[branch-name]',
-            should_escape: false
-          }
-        ]
+        slash_commands: manifest.slashCommands.map(({ command, path, description, usage_hint, should_escape }) => {
+          return {
+            command,
+            url: `${url}${path}`,
+            description,
+            usage_hint,
+            should_escape,
+          };
+        })
       },
       oauth_config: {
         scopes: {

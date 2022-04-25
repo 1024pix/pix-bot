@@ -5,6 +5,10 @@ require('dotenv').config();
 const path = require('path');
 const Hapi = require('@hapi/hapi');
 const config = require('./config');
+const runManifest = require('./run/manifest');
+const buildManifest = require('./build/manifest');
+const { slackConfig } = require('./common/config');
+const manifests = [runManifest, buildManifest];
 
 const server = Hapi.server({
   port: config.port,
@@ -15,6 +19,18 @@ const server = Hapi.server({
   require('fs').readdirSync(routesDir)
     .filter((file) => path.extname(file) === '.js')
     .forEach((file) => server.route(require(path.join(routesDir, file))));
+});
+
+manifests.forEach((manifest) => {
+  const routes = manifest
+        .getHapiRoutes()
+        .map((route) => {
+          return {
+            ...route,
+            config: slackConfig,
+          };
+        });
+  server.route(routes);
 });
 
 module.exports = server;
