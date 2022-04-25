@@ -55,13 +55,11 @@ GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_PERSONA
 ### Test the endpoint on Slack
 
 If you want to test your new endpoint before deploying it, 
-you will need to run your server locally and make it visible (with ngrok for example).
+you will need to run your server locally and make it visible (with [ngrok][] for example).
 
-Ensure you have the access rights to Pix Bot Build and Pix Bot Run on Slack, 
-then go to [https://api.slack.com/apps](https://api.slack.com/apps).
-Click on the Bot you want to create the new endpoint (Pix Bot Build or Pix Bot Run), 
-then in "Slash commands" tab, click "Create new command".
-In the popup, register ${ngrok url}/slack/commands/my-slack-command.
+Add your new slash command to the corresponding manifest: ./{run,build}/controllers/manifest.js.
+
+Go to [https://api.slack.com/apps](https://api.slack.com/apps), and create a new slack app, and create it from a manifest. The manifest is available a {ngrok_url}/{run,build}/manifest.
 
 ## Deploy
 
@@ -80,3 +78,5 @@ This program is free software: you can redistribute it and/or modify it under th
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License along with this program. If not, see [gnu.org/licenses](https://www.gnu.org/licenses/).
+
+[ngrok]: https://ngrok.com/
