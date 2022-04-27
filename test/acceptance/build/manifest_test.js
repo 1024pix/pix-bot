@@ -39,12 +39,14 @@ describe('Acceptance | Build | Manifest', function() {
               command: '/tips-a11y',
               url: `http://${hostname}/slack/commands/accessibility-tip`,
               description: 'Je veux un tips sur l\'accessibilité !',
+              usage_hint: undefined,
               should_escape: false
             },
             {
               command: '/changelog',
               url: `http://${hostname}/slack/commands/changelog`,
               description: 'Afficher le changelog depuis la dernière release',
+              usage_hint: undefined,
               should_escape: false
             },
             {

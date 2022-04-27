@@ -1,3 +1,5 @@
+const manifest = require('../manifest');
+
 module.exports = {
   async get(request) {
     const protocol = request.headers['x-forwarded-proto'] ? request.headers['x-forwarded-proto'] : 'http';
@@ -5,11 +7,11 @@ module.exports = {
     const url = `${protocol}://${host}`;
     return {
       display_information: {
-        name: 'Pix Bot Run'
+        name: manifest.name
       },
       features: {
         bot_user: {
-          display_name: 'Pix Bot Run',
+          display_name: manifest.name,
           always_online: false
         },
         shortcuts: [
@@ -20,64 +22,15 @@ module.exports = {
             description: 'Lance le déploiement d\'une version sur l\'environnement de production'
           }
         ],
-        slash_commands: [
-          {
-            command: '/deploy-pix-sites',
-            url: `${url}/slack/commands/create-and-deploy-pix-site-release`,
-            description: 'Pour faire une release et deployer les sites Pix, Pix Pro et Pix org',
-            usage_hint: 'patch|minor|major (minor par défaut)',
-            should_escape: false
-          },
-          {
-            command: '/publish-pix-ui',
-            url: `${url}/slack/commands/create-and-deploy-pix-ui-release`,
-            description: 'Crée une release de Pix-UI et la déploie sur les Github pages !',
-            usage_hint: '[patch, minor, major]',
-            should_escape: false
-          },
-          {
-            command: '/deploy-pix-lcms',
-            url: `${url}/slack/commands/create-and-deploy-pix-lcms-release`,
-            description: 'Crée une release de Pix-LCMS et la déploie en production (https://lcms-api.pix.fr)',
-            usage_hint: '[patch, minor, major]',
-            should_escape: false
-          },
-          {
-            command: '/deploy-pix-datawarehouse',
-            url: `${url}/slack/commands/create-and-deploy-pix-datawarehouse-release`,
-            description: 'Crée une release de Pix-Datawarehouse et la déploie en production (pix-datawarehouse-production & pix-datawarehouse-ex-production)',
-            usage_hint: '[patch, minor, major]',
-            should_escape: false
-          },
-          {
-            command: '/deploy-pix-bot',
-            url: `${url}/slack/commands/create-and-deploy-pix-bot-release`,
-            description: 'Releaser et déployer pix-bot-run et pix-bot-build',
-            usage_hint: '[patch, minor, major]',
-            should_escape: false
-          },
-          {
-            command: '/app-status',
-            url: `${url}/slack/commands/app-status`,
-            description: 'Returns the app status given the app name as parameter',
-            usage_hint: '[pix-app-production, production]',
-            should_escape: false
-          },
-          {
-            command: '/deploy-last-version',
-            url: `${url}/slack/commands/deploy-last-version`,
-            description: 'Deploy last version of an app',
-            usage_hint: '[pix-admin-production]',
-            should_escape: false
-          },
-          {
-            command: '/deploy-ember-testing-library',
-            url: `${url}/slack/commands/create-and-deploy-ember-testing-library-release`,
-            description: 'Crée une release de Ember-testing-library',
-            usage_hint: '[patch, minor, major]',
-            should_escape: false
-          }
-        ]
+        slash_commands: manifest.slashCommands.map(({ command, path, description, usage_hint, should_escape }) => {
+          return {
+            command,
+            url: `${url}${path}`,
+            description,
+            usage_hint,
+            should_escape,
+          };
+        })
       },
       oauth_config: {
         scopes: {
