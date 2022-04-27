@@ -22,13 +22,6 @@ module.exports = {
         ],
         slash_commands: [
           {
-            command: '/publish-release',
-            url: `${url}/slack/commands/publish-release`,
-            description: 'Edit and publish a new release',
-            usage_hint: '[version_type (ex: "major", "minor", "patch")]',
-            should_escape: false
-          },
-          {
             command: '/deploy-pix-sites',
             url: `${url}/slack/commands/create-and-deploy-pix-site-release`,
             description: 'Pour faire une release et deployer les sites Pix, Pix Pro et Pix org',

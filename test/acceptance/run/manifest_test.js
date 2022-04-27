@@ -29,13 +29,6 @@ describe('Acceptance | Run | Manifest', function() {
           ],
           slash_commands: [
             {
-              command: '/publish-release',
-              url: `http://${hostname}/slack/commands/publish-release`,
-              description: 'Edit and publish a new release',
-              usage_hint: '[version_type (ex: "major", "minor", "patch")]',
-              should_escape: false
-            },
-            {
               command: '/deploy-pix-sites',
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-site-release`,
               description: 'Pour faire une release et deployer les sites Pix, Pix Pro et Pix org',
