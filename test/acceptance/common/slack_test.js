@@ -15,6 +15,54 @@ function createSlackWebhookSignatureHeaders(body) {
   };
 }
 
+function nockGithubWithNoConfigChanges() {
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/tags')
+    .reply(200, [{
+      'commit': {
+        'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+      },
+    }]);
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/1234')
+    .reply(200, {
+      commit: {
+        'committer': {
+          'date': '2011-04-14'
+        },
+      }
+    });
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+    .reply(200, []);
+}
+
+function nockGithubWithConfigChanges() {
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/tags')
+    .reply(200, [{
+      'commit': {
+        'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+      },
+    }]);
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/1234')
+    .reply(200, {
+      commit: {
+        'committer': {
+          'date': '2011-04-14'
+        },
+      }
+    });
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+    .reply(200, [{}]);
+}
+
 describe('Acceptance | Common | Slack', function() {
   describe('POST /slack/interactive-endpoint', function() {
     it('responds with 204', async () => {
@@ -141,6 +189,141 @@ describe('Acceptance | Common | Slack', function() {
         expect(res.statusCode).to.equal(204);
         expect(slackCall.isDone()).to.be.true;
       });
+
+      describe('with the callback release-type-selection', function() {
+
+        it('returns the confirmation modal', async function () {
+          nockGithubWithNoConfigChanges();
+
+          const body = {
+            type: 'view_submission',
+            view: {
+              callback_id: 'release-type-selection',
+              state: {
+                values: {
+                  'publish-release-type': {
+                    'release-type-option': {
+                      selected_option: {
+                        value: 'minor'
+                      }
+                    },
+                  },
+                },
+              },
+            },
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/slack/interactive-endpoint',
+            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(200);
+          expect(res.payload).to.deep.equal(JSON.stringify(
+            {
+              response_action: 'push',
+              view: {
+                type: 'modal',
+                callback_id: 'release-publication-confirmation',
+                private_metadata: 'minor',
+                title: {
+                  type: 'plain_text',
+                  text: 'Confirmation',
+                },
+                submit: {
+                  type: 'plain_text',
+                  text: '🚀 Go !',
+                  emoji: true,
+                },
+                close: {
+                  type: 'plain_text',
+                  text: 'Annuler',
+                  emoji: true,
+                },
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: 'Vous vous apprêtez à publier une version *minor* et la déployer en recette. Êtes-vous sûr de vous ?',
+                    },
+                  },
+                ],
+              },
+            }
+          ));
+        });
+
+        it('returns the confirmation modal with a warning', async function () {
+          nockGithubWithConfigChanges();
+
+          const body = {
+            type: 'view_submission',
+            view: {
+              callback_id: 'release-type-selection',
+              state: {
+                values: {
+                  'publish-release-type': {
+                    'release-type-option': {
+                      selected_option: {
+                        value: 'major'
+                      }
+                    },
+                  },
+                },
+              },
+            },
+          };
+
+          const res = await server.inject({
+            method: 'POST',
+            url: '/slack/interactive-endpoint',
+            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(200);
+          expect(res.payload).to.deep.equal(JSON.stringify(
+            {
+              response_action: 'push',
+              view: {
+                type: 'modal',
+                callback_id: 'release-publication-confirmation',
+                private_metadata: 'major',
+                title: {
+                  type: 'plain_text',
+                  text: 'Confirmation',
+                },
+                submit: {
+                  type: 'plain_text',
+                  text: '🚀 Go !',
+                  emoji: true,
+                },
+                close: {
+                  type: 'plain_text',
+                  text: 'Annuler',
+                  emoji: true,
+                },
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo RECETTE*.'
+                    }
+                  },
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: 'Vous vous apprêtez à publier une version *major* et la déployer en recette. Êtes-vous sûr de vous ?',
+                    },
+                  },
+                ],
+              },
+            }
+          ));
+        });
+      });
     });
 
     describe('when using the shortcut deploy-release', function() {
@@ -208,27 +391,7 @@ describe('Acceptance | Common | Slack', function() {
 
         it('returns the confirmation modal', async function () {
 
-          nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/tags')
-            .reply(200, [{
-              'commit': {
-                'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
-              },
-            }]);
-
-          nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/commits/1234')
-            .reply(200, {
-              commit: {
-                'committer': {
-                  'date': '2011-04-14'
-                },
-              }
-            });
-
-          nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
-            .reply(200, []);
+          nockGithubWithNoConfigChanges();
 
           const body = {
             type: 'view_submission',
@@ -288,28 +451,7 @@ describe('Acceptance | Common | Slack', function() {
         });
 
         it('returns the confirmation modal with a warning', async function () {
-
-          nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/tags')
-            .reply(200, [{
-              'commit': {
-                'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
-              },
-            }]);
-
-          nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/commits/1234')
-            .reply(200, {
-              commit: {
-                'committer': {
-                  'date': '2011-04-14'
-                },
-              }
-            });
-
-          nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
-            .reply(200, [{}]);
+          nockGithubWithConfigChanges();
 
           const body = {
             type: 'view_submission',
@@ -400,4 +542,3 @@ describe('Acceptance | Common | Slack', function() {
     });
   });
 });
-

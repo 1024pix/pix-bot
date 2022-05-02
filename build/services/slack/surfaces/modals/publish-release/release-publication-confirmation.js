@@ -4,7 +4,7 @@ module.exports = (releaseType, hasConfigFileChanged) => {
     'view': {
       'type': 'modal',
       'callback_id': 'release-publication-confirmation',
-      'private_metadata': `${releaseType}`,
+      'private_metadata': releaseType,
       'title': {
         'type': 'plain_text',
         'text': 'Confirmation'
