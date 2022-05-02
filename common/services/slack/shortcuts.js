@@ -5,6 +5,7 @@ const config = require('../../../config');
 
 module.exports = {
 
+  openViewPublishReleaseTypeSelectionCallbackId: publishReleaseTypeSelectionModal.callbackId,
   openViewPublishReleaseTypeSelection(payload) {
     const options = {
       method: 'POST',
@@ -17,6 +18,8 @@ module.exports = {
     };
     return axios(options);
   },
+
+  openViewDeployReleaseTagSelectionCallbackId: deployReleaseTagSelectionModal.callbackId,
 
   openViewDeployReleaseTagSelection(payload) {
     const options = {

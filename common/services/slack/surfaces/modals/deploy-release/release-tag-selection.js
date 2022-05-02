@@ -1,9 +1,11 @@
+const callbackId = 'release-tag-selection';
+
 module.exports = (triggerId) => {
   return {
     'trigger_id': triggerId,
     'view': {
       'type': 'modal',
-      'callback_id': 'release-tag-selection',
+      'callback_id': callbackId,
       'title': {
         'type': 'plain_text',
         'text': 'Déployer une release',
@@ -42,3 +44,5 @@ module.exports = (triggerId) => {
     }
   };
 };
+
+module.exports.callbackId = callbackId;

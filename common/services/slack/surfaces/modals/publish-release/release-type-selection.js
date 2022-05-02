@@ -1,9 +1,11 @@
+const callbackId = 'release-type-selection';
+
 module.exports = (triggerId) => {
   return {
     'trigger_id': `${triggerId}`,
     'view': {
       'type': 'modal',
-      'callback_id': 'release-type-selection',
+      'callback_id': callbackId,
       'title': {
         'type': 'plain_text',
         'text': 'Publier une release',
@@ -81,3 +83,5 @@ module.exports = (triggerId) => {
     }
   };
 };
+
+module.exports.callbackId = callbackId;

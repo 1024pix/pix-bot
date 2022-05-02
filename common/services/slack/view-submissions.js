@@ -14,6 +14,8 @@ module.exports = {
     return openModalReleasePublicationConfirmation(releaseType, hasConfigFileChanged);
   },
 
+  submitReleaseTypeSelectionCallbackId: openModalReleasePublicationConfirmation.callbackId,
+
   submitReleasePublicationConfirmation(payload) {
     const releaseType = payload.view.private_metadata;
 
@@ -36,6 +38,8 @@ module.exports = {
     const hasConfigFileChanged = await githubService.hasConfigFileChangedSinceLatestRelease();
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
+
+  submitReleaseTagSelectionCallbackId: openModalReleaseDeploymentConfirmation.callbackId,
 
   submitReleaseDeploymentConfirmation(payload) {
     const releaseTag = payload.view.private_metadata;

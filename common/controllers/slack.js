@@ -25,16 +25,16 @@ module.exports = {
       }
       return null;
     case 'view_submission':
-      if (payload.view.callback_id === 'release-type-selection') {
+      if (payload.view.callback_id === shortcuts.openViewPublishReleaseTypeSelectionCallbackId) {
         return viewSubmissions.submitReleaseTypeSelection(payload);
       }
-      if (payload.view.callback_id === 'release-publication-confirmation') {
+      if (payload.view.callback_id === viewSubmissions.submitReleaseTypeSelectionCallbackId) {
         return viewSubmissions.submitReleasePublicationConfirmation(payload);
       }
-      if (payload.view.callback_id === 'release-tag-selection') {
+      if (payload.view.callback_id === shortcuts.openViewDeployReleaseTagSelectionCallbackId) {
         return viewSubmissions.submitReleaseTagSelection(payload);
       }
-      if (payload.view.callback_id === 'release-deployment-confirmation') {
+      if (payload.view.callback_id === viewSubmissions.submitReleaseTagSelectionCallbackId) {
         return viewSubmissions.submitReleaseDeploymentConfirmation(payload);
       }
       return null;

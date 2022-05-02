@@ -1,9 +1,11 @@
+const callbackId = 'release-deployment-confirmation';
+
 module.exports = (releaseTag, hasConfigFileChanged) => {
   const modalReleaseDeploymentConfirmation = {
     'response_action': 'push',
     'view': {
       'type': 'modal',
-      'callback_id': 'release-deployment-confirmation',
+      'callback_id': callbackId,
       'private_metadata': `${releaseTag}`,
       'title': {
         'type': 'plain_text',
@@ -29,17 +31,8 @@ module.exports = (releaseTag, hasConfigFileChanged) => {
         },
       ]
     }
-  };
-
-  if(hasConfigFileChanged) {
-    modalReleaseDeploymentConfirmation.view.blocks.unshift({
-      'type': 'section',
-      'text': {
-        'type': 'mrkdwn',
-        'text': ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo PRODUCTION*.'
-      },
-    });
-  }
 
   return modalReleaseDeploymentConfirmation;
 };
+
+module.exports.callbackId = callbackId;

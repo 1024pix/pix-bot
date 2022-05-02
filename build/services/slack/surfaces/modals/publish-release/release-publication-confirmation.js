@@ -1,9 +1,11 @@
+const callbackId = 'release-publication-confirmation';
+
 module.exports = (releaseType, hasConfigFileChanged) => {
   const modalReleasePublicationConfirmation = {
     'response_action': 'push',
     'view': {
       'type': 'modal',
-      'callback_id': 'release-publication-confirmation',
+      'callback_id': callbackId,
       'private_metadata': releaseType,
       'title': {
         'type': 'plain_text',
@@ -43,3 +45,5 @@ module.exports = (releaseType, hasConfigFileChanged) => {
 
   return modalReleasePublicationConfirmation;
 };
+
+module.exports.callbackId = callbackId;
