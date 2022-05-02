@@ -103,173 +103,176 @@ describe('Acceptance | Common | Slack', function() {
         expect(slackCall.isDone()).to.be.true;
       });
 
-      it('returns the confirmation modal', async function () {
+      describe('with the callback release-tag-selection', function() {
 
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/tags')
-          .reply(200, [{
-            'commit': {
-              'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+        it('returns the confirmation modal', async function () {
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/tags')
+            .reply(200, [{
+              'commit': {
+                'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+              },
+            }]);
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits/1234')
+            .reply(200, {
+              commit: {
+                'committer': {
+                  'date': '2011-04-14'
+                },
+              }
+            });
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+            .reply(200, []);
+
+          const body = {
+            type: 'view_submission',
+            view: {
+              callback_id: 'release-tag-selection',
+              state: {
+                values: {
+                  'deploy-release-tag': {
+                    'release-tag-value': {
+                      value: 'v2.130.0',
+                    },
+                  },
+                },
+              },
             },
-          }]);
-
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/commits/1234')
-          .reply(200, {
-            commit: {
-              'committer': {
-                'date': '2011-04-14'
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/slack/interactive-endpoint',
+            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(200);
+          expect(res.payload).to.deep.equal(JSON.stringify(
+            {
+              response_action: 'push',
+              view: {
+                type: 'modal',
+                callback_id: 'release-deployment-confirmation',
+                private_metadata: 'v2.130.0',
+                title: {
+                  type: 'plain_text',
+                  text: 'Confirmation',
+                },
+                submit: {
+                  type: 'plain_text',
+                  text: '🚀 Go !',
+                  emoji: true,
+                },
+                close: {
+                  type: 'plain_text',
+                  text: 'Annuler',
+                  emoji: true,
+                },
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
+                    },
+                  },
+                ],
               },
             }
-          });
-
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
-          .reply(200, []);
-
-        const body = {
-          type: 'view_submission',
-          view: {
-            callback_id: 'release-tag-selection',
-            state: {
-              values: {
-                'deploy-release-tag': {
-                  'release-tag-value': {
-                    value: 'v2.130.0',
-                  },
-                },
-              },
-            },
-          },
-        };
-        const res = await server.inject({
-          method: 'POST',
-          url: '/slack/interactive-endpoint',
-          headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
-          payload: body,
+          ));
         });
-        expect(res.statusCode).to.equal(200);
-        expect(res.payload).to.deep.equal(JSON.stringify(
-          {
-            response_action: 'push',
+
+        it('returns the confirmation modal with a warning', async function () {
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/tags')
+            .reply(200, [{
+              'commit': {
+                'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+              },
+            }]);
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits/1234')
+            .reply(200, {
+              commit: {
+                'committer': {
+                  'date': '2011-04-14'
+                },
+              }
+            });
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+            .reply(200, [{}]);
+
+          const body = {
+            type: 'view_submission',
             view: {
-              type: 'modal',
-              callback_id: 'release-deployment-confirmation',
-              private_metadata: 'v2.130.0',
-              title: {
-                type: 'plain_text',
-                text: 'Confirmation',
-              },
-              submit: {
-                type: 'plain_text',
-                text: '🚀 Go !',
-                emoji: true,
-              },
-              close: {
-                type: 'plain_text',
-                text: 'Annuler',
-                emoji: true,
-              },
-              blocks: [
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
+              callback_id: 'release-tag-selection',
+              state: {
+                values: {
+                  'deploy-release-tag': {
+                    'release-tag-value': {
+                      value: 'v2.130.0',
+                    },
                   },
                 },
-              ],
+              },
             },
-          }
-        ));
-      });
-
-      it('returns the confirmation modal with a warning', async function () {
-
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/tags')
-          .reply(200, [{
-            'commit': {
-              'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
-            },
-          }]);
-
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/commits/1234')
-          .reply(200, {
-            commit: {
-              'committer': {
-                'date': '2011-04-14'
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/slack/interactive-endpoint',
+            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(200);
+          expect(res.payload).to.deep.equal(JSON.stringify(
+            {
+              response_action: 'push',
+              view: {
+                type: 'modal',
+                callback_id: 'release-deployment-confirmation',
+                private_metadata: 'v2.130.0',
+                title: {
+                  type: 'plain_text',
+                  text: 'Confirmation',
+                },
+                submit: {
+                  type: 'plain_text',
+                  text: '🚀 Go !',
+                  emoji: true,
+                },
+                close: {
+                  type: 'plain_text',
+                  text: 'Annuler',
+                  emoji: true,
+                },
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo PRODUCTION*.'
+                    }
+                  },
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
+                    },
+                  },
+                ],
               },
             }
-          });
-
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
-          .reply(200, [{}]);
-
-        const body = {
-          type: 'view_submission',
-          view: {
-            callback_id: 'release-tag-selection',
-            state: {
-              values: {
-                'deploy-release-tag': {
-                  'release-tag-value': {
-                    value: 'v2.130.0',
-                  },
-                },
-              },
-            },
-          },
-        };
-        const res = await server.inject({
-          method: 'POST',
-          url: '/slack/interactive-endpoint',
-          headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
-          payload: body,
+          ));
         });
-        expect(res.statusCode).to.equal(200);
-        expect(res.payload).to.deep.equal(JSON.stringify(
-          {
-            response_action: 'push',
-            view: {
-              type: 'modal',
-              callback_id: 'release-deployment-confirmation',
-              private_metadata: 'v2.130.0',
-              title: {
-                type: 'plain_text',
-                text: 'Confirmation',
-              },
-              submit: {
-                type: 'plain_text',
-                text: '🚀 Go !',
-                emoji: true,
-              },
-              close: {
-                type: 'plain_text',
-                text: 'Annuler',
-                emoji: true,
-              },
-              blocks: [
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo PRODUCTION*.'
-                  }
-                },
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
-                  },
-                },
-              ],
-            },
-          }
-        ));
       });
 
       describe('callback release-deployment-confirmation', function() {
