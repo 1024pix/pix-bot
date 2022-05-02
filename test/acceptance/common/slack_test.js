@@ -42,6 +42,107 @@ describe('Acceptance | Common | Slack', function() {
       expect(res.statusCode).to.equal(401);
     });
 
+    describe('when using the shortcut publish-release', function() {
+      it('calls slack with the tag selection modal', async function() {
+        const slackCall = nock('https://slack.com')
+          .post('/api/views.open', {
+            'trigger_id': 'trigger id',
+            'view': {
+              'type': 'modal',
+              'callback_id': 'release-type-selection',
+              'title': {
+                'type': 'plain_text',
+                'text': 'Publier une release',
+                'emoji': true
+              },
+              'submit': {
+                'type': 'plain_text',
+                'text': 'Publier',
+                'emoji': true
+              },
+              'close': {
+                'type': 'plain_text',
+                'text': 'Annuler',
+                'emoji': true
+              },
+              'blocks': [
+                {
+                  'type': 'section',
+                  'text': {
+                    'type': 'mrkdwn',
+                    'text': 'Pix utilise le format de gestion de versions _Semantic Versionning_ :\n- *patch* : contient exclusivement des correctif(s)\n- *minor* : contient au moins 1 évolution technique ou fonctionnelle\n- *major* : contient au moins 1 changement majeur d\'architecture'
+                  }
+                },
+                {
+                  'type': 'divider'
+                },
+                {
+                  'type': 'input',
+                  'block_id': 'publish-release-type',
+                  'label': {
+                    'type': 'plain_text',
+                    'text': 'Type de release',
+                    'emoji': true
+                  },
+                  'element': {
+                    'action_id': 'release-type-option',
+                    'type': 'static_select',
+                    'placeholder': {
+                      'type': 'plain_text',
+                      'text': 'Selectionnez un élément'
+                    },
+                    'initial_option': {
+                      'text': {
+                        'type': 'plain_text',
+                        'text': 'Minor'
+                      },
+                      'value': 'minor'
+                    },
+                    'options': [
+                      {
+                        'text': {
+                          'type': 'plain_text',
+                          'text': 'Minor'
+                        },
+                        'value': 'minor'
+                      },
+                      {
+                        'text': {
+                          'type': 'plain_text',
+                          'text': 'Patch'
+                        },
+                        'value': 'patch'
+                      },
+                      {
+                        'text': {
+                          'type': 'plain_text',
+                          'text': 'Major'
+                        },
+                        'value': 'major'
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          })
+          .reply(200);
+        const body = {
+          type: 'shortcut',
+          callback_id: 'publish-release',
+          trigger_id: 'trigger id'
+        };
+        const res = await server.inject({
+          method: 'POST',
+          url: '/slack/interactive-endpoint',
+          headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(204);
+        expect(slackCall.isDone()).to.be.true;
+      });
+    });
+
     describe('when using the shortcut deploy-release', function() {
       it('calls slack with the tag selection modal', async function() {
         const slackCall = nock('https://slack.com')
