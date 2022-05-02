@@ -6,7 +6,8 @@ const repositoryToScalingoAppsReview = {
   'pix-db-replication': ['pix-datawarehouse-integration'],
   'pix-db-stats': ['pix-db-stats-review'],
   'pix-site': ['pix-site-review', 'pix-pro-review'],
-  'pix-bot': ['pix-bot-review']
+  'pix-bot': ['pix-bot-review'],
+  'pix-ui': ['pix-ui-review']
 };
 
 module.exports = {
