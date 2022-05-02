@@ -1,5 +1,21 @@
 # pix-bot Changelog
 
+## v1.18.0 (02/05/2022)
+
+
+### :rocket: Amélioration
+- [#118](https://github.com/1024pix/pix-bot/pull/118) [FEATURE] Rajoute le déploiement des reviews app de pix-pro et de pix-ui
+- [#116](https://github.com/1024pix/pix-bot/pull/116) [FEATURE] Factorisation de la génération des routes des commandes slash et du manifest
+- [#114](https://github.com/1024pix/pix-bot/pull/114) [FEATURE] Générer le manifest pour configurer les applications slack
+- [#101](https://github.com/1024pix/pix-bot/pull/101) [FEATURE] Génére correctement le changelog pour une release après une correction de release à chaud
+
+### :building_construction: Tech
+- [#105](https://github.com/1024pix/pix-bot/pull/105) [TECH] Mettre à jour les dépendances
+
+### :coffee: Autre
+- [#115](https://github.com/1024pix/pix-bot/pull/115) [CLEANUP] Nettoyer les routes du module common
+- [#111](https://github.com/1024pix/pix-bot/pull/111) [CLEANUP] Ajout de tests unitaires sur le script release-pix-repo.sh
+
 ## v1.17.0 (20/04/2022)
 
 
