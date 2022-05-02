@@ -1,13 +1,13 @@
 const ScalingoClient = require('../../common/services/scalingo-client');
 
 const repositoryToScalingoAppsReview = {
-  pix: ['pix-front-review', 'pix-api-review'],
-  'pix-editor': ['pix-lcms-review'],
+  'pix-bot': ['pix-bot-review'],
   'pix-db-replication': ['pix-datawarehouse-integration'],
   'pix-db-stats': ['pix-db-stats-review'],
+  'pix-editor': ['pix-lcms-review'],
   'pix-site': ['pix-site-review', 'pix-pro-review'],
-  'pix-bot': ['pix-bot-review'],
-  'pix-ui': ['pix-ui-review']
+  'pix-ui': ['pix-ui-review'],
+  pix: ['pix-front-review', 'pix-api-review'],
 };
 
 module.exports = {
