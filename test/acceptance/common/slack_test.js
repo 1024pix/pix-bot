@@ -271,6 +271,28 @@ describe('Acceptance | Common | Slack', function() {
           }
         ));
       });
+
+      describe('callback release-deployment-confirmation', function() {
+        it('deploy the app', async function () {
+          const body = {
+            type: 'view_submission',
+            view: {
+              callback_id: 'release-deployment-confirmation',
+              private_metadata: 'v2.130.0',
+            },
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/slack/interactive-endpoint',
+            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(200);
+          expect(res.payload).to.deep.equal(JSON.stringify({
+            response_action: 'clear'
+          }));
+        });
+      });
     });
   });
 });
