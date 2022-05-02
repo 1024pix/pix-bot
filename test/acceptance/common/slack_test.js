@@ -101,17 +101,14 @@ describe('Acceptance | Common | Slack', function() {
               'title': {
                 'type': 'plain_text',
                 'text': 'Publier une release',
-                'emoji': true
               },
               'submit': {
                 'type': 'plain_text',
                 'text': 'Publier',
-                'emoji': true
               },
               'close': {
                 'type': 'plain_text',
                 'text': 'Annuler',
-                'emoji': true
               },
               'blocks': [
                 {
@@ -130,7 +127,6 @@ describe('Acceptance | Common | Slack', function() {
                   'label': {
                     'type': 'plain_text',
                     'text': 'Type de release',
-                    'emoji': true
                   },
                   'element': {
                     'action_id': 'release-type-option',
@@ -232,12 +228,10 @@ describe('Acceptance | Common | Slack', function() {
               submit: {
                 type: 'plain_text',
                 text: '🚀 Go !',
-                emoji: true,
               },
               close: {
                 type: 'plain_text',
                 text: 'Annuler',
-                emoji: true,
               },
               blocks: [
                 {
@@ -293,12 +287,10 @@ describe('Acceptance | Common | Slack', function() {
               submit: {
                 type: 'plain_text',
                 text: '🚀 Go !',
-                emoji: true,
               },
               close: {
                 type: 'plain_text',
                 text: 'Annuler',
-                emoji: true,
               },
               blocks: [
                 {
@@ -355,17 +347,14 @@ describe('Acceptance | Common | Slack', function() {
               'title': {
                 'type': 'plain_text',
                 'text': 'Déployer une release',
-                'emoji': true
               },
               'submit': {
                 'type': 'plain_text',
                 'text': 'Déployer',
-                'emoji': true
               },
               'close': {
                 'type': 'plain_text',
                 'text': 'Annuler',
-                'emoji': true
               },
               'blocks': [
                 {
@@ -374,7 +363,6 @@ describe('Acceptance | Common | Slack', function() {
                   'label': {
                     'type': 'plain_text',
                     'text': 'Numéro de release',
-                    'emoji': true
                   },
                   'element': {
                     'type': 'plain_text_input',
@@ -382,7 +370,6 @@ describe('Acceptance | Common | Slack', function() {
                     'placeholder': {
                       'type': 'plain_text',
                       'text': 'Ex : v2.130.0',
-                      'emoji': true
                     }
                   }
                 },
@@ -446,12 +433,10 @@ describe('Acceptance | Common | Slack', function() {
               submit: {
                 type: 'plain_text',
                 text: '🚀 Go !',
-                emoji: true,
               },
               close: {
                 type: 'plain_text',
                 text: 'Annuler',
-                emoji: true,
               },
               blocks: [
                 {
@@ -504,12 +489,10 @@ describe('Acceptance | Common | Slack', function() {
               submit: {
                 type: 'plain_text',
                 text: '🚀 Go !',
-                emoji: true,
               },
               close: {
                 type: 'plain_text',
                 text: 'Annuler',
-                emoji: true,
               },
               blocks: [
                 {

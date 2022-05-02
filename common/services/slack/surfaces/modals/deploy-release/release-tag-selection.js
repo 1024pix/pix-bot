@@ -1,47 +1,26 @@
+const { Modal, Blocks, Elements } = require('slack-block-builder');
+
 const callbackId = 'release-tag-selection';
 
 module.exports = (triggerId) => {
+  const modal = Modal({
+    title: 'Déployer une release',
+    callbackId,
+    submit: 'Déployer',
+    close: 'Annuler'
+  }).blocks([
+    Blocks.Input({
+      blockId: 'deploy-release-tag',
+      label: 'Numéro de release',
+    }).element(Elements.TextInput({
+      actionId: 'release-tag-value',
+      placeholder: 'Ex : v2.130.0'
+    }))
+  ]);
+
   return {
-    'trigger_id': triggerId,
-    'view': {
-      'type': 'modal',
-      'callback_id': callbackId,
-      'title': {
-        'type': 'plain_text',
-        'text': 'Déployer une release',
-        'emoji': true
-      },
-      'submit': {
-        'type': 'plain_text',
-        'text': 'Déployer',
-        'emoji': true
-      },
-      'close': {
-        'type': 'plain_text',
-        'text': 'Annuler',
-        'emoji': true
-      },
-      'blocks': [
-        {
-          'type': 'input',
-          'block_id': 'deploy-release-tag',
-          'label': {
-            'type': 'plain_text',
-            'text': 'Numéro de release',
-            'emoji': true
-          },
-          'element': {
-            'type': 'plain_text_input',
-            'action_id': 'release-tag-value',
-            'placeholder': {
-              'type': 'plain_text',
-              'text': 'Ex : v2.130.0',
-              'emoji': true
-            }
-          }
-        },
-      ]
-    }
+    trigger_id: triggerId,
+    view: modal.buildToObject()
   };
 };
 
