@@ -2,8 +2,8 @@ const { Modal, Blocks, Elements, Bits } = require('slack-block-builder');
 
 const callbackId = 'release-type-selection';
 
-module.exports = (triggerId) => {
-  const modal = Modal({
+function modal() {
+  return Modal({
     title: 'Publier une release',
     callbackId,
     submit: 'Publier',
@@ -39,11 +39,17 @@ module.exports = (triggerId) => {
       }))
     )
   ]);
+}
 
+module.exports = (triggerId) => {
   return {
     trigger_id: triggerId,
-    view: modal.buildToObject()
+    view: modal().buildToObject()
   };
+};
+
+module.exports.sampleView = () => {
+  return modal();
 };
 
 module.exports.callbackId = callbackId;
