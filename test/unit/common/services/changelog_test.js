@@ -7,7 +7,7 @@ const {
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,
-  getTagReleaseDate,
+  getLastMEPDate,
   getNewChangeLogLines,
   orderPr,
 } = require('../../../../common/services/changelog');
@@ -123,15 +123,14 @@ describe('Unit | Common | Services | Changelog', () => {
     });
   });
 
-  describe('#getTagReleaseDate', () => {
+  describe('#getLastMEPDate', () => {
 
     const repoOwner = '1024pix';
     const repoName = 'pix';
-    const tagName = 'v3.193.1';
 
     beforeEach(() => {
-      sinon.stub(github, 'getLastCommitUrl')
-        .withArgs({ owner: repoOwner, repo: repoName, tagName })
+      sinon.stub(github, 'getLatestReleaseTagUrl')
+        .withArgs(repoOwner, repoName)
         .resolves(`https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`);
 
       sinon.stub(github, 'getCommitAtURL')
@@ -144,7 +143,7 @@ describe('Unit | Common | Services | Changelog', () => {
       const expectedDate = '2019-01-18T15:29:51Z';
 
       // when
-      const date = await getTagReleaseDate(repoOwner, repoName, tagName);
+      const date = await getLastMEPDate(repoOwner, repoName);
 
       // then
       expect(date).to.be.equal(expectedDate);

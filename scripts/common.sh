@@ -39,8 +39,7 @@ function push_commit_and_tag_to_remote() {
 }
 
 function complete_change_log() {
-  LAST_TAG_ON_BRANCH=$(git tag --merged | sort --version-sort | tail -1)
-  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}" "${BRANCH_NAME}" "${LAST_TAG_ON_BRANCH}"
+  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}" "${BRANCH_NAME}"
 
   echo "Updated CHANGELOG.md"
 }
