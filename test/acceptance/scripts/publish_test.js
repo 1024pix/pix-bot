@@ -49,7 +49,7 @@ describe('Acceptance | Scripts | publish.sh', function() {
     };
 
     // when
-    const { stdout, stderr } = await runScriptWithArgument(scriptName, [versionType, testRepositoryPath, branchName], { env });
+    const { stdout, stderr } = await runScriptWithArgument(scriptName, [versionType, 'file://' +testRepositoryPath, branchName], { env });
 
     // then
     const expectedStdout = [
@@ -80,8 +80,6 @@ describe('Acceptance | Scripts | publish.sh', function() {
     ];
     const expectedStderr = [
       /^Cloning into/,
-      'warning: --depth is ignored in local clones; use file:// instead.',
-      'done.',
       /To (.+)/,
       /dev -> dev/,
       /v0.2.0 -> v0.2.0/,
