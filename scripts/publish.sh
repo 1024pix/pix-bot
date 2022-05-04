@@ -45,6 +45,7 @@ function update_pix_module_version() {
 }
 
 function update_all_pix_modules_version() {
+  PREVIOUS_PACKAGE_VERSION=$(get_package_version)
   # TODO: refacto using dynamic package.json update => find . -name package.json  ! -path '*/node_modules/*'
   update_pix_module_version "admin/"
   update_pix_module_version "api/"
