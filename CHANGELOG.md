@@ -1,5 +1,12 @@
 # pix-bot Changelog
 
+## v1.19.0 (04/05/2022)
+
+
+### :coffee: Autre
+- [#119](https://github.com/1024pix/pix-bot/pull/119) [REVERT] Génére correctement le changelog pour une release après une correction de release à chaud
+- [#117](https://github.com/1024pix/pix-bot/pull/117) [CLEANUP] Ajout de tests sur le endpoint /slack/interactive-endpoint
+
 ## v1.18.0 (02/05/2022)
 
 
