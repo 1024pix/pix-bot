@@ -8,8 +8,8 @@ const PullRequestGroupFactory = require('../models/PullRequestGroupFactory');
 
 const CHANGELOG_HEADER_LINES = 2;
 
-async function getTagReleaseDate(repoOwner, repoName, tagName) {
-  const latestTagUrl = await github.getLastCommitUrl({ tagName, owner: repoOwner, repo: repoName });
+async function getLastMEPDate(repoOwner, repoName) {
+  const latestTagUrl = await github.getLatestReleaseTagUrl(repoOwner, repoName);
 
   const commit = await github.getCommitAtURL(latestTagUrl);
   return commit.committer.date;
@@ -66,7 +66,7 @@ module.exports = {
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,
-  getTagReleaseDate,
+  getLastMEPDate,
   getNewChangeLogLines,
   orderPr,
 };
