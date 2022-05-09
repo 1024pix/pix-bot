@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.20.0 (09/05/2022)
+
+
+### :rocket: Amélioration
+- [#120](https://github.com/1024pix/pix-bot/pull/120) [FEATURE] Génére correctement le changelog pour une release après une correction de release à chaud 
+
+### :coffee: Autre
+- [#121](https://github.com/1024pix/pix-bot/pull/121) [CLEANUP] Refactoring des modals slack
+
 ## v1.19.0 (04/05/2022)
 
 
