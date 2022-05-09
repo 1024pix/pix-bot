@@ -113,16 +113,14 @@ function _sortWithInProgressLast(prA, prB) {
   return fieldA.localeCompare(fieldB);
 }
 
-async function getLastCommitUrl({ branchName, tagName }) {
+async function getLastCommitUrl({ branchName, tagName, owner, repo }) {
   if (branchName) {
-    return await _getBranchLastCommitUrl(branchName);
+    return await _getBranchLastCommitUrl({ owner, repo, branch: branchName });
   }
-  return _getTagCommitUrl(tagName);
+  return _getTagCommitUrl({ owner, repo, tagName });
 }
 
-async function _getBranchLastCommitUrl(branch) {
-  const owner = settings.github.owner;
-  const repo = settings.github.repository;
+async function _getBranchLastCommitUrl({ owner, repo, branch }) {
   const octokit = _createOctokit();
   const { data } = await octokit.repos.getBranch({
     owner,
@@ -132,9 +130,7 @@ async function _getBranchLastCommitUrl(branch) {
   return data.commit.url;
 }
 
-async function _getTagCommitUrl(tagName) {
-  const owner = settings.github.owner;
-  const repo = settings.github.repository;
+async function _getTagCommitUrl({ owner, repo, tagName }) {
   const tags = await _getTags(owner, repo);
   const tag = tags.find((tag) => tag.name === tagName);
   return tag.commit.url;
@@ -164,12 +160,12 @@ async function _getDefaultBranch(repoOwner, repoName) {
 }
 
 async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
-  const defaultBranch = branchName || await _getDefaultBranch(repoOwner, repoName);
+  const baseBranch = branchName || await _getDefaultBranch(repoOwner, repoName);
   const { pulls } = _createOctokit();
   const { data } = await pulls.list({
     owner: repoOwner,
     repo: repoName,
-    base: defaultBranch,
+    base: baseBranch,
     state: 'closed',
     sort: 'updated',
     direction: 'desc'
@@ -251,6 +247,8 @@ module.exports = {
     return _getLatestReleaseTagUrl(repoOwner, repoName);
   },
 
+  getLastCommitUrl,
+
   async getCommitAtURL(commitUrl) {
     return _getCommitAtURL(commitUrl);
   },
@@ -265,7 +263,8 @@ module.exports = {
 
   async isBuildStatusOK({ branchName, tagName }) {
     const githubCICheckName = 'build-test-and-deploy';
-    const commitUrl = await getLastCommitUrl({ branchName, tagName });
+    const { owner, repository: repo } = settings.github;
+    const commitUrl = await getLastCommitUrl({ branchName, tagName, owner, repo });
     const commitStatusUrl = commitUrl + '/check-runs';
     const octokit = _createOctokit();
     const { data } = await octokit.request(commitStatusUrl);

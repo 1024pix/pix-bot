@@ -39,7 +39,7 @@ function push_commit_and_tag_to_remote() {
 }
 
 function complete_change_log() {
-  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}" "${BRANCH_NAME}"
+  node "${CWD_DIR}/scripts/get-pull-requests-to-release-in-prod.js" "${NEW_PACKAGE_VERSION}" "${GITHUB_OWNER}" "${GITHUB_REPOSITORY}" "${BRANCH_NAME}" "v${PREVIOUS_PACKAGE_VERSION}"
 
   echo "Updated CHANGELOG.md"
 }

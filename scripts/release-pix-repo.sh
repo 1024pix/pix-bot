@@ -19,6 +19,7 @@ function executeCommandRecursivelyInPackageJsonDir {
 }
 
 function create_release {
+  PREVIOUS_PACKAGE_VERSION=$(get_package_version)
   npm_arg="" && [[ -n "$VERSION_TYPE" ]]  && npm_arg="$VERSION_TYPE"
   executeCommandRecursivelyInPackageJsonDir "npm version ${npm_arg} --no-git-tag-version"
   NEW_PACKAGE_VERSION=$(get_package_version)

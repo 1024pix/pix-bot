@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const os = require('os');
 const simpleGit = require('simple-git');
+const dayjs = require('dayjs');
 
 const { runScriptWithArgument, expectLines } = require('./script-helpers');
 
@@ -45,7 +46,7 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function() {
     };
 
     // when
-    const { stdout, stderr } = await runScriptWithArgument(scriptName, [githubOwner, githubRepository, versionType, branchName, testRepositoryPath], { env });
+    const { stdout, stderr } = await runScriptWithArgument(scriptName, [githubOwner, githubRepository, versionType, branchName, 'file://'+ testRepositoryPath], { env });
 
     // then
     const expectedStdout = [
@@ -66,7 +67,7 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function() {
       'Writing to CHANGELOG.md',
       'Updated CHANGELOG.md',
       /A minor is being released to 0.2.0.$/,
-      ' 8 files changed, 8 insertions(+), 8 deletions(-)',
+      ' 9 files changed, 14 insertions(+), 8 deletions(-)',
       'Created the release commit',
       'Created annotated tag',
       'Pushed release commit to the origin',
@@ -75,8 +76,6 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function() {
     ];
     const expectedStderr = [
       /^Cloning into/,
-      'warning: --depth is ignored in local clones; use file:// instead.',
-      'done.',
       /To (.+)/,
       /dev -> dev/,
       /v0.2.0 -> v0.2.0/,
@@ -88,6 +87,13 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function() {
     const tags = await git.tag();
     expect(tags).to.eql('v0.1.0\nv0.1.1\nv0.2.0\n');
     const changelog = await git.show('dev:CHANGELOG.md');
-    expect(changelog).to.eql('');
+    const now = dayjs().format('DD/MM/YYYY');
+    expect(changelog).to.eql(`
+## v0.2.0 (${now})
+
+
+### :rocket: Amélioration
+- [#1](https://github.com/1024pix/pix-bot-publish-test/pull/1) [FEATURE] Ajout d'un index pour Pix App
+`);
   });
 });

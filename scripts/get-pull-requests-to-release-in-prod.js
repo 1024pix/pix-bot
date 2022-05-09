@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const github = require('../common/services/github');
 const {
-  getLastMEPDate,
+  getTagReleaseDate,
   filterPullRequest,
   getNewChangeLogLines,
   getHeadOfChangelog,
@@ -17,17 +17,18 @@ async function main() {
   const repoOwner = process.argv[3];
   const repoName = process.argv[4];
   const branchName = process.argv[5];
+  const lastTagNameOnBranch = process.argv[6];
 
   try {
-    const dateOfLastMEP = await getLastMEPDate(repoOwner, repoName);
+    const dateOfLastRelease = await getTagReleaseDate(repoOwner, repoName, lastTagNameOnBranch);
 
     const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
 
-    const pullRequestsSinceLastMEP = filterPullRequest(pullRequests, dateOfLastMEP);
+    const pullRequestsSinceLastRelease = filterPullRequest(pullRequests, dateOfLastRelease);
 
     const newChangeLogLines = getNewChangeLogLines({
       headOfChangelogTitle: getHeadOfChangelog(tagVersion),
-      pullRequests: pullRequestsSinceLastMEP,
+      pullRequests: pullRequestsSinceLastRelease,
     });
 
     let currentChangeLog = '';
