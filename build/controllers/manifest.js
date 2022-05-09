@@ -14,14 +14,7 @@ module.exports = {
           display_name: manifest.name,
           always_online: false
         },
-        shortcuts: [
-          {
-            name: 'Publier une version/MER',
-            type: 'global',
-            callback_id: 'publish-release',
-            description: 'Publie une nouvelle version et la déploie sur l\'environnement de recette'
-          }
-        ],
+        shortcuts: manifest.shortcuts,
         slash_commands: manifest.slashCommands.map(({ command, path, description, usage_hint, should_escape }) => {
           return {
             command,

@@ -14,14 +14,7 @@ module.exports = {
           display_name: manifest.name,
           always_online: false
         },
-        shortcuts: [
-          {
-            name: 'Déployer une version/MEP',
-            type: 'global',
-            callback_id: 'deploy-release',
-            description: 'Lance le déploiement d\'une version sur l\'environnement de production'
-          }
-        ],
+        shortcuts: manifest.shortcuts,
         slash_commands: manifest.slashCommands.map(({ command, path, description, usage_hint, should_escape }) => {
           return {
             command,

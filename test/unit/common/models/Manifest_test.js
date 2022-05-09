@@ -76,4 +76,29 @@ describe('Unit | Common | Models | Manifest', () => {
       ]);
     });
   });
+
+  describe('#registerShortcut', () => {
+    it('register a shortcut', () => {
+      // given
+      const manifest = new Manifest('Pix Bot: The return');
+      // when
+      manifest.registerShortcut({
+        name: 'Test shortcut',
+        type: 'global',
+        callback_id: 'test-shortcut',
+        description: 'Test description'
+      });
+
+      // then
+      expect(manifest.shortcuts).to.have.lengthOf(1);
+      expect(manifest.shortcuts).to.eql([
+        {
+          name: 'Test shortcut',
+          type: 'global',
+          callback_id: 'test-shortcut',
+          description: 'Test description'
+        }
+      ]);
+    });
+  });
 });

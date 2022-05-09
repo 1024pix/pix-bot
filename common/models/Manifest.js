@@ -2,10 +2,15 @@ class Manifest {
   constructor(name) {
     this.name = name;
     this.slashCommands = [];
+    this.shortcuts = [];
   }
 
   registerSlashCommand(command) {
     this.slashCommands.push(command);
+  }
+
+  registerShortcut(shortcut) {
+    this.shortcuts.push(shortcut);
   }
 
   getHapiRoutes() {

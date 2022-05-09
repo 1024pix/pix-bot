@@ -75,4 +75,11 @@ manifest.registerSlashCommand({
   handler: slackbotController.createAndDeployEmberTestingLibraryRelease,
 });
 
+manifest.registerShortcut({
+  name: 'Déployer une version/MEP',
+  type: 'global',
+  callback_id: 'deploy-release',
+  description: 'Lance le déploiement d\'une version sur l\'environnement de production'
+});
+
 module.exports = manifest;
