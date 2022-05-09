@@ -105,7 +105,7 @@ async function publishAndDeployPixBot(repoName, releaseType, responseUrl) {
   const releaseTag = await githubServices.getLatestReleaseTag(repoName);
 
   const recette = await ScalingoClient.getInstance('recette');
-  await recette.deployFromArchive('pix-bot-build', releaseTag, repoName, { withEnvSuffix: false });
+  await recette.deployFromArchive('pix-bot-build-production', releaseTag, repoName, { withEnvSuffix: false });
 
   const production = await ScalingoClient.getInstance('production');
   await production.deployFromArchive('pix-bot-run', releaseTag, repoName);

@@ -197,7 +197,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should deploy the release for pix-bot-build', () => {
       // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build');
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build-production');
     });
 
     it('should deploy the release for pix-bot-run', () => {
