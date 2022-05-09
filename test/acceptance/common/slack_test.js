@@ -101,17 +101,14 @@ describe('Acceptance | Common | Slack', function() {
               'title': {
                 'type': 'plain_text',
                 'text': 'Publier une release',
-                'emoji': true
               },
               'submit': {
                 'type': 'plain_text',
                 'text': 'Publier',
-                'emoji': true
               },
               'close': {
                 'type': 'plain_text',
                 'text': 'Annuler',
-                'emoji': true
               },
               'blocks': [
                 {
@@ -130,7 +127,6 @@ describe('Acceptance | Common | Slack', function() {
                   'label': {
                     'type': 'plain_text',
                     'text': 'Type de release',
-                    'emoji': true
                   },
                   'element': {
                     'action_id': 'release-type-option',
@@ -219,39 +215,35 @@ describe('Acceptance | Common | Slack', function() {
             payload: body,
           });
           expect(res.statusCode).to.equal(200);
-          expect(res.payload).to.deep.equal(JSON.stringify(
-            {
-              response_action: 'push',
-              view: {
-                type: 'modal',
-                callback_id: 'release-publication-confirmation',
-                private_metadata: 'minor',
-                title: {
-                  type: 'plain_text',
-                  text: 'Confirmation',
-                },
-                submit: {
-                  type: 'plain_text',
-                  text: '🚀 Go !',
-                  emoji: true,
-                },
-                close: {
-                  type: 'plain_text',
-                  text: 'Annuler',
-                  emoji: true,
-                },
-                blocks: [
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: 'Vous vous apprêtez à publier une version *minor* et la déployer en recette. Êtes-vous sûr de vous ?',
-                    },
-                  },
-                ],
+          expect(JSON.parse(res.payload)).to.deep.equal({
+            response_action: 'push',
+            view: {
+              type: 'modal',
+              callback_id: 'release-publication-confirmation',
+              private_metadata: 'minor',
+              title: {
+                type: 'plain_text',
+                text: 'Confirmation',
               },
-            }
-          ));
+              submit: {
+                type: 'plain_text',
+                text: '🚀 Go !',
+              },
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
+              },
+              blocks: [
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: 'Vous vous apprêtez à publier une version *minor* et la déployer en recette. Êtes-vous sûr de vous ?',
+                  },
+                },
+              ],
+            },
+          });
         });
 
         it('returns the confirmation modal with a warning', async function () {
@@ -282,46 +274,42 @@ describe('Acceptance | Common | Slack', function() {
             payload: body,
           });
           expect(res.statusCode).to.equal(200);
-          expect(res.payload).to.deep.equal(JSON.stringify(
-            {
-              response_action: 'push',
-              view: {
-                type: 'modal',
-                callback_id: 'release-publication-confirmation',
-                private_metadata: 'major',
-                title: {
-                  type: 'plain_text',
-                  text: 'Confirmation',
-                },
-                submit: {
-                  type: 'plain_text',
-                  text: '🚀 Go !',
-                  emoji: true,
-                },
-                close: {
-                  type: 'plain_text',
-                  text: 'Annuler',
-                  emoji: true,
-                },
-                blocks: [
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo RECETTE*.'
-                    }
-                  },
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: 'Vous vous apprêtez à publier une version *major* et la déployer en recette. Êtes-vous sûr de vous ?',
-                    },
-                  },
-                ],
+          expect(JSON.parse(res.payload)).to.deep.equal({
+            response_action: 'push',
+            view: {
+              type: 'modal',
+              callback_id: 'release-publication-confirmation',
+              private_metadata: 'major',
+              title: {
+                type: 'plain_text',
+                text: 'Confirmation',
               },
-            }
-          ));
+              submit: {
+                type: 'plain_text',
+                text: '🚀 Go !',
+              },
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
+              },
+              blocks: [
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo RECETTE*.'
+                  }
+                },
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: 'Vous vous apprêtez à publier une version *major* et la déployer en recette. Êtes-vous sûr de vous ?',
+                  },
+                },
+              ],
+            },
+          });
         });
       });
 
@@ -341,9 +329,9 @@ describe('Acceptance | Common | Slack', function() {
             payload: body,
           });
           expect(res.statusCode).to.equal(200);
-          expect(res.payload).to.deep.equal(JSON.stringify({
+          expect(JSON.parse(res.payload)).to.deep.equal({
             response_action: 'clear'
-          }));
+          });
         });
       });
     });
@@ -359,17 +347,14 @@ describe('Acceptance | Common | Slack', function() {
               'title': {
                 'type': 'plain_text',
                 'text': 'Déployer une release',
-                'emoji': true
               },
               'submit': {
                 'type': 'plain_text',
                 'text': 'Déployer',
-                'emoji': true
               },
               'close': {
                 'type': 'plain_text',
                 'text': 'Annuler',
-                'emoji': true
               },
               'blocks': [
                 {
@@ -378,7 +363,6 @@ describe('Acceptance | Common | Slack', function() {
                   'label': {
                     'type': 'plain_text',
                     'text': 'Numéro de release',
-                    'emoji': true
                   },
                   'element': {
                     'type': 'plain_text_input',
@@ -386,7 +370,6 @@ describe('Acceptance | Common | Slack', function() {
                     'placeholder': {
                       'type': 'plain_text',
                       'text': 'Ex : v2.130.0',
-                      'emoji': true
                     }
                   }
                 },
@@ -437,39 +420,35 @@ describe('Acceptance | Common | Slack', function() {
             payload: body,
           });
           expect(res.statusCode).to.equal(200);
-          expect(res.payload).to.deep.equal(JSON.stringify(
-            {
-              response_action: 'push',
-              view: {
-                type: 'modal',
-                callback_id: 'release-deployment-confirmation',
-                private_metadata: 'v2.130.0',
-                title: {
-                  type: 'plain_text',
-                  text: 'Confirmation',
-                },
-                submit: {
-                  type: 'plain_text',
-                  text: '🚀 Go !',
-                  emoji: true,
-                },
-                close: {
-                  type: 'plain_text',
-                  text: 'Annuler',
-                  emoji: true,
-                },
-                blocks: [
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
-                    },
-                  },
-                ],
+          expect(JSON.parse(res.payload)).to.deep.equal({
+            response_action: 'push',
+            view: {
+              type: 'modal',
+              callback_id: 'release-deployment-confirmation',
+              private_metadata: 'v2.130.0',
+              title: {
+                type: 'plain_text',
+                text: 'Confirmation',
               },
-            }
-          ));
+              submit: {
+                type: 'plain_text',
+                text: '🚀 Go !',
+              },
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
+              },
+              blocks: [
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
+                  },
+                },
+              ],
+            },
+          });
         });
 
         it('returns the confirmation modal with a warning', async function () {
@@ -497,46 +476,42 @@ describe('Acceptance | Common | Slack', function() {
             payload: body,
           });
           expect(res.statusCode).to.equal(200);
-          expect(res.payload).to.deep.equal(JSON.stringify(
-            {
-              response_action: 'push',
-              view: {
-                type: 'modal',
-                callback_id: 'release-deployment-confirmation',
-                private_metadata: 'v2.130.0',
-                title: {
-                  type: 'plain_text',
-                  text: 'Confirmation',
-                },
-                submit: {
-                  type: 'plain_text',
-                  text: '🚀 Go !',
-                  emoji: true,
-                },
-                close: {
-                  type: 'plain_text',
-                  text: 'Annuler',
-                  emoji: true,
-                },
-                blocks: [
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo PRODUCTION*.'
-                    }
-                  },
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
-                    },
-                  },
-                ],
+          expect(JSON.parse(res.payload)).to.deep.equal({
+            response_action: 'push',
+            view: {
+              type: 'modal',
+              callback_id: 'release-deployment-confirmation',
+              private_metadata: 'v2.130.0',
+              title: {
+                type: 'plain_text',
+                text: 'Confirmation',
               },
-            }
-          ));
+              submit: {
+                type: 'plain_text',
+                text: '🚀 Go !',
+              },
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
+              },
+              blocks: [
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo PRODUCTION*.'
+                  }
+                },
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: 'Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s\'agit d\'une opération critique. Êtes-vous sûr de vous ?',
+                  },
+                },
+              ],
+            },
+          });
         });
       });
 
@@ -556,9 +531,9 @@ describe('Acceptance | Common | Slack', function() {
             payload: body,
           });
           expect(res.statusCode).to.equal(200);
-          expect(res.payload).to.deep.equal(JSON.stringify({
+          expect(JSON.parse(res.payload)).to.deep.equal({
             response_action: 'clear'
-          }));
+          });
         });
       });
     });

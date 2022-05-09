@@ -41,6 +41,7 @@
     "scalingo": "^0.3.11",
     "scalingo-review-app-manager": "^1.0.1",
     "sib-api-v3-sdk": "^8.3.0",
+    "slack-block-builder": "^2.5.0",
     "tsscmp": "^1.0.6"
   },
   "devDependencies": {

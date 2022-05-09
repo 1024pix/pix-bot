@@ -61,6 +61,10 @@ Add your new slash command to the corresponding manifest: ./{run,build}/controll
 
 Go to [https://api.slack.com/apps](https://api.slack.com/apps), and create a new slack app, and create it from a manifest. The manifest is available a {ngrok_url}/{run,build}/manifest.
 
+### Test slack views
+
+Go to http://localhost:3000/slackviews to test and debug slack views.
+
 ## Deploy
 
 Pix Bot has a Slack command that allow to release itself:
