@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.20.1 (09/05/2022)
+
+
+### :bug: Correction
+- [#123](https://github.com/1024pix/pix-bot/pull/123) [BUGFIX] Corrige le nom de l'application a déployer pour pix-bot-build
+
 ## v1.20.0 (09/05/2022)
 
 
