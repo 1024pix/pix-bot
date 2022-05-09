@@ -44,7 +44,7 @@ module.exports = {
       settings: {
         interactivity: {
           is_enabled: true,
-          request_url: `${url}/slack/interactive-endpoint`
+          request_url: `${url}/run/slack/interactive-endpoint`
         },
         org_deploy_enabled: false,
         socket_mode_enabled: false,

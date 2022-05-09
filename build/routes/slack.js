@@ -1,10 +1,10 @@
-const { slackConfig } = require('../config');
+const { slackConfig } = require('../../common/config');
 const slackbotController = require('../controllers/slack');
 
 module.exports = [
   {
     method: 'POST',
-    path: '/slack/interactive-endpoint',
+    path: '/build/slack/interactive-endpoint',
     handler: slackbotController.interactiveEndpoint,
     config: slackConfig
   },
