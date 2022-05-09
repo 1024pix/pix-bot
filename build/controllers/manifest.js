@@ -35,10 +35,10 @@ module.exports = {
         }
       },
       settings: {
-        interactivity: {
+        interactivity: manifest.interactivity ? {
           is_enabled: true,
-          request_url: `${url}/build/slack/interactive-endpoint`
-        },
+          request_url: `${url}${manifest.interactivity.path}`
+        } : null,
         org_deploy_enabled: false,
         socket_mode_enabled: false,
         token_rotation_enabled: false

@@ -82,4 +82,9 @@ manifest.registerShortcut({
   description: 'Lance le déploiement d\'une version sur l\'environnement de production'
 });
 
+manifest.addInteractivity({
+  path: '/run/slack/interactive-endpoint',
+  handler: slackbotController.interactiveEndpoint,
+});
+
 module.exports = manifest;

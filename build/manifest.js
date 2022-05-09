@@ -45,4 +45,9 @@ manifest.registerShortcut({
   description: 'Publie une nouvelle version et la déploie sur l\'environnement de recette'
 });
 
+manifest.addInteractivity({
+  path: '/build/slack/interactive-endpoint',
+  handler: slackbotController.interactiveEndpoint,
+});
+
 module.exports = manifest;
