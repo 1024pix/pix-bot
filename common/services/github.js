@@ -262,10 +262,10 @@ module.exports = {
   },
 
   async isBuildStatusOK({ branchName, tagName }) {
-    const githubCICheckName = 'build-test-and-deploy';
+    const githubCICheckName = 'build-and-test';
     const { owner, repository: repo } = settings.github;
     const commitUrl = await getLastCommitUrl({ branchName, tagName, owner, repo });
-    const commitStatusUrl = commitUrl + '/check-runs';
+    const commitStatusUrl = `${commitUrl}/check-runs?check_name=${githubCICheckName}`;
     const octokit = _createOctokit();
     const { data } = await octokit.request(commitStatusUrl);
     const runs = data.check_runs;

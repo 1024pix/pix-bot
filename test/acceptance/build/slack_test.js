@@ -30,6 +30,29 @@ describe('Acceptance | Build | Slack', function() {
 
     describe('when using the shortcut publish-release', function() {
       it('calls slack with the tag selection modal', async function() {
+        const githubLastCommitUrlCall = nock('https://api.github.com')
+          .get('/repos/github-owner/github-repository/branches/dev')
+          .reply(200, {
+            name: 'master',
+            commit: {
+              sha: 'c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc',
+              url: 'https://api.github.com/repos/github-owner/github-repository/commits/sha1'
+            }
+          });
+        const githubCheckRunsCall = nock('https://api.github.com')
+          .get('/repos/github-owner/github-repository/commits/sha1/check-runs')
+          .query({
+            check_name: 'build-and-test',
+          })
+          .reply(200, {
+            check_runs: [
+              {
+                name: 'build-and-test',
+                status: 'completed',
+                conclusion: 'success'
+              }
+            ]
+          });
         const slackCall = nock('https://slack.com')
           .post('/api/views.open', {
             'trigger_id': 'trigger id',
@@ -122,6 +145,55 @@ describe('Acceptance | Build | Slack', function() {
         });
         expect(res.statusCode).to.equal(204);
         expect(slackCall.isDone()).to.be.true;
+        expect(githubLastCommitUrlCall.isDone()).to.be.true;
+        expect(githubCheckRunsCall.isDone()).to.be.true;
+      });
+
+      it('calls slack with release check error', async function() {
+        const githubLastCommitUrlCall = nock('https://api.github.com')
+          .get('/repos/github-owner/github-repository/branches/dev')
+          .reply(200, {
+            name: 'master',
+            commit: {
+              sha: 'c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc',
+              url: 'https://api.github.com/repos/github-owner/github-repository/commits/sha1'
+            }
+          });
+        const githubCheckRunsCall = nock('https://api.github.com')
+          .get('/repos/github-owner/github-repository/commits/sha1/check-runs')
+          .query({
+            check_name: 'build-and-test',
+          })
+          .reply(200, {
+            check_runs: [
+              {
+                name: 'build-and-test',
+                status: 'failure',
+                conclusion: 'failure'
+              }
+            ]
+          });
+        const slackCall = nock('https://slack.com')
+          .post('/api/chat.postMessage', {
+            'channel': '#tech-releases',
+            'text': 'MER bloquée. Etat de l‘environnement d‘intégration à vérifier.',
+          })
+          .reply(200);
+        const body = {
+          type: 'shortcut',
+          callback_id: 'publish-release',
+          trigger_id: 'trigger id'
+        };
+        const res = await server.inject({
+          method: 'POST',
+          url: '/build/slack/interactive-endpoint',
+          headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(204);
+        expect(slackCall.isDone()).to.be.true;
+        expect(githubLastCommitUrlCall.isDone()).to.be.true;
+        expect(githubCheckRunsCall.isDone()).to.be.true;
       });
 
       describe('with the callback release-type-selection', function() {

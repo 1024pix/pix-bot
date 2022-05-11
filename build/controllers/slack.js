@@ -31,7 +31,7 @@ module.exports = {
     };
   },
 
-  interactiveEndpoint(request) {
+  async interactiveEndpoint(request) {
     const payload = request.pre.payload;
 
     const interactionType = payload.type;
@@ -41,8 +41,9 @@ module.exports = {
     switch (interactionType) {
     case 'shortcut':
       if (payload.callback_id === 'publish-release') {
-        if (!github.isBuildStatusOK({ branchName: releaseBranch })) {
-          return this._interruptRelease();
+        const buildOk = await github.isBuildStatusOK({ branchName: releaseBranch });
+        if (!buildOk) {
+          return _interruptRelease();
         }
         shortcuts.openViewPublishReleaseTypeSelection(payload);
       }
@@ -62,11 +63,9 @@ module.exports = {
       return null;
     }
   },
-
-  _interruptRelease() {
-    postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
-    return {
-      'response_action': 'clear'
-    };
-  },
 };
+
+function _interruptRelease() {
+  postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
+  return null;
+}

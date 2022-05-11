@@ -219,8 +219,9 @@ describe('#isBuildStatusOK', () => {
       });
     nock('https://api.github.com')
       .get('/repos/github-owner/github-repository/commits/commitSHA1/check-runs')
+      .query({ check_name: 'build-and-test' })
       .reply(200, {
-        'check_runs': [{ name: 'build-test-and-deploy', status: 'completed', conclusion: 'success' }]
+        'check_runs': [{ name: 'build-and-test', status: 'completed', conclusion: 'success' }]
       });
 
     // when
@@ -249,8 +250,9 @@ describe('#isBuildStatusOK', () => {
       }]);
     nock('https://api.github.com')
       .get('/repos/github-owner/github-repository/commits/v1.0.9SHA1/check-runs')
+      .query({ check_name: 'build-and-test' })
       .reply(200, {
-        'check_runs': [{ name: 'build-test-and-deploy', status: 'completed', conclusion: 'success' }]
+        'check_runs': [{ name: 'build-and-test', status: 'completed', conclusion: 'success' }]
       });
 
     // when
