@@ -128,7 +128,8 @@ describe('#getChangelogSinceLatestRelease', () => {
         base: 'my_default_branch',
         state: 'closed',
         sort: 'updated',
-        direction: 'desc'
+        direction: 'desc',
+        per_page: 100,
       })
       .reply(200, [
         {merged_at: afterTag1Date, title: 'PR Protéines'},
@@ -157,7 +158,7 @@ describe('#getMergedPullRequestsSortedByDescendingDate', () => {
       .get('/repos/github-owner/github-repository')
       .reply(200, { default_branch: 'dev' });
     nock('https://api.github.com')
-      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=dev')
+      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=dev&per_page=100')
       .reply(200, pullRequests);
 
     // when
@@ -174,7 +175,7 @@ describe('#getMergedPullRequestsSortedByDescendingDate', () => {
       { merged_at: '2020-09-01T12:26:47Z' }
     ];
     nock('https://api.github.com')
-      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=toto')
+      .get('/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=toto&per_page=100')
       .reply(200, pullRequests);
 
     // when

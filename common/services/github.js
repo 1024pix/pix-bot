@@ -171,7 +171,8 @@ async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName,
     base: baseBranch,
     state: 'closed',
     sort: 'updated',
-    direction: 'desc'
+    direction: 'desc',
+    per_page: 100,
   });
   return data;
 }
