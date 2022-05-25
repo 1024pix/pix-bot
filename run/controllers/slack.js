@@ -81,6 +81,15 @@ module.exports = {
     };
   },
 
+  createAndDeployDbStats(request) {
+    const payload = request.pre.payload;
+    commands.createAndDeployDbStats(payload);
+
+    return {
+      'text': _getDeployStartedMessage(payload.text, 'DB stats')
+    };
+  },
+
   interactiveEndpoint(request) {
     const payload = request.pre.payload;
 

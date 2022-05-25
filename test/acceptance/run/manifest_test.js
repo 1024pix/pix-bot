@@ -83,6 +83,13 @@ describe('Acceptance | Run | Manifest', function() {
               description: 'Crée une release de Ember-testing-library',
               usage_hint: '[patch, minor, major]',
               should_escape: false
+            },
+            {
+              command: '/deploy-db-stats',
+              description: 'Crée une release de db stats',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/create-and-deploy-db-stats`,
+              usage_hint: '[patch, minor, major]'
             }
           ]
         },

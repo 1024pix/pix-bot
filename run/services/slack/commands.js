@@ -12,6 +12,8 @@ const {
   PIX_LCMS_APP_NAME,
   PIX_UI_REPO_NAME,
   PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
+  PIX_DB_STATS_REPO_NAME,
+  PIX_DB_STATS_APPS_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -170,6 +172,9 @@ module.exports = {
 
   async getAndDeployLastVersion({ appName }) {
     await getAndDeployLastVersion({ appName });
-  }
+  },
 
+  async createAndDeployDbStats(payload) {
+    await publishAndDeployRelease(PIX_DB_STATS_REPO_NAME, PIX_DB_STATS_APPS_NAME, payload.text, payload.response_url);
+  }
 };
