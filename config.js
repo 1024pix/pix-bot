@@ -24,8 +24,6 @@ module.exports = (function() {
     port: _getNumber(process.env.PORT, 3000),
     environment: (process.env.NODE_ENV || 'development'),
 
-    pixApps: _getCommaSeparatedValues(process.env.PIX_APPS_TO_DEPLOY),
-
     baleen: {
       pat: process.env.BALEEN_PERSONAL_ACCESS_TOKEN,
       appNamespaces: _getJSON(process.env.BALEEN_APP_NAMESPACES),
@@ -124,8 +122,6 @@ module.exports = (function() {
     config.scalingo.recette.apiUrl = 'https://scalingo.recette';
     config.scalingo.production.token = 'tk-us-scalingo-token-production';
     config.scalingo.production.apiUrl = 'https://scalingo.production';
-
-    config.pixApps = ['pix-app1', 'pix-app2', 'pix-app3'];
 
     config.prismic.secret = 'prismic-secret';
   }

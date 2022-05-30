@@ -43,10 +43,12 @@ describe('releases', function() {
       // when
       const response = await releasesService.deploy('production', 'v1.0');
       // then
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-app1', 'v1.0');
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-app2', 'v1.0');
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-app3', 'v1.0');
-      expect(response).to.deep.equal(['OK', 'OK', 'OK']);
+      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-app', 'v1.0');
+      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-certif', 'v1.0');
+      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-admin', 'v1.0');
+      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-orga', 'v1.0');
+      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-api', 'v1.0');
+      expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK']);
     });
 
     it('should trigger deployments of managed applications', async () => {
