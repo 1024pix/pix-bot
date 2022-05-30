@@ -1,6 +1,8 @@
 const commands = require('../services/slack/commands');
 const { getAppStatusFromScalingo } = require('../services/slack/app-status-from-scalingo');
 const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
+const shortcuts = require('../services/slack/shortcuts');
+const viewSubmissions = require('../services/slack/view-submissions');
 
 function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
@@ -77,5 +79,32 @@ module.exports = {
     return {
       'text': _getDeployStartedMessage(payload.text, 'EMBER-TESTING-LIBRARY')
     };
+  },
+
+  interactiveEndpoint(request) {
+    const payload = request.pre.payload;
+
+    const interactionType = payload.type;
+
+    switch (interactionType) {
+    case 'shortcut':
+      if (payload.callback_id === 'deploy-release') {
+        shortcuts.openViewDeployReleaseTagSelection(payload);
+      }
+      return null;
+    case 'view_submission':
+      if (payload.view.callback_id === shortcuts.openViewDeployReleaseTagSelectionCallbackId) {
+        return viewSubmissions.submitReleaseTagSelection(payload);
+      }
+      if (payload.view.callback_id === viewSubmissions.submitReleaseTagSelectionCallbackId) {
+        return viewSubmissions.submitReleaseDeploymentConfirmation(payload);
+      }
+      return null;
+    case 'view_closed':
+    case 'block_actions':
+    default:
+      console.log('This kind of interaction is not yet supported by Pix Bot.');
+      return null;
+    }
   },
 };

@@ -14,14 +14,7 @@ module.exports = {
           display_name: manifest.name,
           always_online: false
         },
-        shortcuts: [
-          {
-            name: 'Publier une version/MER',
-            type: 'global',
-            callback_id: 'publish-release',
-            description: 'Publie une nouvelle version et la déploie sur l\'environnement de recette'
-          }
-        ],
+        shortcuts: manifest.shortcuts,
         slash_commands: manifest.slashCommands.map(({ command, path, description, usage_hint, should_escape }) => {
           return {
             command,
@@ -42,10 +35,10 @@ module.exports = {
         }
       },
       settings: {
-        interactivity: {
+        interactivity: manifest.interactivity ? {
           is_enabled: true,
-          request_url: `${url}/slack/interactive-endpoint`
-        },
+          request_url: `${url}${manifest.interactivity.path}`
+        } : null,
         org_deploy_enabled: false,
         socket_mode_enabled: false,
         token_rotation_enabled: false

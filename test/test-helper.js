@@ -36,10 +36,73 @@ function createGithubWebhookSignatureHeader(body) {
   };
 }
 
+function createSlackWebhookSignatureHeaders(body) {
+  const timestamp = Date.now();
+  const version = 'v0';
+  const hmac = crypto.createHmac('sha256', config.slack.requestSigningSecret);
+  hmac.update(`${version}:${timestamp}:${body}`);
+
+  return {
+    'x-slack-signature': version +'='+ hmac.digest('hex'),
+    'x-slack-request-timestamp': timestamp
+  };
+}
+
+function nockGithubWithNoConfigChanges() {
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/tags')
+    .reply(200, [{
+      'commit': {
+        'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+      },
+    }]);
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/1234')
+    .reply(200, {
+      commit: {
+        'committer': {
+          'date': '2011-04-14'
+        },
+      }
+    });
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+    .reply(200, []);
+}
+
+function nockGithubWithConfigChanges() {
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/tags')
+    .reply(200, [{
+      'commit': {
+        'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+      },
+    }]);
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/1234')
+    .reply(200, {
+      commit: {
+        'committer': {
+          'date': '2011-04-14'
+        },
+      }
+    });
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+    .reply(200, [{}]);
+}
+
 module.exports = {
   catchErr,
   expect,
   nock,
   sinon,
   createGithubWebhookSignatureHeader,
+  createSlackWebhookSignatureHeaders,
+  nockGithubWithConfigChanges,
+  nockGithubWithNoConfigChanges,
 };

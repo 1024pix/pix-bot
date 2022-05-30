@@ -98,7 +98,7 @@ describe('Acceptance | Run | Manifest', function() {
         settings: {
           interactivity: {
             is_enabled: true,
-            request_url: `http://${hostname}/slack/interactive-endpoint`
+            request_url: `http://${hostname}/run/slack/interactive-endpoint`
           },
           org_deploy_enabled: false,
           socket_mode_enabled: false,
