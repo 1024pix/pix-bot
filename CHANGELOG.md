@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.21.1 (31/05/2022)
+
+
+### :bug: Correction
+- [#127](https://github.com/1024pix/pix-bot/pull/127) [BUGFIX] Corrige la première release
+
 ## v1.21.0 (31/05/2022)
 
 
