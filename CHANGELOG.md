@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.21.0 (31/05/2022)
+
+
+### :rocket: Amélioration
+- [#125](https://github.com/1024pix/pix-bot/pull/125) [FEATURE] Ajoute le déploiement de pix-db-stats
+
+### :coffee: Autre
+- [#122](https://github.com/1024pix/pix-bot/pull/122) [CLEANUP] Sépare le callback d'interactivité de la partie build de la partie run
+
 ## v1.20.1 (09/05/2022)
 
 
