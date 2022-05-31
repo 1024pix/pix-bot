@@ -75,7 +75,6 @@ manifest.registerSlashCommand({
   handler: slackbotController.createAndDeployEmberTestingLibraryRelease,
 });
 
-
 manifest.registerSlashCommand({
   command: '/deploy-db-stats',
   path: '/slack/commands/create-and-deploy-db-stats',
@@ -83,6 +82,15 @@ manifest.registerSlashCommand({
   usage_hint: '[patch, minor, major]',
   should_escape: false,
   handler: slackbotController.createAndDeployDbStats,
+});
+
+manifest.registerSlashCommand({
+  command: '/deploy-metabase',
+  path: '/slack/commands/deploy-metabase',
+  description: 'Déploie metabase',
+  usage_hint: '/deploy-metabase',
+  should_escape: false,
+  handler: slackbotController.deployMetabase,
 });
 
 manifest.registerShortcut({
