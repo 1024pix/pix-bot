@@ -133,6 +133,9 @@ async function _getBranchLastCommitUrl({ owner, repo, branch }) {
 async function _getTagCommitUrl({ owner, repo, tagName }) {
   const tags = await _getTags(owner, repo);
   const tag = tags.find((tag) => tag.name === tagName);
+  if (!tag) {
+    throw new Error(`Could not find the tag ${tagName} on ${owner}/${repo}`);
+  }
   return tag.commit.url;
 }
 
@@ -168,7 +171,8 @@ async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName,
     base: baseBranch,
     state: 'closed',
     sort: 'updated',
-    direction: 'desc'
+    direction: 'desc',
+    per_page: 100,
   });
   return data;
 }

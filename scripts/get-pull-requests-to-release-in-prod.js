@@ -12,6 +12,13 @@ const {
 
 const CHANGELOG_FILE = 'CHANGELOG.md';
 
+async function pullRequestSinceLastRelease(repoOwner, repoName, lastTagNameOnBranch, branchName) {
+  const dateOfLastRelease = await getTagReleaseDate(repoOwner, repoName, lastTagNameOnBranch);
+
+  const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
+  return filterPullRequest(pullRequests, dateOfLastRelease);
+}
+
 async function main() {
   const tagVersion = process.argv[2];
   const repoOwner = process.argv[3];
@@ -20,15 +27,21 @@ async function main() {
   const lastTagNameOnBranch = process.argv[6];
 
   try {
-    const dateOfLastRelease = await getTagReleaseDate(repoOwner, repoName, lastTagNameOnBranch);
-
-    const pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
-
-    const pullRequestsSinceLastRelease = filterPullRequest(pullRequests, dateOfLastRelease);
+    let pullRequests;
+    if (lastTagNameOnBranch === '0.0.0') {
+      pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
+    } else {
+      try {
+        pullRequests = await pullRequestSinceLastRelease(repoOwner, repoName, lastTagNameOnBranch, branchName)
+      } catch (e) {
+        console.error('Error while fetching the tag and pull-requests. If it\'s your first release, ensure that the version set is 0.0.0.');
+        throw e;
+      }
+    }
 
     const newChangeLogLines = getNewChangeLogLines({
       headOfChangelogTitle: getHeadOfChangelog(tagVersion),
-      pullRequests: pullRequestsSinceLastRelease,
+      pullRequests,
     });
 
     let currentChangeLog = '';

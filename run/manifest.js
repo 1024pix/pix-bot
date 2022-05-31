@@ -75,6 +75,16 @@ manifest.registerSlashCommand({
   handler: slackbotController.createAndDeployEmberTestingLibraryRelease,
 });
 
+
+manifest.registerSlashCommand({
+  command: '/deploy-db-stats',
+  path: '/slack/commands/create-and-deploy-db-stats',
+  description: 'Crée une release de db stats',
+  usage_hint: '[patch, minor, major]',
+  should_escape: false,
+  handler: slackbotController.createAndDeployDbStats,
+});
+
 manifest.registerShortcut({
   name: 'Déployer une version/MEP',
   type: 'global',

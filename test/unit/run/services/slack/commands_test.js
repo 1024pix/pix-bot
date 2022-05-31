@@ -10,6 +10,7 @@ const {
   createAndDeployPixDatawarehouse,
   createAndDeployPixBotRelease,
   getAndDeployLastVersion,
+  createAndDeployDbStats,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
@@ -262,6 +263,29 @@ describe('Services | Slack | Commands', () => {
 
       // then
       expect(response).to.be.instanceOf(Error);
+    });
+  });
+
+  describe('#createAndDeployDbStats', () => {
+    beforeEach(async () => {
+      // given
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployDbStats(payload);
+    });
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-stats', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', () => {
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-db-stats');
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.deployPixRepo);
     });
   });
 });
