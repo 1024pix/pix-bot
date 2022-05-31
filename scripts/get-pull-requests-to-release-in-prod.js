@@ -28,7 +28,7 @@ async function main() {
 
   try {
     let pullRequests;
-    if (lastTagNameOnBranch === '0.0.0') {
+    if (lastTagNameOnBranch === 'v0.0.0') {
       pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
     } else {
       try {
