@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.21.2 (31/05/2022)
+
+
+### :bug: Correction
+- [#128](https://github.com/1024pix/pix-bot/pull/128) [BUGFIX] Corrige le nom des applications déployées pour pix-db-stats
+
 ## v1.21.1 (31/05/2022)
 
 
