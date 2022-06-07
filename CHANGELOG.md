@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.22.0 (07/06/2022)
+
+
+### :rocket: Amélioration
+- [#130](https://github.com/1024pix/pix-bot/pull/130) [FEATURE] Ajouter les review apps pour pix-tutos (PIX-5030)
+
 ## v1.21.2 (31/05/2022)
 
 
