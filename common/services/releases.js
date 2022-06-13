@@ -34,8 +34,8 @@ module.exports = {
 
     const client = await ScalingoClient.getInstance(sanitizedEnvironment);
 
-    const results = await Promise.all(config.pixApps.map(pixApp => {
-      return client.deployFromArchive(pixApp, sanitizedReleaseTag);
+    const results = await Promise.all(config.PIX_APPS.map(pixApp => {
+      return client.deployFromArchive(`pix-${pixApp}`, sanitizedReleaseTag);
     }));
 
     return results;
