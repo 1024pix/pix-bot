@@ -90,6 +90,13 @@ describe('Acceptance | Run | Manifest', function() {
               should_escape: false,
               url: `http://${hostname}/slack/commands/create-and-deploy-db-stats`,
               usage_hint: '[patch, minor, major]'
+            },
+            {
+              command: '/deploy-metabase',
+              description: 'Déploie metabase',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-metabase`,
+              usage_hint: '/deploy-metabase'
             }
           ]
         },

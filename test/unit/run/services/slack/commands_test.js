@@ -11,6 +11,7 @@ const {
   createAndDeployPixBotRelease,
   getAndDeployLastVersion,
   createAndDeployDbStats,
+  deployMetabase,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
@@ -273,6 +274,7 @@ describe('Services | Slack | Commands', () => {
       // when
       await createAndDeployDbStats(payload);
     });
+
     it('should publish a new release', () => {
       // then
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-stats', 'minor');
@@ -286,6 +288,24 @@ describe('Services | Slack | Commands', () => {
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixRepo);
+    });
+  });
+
+  describe('#deployMetabase', () => {
+    let client;
+
+    beforeEach(async () => {
+      // given
+      client = { deployFromArchive: sinon.spy() };
+      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
+      // when
+      await deployMetabase();
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-metabase-production', 'master', 'metabase-deploy', { withEnvSuffix: false });
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-data-metabase-dev', 'master', 'metabase-deploy', { withEnvSuffix: false });
     });
   });
 });

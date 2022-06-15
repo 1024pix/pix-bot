@@ -14,6 +14,8 @@ const {
   PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
   PIX_DB_STATS_REPO_NAME,
   PIX_DB_STATS_APPS_NAME,
+  PIX_METABASE_REPO_NAME,
+  PIX_METABASE_APPS_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -176,5 +178,13 @@ module.exports = {
 
   async createAndDeployDbStats(payload) {
     await publishAndDeployRelease(PIX_DB_STATS_REPO_NAME, PIX_DB_STATS_APPS_NAME, payload.text, payload.response_url);
+  },
+
+  async deployMetabase() {
+    const repoName = PIX_METABASE_REPO_NAME;
+    const client = await ScalingoClient.getInstance('production');
+    await PIX_METABASE_APPS_NAME.map((appName) => {
+      return client.deployFromArchive(appName, 'master', repoName, { withEnvSuffix: false });
+    });
   }
 };

@@ -93,12 +93,16 @@ module.exports = (function() {
     PIX_LCMS_APP_NAME: 'pix-lcms',
     PIX_UI_REPO_NAME: 'pix-ui',
     PIX_EMBER_TESTING_LIBRARY_REPO_NAME: 'ember-testing-library',
-    PIX_SITE_REPO_NAME: 'pix-site',
     PIX_DB_STATS_REPO_NAME: 'pix-db-stats',
     PIX_DB_STATS_APPS_NAME: ['pix-db-stats', 'pix-db-stats-datawarehouse', 'pix-db-stats-datawarehouse-ext'],
+    PIX_SITE_REPO_NAME: 'pix-site',
     PIX_SITE_APPS: ['pix-site', 'pix-pro'],
     PIX_DATAWAREHOUSE_REPO_NAME: 'pix-db-replication',
     PIX_DATAWAREHOUSE_APPS_NAME: ['pix-datawarehouse', 'pix-datawarehouse-ex'],
+
+    PIX_METABASE_REPO_NAME: 'metabase-deploy',
+    PIX_METABASE_APPS_NAME: ['pix-metabase-production', 'pix-data-metabase-dev'],
+
     PIX_APPS: ['app', 'certif', 'admin', 'orga', 'api'],
     PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
   };
