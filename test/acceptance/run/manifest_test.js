@@ -97,6 +97,13 @@ describe('Acceptance | Run | Manifest', function() {
               should_escape: false,
               url: `http://${hostname}/slack/commands/deploy-metabase`,
               usage_hint: '/deploy-metabase'
+            },
+            {
+              command: '/deploy-pix-tutos',
+              description: 'Crée une release de Pix Tutos',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/create-and-deploy-pix-tutos-release`,
+              usage_hint: '[patch, minor, major]'
             }
           ]
         },

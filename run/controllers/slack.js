@@ -55,6 +55,15 @@ module.exports = {
     };
   },
 
+  createAndDeployPixTutosRelease(request) {
+    const payload = request.pre.payload;
+    commands.createAndDeployPixTutosRelease(payload);
+
+    return {
+      'text': _getDeployStartedMessage(payload.text, 'PIX Tutos')
+    };
+  },
+
   getAppStatus(request) {
     const appName = request.pre.payload.text;
     return getAppStatusFromScalingo(appName);

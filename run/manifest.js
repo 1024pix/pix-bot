@@ -93,6 +93,15 @@ manifest.registerSlashCommand({
   handler: slackbotController.deployMetabase,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-pix-tutos',
+  path: '/slack/commands/create-and-deploy-pix-tutos-release',
+  description: 'Crée une release de Pix Tutos',
+  usage_hint: '[patch, minor, major]',
+  should_escape: false,
+  handler: slackbotController.createAndDeployPixTutosRelease,
+});
+
 manifest.registerShortcut({
   name: 'Déployer une version/MEP',
   type: 'global',
