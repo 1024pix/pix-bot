@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.23.0 (15/06/2022)
+
+
+### :rocket: Amélioration
+- [#129](https://github.com/1024pix/pix-bot/pull/129) [FEATURE] Déploiement de metabase
+
+### :coffee: Autre
+- [#126](https://github.com/1024pix/pix-bot/pull/126) [CLEANUP] Supprime la config PIX_APPS_TO_DEPLOY
+
 ## v1.22.0 (07/06/2022)
 
 
