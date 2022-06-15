@@ -12,6 +12,7 @@ const {
   getAndDeployLastVersion,
   createAndDeployDbStats,
   deployMetabase,
+  createAndDeployPixTutosRelease,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
@@ -283,6 +284,31 @@ describe('Services | Slack | Commands', () => {
     it('should retrieve the last release tag from GitHub', () => {
       // then
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-db-stats');
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.deployPixRepo);
+    });
+  });
+
+  describe('#createAndDeployPixTutosRelease', () => {
+
+    beforeEach(async () => {
+      // given
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPixTutosRelease(payload);
+    });
+
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-tutos', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', () => {
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-tutos');
     });
 
     it('should deploy the release', () => {
