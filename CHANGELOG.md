@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.24.0 (20/06/2022)
+
+
+### :rocket: Amélioration
+- [#132](https://github.com/1024pix/pix-bot/pull/132) [FEATURE] Utilise une seule application de production pour pix-db-stats
+
+### :building_construction: Tech
+- [#131](https://github.com/1024pix/pix-bot/pull/131) [TECH] Ajouter une commande de création et de déploiement de Pix Tutos (PIX-5127).
+
 ## v1.23.0 (15/06/2022)
 
 
