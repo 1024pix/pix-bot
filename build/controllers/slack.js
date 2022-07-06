@@ -1,5 +1,9 @@
 const github = require('../../common/services/github');
-const { environments, deploy, publish } = require('../../common/services/releases');
+const {
+  environments,
+  deploy,
+  publish,
+} = require('../../common/services/releases');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const postSlackMessage = require('../../common/services/slack/surfaces/messages/post-message');
@@ -14,12 +18,21 @@ module.exports = {
     const prTitlesList = await github.getChangelogSinceLatestRelease();
     return {
       response_type: 'in_channel',
-      'text': prTitlesList.join('\n'),
+      text: prTitlesList.join('\n'),
     };
   },
 
-  startMobRoles() {
-    return { 'text': 'doudou' };
+  startMobRoles(request) {
+    const payload = request.pre.payload;
+    const participants = payload.text.split(' ');
+    const organizer = payload.user_name;
+    participants.push(organizer);
+
+    const message = participants.map((participant,index)=>{
+      const nextParticipant = participants[index + 1] ?? participants[0] 
+      return  `tour ${index+1} \n pilote : ${participant} \n copilote : ${nextParticipant} \n ` });
+    
+    return { text: message.join('\n') };
   },
 
   createAndDeployPixHotfix(request) {
@@ -31,7 +44,7 @@ module.exports = {
     });
 
     return {
-      'text': 'Commande de déploiement de hotfix de PIX en recette.'
+      text: 'Commande de déploiement de hotfix de PIX en recette.',
     };
   },
 
@@ -52,25 +65,35 @@ module.exports = {
       }
       return null;
     case 'view_submission':
-      if (payload.view.callback_id === shortcuts.openViewPublishReleaseTypeSelectionCallbackId) {
+      if (
+        payload.view.callback_id ===
+          shortcuts.openViewPublishReleaseTypeSelectionCallbackId
+      ) {
         return viewSubmissions.submitReleaseTypeSelection(payload);
       }
-      if (payload.view.callback_id === viewSubmissions.submitReleaseTypeSelectionCallbackId) {
+      if (
+        payload.view.callback_id ===
+          viewSubmissions.submitReleaseTypeSelectionCallbackId
+      ) {
         return viewSubmissions.submitReleasePublicationConfirmation(payload);
       }
       return null;
     case 'view_closed':
     case 'block_actions':
     default:
-      console.log('This kind of interaction is not yet supported by Pix Bot.');
+      console.log(
+        'This kind of interaction is not yet supported by Pix Bot.'
+      );
       return null;
     }
   },
 
   _interruptRelease() {
-    postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
+    postSlackMessage(
+      'MER bloquée. Etat de l‘environnement d‘intégration à vérifier.'
+    );
     return {
-      'response_action': 'clear'
+      response_action: 'clear',
     };
   },
 };
