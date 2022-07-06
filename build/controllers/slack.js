@@ -18,6 +18,10 @@ module.exports = {
     };
   },
 
+  startMobRoles() {
+    return { 'text': 'doudou' };
+  },
+
   createAndDeployPixHotfix(request) {
     const payload = request.pre.payload;
     const branchName = payload.text;
