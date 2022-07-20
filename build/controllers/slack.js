@@ -9,6 +9,10 @@ const viewSubmissions = require('../services/slack/view-submissions');
 const postSlackMessage = require('../../common/services/slack/surfaces/messages/post-message');
 const _ = require('lodash');
 
+function _getUserSurname(username) {
+  return _.capitalize(username.split('.')[0]);
+}
+
 module.exports = {
   async getPullRequests(request) {
     const label = request.pre.payload.text;
@@ -26,12 +30,12 @@ module.exports = {
   startMobRoles(request) {
     const payload = request.pre.payload;
     const participants = payload.text.split(' ');
-    const organizer = payload.user_name;
+    const organizer = _getUserSurname(payload.user_name);
     participants.push(organizer);
     const shuffledParticipants = _.shuffle(participants);
 
     const message = shuffledParticipants.map((participant,index) => {
-      const nextParticipant = participants[index + 1] ?? participants[0];
+      const nextParticipant = shuffledParticipants[index + 1] ?? shuffledParticipants[0];
       return  `tour ${index+1} \n pilote : ${participant} \n copilote : ${nextParticipant} \n `; });
 
     return { text: message.join('\n') };
