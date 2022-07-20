@@ -1,17 +1,10 @@
 const github = require('../../common/services/github');
-const {
-  environments,
-  deploy,
-  publish,
-} = require('../../common/services/releases');
+const { environments, deploy, publish } = require('../../common/services/releases');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const postSlackMessage = require('../../common/services/slack/surfaces/messages/post-message');
+const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
 const _ = require('lodash');
-
-function _getUserSurname(username) {
-  return _.capitalize(username.split('.')[0]);
-}
 
 module.exports = {
   async getPullRequests(request) {
@@ -30,15 +23,17 @@ module.exports = {
   startMobRoles(request) {
     const payload = request.pre.payload;
     const participants = payload.text.split(' ');
-    const organizer = _getUserSurname(payload.user_name);
+    console.log(payload);
+    const organizer = `@${payload.user_name}`;
     participants.push(organizer);
     const shuffledParticipants = _.shuffle(participants);
 
-    const message = shuffledParticipants.map((participant,index) => {
+    const message = shuffledParticipants.map((participant, index) => {
       const nextParticipant = shuffledParticipants[index + 1] ?? shuffledParticipants[0];
-      return  `tour ${index+1} \n pilote : ${participant} \n copilote : ${nextParticipant} \n `; });
+      return `tour ${index + 1} \n pilote : ${participant} \n copilote : ${nextParticipant} \n `;
+    });
 
-    return { text: message.join('\n') };
+    return sendSlackBlockMessage(message.join('\n'));
   },
 
   createAndDeployPixHotfix(request) {
@@ -71,33 +66,23 @@ module.exports = {
       }
       return null;
     case 'view_submission':
-      if (
-        payload.view.callback_id ===
-          shortcuts.openViewPublishReleaseTypeSelectionCallbackId
-      ) {
+      if (payload.view.callback_id === shortcuts.openViewPublishReleaseTypeSelectionCallbackId) {
         return viewSubmissions.submitReleaseTypeSelection(payload);
       }
-      if (
-        payload.view.callback_id ===
-          viewSubmissions.submitReleaseTypeSelectionCallbackId
-      ) {
+      if (payload.view.callback_id === viewSubmissions.submitReleaseTypeSelectionCallbackId) {
         return viewSubmissions.submitReleasePublicationConfirmation(payload);
       }
       return null;
     case 'view_closed':
     case 'block_actions':
     default:
-      console.log(
-        'This kind of interaction is not yet supported by Pix Bot.'
-      );
+      console.log('This kind of interaction is not yet supported by Pix Bot.');
       return null;
     }
   },
 
   _interruptRelease() {
-    postSlackMessage(
-      'MER bloquée. Etat de l‘environnement d‘intégration à vérifier.'
-    );
+    postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
     return {
       response_action: 'clear',
     };
