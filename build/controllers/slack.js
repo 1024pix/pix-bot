@@ -7,6 +7,7 @@ const {
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const postSlackMessage = require('../../common/services/slack/surfaces/messages/post-message');
+const _ = require('lodash');
 
 module.exports = {
   async getPullRequests(request) {
@@ -27,11 +28,12 @@ module.exports = {
     const participants = payload.text.split(' ');
     const organizer = payload.user_name;
     participants.push(organizer);
+    const shuffledParticipants = _.shuffle(participants);
 
-    const message = participants.map((participant,index)=>{
-      const nextParticipant = participants[index + 1] ?? participants[0] 
-      return  `tour ${index+1} \n pilote : ${participant} \n copilote : ${nextParticipant} \n ` });
-    
+    const message = shuffledParticipants.map((participant,index) => {
+      const nextParticipant = participants[index + 1] ?? participants[0];
+      return  `tour ${index+1} \n pilote : ${participant} \n copilote : ${nextParticipant} \n `; });
+
     return { text: message.join('\n') };
   },
 
