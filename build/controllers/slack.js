@@ -2,7 +2,7 @@ const github = require('../../common/services/github');
 const { environments, deploy, publish } = require('../../common/services/releases');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
-const postSlackMessage = require('../../common/services/slack/surfaces/messages/post-message');
+const postMessageService = require('../../common/services/slack/surfaces/messages/post-message');
 const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
 const _ = require('lodash');
 
@@ -82,7 +82,7 @@ module.exports = {
   },
 
   _interruptRelease() {
-    postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
+    postMessageService.postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
     return {
       response_action: 'clear',
     };
