@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.25.0 (03/08/2022)
+
+
+### :building_construction: Tech
+- [#133](https://github.com/1024pix/pix-bot/pull/133) [TECH] Utiliser node 16. 
+
 ## v1.24.0 (20/06/2022)
 
 
