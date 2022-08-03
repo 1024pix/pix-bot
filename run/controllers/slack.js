@@ -64,6 +64,15 @@ module.exports = {
     };
   },
 
+  createAndDeployPix360Release(request) {
+    const payload = request.pre.payload;
+    commands.createAndDeployPix360Release(payload);
+
+    return {
+      'text': _getDeployStartedMessage(payload.text, 'Pix 360')
+    };
+  },
+
   getAppStatus(request) {
     const appName = request.pre.payload.text;
     return getAppStatusFromScalingo(appName);

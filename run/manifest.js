@@ -102,6 +102,15 @@ manifest.registerSlashCommand({
   handler: slackbotController.createAndDeployPixTutosRelease,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-pix-360',
+  path: '/slack/commands/create-and-deploy-pix-360-release',
+  description: 'Crée une release de Pix 360',
+  usage_hint: '[patch, minor, major]',
+  should_escape: false,
+  handler: slackbotController.createAndDeployPix360Release,
+});
+
 manifest.registerShortcut({
   name: 'Déployer une version/MEP',
   type: 'global',

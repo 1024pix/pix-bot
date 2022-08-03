@@ -104,6 +104,13 @@ describe('Acceptance | Run | Manifest', function() {
               should_escape: false,
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-tutos-release`,
               usage_hint: '[patch, minor, major]'
+            },
+            {
+              command: '/deploy-pix-360',
+              description: 'Crée une release de Pix 360',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/create-and-deploy-pix-360-release`,
+              usage_hint: '[patch, minor, major]'
             }
           ]
         },

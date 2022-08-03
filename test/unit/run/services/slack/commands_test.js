@@ -3,16 +3,17 @@ const { expect } = require('chai');
 const axios = require('axios');
 const { catchErr, sinon } = require('../../../../test-helper');
 const {
-  createAndDeployPixLCMS,
-  createAndDeployPixUI,
-  createAndDeployEmberTestingLibrary,
-  createAndDeployPixSiteRelease,
-  createAndDeployPixDatawarehouse,
-  createAndDeployPixBotRelease,
-  getAndDeployLastVersion,
   createAndDeployDbStats,
-  deployMetabase,
+  createAndDeployEmberTestingLibrary,
+  createAndDeployPix360Release,
+  createAndDeployPixBotRelease,
+  createAndDeployPixDatawarehouse,
+  createAndDeployPixLCMS,
+  createAndDeployPixSiteRelease,
   createAndDeployPixTutosRelease,
+  createAndDeployPixUI,
+  deployMetabase,
+  getAndDeployLastVersion,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
@@ -309,6 +310,31 @@ describe('Services | Slack | Commands', () => {
     it('should retrieve the last release tag from GitHub', () => {
       // then
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-tutos');
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.deployPixRepo);
+    });
+  });
+
+  describe('#createAndDeployPix360Release', () => {
+
+    beforeEach(async () => {
+      // given
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPix360Release(payload);
+    });
+
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-360', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', () => {
+      // then
+      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-360');
     });
 
     it('should deploy the release', () => {

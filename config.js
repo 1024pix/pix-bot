@@ -107,6 +107,8 @@ module.exports = (function() {
     PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
     PIX_TUTOS_APP_NAME: 'pix-tutos',
+    PIX_360_REPO_NAME: 'pix-360',
+    PIX_360_APP_NAME: 'pix-360',
   };
 
   if (process.env.NODE_ENV === 'test') {

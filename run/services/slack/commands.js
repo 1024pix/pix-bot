@@ -18,6 +18,8 @@ const {
   PIX_METABASE_APPS_NAME,
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
+  PIX_360_REPO_NAME,
+  PIX_360_APP_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -192,5 +194,9 @@ module.exports = {
 
   async createAndDeployPixTutosRelease(payload) {
     await publishAndDeployRelease(PIX_TUTOS_REPO_NAME, [PIX_TUTOS_APP_NAME], payload.text, payload.response_url);
-  }
+  },
+
+  async createAndDeployPix360Release(payload) {
+    await publishAndDeployRelease(PIX_360_REPO_NAME, [PIX_360_APP_NAME], payload.text, payload.response_url);
+  },
 };
