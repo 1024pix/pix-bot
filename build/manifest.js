@@ -38,6 +38,15 @@ manifest.registerSlashCommand({
   handler: slackbotController.createAndDeployPixHotfix,
 });
 
+manifest.registerSlashCommand({
+  command: '/mob',
+  path: '/slack/commands/mob',
+  description: 'Afficher des couples pilote/co-pilote à partir d\'une liste de participants',
+  usage_hint: '[@quelqu\'un @quelqu\'une]',
+  should_escape: false,
+  handler: slackbotController.startMobRoles,
+});
+
 manifest.registerShortcut({
   name: 'Publier une version/MER',
   type: 'global',

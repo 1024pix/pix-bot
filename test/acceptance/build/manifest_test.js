@@ -10,7 +10,7 @@ describe('Acceptance | Build | Manifest', function() {
       });
       const hostname = server.info.host + ':0';
       expect(res.statusCode).to.equal(200);
-      expect(res.result).to.eql({
+      expect(res.result).to.deep.equal({
         display_information: {
           name: 'Pix Bot Build'
         },
@@ -54,6 +54,13 @@ describe('Acceptance | Build | Manifest', function() {
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-hotfix`,
               description: 'Créer une version patch à partir d\'une branche et la déployer en recette',
               usage_hint: '[branch-name]',
+              should_escape: false
+            },
+            {
+              command: '/mob',
+              url: `http://${hostname}/slack/commands/mob`,
+              description: 'Afficher des couples pilote/co-pilote à partir d\'une liste de participants',
+              usage_hint: '[@quelqu\'un @quelqu\'une]',
               should_escape: false
             }
           ],

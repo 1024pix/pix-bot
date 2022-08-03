@@ -3,6 +3,8 @@ const { environments, deploy, publish } = require('../../common/services/release
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const postSlackMessage = require('../../common/services/slack/surfaces/messages/post-message');
+const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
+const _ = require('lodash');
 
 module.exports = {
   async getPullRequests(request) {
@@ -14,8 +16,24 @@ module.exports = {
     const prTitlesList = await github.getChangelogSinceLatestRelease();
     return {
       response_type: 'in_channel',
-      'text': prTitlesList.join('\n'),
+      text: prTitlesList.join('\n'),
     };
+  },
+
+  startMobRoles(request) {
+    const payload = request.pre.payload;
+    const participants = payload.text.split(' ');
+    console.log(payload);
+    const organizer = `@${payload.user_name}`;
+    participants.push(organizer);
+    const shuffledParticipants = _.shuffle(participants);
+
+    const message = shuffledParticipants.map((participant, index) => {
+      const nextParticipant = shuffledParticipants[index + 1] ?? shuffledParticipants[0];
+      return `tour ${index + 1} \n pilote : ${participant} \n copilote : ${nextParticipant} \n `;
+    });
+
+    return sendSlackBlockMessage(message.join('\n'));
   },
 
   createAndDeployPixHotfix(request) {
@@ -27,7 +45,7 @@ module.exports = {
     });
 
     return {
-      'text': 'Commande de déploiement de hotfix de PIX en recette.'
+      text: 'Commande de déploiement de hotfix de PIX en recette.',
     };
   },
 
@@ -66,7 +84,7 @@ module.exports = {
   _interruptRelease() {
     postSlackMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
     return {
-      'response_action': 'clear'
+      response_action: 'clear',
     };
   },
 };
