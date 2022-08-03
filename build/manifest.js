@@ -41,7 +41,8 @@ manifest.registerSlashCommand({
 manifest.registerSlashCommand({
   command: '/mob',
   path: '/slack/commands/mob',
-  description: 'Afficher une liste de couples pilote/co-pilote',
+  description: 'Afficher des couples pilote/co-pilote à partir d\'une liste de participants',
+  usage_hint: '[@quelqu\'un @quelqu\'une]',
   should_escape: false,
   handler: slackbotController.startMobRoles,
 });
