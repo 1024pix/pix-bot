@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.26.0 (03/08/2022)
+
+
+### :rocket: Amélioration
+- [#134](https://github.com/1024pix/pix-bot/pull/134) [FEATURE] Créer une commande Slack pour donner les rôles par tour lors d'un mob
+
 ## v1.25.0 (03/08/2022)
 
 
