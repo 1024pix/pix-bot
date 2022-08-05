@@ -30,6 +30,7 @@ module.exports = (function() {
     },
 
     scalingo: {
+      oscFr1Url: 'https://dashboard.scalingo.com/apps/osc-fr1',
       reviewApps: {
         token: process.env.SCALINGO_TOKEN_REVIEW_APPS,
         apiUrl: process.env.SCALINGO_API_URL_REVIEW_APPS || 'https://api.osc-fr1.scalingo.com',
