@@ -51,48 +51,86 @@ function createSlackWebhookSignatureHeaders(body) {
 function nockGithubWithNoConfigChanges() {
   nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/tags')
-    .reply(200, [{
-      'commit': {
-        'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+    .twice()
+    .reply(200, [
+      {
+        'commit': {
+          'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+        },
       },
-    }]);
+      {
+        'commit': {
+          'url': 'https://api.github.com/repos/github-owner/github-repository/commits/456',
+        },
+      }
+    ]);
 
   nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/commits/1234')
     .reply(200, {
       commit: {
         'committer': {
-          'date': '2011-04-14'
+          'date': '2021-04-14T12:40:50.326Z'
         },
       }
     });
 
   nock('https://api.github.com')
-    .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+    .get('/repos/github-owner/github-repository/commits/456')
+    .reply(200, {
+      commit: {
+        'committer': {
+          'date': '2021-04-10T12:40:50.326Z'
+        },
+      }
+    });
+
+  nock('https://api.github.com')
+    .filteringPath(/since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g, 'since=XXXX&until=XXXX')
+    .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
     .reply(200, []);
 }
 
 function nockGithubWithConfigChanges() {
   nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/tags')
-    .reply(200, [{
-      'commit': {
-        'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+    .twice()
+    .reply(200, [
+      {
+        'commit': {
+          'url': 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+        },
       },
-    }]);
+      {
+        'commit': {
+          'url': 'https://api.github.com/repos/github-owner/github-repository/commits/456',
+        },
+      }
+    ]);
 
   nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/commits/1234')
     .reply(200, {
       commit: {
         'committer': {
-          'date': '2011-04-14'
+          'date': '2021-04-14T12:40:50.326Z'
         },
       }
     });
 
   nock('https://api.github.com')
-    .get('/repos/github-owner/github-repository/commits?since=2011-04-14&path=api%2Flib%2Fconfig.js')
+    .get('/repos/github-owner/github-repository/commits/456')
+    .reply(200, {
+      commit: {
+        'committer': {
+          'date': '2021-04-10T12:40:50.326Z'
+        },
+      }
+    });
+
+  nock('https://api.github.com')
+    .filteringPath(/since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g, 'since=XXXX&until=XXXX')
+    .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
     .reply(200, [{}]);
 }
 

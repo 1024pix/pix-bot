@@ -3,6 +3,7 @@ const server = require('../../../server');
 
 describe('Acceptance | Run | Slack', function() {
   describe('POST /run/slack/interactive-endpoint', function() {
+
     it('responds with 204', async () => {
       const body = {
         type: 'view_closed'

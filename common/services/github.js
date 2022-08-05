@@ -144,6 +144,11 @@ async function getLatestRelease(repoOwner, repoName) {
   return tags[0];
 }
 
+async function getSecondToLastRelease(repoOwner, repoName) {
+  const tags = await _getTags(repoOwner, repoName);
+  return tags[1];
+}
+
 async function _getTags(repoOwner, repoName) {
   const { repos } = _createOctokit();
   const { data } = await repos.listTags({
@@ -182,6 +187,11 @@ async function _getLatestReleaseTagUrl(repoOwner, repoName) {
   return latestReleaseTag.commit.url;
 }
 
+async function _getSecondToLastReleaseTagUrl(repoOwner, repoName) {
+  const secondToLastReleaseTag = await getSecondToLastRelease(repoOwner, repoName);
+  return secondToLastReleaseTag.commit.url;
+}
+
 async function _getLatestReleaseTagName(repoOwner, repoName) {
   const latestReleaseTag = await getLatestRelease(repoOwner, repoName);
   return latestReleaseTag.name;
@@ -200,12 +210,19 @@ async function _getLatestReleaseDate(repoOwner, repoName) {
   return commit.committer.date;
 }
 
-async function _getCommitsWhereConfigFileHasChangedSinceDate(repoOwner, repoName, date) {
+async function _getSecondToLastReleaseDate(repoOwner, repoName) {
+  const secondToLastTagUrl = await _getSecondToLastReleaseTagUrl(repoOwner, repoName);
+  const commit = await _getCommitAtURL(secondToLastTagUrl);
+  return commit.committer.date;
+}
+
+async function _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, sinceDate, untilDate) {
   const { repos } = _createOctokit();
   const { data } = await repos.listCommits({
     owner: repoOwner,
     repo: repoName,
-    since: date,
+    since: sinceDate,
+    until: untilDate,
     path: 'api/lib/config.js',
   });
   
@@ -288,7 +305,15 @@ module.exports = {
 
   async hasConfigFileChangedSinceLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
-    const commits = await _getCommitsWhereConfigFileHasChangedSinceDate(repoOwner, repoName, latestReleaseDate);
+    const now = new Date().toISOString();
+    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
+    return commits.length > 0;
+  },
+
+  async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
+    const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
+    const secondToLastReleaseDate = await _getSecondToLastReleaseDate(repoOwner, repoName);
+    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, secondToLastReleaseDate, latestReleaseDate);
     return commits.length > 0;
   },
 
