@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.27.0 (05/08/2022)
+
+
+### :rocket: Amélioration
+- [#135](https://github.com/1024pix/pix-bot/pull/135) [FEATURE] Être en capacité d'être notifié en cas d'erreur de deploiement
+
 ## v1.26.0 (03/08/2022)
 
 
