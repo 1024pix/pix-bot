@@ -10,4 +10,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 11,
   },
+  rules: {
+    'mocha/no-setup-in-describe': 'off',
+  },
 };
