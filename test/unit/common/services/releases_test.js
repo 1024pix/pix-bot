@@ -51,7 +51,7 @@ describe('releases', function () {
       expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK']);
     });
 
-    it('should trigger deployments of managed applications', async () => {
+    it('should throw an error when an application deployment fails', async () => {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
