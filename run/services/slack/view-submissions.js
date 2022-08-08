@@ -6,7 +6,7 @@ const postSlackMessage = require('../../../common/services/slack/surfaces/messag
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-    const hasConfigFileChanged = await githubService.hasConfigFileChangedSinceLatestRelease();
+    const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestRelease();
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 

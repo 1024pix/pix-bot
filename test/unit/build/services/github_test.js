@@ -1,6 +1,6 @@
 const { describe, it } = require('mocha');
 const { expect } = require('chai');
-const { nock, createGithubWebhookSignatureHeader } = require('../../../test-helper');
+const { nock, createGithubWebhookSignatureHeader, sinon } = require('../../../test-helper');
 const githubService = require('../../../../common/services/github');
 
 describe('#getPullRequests', function() {
@@ -267,12 +267,23 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
   const repoOwner = 'github-owner';
   const repoName = 'github-repository';
 
+  let clock, now;
+
+  beforeEach(() => {
+    now = new Date();
+    clock = sinon.useFakeTimers(now);
+  });
+
+  afterEach(() => {
+    clock.restore();
+  });
+
   context('should return true when config file has been changed', ()=> {
     it('should call Github "commits list" API', async () => {
       // given
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
-        .query({ since: latestReleaseDate, path: 'api/lib/config.js' })
+        .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
         .reply(200,
           [{
             sha: '5ec2f42',
@@ -299,7 +310,7 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
       // given
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
-        .query({ since: latestReleaseDate, path: 'api/lib/config.js' })
+        .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
         .reply(200,
           []
         );
@@ -314,6 +325,81 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
 
       // when
       const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+      // then
+      expect(response).to.be.false;
+    });
+  });
+});
+
+describe('#hasConfigFileChangedInLatestRelease', () => {
+  const latestReleaseDate= '2020-08-13T04:45:06Z';
+  const secondToLastReleaseDate = '2020-08-10T12:45:06Z';
+  const repoOwner = 'github-owner';
+  const repoName = 'github-repository';
+
+  context('should return true when config file has been changed', ()=> {
+    it('should call Github "commits list" API', async () => {
+      // given
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/commits')
+        .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/lib/config.js' })
+        .reply(200,
+          [{
+            sha: '5ec2f42',
+          }]
+        );
+
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/tags')
+        .twice()
+        .reply(200, [
+          { commit: { url: '/latest_tag_commit_url' } },
+          { commit: { url: '/second-to-last_tag_commit_url' } },
+        ]);
+
+      nock('https://api.github.com')
+        .get('/latest_tag_commit_url')
+        .reply(200, {commit: {committer: {date: latestReleaseDate}}});
+
+      nock('https://api.github.com')
+        .get('/second-to-last_tag_commit_url')
+        .reply(200, {commit: {committer: {date: secondToLastReleaseDate}}});
+
+      // when
+      const response = await githubService.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
+      // then
+      expect(response).to.be.true;
+    });
+  });
+
+  context('should return false when config file did not changed changed', ()=> {
+    it('should call Github "commits list" API', async () => {
+      // given
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/commits')
+        .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/lib/config.js' })
+        .reply(200,
+          []
+        );
+
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/tags')
+        .twice()
+        .reply(200, [
+          { commit: { url: '/latest_tag_commit_url' } },
+          { commit: { url: '/second-to-last_tag_commit_url' } },
+        ]);
+
+      nock('https://api.github.com')
+        .get('/latest_tag_commit_url')
+        .reply(200, {commit: {committer: {date: latestReleaseDate}}});
+
+      nock('https://api.github.com')
+        .get('/second-to-last_tag_commit_url')
+        .reply(200, {commit: {committer: {date: secondToLastReleaseDate}}});
+
+      // when
+      const response = await githubService.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
       // then
       expect(response).to.be.false;
     });
