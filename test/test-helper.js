@@ -140,6 +140,7 @@ function nockGithubWithConfigChanges() {
     .reply(200, [{}]);
 }
 
+// eslint-disable-next-line mocha/no-exports
 module.exports = {
   catchErr,
   expect,
