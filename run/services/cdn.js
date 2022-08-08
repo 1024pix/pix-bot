@@ -17,13 +17,17 @@ async function _getNamespaceKey(application) {
     headers: {
       'X-Api-Key': config.baleen.pat,
       'Content-type': 'application/json',
-    }
+    },
   });
 
   const namespaces = config.baleen.appNamespaces;
-  const namespace = _.find(namespaces, (v, k) => { return k === application; });
+  const namespace = _.find(namespaces, (v, k) => {
+    return k === application;
+  });
 
-  const namespaceKey = _.findKey(accountDetails.data.namespaces, (v) => { return v === namespace; });
+  const namespaceKey = _.findKey(accountDetails.data.namespaces, (v) => {
+    return v === namespace;
+  });
 
   if (!namespaceKey) {
     throw new NamespaceNotFoundError(application);
@@ -36,20 +40,24 @@ async function invalidateCdnCache(application) {
   const namespaceKey = await _getNamespaceKey(application);
   const urlForInvalidate = `${CDN_URL}/cache/invalidations`;
 
-  await axios.post(urlForInvalidate, {
-    patterns: [ '.' ]
-  }, {
-    headers: {
-      'X-Api-Key': config.baleen.pat,
-      'Content-type': 'application/json',
-      'Cookie': `baleen-namespace=${namespaceKey}`,
+  await axios.post(
+    urlForInvalidate,
+    {
+      patterns: ['.'],
+    },
+    {
+      headers: {
+        'X-Api-Key': config.baleen.pat,
+        'Content-type': 'application/json',
+        Cookie: `baleen-namespace=${namespaceKey}`,
+      },
     }
-  });
+  );
 
   return `Cache CDN invalidé pour l‘application ${application}.`;
 }
 
 module.exports = {
   invalidateCdnCache,
-  NamespaceNotFoundError
+  NamespaceNotFoundError,
 };

@@ -11,7 +11,10 @@ describe('Integration | Run | Applications', () => {
       const badApiKey = 'bad-api-key';
 
       // when
-      const response = await server.inject({ method: 'POST', url: `/applications/test/cdn-cache-invalidations?apiKey=${badApiKey}` });
+      const response = await server.inject({
+        method: 'POST',
+        url: `/applications/test/cdn-cache-invalidations?apiKey=${badApiKey}`,
+      });
 
       // then
       expect(response.statusCode).to.equal(401);
@@ -26,7 +29,10 @@ describe('Integration | Run | Applications', () => {
         sinon.stub(axios, 'post').resolves();
 
         // when
-        const response = await server.inject({ method: 'POST', url: `/applications/Pix_Test/cdn-cache-invalidations?apiKey=${apiKey}` });
+        const response = await server.inject({
+          method: 'POST',
+          url: `/applications/Pix_Test/cdn-cache-invalidations?apiKey=${apiKey}`,
+        });
 
         // then
         expect(response.statusCode).to.equal(200);
@@ -34,7 +40,7 @@ describe('Integration | Run | Applications', () => {
     });
 
     describe('Fail case', () => {
-      context('When application not have equivalent in namespace', () => {
+      context('When application not have equivalent in namespace', function () {
         it('should return a HTTP response with status code 400', async () => {
           // given
           const apiKey = config.openApi.authorizationToken;
@@ -44,7 +50,10 @@ describe('Integration | Run | Applications', () => {
           sinon.stub(axios, 'post').resolves();
 
           // when
-          const response = await server.inject({ method: 'POST', url: `/applications/${application}/cdn-cache-invalidations?apiKey=${apiKey}` });
+          const response = await server.inject({
+            method: 'POST',
+            url: `/applications/${application}/cdn-cache-invalidations?apiKey=${apiKey}`,
+          });
 
           // then
           expect(response.statusCode).to.equal(400);

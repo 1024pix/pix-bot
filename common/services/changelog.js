@@ -55,9 +55,7 @@ function getNewChangeLogLines({ headOfChangelogTitle, pullRequests }) {
     pullRequestGroups: PullRequestGroupFactory.build(),
   });
 
-  partialChangeLogGenerator.grabPullRequestsByTag(
-    pullRequests.map((item) => new PullRequest(item))
-  );
+  partialChangeLogGenerator.grabPullRequestsByTag(pullRequests.map((item) => new PullRequest(item)));
   return partialChangeLogGenerator.getLinesToDisplay();
 }
 

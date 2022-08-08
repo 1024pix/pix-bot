@@ -2,11 +2,9 @@ const { expect } = require('../../../test-helper');
 
 const { Manifest } = require('../../../../common/models/Manifest');
 
-describe('Unit | Common | Models | Manifest', () => {
-
-  describe('#constructor', () => {
-
-    it('should create an instance of manifest', () => {
+describe('Unit | Common | Models | Manifest', function () {
+  describe('#constructor', function () {
+    it('should create an instance of manifest', function () {
       // given
       const manifest = new Manifest('Pix Bot: The return');
 
@@ -18,8 +16,8 @@ describe('Unit | Common | Models | Manifest', () => {
     });
   });
 
-  describe('#registerSlashCommand', () => {
-    it('register a slash commands', () => {
+  describe('#registerSlashCommand', function () {
+    it('register a slash commands', function () {
       // given
       const manifest = new Manifest('Pix Bot: The return');
       const handler = () => {};
@@ -44,13 +42,13 @@ describe('Unit | Common | Models | Manifest', () => {
           usage_hint: 'this is a test',
           should_escape: false,
           handler,
-        }
+        },
       ]);
     });
   });
 
-  describe('#addInteractivity', () => {
-    it('add interactivity url', () => {
+  describe('#addInteractivity', function () {
+    it('add interactivity url', function () {
       // given
       const manifest = new Manifest('Pix Bot: The return');
       const handler = () => {};
@@ -58,25 +56,25 @@ describe('Unit | Common | Models | Manifest', () => {
       // when
       manifest.addInteractivity({
         path: '/test-url',
-        handler
+        handler,
       });
 
       // then
       expect(manifest.interactivity).to.eql({
         path: '/test-url',
-        handler
+        handler,
       });
     });
   });
 
-  describe('#getRoutes', () => {
+  describe('#getRoutes', function () {
     let manifest;
 
-    beforeEach(() => {
+    beforeEach(function () {
       manifest = new Manifest('Pix Bot: The return');
     });
 
-    it('returns the hapi routes for slash commands', () => {
+    it('returns the hapi routes for slash commands', function () {
       // given
       const handler = () => {};
 
@@ -97,11 +95,11 @@ describe('Unit | Common | Models | Manifest', () => {
           method: 'POST',
           path: '/command/test',
           handler,
-        }
+        },
       ]);
     });
 
-    it('returns the hapi routes for interactivity', () => {
+    it('returns the hapi routes for interactivity', function () {
       // given
       const handler = () => {};
 
@@ -118,11 +116,11 @@ describe('Unit | Common | Models | Manifest', () => {
           method: 'POST',
           path: '/command/interactivity',
           handler,
-        }
+        },
       ]);
     });
 
-    it('returns the hapi routes for slash commands and interactivity', () => {
+    it('returns the hapi routes for slash commands and interactivity', function () {
       // given
       const handler = () => {};
 
@@ -145,8 +143,8 @@ describe('Unit | Common | Models | Manifest', () => {
     });
   });
 
-  describe('#registerShortcut', () => {
-    it('register a shortcut', () => {
+  describe('#registerShortcut', function () {
+    it('register a shortcut', function () {
       // given
       const manifest = new Manifest('Pix Bot: The return');
       // when
@@ -154,7 +152,7 @@ describe('Unit | Common | Models | Manifest', () => {
         name: 'Test shortcut',
         type: 'global',
         callback_id: 'test-shortcut',
-        description: 'Test description'
+        description: 'Test description',
       });
 
       // then
@@ -164,8 +162,8 @@ describe('Unit | Common | Models | Manifest', () => {
           name: 'Test shortcut',
           type: 'global',
           callback_id: 'test-shortcut',
-          description: 'Test description'
-        }
+          description: 'Test description',
+        },
       ]);
     });
   });

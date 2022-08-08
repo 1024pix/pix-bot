@@ -24,12 +24,12 @@ function _createOctokit() {
       debug: noop,
       info: noop,
       warn: console.warn,
-      error: console.error
+      error: console.error,
     },
   });
 }
 
-async function _getPullReviewsFromGithub(label){
+async function _getPullReviewsFromGithub(label) {
   const owner = settings.github.owner;
 
   label = label.replace(/ /g, '%20');
@@ -39,7 +39,7 @@ async function _getPullReviewsFromGithub(label){
     const { data } = await octokit.search.issuesAndPullRequests({
       q: `is:pr+is:open+archived:false+user:${owner}+label:${label}`,
       sort: 'updated',
-      order: 'desc'
+      order: 'desc',
     });
 
     return data.items;
@@ -49,20 +49,20 @@ async function _getPullReviewsFromGithub(label){
   }
 }
 
-async function _getReviewsFromGithub(pull_number){
+async function _getReviewsFromGithub(pull_number) {
   const owner = settings.github.owner;
   const repo = settings.github.repository;
   const octokit = _createOctokit();
   const { data } = await octokit.pulls.listReviews({
     owner,
     repo,
-    pull_number
+    pull_number,
   });
   return data;
 }
 
 function _getEmojis(pullRequests) {
-  const labelsEmojis = pullRequests.labels.map(label => {
+  const labelsEmojis = pullRequests.labels.map((label) => {
     const match = label.name.match(/^:[A-z,_-]*:/);
     return match ? match[0] : '';
   });
@@ -73,31 +73,37 @@ function _getReviewsLabel(reviews) {
   const countByState = countBy(reviews, 'state');
   return entries(countByState)
     .map(([label, times]) => {
-      switch(label) {
-      case 'COMMENTED': return `💬x${times}`;
-      case 'APPROVED': return `✅x${times}`;
-      case 'CHANGES_REQUESTED': return `❌x${times}`;
+      switch (label) {
+        case 'COMMENTED':
+          return `💬x${times}`;
+        case 'APPROVED':
+          return `✅x${times}`;
+        case 'CHANGES_REQUESTED':
+          return `❌x${times}`;
       }
-    }).join(' ');
+    })
+    .join(' ');
 }
 
 function _createResponseForSlack(data, label) {
-  const attachments = data.map(({pullRequest, reviews}) => {
-    const emojis = _getEmojis(pullRequest);
-    const reviewsLabel = _getReviewsLabel(reviews);
-    const link = `<${pullRequest.html_url}|${pullRequest.title}>`;
-    const message = [reviewsLabel, emojis, link].filter(Boolean).join(' | ');
-    return {
-      color: color[label],
-      pretext: '',
-      fields:[ {value: message, short: false},],
-    };
-  }).sort(_sortWithInProgressLast);
+  const attachments = data
+    .map(({ pullRequest, reviews }) => {
+      const emojis = _getEmojis(pullRequest);
+      const reviewsLabel = _getReviewsLabel(reviews);
+      const link = `<${pullRequest.html_url}|${pullRequest.title}>`;
+      const message = [reviewsLabel, emojis, link].filter(Boolean).join(' | ');
+      return {
+        color: color[label],
+        pretext: '',
+        fields: [{ value: message, short: false }],
+      };
+    })
+    .sort(_sortWithInProgressLast);
 
   return {
     response_type: 'in_channel',
     text: 'PRs à review pour ' + label,
-    attachments
+    attachments,
   };
 }
 
@@ -108,8 +114,8 @@ function _sortWithInProgressLast(prA, prB) {
   const isAinProgress = fieldA.indexOf(inProgressIcon) !== -1;
   const isBinProgress = fieldB.indexOf(inProgressIcon) !== -1;
 
-  if(isAinProgress && !isBinProgress) return 1;
-  if(!isAinProgress && isBinProgress) return -1;
+  if (isAinProgress && !isBinProgress) return 1;
+  if (!isAinProgress && isBinProgress) return -1;
   return fieldA.localeCompare(fieldB);
 }
 
@@ -168,7 +174,7 @@ async function _getDefaultBranch(repoOwner, repoName) {
 }
 
 async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
-  const baseBranch = branchName || await _getDefaultBranch(repoOwner, repoName);
+  const baseBranch = branchName || (await _getDefaultBranch(repoOwner, repoName));
   const { pulls } = _createOctokit();
   const { data } = await pulls.list({
     owner: repoOwner,
@@ -225,7 +231,7 @@ async function _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoNa
     until: untilDate,
     path: 'api/lib/config.js',
   });
-  
+
   return data;
 }
 
@@ -243,12 +249,9 @@ function _verifyRequestSignature(webhookSecret, body, signature) {
 }
 
 module.exports = {
-
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
-    const reviewsByPR = await Promise.all(
-      pullRequests.map(({number}) => _getReviewsFromGithub(number))
-    );
+    const reviewsByPR = await Promise.all(pullRequests.map(({ number }) => _getReviewsFromGithub(number)));
 
     const data = zipWith(pullRequests, reviewsByPR, (pullRequest, reviews) => {
       return {
@@ -303,7 +306,10 @@ module.exports = {
     return pullRequestsSinceLatestRelease.map((PR) => `${PR.title}`);
   },
 
-  async hasConfigFileChangedSinceLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
+  async hasConfigFileChangedSinceLatestRelease(
+    repoOwner = settings.github.owner,
+    repoName = settings.github.repository
+  ) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const now = new Date().toISOString();
     const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
@@ -313,7 +319,12 @@ module.exports = {
   async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const secondToLastReleaseDate = await _getSecondToLastReleaseDate(repoOwner, repoName);
-    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, secondToLastReleaseDate, latestReleaseDate);
+    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(
+      repoOwner,
+      repoName,
+      secondToLastReleaseDate,
+      latestReleaseDate
+    );
     return commits.length > 0;
   },
 
@@ -330,5 +341,5 @@ module.exports = {
       return error;
     }
     return true;
-  }
+  },
 };

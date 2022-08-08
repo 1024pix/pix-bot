@@ -1,8 +1,7 @@
 const { Tags } = require('./Tags');
 
 class PullRequestGroup {
-
-  constructor({ tagToGrab, groupTitle}) {
+  constructor({ tagToGrab, groupTitle }) {
     if (!Tags.isValidTag(tagToGrab)) {
       throw new TypeError('A valid Tag must be used');
     }

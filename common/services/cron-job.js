@@ -15,5 +15,5 @@ function createCronJob(jobName, jobFunction, jobSchedule) {
 }
 
 module.exports = {
-  createCronJob
+  createCronJob,
 };

@@ -16,7 +16,7 @@ function verifyRequestSignature(signingSecret, body, signature, requestTimestamp
 
   // Divide current date to match Slack ts format
   // Subtract 5 minutes from current time
-  const fiveMinutesAgo = Math.floor(Date.now() / 1000) - (60 * 5);
+  const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 60 * 5;
 
   if (ts < fiveMinutesAgo) {
     throw Boom.unauthorized('Slack request signing verification failed. Timestamp is too old.');
@@ -55,7 +55,6 @@ function parseRequestBody(stringBody, contentType) {
 }
 
 module.exports = {
-
   async verifySignatureAndParseBody(request) {
     const { headers, payload } = request;
 
@@ -72,5 +71,5 @@ module.exports = {
     }
 
     return parseRequestBody(stringBody, contentType);
-  }
+  },
 };

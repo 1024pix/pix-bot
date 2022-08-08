@@ -5,11 +5,9 @@ const { Tag } = require('../../../../common/models/Tags');
 
 const PullRequestGroup = require('../../../../common/models/PullRequestGroup');
 
-describe('Unit | Common | Models | PullRequestGroup', () => {
-
-  describe('#constructor', () => {
-
-    it('should not create an instance if parameter tag to grab is not valid', () => {
+describe('Unit | Common | Models | PullRequestGroup', function () {
+  describe('#constructor', function () {
+    it('should not create an instance if parameter tag to grab is not valid', function () {
       // given
       const wrongTag = 'wrongTag';
       const groupTitle = '### :bug: Correction';
@@ -21,7 +19,7 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
       expect(instantiate).to.throw(TypeError);
     });
 
-    it('should create an instance if parameter tag is valid', () => {
+    it('should create an instance if parameter tag is valid', function () {
       // given
       const validTag = Tag.FEATURE;
       const groupTitle = '### :rocket: Amélioration';
@@ -37,9 +35,8 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
     });
   });
 
-  describe('#grabPullRequestsByTag', () => {
-
-    it('should return the initial Pull Request array if no Pull Request is grabbed', () => {
+  describe('#grabPullRequestsByTag', function () {
+    it('should return the initial Pull Request array if no Pull Request is grabbed', function () {
       // given
       const featureTag = Tag.FEATURE;
       const groupTitle = '### :rocket: Amélioration';
@@ -54,7 +51,7 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
       expect(pullRequestGroup.grabbedPullRequests).to.an('array').that.is.empty;
     });
 
-    it('should return an empty array if all Pull Requests are grabbed', () => {
+    it('should return an empty array if all Pull Requests are grabbed', function () {
       // given
       const featureTag = Tag.FEATURE;
       const groupTitle = '### :rocket: Amélioration';
@@ -62,7 +59,7 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
 
       const initialPullRequests = [
         new PullRequest({ title: '[FEATURE] PIX-1' }),
-        new PullRequest({ title: '[FEATURE] PIX-2' })
+        new PullRequest({ title: '[FEATURE] PIX-2' }),
       ];
 
       // when
@@ -73,7 +70,7 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
       expect(pullRequestGroup.grabbedPullRequests).to.deep.equal(initialPullRequests);
     });
 
-    it('should return the initial Pull Requests array minus Pull Requests grabbed', () => {
+    it('should return the initial Pull Requests array minus Pull Requests grabbed', function () {
       // given
       const featureTag = Tag.FEATURE;
       const groupTitle = '### :rocket: Amélioration';
@@ -95,9 +92,8 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
     });
   });
 
-  describe('#getLinesToDisplay', () => {
-
-    it('should return empty array if if no Pull Request is grabbed', () => {
+  describe('#getLinesToDisplay', function () {
+    it('should return empty array if if no Pull Request is grabbed', function () {
       // given
       const featureTag = Tag.FEATURE;
       const groupTitle = '### :rocket: Amélioration';
@@ -110,7 +106,7 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
       expect(result).to.an('array').that.is.empty;
     });
 
-    it('should return group title and list of Pull Requests grabbed', () => {
+    it('should return group title and list of Pull Requests grabbed', function () {
       // given
       const featureTag = Tag.FEATURE;
       const groupTitle = '### :rocket: Amélioration';
@@ -125,11 +121,7 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
       const initialPullRequests = [featurePullRequest, techPullRequest];
       pullRequestGroup.grabPullRequestsByTag(initialPullRequests);
 
-      const expectedLinesToDisplay = [
-        groupTitle,
-        featurePullRequest.toString(),
-        '',
-      ];
+      const expectedLinesToDisplay = [groupTitle, featurePullRequest.toString(), ''];
 
       // when
       const result = pullRequestGroup.getLinesToDisplay();
@@ -138,5 +130,4 @@ describe('Unit | Common | Models | PullRequestGroup', () => {
       expect(result).to.deep.equal(expectedLinesToDisplay);
     });
   });
-
 });

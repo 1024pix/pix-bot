@@ -11,10 +11,10 @@ module.exports = {
       url: 'https://slack.com/api/views.open',
       headers: {
         'content-type': 'application/json',
-        'authorization': `Bearer ${config.slack.botToken}`
+        authorization: `Bearer ${config.slack.botToken}`,
       },
-      data: deployReleaseTagSelectionModal(payload.trigger_id)
+      data: deployReleaseTagSelectionModal(payload.trigger_id),
     };
     return axios(options);
-  }
+  },
 };

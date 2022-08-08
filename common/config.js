@@ -5,19 +5,15 @@ module.exports = {
   slackConfig: {
     payload: {
       allow: ['application/json', 'application/x-www-form-urlencoded'],
-      parse: false
+      parse: false,
     },
-    pre: [
-      { method: verifySlackSignatureAndParseBody, assign: 'payload' }
-    ]
+    pre: [{ method: verifySlackSignatureAndParseBody, assign: 'payload' }],
   },
 
   githubConfig: {
     payload: {
       allow: ['application/json'],
     },
-    pre: [
-      { method: verifyGithubSignature }
-    ]
-  }
+    pre: [{ method: verifyGithubSignature }],
+  },
 };

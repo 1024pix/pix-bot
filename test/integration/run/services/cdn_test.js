@@ -9,14 +9,14 @@ function _stubAccountDetails(namespace) {
     reqheaders: {
       'X-Api-Key': config.baleen.pat,
       'Content-type': 'application/json',
-    }
+    },
   })
     .get('/account')
     .reply(200, {
-      namespaces : {
+      namespaces: {
         'namespace-key2': 'Test2',
         'namespace-key1': namespace,
-      }
+      },
     });
 }
 
@@ -25,10 +25,10 @@ function _stubInvalidationCachePost(namespaceKey) {
     reqheaders: {
       'X-Api-Key': config.baleen.pat,
       'Content-type': 'application/json',
-      'Cookie': `baleen-namespace=${namespaceKey}`
-    }
+      Cookie: `baleen-namespace=${namespaceKey}`,
+    },
   })
-    .post('/cache/invalidations', { patterns: ['.']})
+    .post('/cache/invalidations', { patterns: ['.'] })
     .reply(200);
 }
 

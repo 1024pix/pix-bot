@@ -11,7 +11,13 @@ const init = async () => {
   await ecoModeService.start();
 
   createCronJob('SendInBlue Report', sendInBlueReport.getReport, config.thirdServicesUsageReport.schedule);
-  createCronJob('Deploy Pix site', () => { deploy(config.PIX_SITE_REPO_NAME, config.PIX_SITE_APPS); }, config.pixSiteDeploy.schedule);
+  createCronJob(
+    'Deploy Pix site',
+    () => {
+      deploy(config.PIX_SITE_REPO_NAME, config.PIX_SITE_APPS);
+    },
+    config.pixSiteDeploy.schedule
+  );
 
   await server.start();
   console.log('Server running on %s', server.info.uri);

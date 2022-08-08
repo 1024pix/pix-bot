@@ -57,27 +57,27 @@ module.exports = {
     const releaseBranch = 'dev';
 
     switch (interactionType) {
-    case 'shortcut':
-      if (payload.callback_id === 'publish-release') {
-        if (!github.isBuildStatusOK({ branchName: releaseBranch })) {
-          return this._interruptRelease();
+      case 'shortcut':
+        if (payload.callback_id === 'publish-release') {
+          if (!github.isBuildStatusOK({ branchName: releaseBranch })) {
+            return this._interruptRelease();
+          }
+          shortcuts.openViewPublishReleaseTypeSelection(payload);
         }
-        shortcuts.openViewPublishReleaseTypeSelection(payload);
-      }
-      return null;
-    case 'view_submission':
-      if (payload.view.callback_id === shortcuts.openViewPublishReleaseTypeSelectionCallbackId) {
-        return viewSubmissions.submitReleaseTypeSelection(payload);
-      }
-      if (payload.view.callback_id === viewSubmissions.submitReleaseTypeSelectionCallbackId) {
-        return viewSubmissions.submitReleasePublicationConfirmation(payload);
-      }
-      return null;
-    case 'view_closed':
-    case 'block_actions':
-    default:
-      console.log('This kind of interaction is not yet supported by Pix Bot.');
-      return null;
+        return null;
+      case 'view_submission':
+        if (payload.view.callback_id === shortcuts.openViewPublishReleaseTypeSelectionCallbackId) {
+          return viewSubmissions.submitReleaseTypeSelection(payload);
+        }
+        if (payload.view.callback_id === viewSubmissions.submitReleaseTypeSelectionCallbackId) {
+          return viewSubmissions.submitReleasePublicationConfirmation(payload);
+        }
+        return null;
+      case 'view_closed':
+      case 'block_actions':
+      default:
+        console.log('This kind of interaction is not yet supported by Pix Bot.');
+        return null;
     }
   },
 

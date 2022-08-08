@@ -2,7 +2,6 @@ const { Tag } = require('./Tags');
 const PullRequestGroup = require('./PullRequestGroup');
 
 class PullRequestGroupFactory {
-
   static build() {
     return [
       new PullRequestGroup({

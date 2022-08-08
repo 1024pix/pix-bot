@@ -3,9 +3,9 @@ const path = require('path');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-async function runScriptWithArgument (scriptFileName, args=[], options={}) {
+async function runScriptWithArgument(scriptFileName, args = [], options = {}) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
-  const {stdout, stderr} = await exec(`${path.join(scriptsDirectory, scriptFileName)} ${args.join(' ')}`, options);
+  const { stdout, stderr } = await exec(`${path.join(scriptsDirectory, scriptFileName)} ${args.join(' ')}`, options);
   return { stdout: stdout.split('\n'), stderr: stderr.split('\n') };
 }
 

@@ -9,13 +9,12 @@ function _getDeployStartedMessage(release, appName) {
 }
 
 module.exports = {
-
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixSiteRelease(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX site and pro')
+      text: _getDeployStartedMessage(payload.text, 'PIX site and pro'),
     };
   },
 
@@ -24,7 +23,7 @@ module.exports = {
     commands.createAndDeployPixUI(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX UI')
+      text: _getDeployStartedMessage(payload.text, 'PIX UI'),
     };
   },
 
@@ -33,7 +32,7 @@ module.exports = {
     commands.createAndDeployPixLCMS(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX LCMS')
+      text: _getDeployStartedMessage(payload.text, 'PIX LCMS'),
     };
   },
 
@@ -42,7 +41,7 @@ module.exports = {
     commands.createAndDeployPixDatawarehouse(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX Datawarehouse')
+      text: _getDeployStartedMessage(payload.text, 'PIX Datawarehouse'),
     };
   },
 
@@ -51,7 +50,7 @@ module.exports = {
     commands.createAndDeployPixBotRelease(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX Bot')
+      text: _getDeployStartedMessage(payload.text, 'PIX Bot'),
     };
   },
 
@@ -60,7 +59,7 @@ module.exports = {
     commands.createAndDeployPixTutosRelease(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'PIX Tutos')
+      text: _getDeployStartedMessage(payload.text, 'PIX Tutos'),
     };
   },
 
@@ -74,7 +73,7 @@ module.exports = {
 
     try {
       await commands.getAndDeployLastVersion({ appName });
-    } catch(e) {
+    } catch (e) {
       return sendSlackBlockMessage(e.message);
     }
 
@@ -86,7 +85,7 @@ module.exports = {
     commands.createAndDeployEmberTestingLibrary(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'EMBER-TESTING-LIBRARY')
+      text: _getDeployStartedMessage(payload.text, 'EMBER-TESTING-LIBRARY'),
     };
   },
 
@@ -95,7 +94,7 @@ module.exports = {
     commands.createAndDeployDbStats(payload);
 
     return {
-      'text': _getDeployStartedMessage(payload.text, 'DB stats')
+      text: _getDeployStartedMessage(payload.text, 'DB stats'),
     };
   },
 
@@ -113,24 +112,24 @@ module.exports = {
     const interactionType = payload.type;
 
     switch (interactionType) {
-    case 'shortcut':
-      if (payload.callback_id === 'deploy-release') {
-        shortcuts.openViewDeployReleaseTagSelection(payload);
-      }
-      return null;
-    case 'view_submission':
-      if (payload.view.callback_id === shortcuts.openViewDeployReleaseTagSelectionCallbackId) {
-        return viewSubmissions.submitReleaseTagSelection(payload);
-      }
-      if (payload.view.callback_id === viewSubmissions.submitReleaseTagSelectionCallbackId) {
-        return viewSubmissions.submitReleaseDeploymentConfirmation(payload);
-      }
-      return null;
-    case 'view_closed':
-    case 'block_actions':
-    default:
-      console.log('This kind of interaction is not yet supported by Pix Bot.');
-      return null;
+      case 'shortcut':
+        if (payload.callback_id === 'deploy-release') {
+          shortcuts.openViewDeployReleaseTagSelection(payload);
+        }
+        return null;
+      case 'view_submission':
+        if (payload.view.callback_id === shortcuts.openViewDeployReleaseTagSelectionCallbackId) {
+          return viewSubmissions.submitReleaseTagSelection(payload);
+        }
+        if (payload.view.callback_id === viewSubmissions.submitReleaseTagSelectionCallbackId) {
+          return viewSubmissions.submitReleaseDeploymentConfirmation(payload);
+        }
+        return null;
+      case 'view_closed':
+      case 'block_actions':
+      default:
+        console.log('This kind of interaction is not yet supported by Pix Bot.');
+        return null;
     }
   },
 };

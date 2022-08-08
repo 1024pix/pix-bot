@@ -1,5 +1,4 @@
 class PartialChangeLogGenerator {
-
   constructor({ headOfChangelogTitle, pullRequestGroups }) {
     this.headOfChangelogTitle = headOfChangelogTitle;
     this.pullRequestGroups = pullRequestGroups;
@@ -12,11 +11,11 @@ class PartialChangeLogGenerator {
   }
 
   getLinesToDisplay() {
-    const linesToDisplay = this.pullRequestGroups.map((pullRequestGroup) => pullRequestGroup.getLinesToDisplay()).flat();
+    const linesToDisplay = this.pullRequestGroups
+      .map((pullRequestGroup) => pullRequestGroup.getLinesToDisplay())
+      .flat();
 
-    return linesToDisplay.length
-      ? [this.headOfChangelogTitle, ''].concat(linesToDisplay).flat()
-      : [];
+    return linesToDisplay.length ? [this.headOfChangelogTitle, ''].concat(linesToDisplay).flat() : [];
   }
 }
 

@@ -17,22 +17,22 @@ const scriptName = 'publish.sh';
 // git clone --bare https://github.com/1024pix/pix-bot-publish-test data/clean_repository.git
 // Make sure that empty folders on the bare git repostory have a .gitkeep file
 // Have a nice day
-describe('Acceptance | Scripts | publish.sh', function() {
+describe('Acceptance | Scripts | publish.sh', function () {
   this.timeout(30000);
   let testRepositoryPath;
 
-  beforeEach(async () => {
+  beforeEach(async function () {
     const originRepositoryPath = path.join(__dirname, 'data', 'clean_repository.git');
     testRepositoryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'clean-repository'));
 
     await fs.copy(originRepositoryPath, testRepositoryPath);
   });
 
-  afterEach(async () => {
+  afterEach(async function () {
     await fs.rm(testRepositoryPath, { force: true, recursive: true });
   });
 
-  it('Update package version, generate changelog, commit, tag and push', async () => {
+  it('Update package version, generate changelog, commit, tag and push', async function () {
     // given
     const branchName = 'dev';
     const versionType = 'minor';
@@ -49,7 +49,11 @@ describe('Acceptance | Scripts | publish.sh', function() {
     };
 
     // when
-    const { stdout, stderr } = await runScriptWithArgument(scriptName, [versionType, 'file://' +testRepositoryPath, branchName], { env });
+    const { stdout, stderr } = await runScriptWithArgument(
+      scriptName,
+      [versionType, 'file://' + testRepositoryPath, branchName],
+      { env }
+    );
 
     // then
     const expectedStdout = [
@@ -78,13 +82,7 @@ describe('Acceptance | Scripts | publish.sh', function() {
       'v0.2.0',
       '',
     ];
-    const expectedStderr = [
-      /^Cloning into/,
-      /To (.+)/,
-      /dev -> dev/,
-      /v0.2.0 -> v0.2.0/,
-      ''
-    ];
+    const expectedStderr = [/^Cloning into/, /To (.+)/, /dev -> dev/, /v0.2.0 -> v0.2.0/, ''];
     expectLines(expectedStdout, stdout);
     expectLines(expectedStderr, stderr);
     const git = simpleGit(testRepositoryPath);

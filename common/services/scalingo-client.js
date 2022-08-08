@@ -29,7 +29,7 @@ class ScalingoClient {
     try {
       await this.client.Deployments.create(scalingoApp, {
         git_ref: releaseTag,
-        source_url: `https://${config.github.token}@github.com/${config.github.owner}/${repository}/archive/${releaseTag}.tar.gz`
+        source_url: `https://${config.github.token}@github.com/${config.github.owner}/${repository}/archive/${releaseTag}.tar.gz`,
       });
     } catch (e) {
       console.error(e);
@@ -53,7 +53,7 @@ class ScalingoClient {
 
   async _getAllAppsInfo(environment) {
     const apps = ['api', 'app', 'orga', 'certif', 'admin'];
-    const promises = apps.map(appName => this._getSingleAppInfo(appName, environment));
+    const promises = apps.map((appName) => this._getSingleAppInfo(appName, environment));
     return Promise.all(promises);
   }
 
@@ -74,7 +74,7 @@ class ScalingoClient {
         isUp,
         lastDeployementAt: created_at,
         lastDeployedBy: pusher.username,
-        lastDeployedVersion: git_ref
+        lastDeployedVersion: git_ref,
       };
     } catch (err) {
       if (err.status === 404) {
@@ -86,7 +86,6 @@ class ScalingoClient {
 }
 
 async function _isUrlReachable(url) {
-
   let pingUrl = url;
   if (url.includes('api')) {
     pingUrl = url + '/api';

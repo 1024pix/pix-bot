@@ -7,11 +7,8 @@ const Tag = Object.freeze({
 });
 
 class Tags {
-
   static getTagByTitle(title) {
-    const typeOfPullRequest = title
-      .substring(1, title.indexOf(']'))
-      .replace(/ /g, '_');
+    const typeOfPullRequest = title.substring(1, title.indexOf(']')).replace(/ /g, '_');
 
     return Tag[typeOfPullRequest] || Tag.OTHERS;
   }
