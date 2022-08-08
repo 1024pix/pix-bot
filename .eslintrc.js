@@ -6,26 +6,8 @@ module.exports = {
     'node': true,
     'mocha': true,
   },
-  'extends': 'eslint:recommended',
+  'extends': ['eslint:recommended', 'plugin:mocha/recommended', 'plugin:prettier/recommended'],
   'parserOptions': {
     'ecmaVersion': 11
   },
-  'rules': {
-    'indent': [
-      'error',
-      2
-    ],
-    'linebreak-style': [
-      'error',
-      'unix'
-    ],
-    'quotes': [
-      'error',
-      'single'
-    ],
-    'semi': [
-      'error',
-      'always'
-    ]
-  }
 };
