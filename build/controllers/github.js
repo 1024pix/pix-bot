@@ -6,7 +6,7 @@ const repositoryToScalingoAppsReview = {
   'pix-db-stats': ['pix-db-stats-review'],
   'pix-editor': ['pix-lcms-review'],
   'pix-site': ['pix-site-review', 'pix-pro-review'],
-  'pix-tutos':['pix-tutos-review'],
+  'pix-tutos': ['pix-tutos-review'],
   'pix-ui': ['pix-ui-review'],
   pix: ['pix-front-review', 'pix-api-review'],
 };
@@ -36,5 +36,5 @@ module.exports = {
     } else {
       return `Ignoring ${eventName} event`;
     }
-  }
+  },
 };

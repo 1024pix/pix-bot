@@ -26,11 +26,15 @@ class Manifest {
           handler,
         };
       }),
-      ...(this.interactivity ? [{
-        method: 'POST',
-        path: this.interactivity.path,
-        handler: this.interactivity.handler
-      }] : [])
+      ...(this.interactivity
+        ? [
+            {
+              method: 'POST',
+              path: this.interactivity.path,
+              handler: this.interactivity.handler,
+            },
+          ]
+        : []),
     ];
   }
 }

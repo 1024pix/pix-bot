@@ -20,7 +20,7 @@ module.exports = {
       deploy(environments.production, releaseTag);
     }
     return {
-      'response_action': 'clear'
+      response_action: 'clear',
     };
-  }
+  },
 };

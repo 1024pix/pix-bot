@@ -29,12 +29,7 @@ function _getColor(percentage) {
   return color;
 }
 
-function _generateAndReturnFilledSlackBlocks({
-  requestEmails,
-  usagePercentage,
-  startDate,
-  endDate
-}) {
+function _generateAndReturnFilledSlackBlocks({ requestEmails, usagePercentage, startDate, endDate }) {
   const emoji = _getEmoji(usagePercentage);
   const color = _getColor(usagePercentage);
 
@@ -50,16 +45,16 @@ function _generateAndReturnFilledSlackBlocks({
           {
             title: 'Nombre d‘e-mails envoyés :',
             value: `${requestEmails}`,
-            short: true
+            short: true,
           },
           {
             title: 'Quota utilisé :',
             value: `${usagePercentage}% ${emoji}`,
-            short: true
+            short: true,
           },
         ],
-      }
-    ]
+      },
+    ],
   };
 }
 
@@ -76,7 +71,7 @@ async function getReport() {
 
   const requestEmails = response.requests;
   const mailingQuota = config.sendInBlue.mailingQuota;
-  const usagePercentage = (requestEmails/mailingQuota * 100).toFixed();
+  const usagePercentage = ((requestEmails / mailingQuota) * 100).toFixed();
   const blocks = _generateAndReturnFilledSlackBlocks({
     requestEmails: requestEmails.toLocaleString(),
     usagePercentage,
@@ -87,8 +82,6 @@ async function getReport() {
   return axios.post(config.slack.webhookUrlForReporting, blocks, { headers: { 'content-type': 'application/json' } });
 }
 
-
 module.exports = {
-  getReport
+  getReport,
 };
-

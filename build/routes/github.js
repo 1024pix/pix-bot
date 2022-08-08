@@ -6,6 +6,6 @@ module.exports = [
     method: 'POST',
     path: '/github/webhook',
     handler: githubController.processWebhook,
-    config: githubConfig
+    config: githubConfig,
   },
 ];

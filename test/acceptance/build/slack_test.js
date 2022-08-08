@@ -1,11 +1,17 @@
-const { expect, nock, createSlackWebhookSignatureHeaders, nockGithubWithNoConfigChanges, nockGithubWithConfigChanges } = require('../../test-helper');
+const {
+  expect,
+  nock,
+  createSlackWebhookSignatureHeaders,
+  nockGithubWithNoConfigChanges,
+  nockGithubWithConfigChanges,
+} = require('../../test-helper');
 const server = require('../../../server');
 
-describe('Acceptance | Build | Slack', function() {
-  describe('POST /build/slack/interactive-endpoint', function() {
-    it('responds with 204', async () => {
+describe('Acceptance | Build | Slack', function () {
+  describe('POST /build/slack/interactive-endpoint', function () {
+    it('responds with 204', async function () {
       const body = {
-        type: 'view_closed'
+        type: 'view_closed',
       };
       const res = await server.inject({
         method: 'POST',
@@ -16,9 +22,9 @@ describe('Acceptance | Build | Slack', function() {
       expect(res.statusCode).to.equal(204);
     });
 
-    it('responds with 401', async () => {
+    it('responds with 401', async function () {
       const body = {
-        type: 'view_closed'
+        type: 'view_closed',
       };
       const res = await server.inject({
         method: 'POST',
@@ -28,91 +34,91 @@ describe('Acceptance | Build | Slack', function() {
       expect(res.statusCode).to.equal(401);
     });
 
-    describe('when using the shortcut publish-release', function() {
-      it('calls slack with the tag selection modal', async function() {
+    describe('when using the shortcut publish-release', function () {
+      it('calls slack with the tag selection modal', async function () {
         const slackCall = nock('https://slack.com')
           .post('/api/views.open', {
-            'trigger_id': 'trigger id',
-            'view': {
-              'type': 'modal',
-              'callback_id': 'release-type-selection',
-              'title': {
-                'type': 'plain_text',
-                'text': 'Publier une release',
+            trigger_id: 'trigger id',
+            view: {
+              type: 'modal',
+              callback_id: 'release-type-selection',
+              title: {
+                type: 'plain_text',
+                text: 'Publier une release',
               },
-              'submit': {
-                'type': 'plain_text',
-                'text': 'Publier',
+              submit: {
+                type: 'plain_text',
+                text: 'Publier',
               },
-              'close': {
-                'type': 'plain_text',
-                'text': 'Annuler',
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
               },
-              'blocks': [
+              blocks: [
                 {
-                  'type': 'section',
-                  'text': {
-                    'type': 'mrkdwn',
-                    'text': 'Pix utilise le format de gestion de versions _Semantic Versionning_ :\n- *patch* : contient exclusivement des correctif(s)\n- *minor* : contient au moins 1 évolution technique ou fonctionnelle\n- *major* : contient au moins 1 changement majeur d\'architecture'
-                  }
-                },
-                {
-                  'type': 'divider'
-                },
-                {
-                  'type': 'input',
-                  'block_id': 'publish-release-type',
-                  'label': {
-                    'type': 'plain_text',
-                    'text': 'Type de release',
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: "Pix utilise le format de gestion de versions _Semantic Versionning_ :\n- *patch* : contient exclusivement des correctif(s)\n- *minor* : contient au moins 1 évolution technique ou fonctionnelle\n- *major* : contient au moins 1 changement majeur d'architecture",
                   },
-                  'element': {
-                    'action_id': 'release-type-option',
-                    'type': 'static_select',
-                    'placeholder': {
-                      'type': 'plain_text',
-                      'text': 'Selectionnez un élément'
+                },
+                {
+                  type: 'divider',
+                },
+                {
+                  type: 'input',
+                  block_id: 'publish-release-type',
+                  label: {
+                    type: 'plain_text',
+                    text: 'Type de release',
+                  },
+                  element: {
+                    action_id: 'release-type-option',
+                    type: 'static_select',
+                    placeholder: {
+                      type: 'plain_text',
+                      text: 'Selectionnez un élément',
                     },
-                    'initial_option': {
-                      'text': {
-                        'type': 'plain_text',
-                        'text': 'Minor'
+                    initial_option: {
+                      text: {
+                        type: 'plain_text',
+                        text: 'Minor',
                       },
-                      'value': 'minor'
+                      value: 'minor',
                     },
-                    'options': [
+                    options: [
                       {
-                        'text': {
-                          'type': 'plain_text',
-                          'text': 'Minor'
+                        text: {
+                          type: 'plain_text',
+                          text: 'Minor',
                         },
-                        'value': 'minor'
+                        value: 'minor',
                       },
                       {
-                        'text': {
-                          'type': 'plain_text',
-                          'text': 'Patch'
+                        text: {
+                          type: 'plain_text',
+                          text: 'Patch',
                         },
-                        'value': 'patch'
+                        value: 'patch',
                       },
                       {
-                        'text': {
-                          'type': 'plain_text',
-                          'text': 'Major'
+                        text: {
+                          type: 'plain_text',
+                          text: 'Major',
                         },
-                        'value': 'major'
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
+                        value: 'major',
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
           })
           .reply(200);
         const body = {
           type: 'shortcut',
           callback_id: 'publish-release',
-          trigger_id: 'trigger id'
+          trigger_id: 'trigger id',
         };
         const res = await server.inject({
           method: 'POST',
@@ -124,8 +130,7 @@ describe('Acceptance | Build | Slack', function() {
         expect(slackCall.isDone()).to.be.true;
       });
 
-      describe('with the callback release-type-selection', function() {
-
+      describe('with the callback release-type-selection', function () {
         it('returns the confirmation modal', async function () {
           nockGithubWithNoConfigChanges();
 
@@ -138,8 +143,8 @@ describe('Acceptance | Build | Slack', function() {
                   'publish-release-type': {
                     'release-type-option': {
                       selected_option: {
-                        value: 'minor'
-                      }
+                        value: 'minor',
+                      },
                     },
                   },
                 },
@@ -196,8 +201,8 @@ describe('Acceptance | Build | Slack', function() {
                   'publish-release-type': {
                     'release-type-option': {
                       selected_option: {
-                        value: 'major'
-                      }
+                        value: 'major',
+                      },
                     },
                   },
                 },
@@ -235,8 +240,8 @@ describe('Acceptance | Build | Slack', function() {
                   type: 'section',
                   text: {
                     type: 'mrkdwn',
-                    text: ':warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d\'environnement sont bien à jour sur *Scalingo RECETTE*.'
-                  }
+                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
+                  },
                 },
                 {
                   type: 'section',
@@ -251,7 +256,7 @@ describe('Acceptance | Build | Slack', function() {
         });
       });
 
-      describe('callback release-publication-confirmation', function() {
+      describe('callback release-publication-confirmation', function () {
         it('publish and deploy the app', async function () {
           const body = {
             type: 'view_submission',
@@ -268,7 +273,7 @@ describe('Acceptance | Build | Slack', function() {
           });
           expect(res.statusCode).to.equal(200);
           expect(JSON.parse(res.payload)).to.deep.equal({
-            response_action: 'clear'
+            response_action: 'clear',
           });
         });
       });

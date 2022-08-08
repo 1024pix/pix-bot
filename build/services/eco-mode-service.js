@@ -18,8 +18,8 @@ module.exports = {
       stopCronTime,
       restartCronTime,
       timeZone,
-      ignoredReviewApps
+      ignoredReviewApps,
     });
     await reviewAppManager.startEcoMode();
-  }
+  },
 };

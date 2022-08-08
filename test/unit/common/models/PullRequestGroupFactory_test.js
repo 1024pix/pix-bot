@@ -5,11 +5,9 @@ const { Tag } = require('../../../../common/models/Tags');
 
 const PullRequestGroupFactory = require('../../../../common/models/PullRequestGroupFactory');
 
-describe('Unit | Common | Models | PullRequestGroupFactory', () => {
-
-  describe('#build', () => {
-
-    it('should return an array of Pull Request Groups', () => {
+describe('Unit | Common | Models | PullRequestGroupFactory', function () {
+  describe('#build', function () {
+    it('should return an array of Pull Request Groups', function () {
       // given
       const expectedPullRequestGroups = [
         new PullRequestGroup({
@@ -38,5 +36,4 @@ describe('Unit | Common | Models | PullRequestGroupFactory', () => {
       expect(result).to.deep.equal(expectedPullRequestGroups);
     });
   });
-
 });

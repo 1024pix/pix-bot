@@ -18,10 +18,10 @@ describe('Unit | SendInBlue Report', () => {
     let getAggregatedSmtpReportStub;
     let axiosStub;
 
-    beforeEach(() => {
+    beforeEach(function () {
       getAggregatedSmtpReportStub = sinon.stub();
       sinon.stub(SibApiV3Sdk, 'TransactionalEmailsApi').returns({
-        getAggregatedSmtpReport: getAggregatedSmtpReportStub
+        getAggregatedSmtpReport: getAggregatedSmtpReportStub,
       });
       axiosStub = sinon.stub(axios, 'post');
       config.sendInBlue.apiKey = 'SendInBlueApiKey';
@@ -30,7 +30,7 @@ describe('Unit | SendInBlue Report', () => {
       clock = sinon.useFakeTimers(date.getTime());
     });
 
-    afterEach(() => {
+    afterEach(function () {
       clock.restore();
     });
 
@@ -45,14 +45,35 @@ describe('Unit | SendInBlue Report', () => {
       // then
       sinon.assert.calledWithExactly(getAggregatedSmtpReportStub, {
         startDate: expectedStartDate,
-        endDate: expectedEndDate
+        endDate: expectedEndDate,
       });
     });
 
     const cases = [
-      { when: 'usagePercentage < 50', expectedEmoji: ':vertical_traffic_light:', expectedColor: '#5bc0de', mailingRatio: 4, requestsMails: 1, percentage: 25 },
-      { when: 'usagePercentage >= 50 and < 70', expectedEmoji: ':warning:', expectedColor: '#f0ad4e', mailingRatio: 4, requestsMails: 2, percentage: 50 },
-      { when: 'usagePercentage >= 70', expectedEmoji: ':rotating_light:', expectedColor: '#d9534f', mailingRatio: 1000000, requestsMails: 700000, percentage: 70 },
+      {
+        when: 'usagePercentage < 50',
+        expectedEmoji: ':vertical_traffic_light:',
+        expectedColor: '#5bc0de',
+        mailingRatio: 4,
+        requestsMails: 1,
+        percentage: 25,
+      },
+      {
+        when: 'usagePercentage >= 50 and < 70',
+        expectedEmoji: ':warning:',
+        expectedColor: '#f0ad4e',
+        mailingRatio: 4,
+        requestsMails: 2,
+        percentage: 50,
+      },
+      {
+        when: 'usagePercentage >= 70',
+        expectedEmoji: ':rotating_light:',
+        expectedColor: '#d9534f',
+        mailingRatio: 1000000,
+        requestsMails: 700000,
+        percentage: 70,
+      },
     ];
 
     cases.forEach((testCase) => {
@@ -74,23 +95,25 @@ describe('Unit | SendInBlue Report', () => {
                 {
                   title: 'Nombre d‘e-mails envoyés :',
                   value: `${testCase.requestsMails.toLocaleString()}`,
-                  short: true
+                  short: true,
                 },
                 {
                   title: 'Quota utilisé :',
                   value: `${testCase.percentage}% ${testCase.expectedEmoji}`,
-                  short: true
+                  short: true,
                 },
               ],
-            }
-          ]
+            },
+          ],
         };
 
         // when
         await sendinblueReport.getReport();
 
         // then
-        sinon.assert.calledWithExactly(axiosStub, expectedWebHookUrl, expectedBlocks, { headers: { 'content-type': 'application/json' }});
+        sinon.assert.calledWithExactly(axiosStub, expectedWebHookUrl, expectedBlocks, {
+          headers: { 'content-type': 'application/json' },
+        });
       });
     });
   });

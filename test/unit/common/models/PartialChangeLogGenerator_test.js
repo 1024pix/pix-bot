@@ -5,11 +5,9 @@ const PullRequest = require('../../../../common/models/PullRequest');
 const PullRequestGroup = require('../../../../common/models/PullRequestGroup');
 const PartialChangeLogGenerator = require('../../../../common/models/PartialChangeLogGenerator');
 
-describe('Unit | Common | Models | PartialChangeLogGenerator', () => {
-
-  describe('#constructor', () => {
-
-    it('should create an instance of PartialChangeLogGenerator', () => {
+describe('Unit | Common | Models | PartialChangeLogGenerator', function () {
+  describe('#constructor', function () {
+    it('should create an instance of PartialChangeLogGenerator', function () {
       // given
       const headOfChangelogTitle = '## v3.99.0 (10/09/2021)';
       const pullRequestGroups = [
@@ -36,9 +34,8 @@ describe('Unit | Common | Models | PartialChangeLogGenerator', () => {
     });
   });
 
-  describe('#grabPullRequestsByTag', () => {
-
-    it('should return an empty array if all Pull Requests are grabbed', () => {
+  describe('#grabPullRequestsByTag', function () {
+    it('should return an empty array if all Pull Requests are grabbed', function () {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
@@ -66,7 +63,7 @@ describe('Unit | Common | Models | PartialChangeLogGenerator', () => {
       expect(result).to.an('array').that.is.empty;
     });
 
-    it('should return the initial Pull Request array if no Pull Request is grabbed', () => {
+    it('should return the initial Pull Request array if no Pull Request is grabbed', function () {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
@@ -94,7 +91,7 @@ describe('Unit | Common | Models | PartialChangeLogGenerator', () => {
       expect(result).to.deep.equal(initialPullRequests);
     });
 
-    it('should return the initial Pull Request array minus all Pull Requests grabbed', () => {
+    it('should return the initial Pull Request array minus all Pull Requests grabbed', function () {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
@@ -126,9 +123,8 @@ describe('Unit | Common | Models | PartialChangeLogGenerator', () => {
     });
   });
 
-  describe('#getLinesToDisplay', () => {
-
-    it('should return empty array if if no Pull Request is grabbed', () => {
+  describe('#getLinesToDisplay', function () {
+    it('should return empty array if if no Pull Request is grabbed', function () {
       // given
       const featurePullRequestGroup = new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
@@ -152,7 +148,7 @@ describe('Unit | Common | Models | PartialChangeLogGenerator', () => {
       expect(result).to.an('array').that.is.empty;
     });
 
-    it('should return head of Changelog title and list of Pull Requests grabbed', () => {
+    it('should return head of Changelog title and list of Pull Requests grabbed', function () {
       // given
       const headOfChangelogTitle = '## v3.99.0 (10/09/2021)';
 

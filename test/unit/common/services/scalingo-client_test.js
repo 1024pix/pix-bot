@@ -8,19 +8,19 @@ const ScalingoClient = require('../../../../common/services/scalingo-client');
 const { expect } = require('chai');
 
 describe('Scalingo client', () => {
-  beforeEach(() => {
+  beforeEach(function () {
     config.github.token = 'github-personal-access-token';
   });
 
-  afterEach(() => {
+  afterEach(function () {
     config.github.token = null;
   });
 
   describe('#ScalingoClient.getInstance', () => {
-
     it('should return the Scalingo client instance for recette', async () => {
       // given
-      sinon.stub(scalingo, 'clientFromToken')
+      sinon
+        .stub(scalingo, 'clientFromToken')
         .withArgs('tk-us-scalingo-token-recette', { apiUrl: 'https://scalingo.recette' })
         .resolves({ apiClient: () => {} });
       // when
@@ -32,7 +32,8 @@ describe('Scalingo client', () => {
 
     it('should return the Scalingo client instance for production', async () => {
       // given
-      sinon.stub(scalingo, 'clientFromToken')
+      sinon
+        .stub(scalingo, 'clientFromToken')
         .withArgs('tk-us-scalingo-token-production', { apiUrl: 'https://scalingo.production' })
         .resolves({ apiClient: () => {} });
       // when
@@ -61,10 +62,9 @@ describe('Scalingo client', () => {
     let createDeploymentStub;
     let scalingoClient;
 
-    beforeEach(async () => {
+    beforeEach(async function () {
       createDeploymentStub = sinon.stub();
-      sinon.stub(scalingo, 'clientFromToken')
-        .resolves({ Deployments: { create: createDeploymentStub } });
+      sinon.stub(scalingo, 'clientFromToken').resolves({ Deployments: { create: createDeploymentStub } });
 
       scalingoClient = await ScalingoClient.getInstance('production');
     });
@@ -92,14 +92,11 @@ describe('Scalingo client', () => {
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0');
       // then
-      sinon.assert.calledWithExactly(
-        createDeploymentStub,
-        'pix-app-production',
-        {
-          git_ref: 'v1.0',
-          source_url: 'https://github-personal-access-token@github.com/github-owner/github-repository/archive/v1.0.tar.gz'
-        }
-      );
+      sinon.assert.calledWithExactly(createDeploymentStub, 'pix-app-production', {
+        git_ref: 'v1.0',
+        source_url:
+          'https://github-personal-access-token@github.com/github-owner/github-repository/archive/v1.0.tar.gz',
+      });
       expect(result).to.be.equal('Deployed pix-app-production v1.0');
     });
 
@@ -116,14 +113,10 @@ describe('Scalingo client', () => {
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', 'given-repository');
       // then
-      sinon.assert.calledWithExactly(
-        createDeploymentStub,
-        'pix-app-production',
-        {
-          git_ref: 'v1.0',
-          source_url: 'https://github-personal-access-token@github.com/github-owner/given-repository/archive/v1.0.tar.gz'
-        }
-      );
+      sinon.assert.calledWithExactly(createDeploymentStub, 'pix-app-production', {
+        git_ref: 'v1.0',
+        source_url: 'https://github-personal-access-token@github.com/github-owner/given-repository/archive/v1.0.tar.gz',
+      });
       expect(result).to.be.equal('Deployed pix-app-production v1.0');
     });
 
@@ -147,7 +140,7 @@ describe('Scalingo client', () => {
     let scalingoClient;
     let axiosGet;
 
-    beforeEach(async () => {
+    beforeEach(async function () {
       clientAppsFind = sinon.stub();
       clientDeploymentsFind = sinon.stub();
       sinon.stub(scalingo, 'clientFromToken').resolves({
@@ -170,7 +163,6 @@ describe('Scalingo client', () => {
         last_deployment_id: 'deployment-id-1',
       });
       clientDeploymentsFind.withArgs('pix-app-production', 'deployment-id-1').resolves({ pusher: {} });
-
 
       // when
       const appInfos = await scalingoClient.getAppInfo('pix-app-production');
@@ -362,12 +354,12 @@ describe('Scalingo client', () => {
     let manualReviewApp;
     let scalingoClient;
 
-    beforeEach(async () => {
+    beforeEach(async function () {
       manualReviewApp = sinon.stub();
       sinon.stub(scalingo, 'clientFromToken').resolves({
         SCMRepoLinks: {
-          manualReviewApp
-        }
+          manualReviewApp,
+        },
       });
 
       scalingoClient = await ScalingoClient.getInstance('reviewApps');

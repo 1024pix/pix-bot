@@ -1,24 +1,24 @@
 const { describe, it } = require('mocha');
 const sinon = require('sinon');
-const proxyquire =  require('proxyquire');
+const proxyquire = require('proxyquire');
 const { expect } = require('chai');
 const ScalingoClient = require('../../../../common/services/scalingo-client');
 const github = require('../../../../common/services/github');
 
-describe('releases', function() {
+describe('releases', function () {
   let exec;
   let releasesService;
 
-  beforeEach(() => {
-    exec = sinon.stub().callsFake(async () => Promise.resolve({stdout: 'some heavy logs\n3.14.0\n', stderr: ''}));
+  beforeEach(function () {
+    exec = sinon.stub().callsFake(async () => Promise.resolve({ stdout: 'some heavy logs\n3.14.0\n', stderr: '' }));
     releasesService = proxyquire('../../../../common/services/releases', {
-      'child_process': {exec},
-      util: {promisify: fn => fn}
+      child_process: { exec },
+      util: { promisify: (fn) => fn },
     });
   });
 
-  describe('#deployPixRepo', async function() {
-    it('should deploy the pix site', async function() {
+  describe('#deployPixRepo', function () {
+    it('should deploy the pix site', async function () {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
@@ -33,7 +33,7 @@ describe('releases', function() {
     });
   });
 
-  describe('#deploy', async function () {
+  describe('#deploy', function () {
     it('should trigger deployments of managed applications', async () => {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
@@ -67,13 +67,18 @@ describe('releases', function() {
     });
   });
 
-  describe('#publish', async function () {
+  describe('#publish', function () {
     it('should call the publish script', async function () {
       //when
       await releasesService.publish('minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git )$')));
+      sinon.assert.calledWith(
+        exec,
+        sinon.match(
+          new RegExp('.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git )$')
+        )
+      );
     });
 
     it('should call the publish script with the branch name', async function () {
@@ -81,7 +86,14 @@ describe('releases', function() {
       await releasesService.publish('minor', 'hotfix');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git hotfix)$')));
+      sinon.assert.calledWith(
+        exec,
+        sinon.match(
+          new RegExp(
+            '.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git hotfix)$'
+          )
+        )
+      );
     });
 
     it('should retrieve new package version', async function () {
@@ -93,8 +105,8 @@ describe('releases', function() {
     });
   });
 
-  describe('#publishPixRepo', async function () {
-    it('should call the release pix script with \'minor\'', async function () {
+  describe('#publishPixRepo', function () {
+    it("should call the release pix script with 'minor'", async function () {
       // given
       sinon.stub(github, 'getDefaultBranch').resolves('dev');
 
@@ -102,8 +114,14 @@ describe('releases', function() {
       await releasesService.publishPixRepo('pix-site', 'minor');
 
       // then
-      sinon.assert.calledWith(exec, sinon.match(new RegExp('.*(/scripts/release-pix-repo.sh) github-owner pix-site minor dev https://undefined@github.com/github-owner/pix-site.git$')));
+      sinon.assert.calledWith(
+        exec,
+        sinon.match(
+          new RegExp(
+            '.*(/scripts/release-pix-repo.sh) github-owner pix-site minor dev https://undefined@github.com/github-owner/pix-site.git$'
+          )
+        )
+      );
     });
   });
-
 });

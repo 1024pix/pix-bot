@@ -5,6 +5,5 @@ module.exports = [
     method: 'POST',
     path: '/applications/{name}/cdn-cache-invalidations',
     handler: applicationController.invalidateCdnCache,
-  }
+  },
 ];
-

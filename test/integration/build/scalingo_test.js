@@ -10,7 +10,7 @@ describe('Integration | Build | Scalingo', function () {
 
   describe('POST /build/scalingo/deploy-endpoint', function () {
     describe('when scalingo build status is "build-error" ', () => {
-      it('should send slack message and return 200', async () => {
+      it('should send slack message and return 200', async function () {
         // Given
         const body = {
           app_name: 'pix-github-actions-test',
@@ -50,7 +50,7 @@ describe('Integration | Build | Scalingo', function () {
                 fields: [
                   {
                     type: 'mrkdwn',
-                    text: '*Deployment failed*\nWith status \'build-error\'',
+                    text: "*Deployment failed*\nWith status 'build-error'",
                   },
                   {
                     type: 'mrkdwn',
@@ -86,7 +86,7 @@ describe('Integration | Build | Scalingo', function () {
     });
 
     describe('when scalingo build status is not "build-error" ', () => {
-      it('should not send slack message and return 200', async () => {
+      it('should not send slack message and return 200', async function () {
         // Given
         const body = {
           app_name: 'pix-github-actions-test',

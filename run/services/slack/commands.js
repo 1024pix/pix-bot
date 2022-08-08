@@ -26,13 +26,14 @@ const axios = require('axios');
 const postSlackMessage = require('../../../common/services/slack/surfaces/messages/post-message');
 
 function sendResponse(responseUrl, text) {
-  axios.post(responseUrl,
+  axios.post(
+    responseUrl,
     { text },
     {
       headers: {
         'content-type': 'application/json',
       },
-    },
+    }
   );
 }
 
@@ -57,8 +58,12 @@ function _isReleaseTypeInvalid(releaseType) {
 }
 async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    postSlackMessage('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
-    throw new Error('Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".');
+    postSlackMessage(
+      'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".'
+    );
+    throw new Error(
+      'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".'
+    );
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
   await releasesService.publishPixRepo(repoName, releaseType);
@@ -74,8 +79,12 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
 
 async function publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    postSlackMessage('Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".');
-    throw new Error('Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".');
+    postSlackMessage(
+      'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".'
+    );
+    throw new Error(
+      'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".'
+    );
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
   await releasesService.publishPixRepo(repoName, releaseType);
@@ -137,19 +146,16 @@ async function getAndDeployLastVersion({ appName }) {
 function _isAppFromPixRepo({ appName }) {
   const appNameParts = appName.split('-');
 
-  if(appNameParts.length != 3) {
+  if (appNameParts.length != 3) {
     return false;
   }
 
   const [appNamePrefix, shortAppName, environment] = appName.split('-');
 
-  return appNamePrefix === 'pix'
-    && PIX_APPS.includes(shortAppName)
-    && PIX_APPS_ENVIRONMENTS.includes(environment);
+  return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
 module.exports = {
-
   async createAndDeployPixLCMS(payload) {
     await publishAndDeployRelease(PIX_LCMS_REPO_NAME, [PIX_LCMS_APP_NAME], payload.text, payload.response_url);
   },
@@ -167,7 +173,12 @@ module.exports = {
   },
 
   async createAndDeployPixDatawarehouse(payload) {
-    await publishAndDeployRelease(PIX_DATAWAREHOUSE_REPO_NAME, PIX_DATAWAREHOUSE_APPS_NAME, payload.text, payload.response_url);
+    await publishAndDeployRelease(
+      PIX_DATAWAREHOUSE_REPO_NAME,
+      PIX_DATAWAREHOUSE_APPS_NAME,
+      payload.text,
+      payload.response_url
+    );
   },
 
   async createAndDeployPixBotRelease(payload) {
@@ -192,5 +203,5 @@ module.exports = {
 
   async createAndDeployPixTutosRelease(payload) {
     await publishAndDeployRelease(PIX_TUTOS_REPO_NAME, [PIX_TUTOS_APP_NAME], payload.text, payload.response_url);
-  }
+  },
 };

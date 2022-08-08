@@ -4,7 +4,6 @@ const { deploy } = require('../services/deploy');
 const Boom = require('@hapi/boom');
 
 module.exports = {
-
   async deploySites(request) {
     const payload = request.payload;
     if (payload.secret !== config.prismic.secret) {
@@ -15,6 +14,4 @@ module.exports = {
 
     return `pix.fr and pro.pix.fr deployments ${releaseTag} are in progress. Check deployment status on Scalingo`;
   },
-
 };
-

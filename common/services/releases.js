@@ -8,10 +8,9 @@ const ScalingoClient = require('./scalingo-client');
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 
 module.exports = {
-
   environments: {
     recette: 'recette',
-    production: 'production'
+    production: 'production',
   },
 
   async publish(releaseType, branchName) {
@@ -20,7 +19,12 @@ module.exports = {
       const sanitizedReleaseType = _sanitizedArgument(releaseType);
       const sanitizedBranchName = _sanitizedArgument(branchName);
       const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${config.github.repository}.git`;
-      const newPackageVersion = await _runScriptWithArgument(scriptFileName, sanitizedReleaseType, repositoryURL, sanitizedBranchName);
+      const newPackageVersion = await _runScriptWithArgument(
+        scriptFileName,
+        sanitizedReleaseType,
+        repositoryURL,
+        sanitizedBranchName
+      );
       return newPackageVersion;
     } catch (err) {
       console.error(err);
@@ -34,9 +38,11 @@ module.exports = {
 
     const client = await ScalingoClient.getInstance(sanitizedEnvironment);
 
-    const results = await Promise.all(config.PIX_APPS.map(pixApp => {
-      return client.deployFromArchive(`pix-${pixApp}`, sanitizedReleaseTag);
-    }));
+    const results = await Promise.all(
+      config.PIX_APPS.map((pixApp) => {
+        return client.deployFromArchive(`pix-${pixApp}`, sanitizedReleaseTag);
+      })
+    );
 
     return results;
   },
@@ -67,9 +73,9 @@ module.exports = {
   _runScriptWithArgument,
 };
 
-async function _runScriptWithArgument (scriptFileName, ...args) {
+async function _runScriptWithArgument(scriptFileName, ...args) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
-  const {stdout, stderr} = await exec(`${scriptsDirectory}/${scriptFileName} ${args.join(' ')}`);
+  const { stdout, stderr } = await exec(`${scriptsDirectory}/${scriptFileName} ${args.join(' ')}`);
   console.log(`stdout: ${stdout}`);
   const lastLine = stdout.split('\n').slice(-2, -1).pop();
   console.error(`stderr: ${stderr}`);
@@ -77,5 +83,5 @@ async function _runScriptWithArgument (scriptFileName, ...args) {
 }
 
 function _sanitizedArgument(param) {
-  return param? param.trim().toLowerCase(): null;
+  return param ? param.trim().toLowerCase() : null;
 }

@@ -1,7 +1,6 @@
 const { Tags } = require('./Tags');
 
 class PullRequest {
-
   constructor({ html_url, number, title }) {
     this.htmlUrl = html_url;
     this.number = number;

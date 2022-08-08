@@ -2,15 +2,13 @@ const { expect } = require('../../../test-helper');
 
 const { Tag, Tags } = require('../../../../common/models/Tags');
 
-describe('Unit | Common | Models | Tags', () => {
-
-  describe('#getTagByTitle', () => {
-
+describe('Unit | Common | Models | Tags', function () {
+  describe('#getTagByTitle', function () {
     [
       {
         testTitle: 'Tag.BUGFIX if title include [BUGFIX]',
         pullRequestTitle: '[BUGFIX] Pull Request Title',
-        expectedTag: Symbol.for('bugfix')
+        expectedTag: Symbol.for('bugfix'),
       },
       {
         testTitle: 'Tag.FEATURE if title include [FEATURE]',
@@ -32,9 +30,8 @@ describe('Unit | Common | Models | Tags', () => {
         pullRequestTitle: '[TECH] Pull Request Title',
         expectedTag: Symbol.for('tech'),
       },
-
     ].forEach((testCase) => {
-      it(`should return ${testCase.testTitle}`, () => {
+      it(`should return ${testCase.testTitle}`, function () {
         // when
         const tag = Tags.getTagByTitle(testCase.pullRequestTitle);
 
@@ -44,9 +41,8 @@ describe('Unit | Common | Models | Tags', () => {
     });
   });
 
-  describe('#isValidTag', () => {
-
-    it('should return false if parameter is not a valid Tag', () => {
+  describe('#isValidTag', function () {
+    it('should return false if parameter is not a valid Tag', function () {
       // given
       const wrongTag = 'wrongTag';
 
@@ -57,7 +53,7 @@ describe('Unit | Common | Models | Tags', () => {
       expect(result).to.be.false;
     });
 
-    it('should return true if parameter is a valid Tag', () => {
+    it('should return true if parameter is a valid Tag', function () {
       // given
       const validTag = Tag.FEATURE;
 

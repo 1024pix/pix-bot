@@ -33,7 +33,8 @@ manifest.registerSlashCommand({
 manifest.registerSlashCommand({
   command: '/deploy-pix-datawarehouse',
   path: '/slack/commands/create-and-deploy-pix-datawarehouse-release',
-  description: 'Crée une release de Pix-Datawarehouse et la déploie en production (pix-datawarehouse-production & pix-datawarehouse-ex-production)',
+  description:
+    'Crée une release de Pix-Datawarehouse et la déploie en production (pix-datawarehouse-production & pix-datawarehouse-ex-production)',
   usage_hint: '[patch, minor, major]',
   should_escape: false,
   handler: slackbotController.createAndDeployPixDatawarehouseRelease,
@@ -106,7 +107,7 @@ manifest.registerShortcut({
   name: 'Déployer une version/MEP',
   type: 'global',
   callback_id: 'deploy-release',
-  description: 'Lance le déploiement d\'une version sur l\'environnement de production'
+  description: "Lance le déploiement d'une version sur l'environnement de production",
 });
 
 manifest.addInteractivity({

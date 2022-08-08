@@ -1,11 +1,6 @@
 const dayjs = require('dayjs');
 const slackPostMessageService = require('../../common/services/slack/surfaces/messages/post-message');
-const {
-  Message,
-  Section,
-  Context,
-  Attachment,
-} = require('slack-block-builder');
+const { Message, Section, Context, Attachment } = require('slack-block-builder');
 const config = require('../../config');
 
 function getSlackMessageAttachments(payload) {
@@ -51,14 +46,9 @@ module.exports = {
 
     console.log(`Failed deployement on the ${request.payload.app_name} app`);
 
-    const { message, attachments } = getSlackMessageAttachments(
-      request.payload
-    );
+    const { message, attachments } = getSlackMessageAttachments(request.payload);
 
-    await slackPostMessageService.postMessage(
-      message,
-      JSON.stringify(attachments)
-    );
+    await slackPostMessageService.postMessage(message, JSON.stringify(attachments));
 
     console.log('Slack error notification sent');
 

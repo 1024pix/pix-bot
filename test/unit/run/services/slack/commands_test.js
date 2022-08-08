@@ -19,7 +19,7 @@ const githubServices = require('../../../../../common/services/github');
 const ScalingoClient = require('../../../../../common/services/scalingo-client');
 
 describe('Services | Slack | Commands', () => {
-  beforeEach(() => {
+  beforeEach(function () {
     // given
     sinon.stub(axios, 'post');
     sinon.stub(releasesServices, 'deployPixRepo').resolves();
@@ -29,7 +29,7 @@ describe('Services | Slack | Commands', () => {
 
   describe('#createAndDeployPixSiteRelease', () => {
     describe('when releaseType is set to minor', () => {
-      beforeEach(async () => {
+      beforeEach(async function () {
         // given
         const payload = { text: 'minor', response_url: 'http://example.net/callback' };
         // when
@@ -53,7 +53,9 @@ describe('Services | Slack | Commands', () => {
       });
 
       it('should inform the user of the progress', () => {
-        sinon.assert.calledWith(axios.post, 'http://example.net/callback', { text: 'Le script de déploiement de la release \'v1.0.0\' pour pix-site, pix-pro en production s\'est déroulé avec succès. En attente de l\'installation des applications sur Scalingo…' });
+        sinon.assert.calledWith(axios.post, 'http://example.net/callback', {
+          text: "Le script de déploiement de la release 'v1.0.0' pour pix-site, pix-pro en production s'est déroulé avec succès. En attente de l'installation des applications sur Scalingo…",
+        });
       });
     });
 
@@ -76,13 +78,14 @@ describe('Services | Slack | Commands', () => {
         // when
         await createAndDeployPixSiteRelease(payload);
         // then
-        sinon.assert.calledWith(axios.post, 'http://example.net/callback', { text: 'Erreur lors du déploiement de pix-site, pix-pro en production.' });
+        sinon.assert.calledWith(axios.post, 'http://example.net/callback', {
+          text: 'Erreur lors du déploiement de pix-site, pix-pro en production.',
+        });
       });
     });
   });
 
   describe('#createAndDeployPixUI', () => {
-
     it('should publish a new release', async () => {
       // given
       const payload = { text: 'minor' };
@@ -118,7 +121,6 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployEmberTestingLibrary', () => {
-
     it('should publish a new release', async () => {
       // given
       const payload = { text: 'minor' };
@@ -154,7 +156,7 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployPixLCMS', () => {
-    beforeEach(async () => {
+    beforeEach(async function () {
       // given
       const payload = { text: 'minor' };
       // when
@@ -179,7 +181,7 @@ describe('Services | Slack | Commands', () => {
 
   describe('#createAndDeployPixBotRelease', () => {
     let client;
-    beforeEach(async () => {
+    beforeEach(async function () {
       // given
       client = { deployFromArchive: sinon.spy() };
       sinon.stub(ScalingoClient, 'getInstance').resolves(client);
@@ -210,7 +212,7 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployPixDatawarehouse', () => {
-    beforeEach(async () => {
+    beforeEach(async function () {
       // given
       const payload = { text: 'minor' };
       // when
@@ -269,7 +271,7 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployDbStats', () => {
-    beforeEach(async () => {
+    beforeEach(async function () {
       // given
       const payload = { text: 'minor' };
       // when
@@ -293,8 +295,7 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployPixTutosRelease', () => {
-
-    beforeEach(async () => {
+    beforeEach(async function () {
       // given
       const payload = { text: 'minor' };
       // when
@@ -320,7 +321,7 @@ describe('Services | Slack | Commands', () => {
   describe('#deployMetabase', () => {
     let client;
 
-    beforeEach(async () => {
+    beforeEach(async function () {
       // given
       client = { deployFromArchive: sinon.spy() };
       sinon.stub(ScalingoClient, 'getInstance').resolves(client);
@@ -330,8 +331,12 @@ describe('Services | Slack | Commands', () => {
 
     it('should deploy the release', () => {
       // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-metabase-production', 'master', 'metabase-deploy', { withEnvSuffix: false });
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-data-metabase-dev', 'master', 'metabase-deploy', { withEnvSuffix: false });
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-metabase-production', 'master', 'metabase-deploy', {
+        withEnvSuffix: false,
+      });
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-data-metabase-dev', 'master', 'metabase-deploy', {
+        withEnvSuffix: false,
+      });
     });
   });
 });

@@ -5,6 +5,5 @@ module.exports = [
     method: 'POST',
     path: '/deploy-sites',
     handler: deploySitesController.deploySites,
-  }
+  },
 ];
-

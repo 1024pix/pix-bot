@@ -3,7 +3,6 @@ const config = require('../../config');
 const Boom = require('@hapi/boom');
 
 module.exports = {
-
   async invalidateCdnCache(request) {
     if (request.query.apiKey !== config.openApi.authorizationToken) {
       throw Boom.unauthorized('Token is missing or is incorrect');
@@ -18,6 +17,4 @@ module.exports = {
       return error;
     }
   },
-
 };
-

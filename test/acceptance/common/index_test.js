@@ -2,27 +2,27 @@ const { expect } = require('../../test-helper');
 const server = require('../../../server');
 const { version } = require('../../../package.json');
 
-describe('Acceptance | Common | Index', function() {
-  describe('GET /', function() {
-    it('responds with 200', async () => {
+describe('Acceptance | Common | Index', function () {
+  describe('GET /', function () {
+    it('responds with 200', async function () {
       const res = await server.inject({
         method: 'GET',
-        url: '/'
+        url: '/',
       });
       expect(res.statusCode).to.equal(200);
       expect(JSON.parse(res.payload)).to.deep.equal({
         name: 'pix-bot',
         version,
-        description: 'Pix Bot application'
+        description: 'Pix Bot application',
       });
     });
   });
 
-  describe('GET /slackviews', function() {
-    it('responds with 200', async () => {
+  describe('GET /slackviews', function () {
+    it('responds with 200', async function () {
       const res = await server.inject({
         method: 'GET',
-        url: '/slackviews'
+        url: '/slackviews',
       });
       expect(res.statusCode).to.equal(200);
     });

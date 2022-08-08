@@ -3,7 +3,6 @@ const { environments, deploy, publish } = require('../../../common/services/rele
 const githubService = require('../../../common/services/github');
 
 module.exports = {
-
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
     const hasConfigFileChanged = await githubService.hasConfigFileChangedSinceLatestRelease();
@@ -23,7 +22,7 @@ module.exports = {
 
     _publishAndDeploy({ releaseType, environment: environments.recette });
     return {
-      'response_action': 'clear'
+      response_action: 'clear',
     };
   },
 };
