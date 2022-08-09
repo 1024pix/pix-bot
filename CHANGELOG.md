@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.28.1 (09/08/2022)
+
+
+### :coffee: Autre
+- [#140](https://github.com/1024pix/pix-bot/pull/140) :bug: Corriger l'envoi de messages slack
+
 ## v1.28.0 (09/08/2022)
 
 
