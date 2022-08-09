@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.28.0 (09/08/2022)
+
+
+### :building_construction: Tech
+- [#138](https://github.com/1024pix/pix-bot/pull/138) [TECH] Mise en place Prettier et utilise les règles standard
+
+### :bug: Correction
+- [#139](https://github.com/1024pix/pix-bot/pull/139) [BUGFIX] Corrige le déploiement en recette
+- [#137](https://github.com/1024pix/pix-bot/pull/137) [BUGFIX] Utiliser les commits entre les 2 releases pour afficher une notification de changement de config lors du déploiement
+
 ## v1.27.0 (05/08/2022)
 
 
