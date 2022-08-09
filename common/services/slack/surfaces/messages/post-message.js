@@ -12,7 +12,7 @@ module.exports = {
       },
       data: {
         channel: '#tech-releases',
-        message: message,
+        text: message,
         attachments: attachments,
       },
     };

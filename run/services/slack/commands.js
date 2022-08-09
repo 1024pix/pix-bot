@@ -23,7 +23,7 @@ const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const githubServices = require('../../../common/services/github');
 const axios = require('axios');
-const postSlackMessage = require('../../../common/services/slack/surfaces/messages/post-message');
+const slackPostMessageService = require('../../../common/services/slack/surfaces/messages/post-message');
 
 function sendResponse(responseUrl, text) {
   axios.post(
@@ -58,7 +58,7 @@ function _isReleaseTypeInvalid(releaseType) {
 }
 async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    postSlackMessage(
+    slackPostMessageService.postMessage(
       'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".'
     );
     throw new Error(
@@ -72,14 +72,14 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
-    postSlackMessage(`[PIX-UI] App deployed (${releaseTagAfterRelease})`);
+    slackPostMessageService.postMessage(`[PIX-UI] App deployed (${releaseTagAfterRelease})`);
     sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
   }
 }
 
 async function publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    postSlackMessage(
+    slackPostMessageService.postMessage(
       'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".'
     );
     throw new Error(
@@ -93,7 +93,7 @@ async function publishAndDeployEmberTestingLibrary(repoName, releaseType, respon
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
-    postSlackMessage(`[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`);
+    slackPostMessageService.postMessage(`[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`);
     sendResponse(responseUrl, getSuccessReleaseMessage(releaseTagAfterRelease, repoName));
   }
 }
