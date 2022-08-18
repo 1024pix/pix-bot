@@ -28,8 +28,19 @@ function orderPr(listPR) {
   });
 }
 
+function cleanPrTitle(pullrequest) {
+  const reg = /\[NORA\]/i;
+  const newTitle = pullrequest.title.replace(reg, '');
+  pullrequest.title = newTitle;
+  return pullrequest;
+}
+
 function filterPullRequest(pullrequests, dateOfLastMEP) {
-  return pullrequests.filter((PR) => PR.merged_at > dateOfLastMEP);
+  pullrequests = pullrequests.filter((PR) => PR.merged_at > dateOfLastMEP);
+  pullrequests.forEach((pullrequest) => {
+    cleanPrTitle(pullrequest);
+  });
+  return pullrequests;
 }
 
 function getHeadOfChangelog(tagVersion) {
@@ -61,6 +72,7 @@ function getNewChangeLogLines({ headOfChangelogTitle, pullRequests }) {
 
 module.exports = {
   displayPullRequest,
+  cleanPrTitle,
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,

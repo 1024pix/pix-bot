@@ -4,6 +4,7 @@ const github = require('../../../../common/services/github');
 
 const {
   displayPullRequest,
+  cleanPrTitle,
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,
@@ -29,6 +30,26 @@ describe('Unit | Common | Services | Changelog', function () {
 
       // then
       expect(result).to.equal(expectedLine);
+    });
+  });
+
+  describe('#cleanPrTitle', function () {
+    it('should remove uc NORA from PR title when defined', function () {
+      const pullRequest = { title: '[TECH] [NORA] pr 1' };
+      console.log(pullRequest.title);
+      const result = cleanPrTitle(pullRequest);
+      console.log(result.title);
+      expect(result.title).to.equal('[TECH]  pr 1');
+    });
+    it('should remove lc nora from PR title when defined', function () {
+      const pullRequest = { title: '[TECH] [nora] pr 1' };
+      const result = cleanPrTitle(pullRequest);
+      expect(result.title).to.equal('[TECH]  pr 1');
+    });
+    it('should do nothing when there is no nora in title', function () {
+      const pullRequest = { title: '[TECH] pr 1' };
+      const result = cleanPrTitle(pullRequest);
+      expect(result.title).to.equal(pullRequest.title);
     });
   });
 

@@ -28,6 +28,10 @@ module.exports = {
       if (!reviewApps) {
         return 'No RA configured for this repository';
       }
+      const titleLc = payload.pull_request.title.toLowerCase();
+      if (/\[nora\]/.test(titleLc)) {
+        return `RA disabled for this PR`;
+      }
       const client = await ScalingoClient.getInstance('reviewApps');
       for (const appName of reviewApps) {
         await client.deployReviewApp(appName, prId);

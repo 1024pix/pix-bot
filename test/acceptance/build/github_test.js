@@ -11,6 +11,7 @@ describe('Acceptance | Build | Github', function () {
         action: 'opened',
         number: 2,
         pull_request: {
+          title: '[TECH] Pr n2',
           head: {
             repo: {
               name: 'pix',
@@ -92,6 +93,21 @@ describe('Acceptance | Build | Github', function () {
       });
       expect(res.statusCode).to.equal(200);
       expect(res.result).to.eql('Ignoring edited action');
+    });
+
+    it('responds with 200 and do nothing for a pr with nora in title', async function () {
+      body.pull_request.title = '[TECH][NORA] Pr n2';
+      const res = await server.inject({
+        method: 'POST',
+        url: '/github/webhook',
+        headers: {
+          ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+          'x-github-event': 'pull_request',
+        },
+        payload: body,
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result).to.eql('RA disabled for this PR');
     });
 
     it('responds with 200 and do nothing for other event', async function () {
