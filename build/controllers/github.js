@@ -19,6 +19,7 @@ module.exports = {
       const repository = payload.pull_request.head.repo.name;
       const prId = payload.number;
       const reviewApps = repositoryToScalingoAppsReview[repository];
+      const labelsList = payload.pull_request.labels;
       if (payload.pull_request.head.repo.fork) {
         return 'No RA for a fork';
       }
@@ -27,6 +28,9 @@ module.exports = {
       }
       if (!reviewApps) {
         return 'No RA configured for this repository';
+      }
+      if (labelsList.some((label) => label.name == 'no-review-app')) {
+        return 'RA disabled for this PR';
       }
       const client = await ScalingoClient.getInstance('reviewApps');
       for (const appName of reviewApps) {
