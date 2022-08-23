@@ -83,6 +83,19 @@ class ScalingoClient {
       throw err;
     }
   }
+
+  async inviteCollaborator(appId, email) {
+    const { invitation_link } = await this.client.Collaborators.invite(appId, email);
+    return invitation_link;
+  }
+
+  async createApp(appName) {
+    const app = {
+      name: appName,
+    };
+    const { id } = await this.client.Apps.create(app);
+    return id;
+  }
 }
 
 async function _isUrlReachable(url) {

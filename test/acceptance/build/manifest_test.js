@@ -63,6 +63,13 @@ describe('Acceptance | Build | Manifest', function () {
               usage_hint: "[@quelqu'un @quelqu'une]",
               should_escape: false,
             },
+            {
+              command: '/scalingo-create-app',
+              url: `http://${hostname}/slack/commands/scalingo-create-app`,
+              description: "Création d'application sur scalingo",
+              usage_hint: '[app-name environment]',
+              should_escape: false,
+            },
           ],
         },
         oauth_config: {

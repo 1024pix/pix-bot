@@ -47,6 +47,15 @@ manifest.registerSlashCommand({
   handler: slackbotController.startMobRoles,
 });
 
+manifest.registerSlashCommand({
+  command: '/scalingo-create-app',
+  path: '/slack/commands/scalingo-create-app',
+  description: "Création d'application sur scalingo",
+  usage_hint: '[app-name environment]',
+  should_escape: false,
+  handler: slackbotController.createAppOnScalingo,
+});
+
 manifest.registerShortcut({
   name: 'Publier une version/MER',
   type: 'global',
