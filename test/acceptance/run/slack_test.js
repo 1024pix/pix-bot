@@ -233,5 +233,180 @@ describe('Acceptance | Run | Slack', function () {
         });
       });
     });
+
+    describe('when using the shortcut scalingo-app-creation', function () {
+      it('calls slack with the create app modal', async function () {
+        const slackCall = nock('https://slack.com')
+          .post('/api/views.open', {
+            trigger_id: 'payload id',
+            view: {
+              title: {
+                type: 'plain_text',
+                text: 'Créer une application',
+              },
+              submit: {
+                type: 'plain_text',
+                text: 'Créer',
+              },
+              callback_id: 'application-name-selection',
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
+              },
+              blocks: [
+                {
+                  block_id: 'create-app-name',
+                  label: {
+                    type: 'plain_text',
+                    text: "Nom de l'application",
+                  },
+                  element: {
+                    action_id: 'scalingo-app-name',
+                    placeholder: {
+                      type: 'plain_text',
+                      text: 'application-name',
+                    },
+                    initial_value: 'pix-super-application-recette',
+                    type: 'plain_text_input',
+                  },
+                  type: 'input',
+                },
+                {
+                  block_id: 'application-env',
+                  label: {
+                    type: 'plain_text',
+                    text: 'Quelle région ?',
+                  },
+                  element: {
+                    placeholder: {
+                      type: 'plain_text',
+                      text: 'Choisis la région',
+                    },
+                    action_id: 'item',
+                    options: [
+                      {
+                        text: {
+                          type: 'plain_text',
+                          text: 'Paris - SecNumCloud - Outscale',
+                        },
+                        value: 'production',
+                      },
+                      {
+                        text: {
+                          type: 'plain_text',
+                          text: 'Paris - Outscale',
+                        },
+                        value: 'recette',
+                      },
+                    ],
+                    type: 'static_select',
+                  },
+                  type: 'input',
+                },
+              ],
+              type: 'modal',
+            },
+          })
+          .reply(200);
+        const body = {
+          type: 'shortcut',
+          callback_id: 'scalingo-app-creation',
+          trigger_id: 'payload id',
+        };
+        // when
+        const res = await server.inject({
+          method: 'POST',
+          url: '/run/slack/interactive-endpoint',
+          headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+          payload: body,
+        });
+        // then
+        expect(res.statusCode).to.equal(204);
+        expect(slackCall.isDone()).to.be.true;
+      });
+
+      describe('with the callback application-name-selection', function () {
+        it('returns the confirmation modal', async function () {
+          const slackBody = {
+            ok: true,
+            user: {
+              profile: {
+                email: 'john.doe@pix.fr',
+              },
+            },
+          };
+          const slackCall = nock('https://slack.com').get('/api/users.info?user=xxxxxx').reply(200, slackBody);
+          const body = {
+            type: 'view_submission',
+            user: {
+              id: 'xxxxxx',
+            },
+            view: {
+              type: 'modal',
+              private_metadata: '',
+              callback_id: 'application-name-selection',
+              state: {
+                values: {
+                  'create-app-name': {
+                    'scalingo-app-name': {
+                      value: 'pix-application-de-folie-recette',
+                    },
+                  },
+                  'application-env': {
+                    item: {
+                      selected_option: {
+                        text: {
+                          text: 'recette',
+                        },
+                        value: 'recette',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/run/slack/interactive-endpoint',
+            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+            payload: body,
+          });
+
+          expect(slackCall.isDone()).to.be.true;
+          expect(res.statusCode).to.equal(200);
+          expect(JSON.parse(res.payload)).to.deep.equal({
+            response_action: 'push',
+            view: {
+              title: {
+                type: 'plain_text',
+                text: 'Confirmation',
+              },
+              submit: {
+                type: 'plain_text',
+                text: '🚀 Go !',
+              },
+              callback_id: 'application-creation-confirmation',
+              private_metadata:
+                '{"applicationName":"pix-application-de-folie-recette","applicationEnvironment":"recette","userEmail":"john.doe@pix.fr"}',
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
+              },
+              blocks: [
+                {
+                  text: {
+                    type: 'mrkdwn',
+                    text: "Vous vous apprêtez à créer l'application *pix-application-de-folie-recette* dans la région : *recette* et à inviter cet adesse email en tant que collaborateur : *john.doe@pix.fr*",
+                  },
+                  type: 'section',
+                },
+              ],
+              type: 'modal',
+            },
+          });
+        });
+      });
+    });
   });
 });

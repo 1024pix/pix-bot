@@ -46,7 +46,9 @@ module.exports = (function() {
       production: {
         token: process.env.SCALINGO_TOKEN_PRODUCTION,
         apiUrl: process.env.SCALINGO_API_URL_PRODUCTION,
-      }
+      },
+      validAppSuffix: _getJSON(process.env.SCALINGO_VALID_APP_SUFFIX) ||
+        ["production","review","integration","recette","sandbox","dev","router","test"]
     },
 
     openApi: {
