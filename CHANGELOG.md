@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.29.0 (29/08/2022)
+
+
+### :rocket: Amélioration
+- [#142](https://github.com/1024pix/pix-bot/pull/142) [FEATURE] Eviter de déployer une RA si la PR contient le label `no-review-app`. 
+
 ## v1.28.1 (09/08/2022)
 
 
