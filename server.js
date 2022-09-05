@@ -14,22 +14,21 @@ const server = Hapi.server({
   port: config.port,
 });
 
-['/build', '/run', '/common'].forEach(subDir => {
+['/build', '/run', '/common'].forEach((subDir) => {
   const routesDir = path.join(__dirname, subDir, '/routes');
-  require('fs').readdirSync(routesDir)
+  require('fs')
+    .readdirSync(routesDir)
     .filter((file) => path.extname(file) === '.js')
     .forEach((file) => server.route(require(path.join(routesDir, file))));
 });
 
 manifests.forEach((manifest) => {
-  const routes = manifest
-        .getHapiRoutes()
-        .map((route) => {
-          return {
-            ...route,
-            config: slackConfig,
-          };
-        });
+  const routes = manifest.getHapiRoutes().map((route) => {
+    return {
+      ...route,
+      config: slackConfig,
+    };
+  });
   server.route(routes);
 });
 
