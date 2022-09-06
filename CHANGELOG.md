@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.30.0 (06/09/2022)
+
+
+### :building_construction: Tech
+- [#147](https://github.com/1024pix/pix-bot/pull/147) [TECH] Linter l'ensemble des fichiers.
+- [#144](https://github.com/1024pix/pix-bot/pull/144) [TECH] Créer une application Scalingo depuis Slack
+- [#145](https://github.com/1024pix/pix-bot/pull/145) [TECH] Permettre de linter avec autofix avant chaque commit en local, si besoin.
+
+### :coffee: Autre
+- [#146](https://github.com/1024pix/pix-bot/pull/146) [CLEANUP] Utilise l'action github d'auto-merge commune
+
 ## v1.29.0 (29/08/2022)
 
 
