@@ -32,9 +32,11 @@ async function main() {
       pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
     } else {
       try {
-        pullRequests = await pullRequestSinceLastRelease(repoOwner, repoName, lastTagNameOnBranch, branchName)
+        pullRequests = await pullRequestSinceLastRelease(repoOwner, repoName, lastTagNameOnBranch, branchName);
       } catch (e) {
-        console.error('Error while fetching the tag and pull-requests. If it\'s your first release, ensure that the version set is 0.0.0.');
+        console.error(
+          "Error while fetching the tag and pull-requests. If it's your first release, ensure that the version set is 0.0.0."
+        );
         throw e;
       }
     }
@@ -48,19 +50,19 @@ async function main() {
 
     try {
       currentChangeLog = fs.readFileSync(CHANGELOG_FILE, 'utf-8').split('\n');
-    } catch(error) {
+    } catch (error) {
       console.log('Changelog file does not exist. It will be created.');
       currentChangeLog = [`# ${repoName} Changelog\n`, '\n'];
     }
 
     const changeLogContent = generateChangeLogContent({
       currentChangelogContent: currentChangeLog,
-      changes: newChangeLogLines
+      changes: newChangeLogLines,
     });
 
     console.log(`Writing to ${CHANGELOG_FILE}`);
     fs.writeFileSync(CHANGELOG_FILE, changeLogContent.join('\n'));
-  } catch(e) {
+  } catch (e) {
     console.log(e);
     process.exit(1);
   }

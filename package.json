@@ -14,7 +14,7 @@
     "deploy:minor": "npm version minor && npm run deploy:tag",
     "deploy:patch": "npm version patch && npm run deploy:tag",
     "deploy:tag": "git push --tags && git push",
-    "lint": "eslint server.js common/* run/* build/* bin/* test/*",
+    "lint": "eslint .",
     "local:trigger-lint-on-commit": "husky install",
     "local:prevent-trigger-lint-on-commit": "git config --unset core.hooksPath",
     "start": "node bin/www",
