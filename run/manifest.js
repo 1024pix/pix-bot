@@ -111,7 +111,7 @@ manifest.registerShortcut({
 });
 
 manifest.registerShortcut({
-  name: 'Créer une application sur Scalingo',
+  name: 'Créer une appli Scalingo',
   type: 'global',
   callback_id: 'scalingo-app-creation',
   description: "Lance la création d'une application sur Scalingo",

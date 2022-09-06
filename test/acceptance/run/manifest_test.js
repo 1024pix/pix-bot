@@ -27,7 +27,7 @@ describe('Acceptance | Run | Manifest', function () {
               description: "Lance le déploiement d'une version sur l'environnement de production",
             },
             {
-              name: 'Créer une application sur Scalingo',
+              name: 'Créer une appli Scalingo',
               type: 'global',
               callback_id: 'scalingo-app-creation',
               description: "Lance la création d'une application sur Scalingo",
