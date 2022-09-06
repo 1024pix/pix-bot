@@ -1,3 +1,3 @@
 {
-  "*.{js,yml, yaml}": "eslint --fix server.js common/* run/* build/* bin/* test/*"
+  "*.{js,yml, yaml}": "eslint --fix"
 }
