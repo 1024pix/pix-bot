@@ -3,13 +3,6 @@ function _getNumber(numberAsString, defaultIntNumber) {
   return isNaN(number) ? defaultIntNumber : number;
 }
 
-function _getCommaSeparatedValues(valuesAsString) {
-  if (!valuesAsString) {
-    return undefined;
-  }
-  return valuesAsString.split(',').map(v => v.trim());
-}
-
 function _getJSON(value) {
   if (!value) {
     return undefined;
@@ -18,11 +11,10 @@ function _getJSON(value) {
   return JSON.parse(value);
 }
 
-module.exports = (function() {
-
+module.exports = (function () {
   const config = {
     port: _getNumber(process.env.PORT, 3000),
-    environment: (process.env.NODE_ENV || 'development'),
+    environment: process.env.NODE_ENV || 'development',
 
     baleen: {
       pat: process.env.BALEEN_PERSONAL_ACCESS_TOKEN,
@@ -47,8 +39,16 @@ module.exports = (function() {
         token: process.env.SCALINGO_TOKEN_PRODUCTION,
         apiUrl: process.env.SCALINGO_API_URL_PRODUCTION,
       },
-      validAppSuffix: _getJSON(process.env.SCALINGO_VALID_APP_SUFFIX) ||
-        ["production","review","integration","recette","sandbox","dev","router","test"]
+      validAppSuffix: _getJSON(process.env.SCALINGO_VALID_APP_SUFFIX) || [
+        'production',
+        'review',
+        'integration',
+        'recette',
+        'sandbox',
+        'dev',
+        'router',
+        'test',
+      ],
     },
 
     openApi: {
@@ -70,7 +70,7 @@ module.exports = (function() {
 
     googleSheet: {
       key: process.env.GOOGLE_SHEET_API_KEY,
-      idA11Y: process.env.GOOGLE_SHEET_A11Y
+      idA11Y: process.env.GOOGLE_SHEET_A11Y,
     },
 
     sendInBlue: {
@@ -136,5 +136,4 @@ module.exports = (function() {
   }
 
   return config;
-
 })();
