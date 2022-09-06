@@ -110,6 +110,13 @@ manifest.registerShortcut({
   description: "Lance le déploiement d'une version sur l'environnement de production",
 });
 
+manifest.registerShortcut({
+  name: 'Créer une application sur Scalingo',
+  type: 'global',
+  callback_id: 'scalingo-app-creation',
+  description: "Lance la création d'une application sur Scalingo",
+});
+
 manifest.addInteractivity({
   path: '/run/slack/interactive-endpoint',
   handler: slackbotController.interactiveEndpoint,

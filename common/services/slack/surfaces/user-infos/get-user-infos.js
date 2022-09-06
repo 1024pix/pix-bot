@@ -2,27 +2,20 @@ const axios = require('axios');
 const config = require('../../../../../config');
 
 module.exports = {
-  async postMessage(message, attachments, channel = '#tech-releases') {
+  async getUserEmail(userId) {
     const options = {
-      method: 'POST',
-      url: 'https://slack.com/api/chat.postMessage',
+      method: 'GET',
+      url: `https://slack.com/api/users.info?user=${userId}`,
       headers: {
         'content-type': 'application/json',
         authorization: `Bearer ${config.slack.botToken}`,
       },
-      data: {
-        channel: channel,
-        text: message,
-        attachments: attachments,
-      },
     };
-
     const response = await axios(options);
     if (!response.data.ok) {
       console.error(response.data);
       throw new Error('Slack error received');
     }
-
-    return response;
+    return response.data.user.profile.email;
   },
 };

@@ -116,13 +116,22 @@ module.exports = {
         if (payload.callback_id === 'deploy-release') {
           shortcuts.openViewDeployReleaseTagSelection(payload);
         }
+        if (payload.callback_id === 'scalingo-app-creation') {
+          shortcuts.openViewCreateAppOnScalingoSelection(payload);
+        }
         return null;
       case 'view_submission':
         if (payload.view.callback_id === shortcuts.openViewDeployReleaseTagSelectionCallbackId) {
           return viewSubmissions.submitReleaseTagSelection(payload);
         }
+        if (payload.view.callback_id === shortcuts.openViewCreateAppOnScalingoSelectionCallbackId) {
+          return viewSubmissions.submitApplicationNameSelection(payload);
+        }
         if (payload.view.callback_id === viewSubmissions.submitReleaseTagSelectionCallbackId) {
           return viewSubmissions.submitReleaseDeploymentConfirmation(payload);
+        }
+        if (payload.view.callback_id === viewSubmissions.submitApplicationNameSelectionCallbackId) {
+          return viewSubmissions.submitCreateAppOnScalingoConfirmation(payload);
         }
         return null;
       case 'view_closed':

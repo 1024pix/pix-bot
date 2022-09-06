@@ -83,6 +83,28 @@ class ScalingoClient {
       throw err;
     }
   }
+  async inviteCollaborator(applicationId, collaboratorEmail) {
+    try {
+      const { invitation_link } = await this.client.Collaborators.invite(applicationId, collaboratorEmail);
+      return invitation_link;
+    } catch (e) {
+      console.error(JSON.stringify(e));
+      throw new Error(`Impossible to invite ${collaboratorEmail} on ${applicationId}`);
+    }
+  }
+
+  async createApplication(name) {
+    const app = {
+      name: name,
+    };
+    try {
+      const { id } = await this.client.Apps.create(app);
+      return id;
+    } catch (e) {
+      console.error(JSON.stringify(e));
+      throw new Error(`Impossible to create ${app.name}, ${e.name}`);
+    }
+  }
 }
 
 async function _isUrlReachable(url) {
