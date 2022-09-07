@@ -48,7 +48,7 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerShortcut({
-  name: 'Publier une version/MER',
+  name: 'MER/Publier une version',
   type: 'global',
   callback_id: 'publish-release',
   description: "Publie une nouvelle version et la déploie sur l'environnement de recette",

@@ -104,7 +104,7 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerShortcut({
-  name: 'Déployer une version/MEP',
+  name: 'MEP/Déployer une version',
   type: 'global',
   callback_id: 'deploy-release',
   description: "Lance le déploiement d'une version sur l'environnement de production",
