@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.31.0 (08/09/2022)
+
+
+### :building_construction: Tech
+- [#148](https://github.com/1024pix/pix-bot/pull/148) [TECH] Mettre à jour cron de 1.8 à 2.1
+
+### :bug: Correction
+- [#149](https://github.com/1024pix/pix-bot/pull/149) [BUGFIX] Le nom du shortcut de création de l'application est trop long.
+
+### :coffee: Autre
+- [#150](https://github.com/1024pix/pix-bot/pull/150) Mentionner MER/MEP au début du label de l'action de release
+
 ## v1.30.0 (06/09/2022)
 
 
