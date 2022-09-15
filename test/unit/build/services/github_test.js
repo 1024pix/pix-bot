@@ -18,7 +18,7 @@ describe('#getPullRequests', function () {
 
     nock('https://api.github.com')
       .get(
-        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+user%3Agithub-owner+label%3Ateam-certif&sort=updated&order=desc'
+        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Ateam-certif&sort=updated&order=desc'
       )
       .reply(200, { items });
 
@@ -55,7 +55,7 @@ describe('#getPullRequests', function () {
     const items = [{ html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [{ name: 'team certif' }] }];
     scopePr = nock('https://api.github.com')
       .get(
-        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+user%3Agithub-owner+label%3ATech%2520Review%2520Needed&sort=updated&order=desc'
+        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3ATech%2520Review%2520Needed&sort=updated&order=desc'
       )
       .reply(200, { items });
 
