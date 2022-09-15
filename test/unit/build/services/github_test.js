@@ -49,13 +49,13 @@ describe('#getPullRequests', function () {
     expect(response).to.deep.equal(expectedResponse);
   });
 
-  it('should call the Github API with the label without space', async function () {
+  it('should call the Github API with the label', async function () {
     // given
     let scopePr, scopeReview;
-    const items = [{ html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [{ name: 'team certif' }] }];
+    const items = [{ html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [{ name: 'cross-team' }] }];
     scopePr = nock('https://api.github.com')
       .get(
-        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3ATech%2520Review%2520Needed&sort=updated&order=desc'
+        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc'
       )
       .reply(200, { items });
 
@@ -64,7 +64,7 @@ describe('#getPullRequests', function () {
       .reply(200, []);
 
     // when
-    await githubService.getPullRequests('Tech Review Needed');
+    await githubService.getPullRequests('cross-team');
 
     // then
     expect(scopePr.isDone());
