@@ -36,8 +36,9 @@ async function _getPullReviewsFromGithub(label) {
   const octokit = _createOctokit();
 
   try {
+    const params = [{ is: 'pr' }, { is: 'open' }, { archived: false }, { draft: false }, { user: owner }, { label }];
     const { data } = await octokit.search.issuesAndPullRequests({
-      q: `is:pr+is:open+archived:false+draft:false+user:${owner}+label:${label}`,
+      q: _buildOctokitSearchQueryString(params),
       sort: 'updated',
       order: 'desc',
     });
@@ -246,6 +247,10 @@ function _verifyRequestSignature(webhookSecret, body, signature) {
   if (!tsscmp(hash, hmac.digest('hex'))) {
     throw Boom.unauthorized('Github signature verification failed. Signature mismatch.');
   }
+}
+
+function _buildOctokitSearchQueryString(params = []) {
+  return params.map((p) => `${Object.keys(p)}:${Object.values(p)}`).join('+');
 }
 
 module.exports = {
