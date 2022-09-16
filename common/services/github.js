@@ -37,7 +37,7 @@ async function _getPullReviewsFromGithub(label) {
 
   try {
     const { data } = await octokit.search.issuesAndPullRequests({
-      q: `is:pr+is:open+archived:false+user:${owner}+label:${label}`,
+      q: `is:pr+is:open+archived:false+draft:false+user:${owner}+label:${label}`,
       sort: 'updated',
       order: 'desc',
     });
