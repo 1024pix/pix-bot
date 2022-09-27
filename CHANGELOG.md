@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.32.0 (27/09/2022)
+
+
+### :rocket: Amélioration
+- [#151](https://github.com/1024pix/pix-bot/pull/151) [FEATURE] Filtrer les PR draft sur la commande Slack /pr-pix 
+
+### :bug: Correction
+- [#153](https://github.com/1024pix/pix-bot/pull/153) [BUGFIX] Mise à jour de scalingo-review-app-manager
+
+### :coffee: Autre
+- [#152](https://github.com/1024pix/pix-bot/pull/152) [DX] Construction query string Octokit via function
+
 ## v1.31.0 (08/09/2022)
 
 
