@@ -106,6 +106,10 @@ module.exports = (function () {
     PIX_METABASE_REPO_NAME: 'metabase-deploy',
     PIX_METABASE_APPS_NAME: ['pix-metabase-production', 'pix-data-metabase-dev'],
 
+    PIX_METABASE_SERVICE_USER: process.env.PIX_METABASE_SERVICE_USER,
+    PIX_METABASE_SERVICE_PASSWORD: process.env.PIX_METABASE_SERVICE_PASSWORD,
+    PIX_METABASE_HOST: process.env.PIX_METABASE_HOST,
+
     PIX_APPS: ['app', 'certif', 'admin', 'orga', 'api'],
     PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
