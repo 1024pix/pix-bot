@@ -18,6 +18,8 @@ const {
   PIX_METABASE_APPS_NAME,
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
+  PIX_GRAVITEE_APIM_REPO_NAME,
+  PIX_GRAVITEE_APIM_APPS_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -156,6 +158,16 @@ function _isAppFromPixRepo({ appName }) {
 }
 
 module.exports = {
+  async deployGraviteeAPIM() {
+    const repoName = PIX_GRAVITEE_APIM_REPO_NAME;
+    const client = await ScalingoClient.getInstance('production');
+    await Promise.all(
+      PIX_GRAVITEE_APIM_APPS_NAME.map((appName) => {
+        return client.deployFromArchive(appName, 'main', repoName, { withEnvSuffix: false });
+      })
+    );
+  },
+
   async createAndDeployPixLCMS(payload) {
     await publishAndDeployRelease(PIX_LCMS_REPO_NAME, [PIX_LCMS_APP_NAME], payload.text, payload.response_url);
   },

@@ -15,4 +15,18 @@ describe('Acceptance | Run | SlashCommand', function () {
       expect(res.result.text).to.equal('Commande de déploiement de Metabase en production bien reçue.');
     });
   });
+
+  describe('POST /slack/commands/deploy-gravitee-apim', function () {
+    it('responds with 200', async function () {
+      const body = {};
+      const res = await server.inject({
+        method: 'POST',
+        url: '/slack/commands/deploy-gravitee-apim',
+        headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+        payload: body,
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.text).to.equal('Commande de déploiement de Gravitee APIM en production bien reçue.');
+    });
+  });
 });
