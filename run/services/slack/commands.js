@@ -157,15 +157,18 @@ function _isAppFromPixRepo({ appName }) {
   return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
+async function deployFromBranch(repoName, appNames, branch) {
+  const client = await ScalingoClient.getInstance('production');
+  return Promise.all(
+    appNames.map((appName) => {
+      return client.deployFromArchive(appName, branch, repoName, { withEnvSuffix: false });
+    })
+  );
+}
+
 module.exports = {
   async deployGraviteeAPIM() {
-    const repoName = PIX_GRAVITEE_APIM_REPO_NAME;
-    const client = await ScalingoClient.getInstance('production');
-    await Promise.all(
-      PIX_GRAVITEE_APIM_APPS_NAME.map((appName) => {
-        return client.deployFromArchive(appName, 'main', repoName, { withEnvSuffix: false });
-      })
-    );
+    await deployFromBranch(PIX_GRAVITEE_APIM_REPO_NAME, PIX_GRAVITEE_APIM_APPS_NAME, 'main');
   },
 
   async createAndDeployPixLCMS(payload) {
@@ -206,13 +209,7 @@ module.exports = {
   },
 
   async deployMetabase() {
-    const repoName = PIX_METABASE_REPO_NAME;
-    const client = await ScalingoClient.getInstance('production');
-    await Promise.all(
-      PIX_METABASE_APPS_NAME.map((appName) => {
-        return client.deployFromArchive(appName, 'master', repoName, { withEnvSuffix: false });
-      })
-    );
+    await deployFromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
   },
 
   async createAndDeployPixTutosRelease(payload) {
