@@ -196,9 +196,11 @@ module.exports = {
   async deployMetabase() {
     const repoName = PIX_METABASE_REPO_NAME;
     const client = await ScalingoClient.getInstance('production');
-    await PIX_METABASE_APPS_NAME.map((appName) => {
-      return client.deployFromArchive(appName, 'master', repoName, { withEnvSuffix: false });
-    });
+    await Promise.all(
+      PIX_METABASE_APPS_NAME.map((appName) => {
+        return client.deployFromArchive(appName, 'master', repoName, { withEnvSuffix: false });
+      })
+    );
   },
 
   async createAndDeployPixTutosRelease(payload) {
