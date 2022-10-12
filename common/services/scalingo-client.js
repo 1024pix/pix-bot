@@ -105,6 +105,10 @@ class ScalingoClient {
       throw new Error(`Impossible to create ${app.name}, ${e.name}`);
     }
   }
+
+  async getDeployments(appName) {
+    return this.client.Deployments.for(appName);
+  }
 }
 
 async function _isUrlReachable(url) {

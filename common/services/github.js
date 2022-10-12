@@ -347,4 +347,6 @@ module.exports = {
     }
     return true;
   },
+
+  createOctokit: _createOctokit
 };
