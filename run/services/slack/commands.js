@@ -18,6 +18,8 @@ const {
   PIX_METABASE_APPS_NAME,
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
+  PIX_GRAVITEE_APIM_REPO_NAME,
+  PIX_GRAVITEE_APIM_APPS_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -155,7 +157,20 @@ function _isAppFromPixRepo({ appName }) {
   return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
+async function deployFromBranch(repoName, appNames, branch) {
+  const client = await ScalingoClient.getInstance('production');
+  return Promise.all(
+    appNames.map((appName) => {
+      return client.deployFromArchive(appName, branch, repoName, { withEnvSuffix: false });
+    })
+  );
+}
+
 module.exports = {
+  async deployGraviteeAPIM() {
+    await deployFromBranch(PIX_GRAVITEE_APIM_REPO_NAME, PIX_GRAVITEE_APIM_APPS_NAME, 'main');
+  },
+
   async createAndDeployPixLCMS(payload) {
     await publishAndDeployRelease(PIX_LCMS_REPO_NAME, [PIX_LCMS_APP_NAME], payload.text, payload.response_url);
   },
@@ -194,11 +209,7 @@ module.exports = {
   },
 
   async deployMetabase() {
-    const repoName = PIX_METABASE_REPO_NAME;
-    const client = await ScalingoClient.getInstance('production');
-    await PIX_METABASE_APPS_NAME.map((appName) => {
-      return client.deployFromArchive(appName, 'master', repoName, { withEnvSuffix: false });
-    });
+    await deployFromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
   },
 
   async createAndDeployPixTutosRelease(payload) {

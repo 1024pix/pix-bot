@@ -103,6 +103,14 @@ manifest.registerSlashCommand({
   handler: slackbotController.createAndDeployPixTutosRelease,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-gravitee-apim',
+  path: '/slack/commands/deploy-gravitee-apim',
+  description: 'Pour déployer les applications Gravitee APIM depuis la branche main',
+  should_escape: false,
+  handler: slackbotController.deployGraviteeAPIM,
+});
+
 manifest.registerShortcut({
   name: 'MEP/Déployer une version',
   type: 'global',

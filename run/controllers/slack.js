@@ -9,6 +9,15 @@ function _getDeployStartedMessage(release, appName) {
 }
 
 module.exports = {
+  deployGraviteeAPIM(request) {
+    const payload = request.pre.payload;
+    commands.deployGraviteeAPIM(payload);
+
+    return {
+      text: 'Commande de déploiement de Gravitee APIM en production bien reçue.',
+    };
+  },
+
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixSiteRelease(payload);

@@ -112,6 +112,13 @@ describe('Acceptance | Run | Manifest', function () {
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-tutos-release`,
               usage_hint: '[patch, minor, major]',
             },
+            {
+              command: '/deploy-gravitee-apim',
+              description: 'Pour déployer les applications Gravitee APIM depuis la branche main',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-gravitee-apim`,
+              usage_hint: undefined,
+            },
           ],
         },
         oauth_config: {

@@ -110,6 +110,13 @@ module.exports = (function () {
     PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
     PIX_TUTOS_APP_NAME: 'pix-tutos',
+    PIX_GRAVITEE_APIM_REPO_NAME: 'pix-gravitee-apim',
+    PIX_GRAVITEE_APIM_APPS_NAME: [
+      'pix-apim-portal-ui-production',
+      'pix-apim-gateway-production',
+      'pix-apim-management-ui-production',
+      'pix-apim-rest-api-production',
+    ],
   };
 
   if (process.env.NODE_ENV === 'test') {
