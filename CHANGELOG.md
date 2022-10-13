@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.33.0 (13/10/2022)
+
+
+### :rocket: Amélioration
+- [#155](https://github.com/1024pix/pix-bot/pull/155) [FEATURE] Déployer Gravitee
+
 ## v1.32.0 (27/09/2022)
 
 
