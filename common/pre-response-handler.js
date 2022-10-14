@@ -2,11 +2,17 @@ const { scalingo } = require('../config');
 
 function handleErrors(request, h) {
   const response = request.response;
+  const expectedStatusCodes = [401, 400];
 
-  if (response instanceof Error && response.output.statusCode !== 401 && response.output.statusCode !== 400) {
-    const stacktrace = response.stack.slice(0, scalingo.maxLogLength);
-    console.error(stacktrace);
-    return h.response('An error occurred, please try again later').code(500);
+  if (response instanceof Error) {
+    const statusCode = response?.output?.statusCode;
+    if (!expectedStatusCodes.includes(statusCode)) {
+      {
+        const message = response.stack.slice(0, scalingo.maxLogLength);
+        console.error(message);
+        return h.response('An error occurred, please try again later').code(500);
+      }
+    }
   }
 
   return h.continue;
