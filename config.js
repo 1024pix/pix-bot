@@ -49,6 +49,7 @@ module.exports = (function () {
         'router',
         'test',
       ],
+      maxLogLength: process.env.MAX_LOG_LENGTH || 1000,
     },
 
     openApi: {

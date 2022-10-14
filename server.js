@@ -9,10 +9,17 @@ const runManifest = require('./run/manifest');
 const buildManifest = require('./build/manifest');
 const { slackConfig } = require('./common/config');
 const manifests = [runManifest, buildManifest];
+const preResponseHandler = require('./common/pre-response-handler');
+
+const setupErrorHandling = function (server) {
+  server.ext('onPreResponse', preResponseHandler.handleErrors);
+};
 
 const server = Hapi.server({
   port: config.port,
 });
+
+setupErrorHandling(server);
 
 ['/build', '/run', '/common'].forEach((subDir) => {
   const routesDir = path.join(__dirname, subDir, '/routes');

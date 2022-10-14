@@ -5,12 +5,16 @@ const nock = require('nock');
 const crypto = require('crypto');
 const config = require('../config');
 
+const { StatusCodes } = require('http-status-codes');
+
 chai.use(require('sinon-chai'));
 
+// eslint-disable-next-line mocha/no-top-level-hooks
 beforeEach(function () {
   nock.disableNetConnect();
 });
 
+// eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(function () {
   sinon.restore();
   nock.cleanAll();
@@ -150,4 +154,5 @@ module.exports = {
   createSlackWebhookSignatureHeaders,
   nockGithubWithConfigChanges,
   nockGithubWithNoConfigChanges,
+  StatusCodes,
 };
