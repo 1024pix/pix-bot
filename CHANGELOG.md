@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.35.0 (18/10/2022)
+
+
+### :building_construction: Tech
+- [#157](https://github.com/1024pix/pix-bot/pull/157) [TECH] Empêcher le merge si un rebase est en cours
+- [#154](https://github.com/1024pix/pix-bot/pull/154) [TECH] Mise à jour des dépendances
+
+### :bug: Correction
+- [#158](https://github.com/1024pix/pix-bot/pull/158) [BUGFIX] Mise a jour de scalingo-review-app-manager
+
 ## v1.34.0 (14/10/2022)
 
 
