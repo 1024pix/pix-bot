@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.35.1 (26/10/2022)
+
+
+### :bug: Correction
+- [#159](https://github.com/1024pix/pix-bot/pull/159) [BUGFIX] Corrige le nom de l'application scalingo pour le metabase de data
+
 ## v1.35.0 (18/10/2022)
 
 
