@@ -16,7 +16,7 @@ describe('Integration | Run | Services | Slack | Commands', function () {
         .post('/v1/apps/pix-metabase-production/deployments', deploymentPayload)
         .reply(200, {});
       const scalingoDeployMetabaseDataNock = nock('https://scalingo.production')
-        .post('/v1/apps/pix-data-metabase-dev/deployments', deploymentPayload)
+        .post('/v1/apps/pix-data-metabase-production/deployments', deploymentPayload)
         .reply(200, {});
 
       await commands.deployMetabase();

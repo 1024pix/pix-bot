@@ -334,7 +334,7 @@ describe('Services | Slack | Commands', () => {
       sinon.assert.calledWith(client.deployFromArchive, 'pix-metabase-production', 'master', 'metabase-deploy', {
         withEnvSuffix: false,
       });
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-data-metabase-dev', 'master', 'metabase-deploy', {
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-data-metabase-production', 'master', 'metabase-deploy', {
         withEnvSuffix: false,
       });
     });
