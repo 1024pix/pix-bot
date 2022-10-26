@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.35.2 (26/10/2022)
+
+
+### :bug: Correction
+- [#160](https://github.com/1024pix/pix-bot/pull/160) [BUGFIX] Mise à jour de scalingo-review-app-manager
+
 ## v1.35.1 (26/10/2022)
 
 
