@@ -2,8 +2,7 @@ const { scalingo } = require('../config');
 
 function handleErrors(request, h) {
   const response = request.response;
-  const expectedStatusCodes = [401, 400];
-
+  const expectedStatusCodes = [404, 401, 400];
   if (response instanceof Error) {
     const statusCode = response?.output?.statusCode;
     if (!expectedStatusCodes.includes(statusCode)) {

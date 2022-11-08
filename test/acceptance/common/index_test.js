@@ -53,6 +53,14 @@ describe('Acceptance | Common | Index', function () {
     });
   });
 
+  it('responds with 404', async function () {
+    const res = await server.inject({
+      method: 'GET',
+      url: '/should-not-exist',
+    });
+    expect(res.statusCode).to.equal(404);
+  });
+
   describe('GET /', function () {
     it('responds with 200', async function () {
       const res = await server.inject({
