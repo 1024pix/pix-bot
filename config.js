@@ -102,7 +102,7 @@ module.exports = (function () {
     PIX_SITE_REPO_NAME: 'pix-site',
     PIX_SITE_APPS: ['pix-site', 'pix-pro'],
     PIX_DATAWAREHOUSE_REPO_NAME: 'pix-db-replication',
-    PIX_DATAWAREHOUSE_APPS_NAME: ['pix-datawarehouse', 'pix-datawarehouse-ex'],
+    PIX_DATAWAREHOUSE_APPS_NAME: ['pix-datawarehouse', 'pix-datawarehouse-ex', 'pix-datawarehouse-data'],
 
     PIX_METABASE_REPO_NAME: 'metabase-deploy',
     PIX_METABASE_APPS_NAME: ['pix-metabase-production', 'pix-data-metabase-production'],
