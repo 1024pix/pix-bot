@@ -32,11 +32,15 @@ module.exports = {
       if (labelsList.some((label) => label.name == 'no-review-app')) {
         return 'RA disabled for this PR';
       }
-      const client = await ScalingoClient.getInstance('reviewApps');
-      for (const appName of reviewApps) {
-        await client.deployReviewApp(appName, prId);
+      try {
+        const client = await ScalingoClient.getInstance('reviewApps');
+        for (const appName of reviewApps) {
+          await client.deployReviewApp(appName, prId);
+        }
+        return `Created RA on app ${reviewApps.join(', ')} with pr ${prId}`;
+      } catch (error) {
+        throw new Error(`Scalingo APIError: ${error.message}`);
       }
-      return `Created RA on app ${reviewApps.join(', ')} with pr ${prId}`;
     } else {
       return `Ignoring ${eventName} event`;
     }
