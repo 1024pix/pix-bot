@@ -1,4 +1,4 @@
-const { expect, StatusCodes, nock, createGithubWebhookSignatureHeader } = require('../../test-helper');
+const { expect, StatusCodes } = require('../../test-helper');
 const server = require('../../../server');
 const { version } = require('../../../package.json');
 
@@ -20,31 +20,6 @@ describe('Acceptance | Common | Index', function () {
           method: 'GET',
           url: '/throw-error',
         });
-        expect(response.statusCode).to.equal(StatusCodes.INTERNAL_SERVER_ERROR);
-        expect(response.result.message).to.equal('An internal server error occurred');
-      });
-
-      it('should not make Boom crash on a Scalingo APIError', async function () {
-        const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(500, {
-          error: "Internal error occured, we're on it!",
-        });
-        const body = {
-          action: 'opened',
-          text: 'app-1',
-          pull_request: { labels: [], head: { repo: { name: 'pix-bot' } } },
-        };
-
-        const response = await server.inject({
-          method: 'POST',
-          url: '/github/webhook',
-          headers: {
-            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
-            'x-github-event': 'pull_request',
-          },
-          payload: body,
-        });
-
-        expect(scalingoTokenNock.isDone()).to.be.true;
         expect(response.statusCode).to.equal(StatusCodes.INTERNAL_SERVER_ERROR);
         expect(response.result.message).to.equal('An internal server error occurred');
       });
