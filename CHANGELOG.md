@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.36.0 (10/11/2022)
+
+
+### :bug: Correction
+- [#162](https://github.com/1024pix/pix-bot/pull/162) [BUGFIX] Corrige les crashs liés aux déploiements de Review Apps Scalingo
+
+### :coffee: Autre
+- [#161](https://github.com/1024pix/pix-bot/pull/161) Adding pix-datawarehouse-data to pix-db-replication app
+
 ## v1.35.2 (26/10/2022)
 
 
