@@ -1,6 +1,11 @@
 function handleErrors(request, h) {
   if (request.response.isBoom) {
-    console.error({ level: 'ERROR', message: request.response.message, stack: request.response.stack });
+    const errorLog = {
+      level: 'ERROR',
+      message: request.response.message,
+      stack: request.response.stack,
+    };
+    console.error(JSON.stringify(errorLog));
   }
   return h.continue;
 }
