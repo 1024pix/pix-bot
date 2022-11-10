@@ -51,12 +51,12 @@ describe('Acceptance | Common | Index', function () {
     });
   });
 
-  it('responds with 404', async function () {
-    const res = await server.inject({
+  it('should respond NOT_FOUND (404)', async function () {
+    const { statusCode } = await server.inject({
       method: 'GET',
       url: '/should-not-exist',
     });
-    expect(res.statusCode).to.equal(404);
+    expect(statusCode).to.equal(StatusCodes.NOT_FOUND);
   });
 
   describe('GET /', function () {
