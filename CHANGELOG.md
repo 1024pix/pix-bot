@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.36.1 (10/11/2022)
+
+
+### :coffee: Autre
+- [#163](https://github.com/1024pix/pix-bot/pull/163) :art: Ecrire les logs d'erreurs sur une ligne
+
 ## v1.36.0 (10/11/2022)
 
 
