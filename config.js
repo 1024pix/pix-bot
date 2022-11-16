@@ -113,10 +113,10 @@ module.exports = (function () {
     PIX_TUTOS_APP_NAME: 'pix-tutos',
     PIX_GRAVITEE_APIM_REPO_NAME: 'pix-gravitee-apim',
     PIX_GRAVITEE_APIM_APPS_NAME: [
-      'pix-apim-portal-ui-production',
-      'pix-apim-gateway-production',
-      'pix-apim-management-ui-production',
-      'pix-apim-rest-api-production',
+      'pix-gravitee-apim-portal-ui-production',
+      'pix-gravitee-apim-gateway-production',
+      'pix-gravitee-apim-console-ui-production',
+      'pix-gravitee-apim-rest-api-production',
     ],
   };
 
