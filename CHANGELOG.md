@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.37.0 (17/11/2022)
+
+
+### :coffee: Autre
+- [#164](https://github.com/1024pix/pix-bot/pull/164) Mise à jour du nom des application Gravitee APIM
+
 ## v1.36.1 (10/11/2022)
 
 
