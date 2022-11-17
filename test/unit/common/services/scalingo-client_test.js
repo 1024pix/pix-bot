@@ -134,6 +134,36 @@ describe('Scalingo client', () => {
     });
   });
 
+  describe('#ScalingoClient.deployFromSCM', () => {
+    let manualDeployStub;
+    let scalingoClient;
+
+    beforeEach(async function () {
+      manualDeployStub = sinon.stub();
+      sinon.stub(scalingo, 'clientFromToken').resolves({ SCMRepoLinks: { manualDeploy: manualDeployStub } });
+
+      scalingoClient = await ScalingoClient.getInstance('production');
+    });
+
+    it('should deploy an application for a given tag', async () => {
+      await scalingoClient.deployFromSCM('pix-app-production', 'v1.0');
+      expect(manualDeployStub).to.have.been.calledOnceWithExactly('pix-app-production', 'v1.0');
+    });
+
+    it('should failed when application does not exists', async () => {
+      // given
+      sinon.stub(console, 'error');
+      manualDeployStub.rejects(new Error());
+      // when
+      try {
+        await scalingoClient.deployFromSCM('unknown-app-production', 'v1.0');
+        expect.fail('Should throw an error when application doesnt exists');
+      } catch (e) {
+        expect(e.message).to.equal('Impossible to deploy unknown-app-production v1.0');
+      }
+    });
+  });
+
   describe('#Scalingo.getAppInfo', () => {
     let clientAppsFind;
     let clientDeploymentsFind;

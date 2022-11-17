@@ -39,6 +39,17 @@ class ScalingoClient {
     return `Deployed ${scalingoApp} ${releaseTag}`;
   }
 
+  async deployFromSCM(scalingoApp, releaseTag) {
+    try {
+      await this.client.SCMRepoLinks.manualDeploy(scalingoApp, releaseTag);
+    } catch (e) {
+      console.error(e);
+      throw new Error(`Impossible to deploy ${scalingoApp} ${releaseTag}`);
+    }
+
+    return `Deployement of ${scalingoApp} ${releaseTag} has been requested`;
+  }
+
   async getAppInfo(target) {
     if (['production', 'integration', 'recette'].includes(target)) {
       return await this._getAllAppsInfo(target);
