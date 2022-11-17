@@ -171,7 +171,7 @@ async function deployTagUsingSCM(appNames, tag) {
   const client = await ScalingoClient.getInstance('production');
   return Promise.all(
     appNames.map((appName) => {
-      return client.deployFromSCM(appName, tag);
+      return client.deployUsingSCM(appName, tag);
     })
   );
 }

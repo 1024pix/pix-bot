@@ -97,7 +97,7 @@ describe('Scalingo client', () => {
         source_url:
           'https://github-personal-access-token@github.com/github-owner/github-repository/archive/v1.0.tar.gz',
       });
-      expect(result).to.be.equal('Deployed pix-app-production v1.0');
+      expect(result).to.be.equal('pix-app-production v1.0 has been deployed');
     });
 
     it('should deploy an application without the environment suffix', async () => {
@@ -105,7 +105,7 @@ describe('Scalingo client', () => {
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', undefined, { withEnvSuffix: false });
       // then
-      expect(result).to.be.equal('Deployed pix-app v1.0');
+      expect(result).to.be.equal('pix-app v1.0 has been deployed');
     });
 
     it('should deploy an application for a given repository', async () => {
@@ -117,10 +117,10 @@ describe('Scalingo client', () => {
         git_ref: 'v1.0',
         source_url: 'https://github-personal-access-token@github.com/github-owner/given-repository/archive/v1.0.tar.gz',
       });
-      expect(result).to.be.equal('Deployed pix-app-production v1.0');
+      expect(result).to.be.equal('pix-app-production v1.0 has been deployed');
     });
 
-    it('should failed when application does not exists', async () => {
+    it('should fail when application does not exists', async () => {
       // given
       sinon.stub(console, 'error');
       createDeploymentStub.rejects(new Error());
@@ -129,12 +129,12 @@ describe('Scalingo client', () => {
         await scalingoClient.deployFromArchive('unknown-app', 'v1.0');
         expect.fail('Should throw an error when application doesnt exists');
       } catch (e) {
-        expect(e.message).to.equal('Impossible to deploy unknown-app-production v1.0');
+        expect(e.message).to.equal('Unable to deploy unknown-app-production v1.0');
       }
     });
   });
 
-  describe('#ScalingoClient.deployFromSCM', () => {
+  describe('#ScalingoClient.deployUsingSCM', () => {
     let manualDeployStub;
     let scalingoClient;
 
@@ -146,20 +146,20 @@ describe('Scalingo client', () => {
     });
 
     it('should deploy an application for a given tag', async () => {
-      await scalingoClient.deployFromSCM('pix-app-production', 'v1.0');
+      await scalingoClient.deployUsingSCM('pix-app-production', 'v1.0');
       expect(manualDeployStub).to.have.been.calledOnceWithExactly('pix-app-production', 'v1.0');
     });
 
-    it('should failed when application does not exists', async () => {
+    it('should fail when application does not exists', async () => {
       // given
       sinon.stub(console, 'error');
       manualDeployStub.rejects(new Error());
       // when
       try {
-        await scalingoClient.deployFromSCM('unknown-app-production', 'v1.0');
+        await scalingoClient.deployUsingSCM('unknown-app-production', 'v1.0');
         expect.fail('Should throw an error when application doesnt exists');
       } catch (e) {
-        expect(e.message).to.equal('Impossible to deploy unknown-app-production v1.0');
+        expect(e.message).to.equal('Unable to deploy unknown-app-production v1.0');
       }
     });
   });
