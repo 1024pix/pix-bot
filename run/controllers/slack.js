@@ -18,6 +18,15 @@ module.exports = {
     };
   },
 
+  deployAirflow(request) {
+    const payload = request.pre.payload;
+    commands.deployAirflow(payload);
+
+    return {
+      text: _getDeployStartedMessage(payload.text, 'Airflow'),
+    };
+  },
+
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixSiteRelease(payload);
