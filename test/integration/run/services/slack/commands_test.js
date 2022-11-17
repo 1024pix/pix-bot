@@ -38,10 +38,10 @@ describe('Integration | Run | Services | Slack | Commands', function () {
         },
       };
       const nockDeploys = [
-        'pix-apim-portal-ui-production',
-        'pix-apim-gateway-production',
-        'pix-apim-management-ui-production',
-        'pix-apim-rest-api-production',
+        'pix-gravitee-apim-portal-ui-production',
+        'pix-gravitee-apim-gateway-production',
+        'pix-gravitee-apim-console-ui-production',
+        'pix-gravitee-apim-rest-api-production',
       ].map((app) => {
         return nock('https://scalingo.production')
           .post(`/v1/apps/${app}/deployments`, deploymentPayload)
