@@ -33,10 +33,21 @@ class ScalingoClient {
       });
     } catch (e) {
       console.error(e);
-      throw new Error(`Impossible to deploy ${scalingoApp} ${releaseTag}`);
+      throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
     }
 
-    return `Deployed ${scalingoApp} ${releaseTag}`;
+    return `${scalingoApp} ${releaseTag} has been deployed`;
+  }
+
+  async deployUsingSCM(scalingoApp, releaseTag) {
+    try {
+      await this.client.SCMRepoLinks.manualDeploy(scalingoApp, releaseTag);
+    } catch (e) {
+      console.error(e);
+      throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
+    }
+
+    return `Deployement of ${scalingoApp} ${releaseTag} has been requested`;
   }
 
   async getAppInfo(target) {

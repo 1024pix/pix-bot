@@ -111,6 +111,15 @@ manifest.registerSlashCommand({
   handler: slackbotController.deployGraviteeAPIM,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-airflow',
+  path: '/slack/commands/deploy-airflow',
+  description: 'Déploie la version précisée de Airflow en production',
+  usage_hint: '/deploy-airflow $version',
+  should_escape: false,
+  handler: slackbotController.deployAirflow,
+});
+
 manifest.registerShortcut({
   name: 'MEP/Déployer une version',
   type: 'global',

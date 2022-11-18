@@ -118,6 +118,7 @@ module.exports = (function () {
       'pix-gravitee-apim-console-ui-production',
       'pix-gravitee-apim-rest-api-production',
     ],
+    PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
   };
 
   if (process.env.NODE_ENV === 'test') {

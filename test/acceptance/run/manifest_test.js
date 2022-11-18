@@ -119,6 +119,13 @@ describe('Acceptance | Run | Manifest', function () {
               url: `http://${hostname}/slack/commands/deploy-gravitee-apim`,
               usage_hint: undefined,
             },
+            {
+              command: '/deploy-airflow',
+              description: 'Déploie la version précisée de Airflow en production',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-airflow`,
+              usage_hint: '/deploy-airflow $version',
+            },
           ],
         },
         oauth_config: {

@@ -20,6 +20,7 @@ const {
   PIX_TUTOS_APP_NAME,
   PIX_GRAVITEE_APIM_REPO_NAME,
   PIX_GRAVITEE_APIM_APPS_NAME,
+  PIX_AIRFLOW_APP_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -166,7 +167,21 @@ async function deployFromBranch(repoName, appNames, branch) {
   );
 }
 
+async function deployTagUsingSCM(appNames, tag) {
+  const client = await ScalingoClient.getInstance('production');
+  return Promise.all(
+    appNames.map((appName) => {
+      return client.deployUsingSCM(appName, tag);
+    })
+  );
+}
+
 module.exports = {
+  async deployAirflow(payload) {
+    const version = payload.text;
+    await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version);
+  },
+
   async deployGraviteeAPIM() {
     await deployFromBranch(PIX_GRAVITEE_APIM_REPO_NAME, PIX_GRAVITEE_APIM_APPS_NAME, 'main');
   },
