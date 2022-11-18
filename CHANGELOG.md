@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.38.0 (18/11/2022)
+
+
+### :building_construction: Tech
+- [#165](https://github.com/1024pix/pix-bot/pull/165) [TECH] Déployer Airflow en production depuis Slack
+
 ## v1.37.0 (17/11/2022)
 
 
