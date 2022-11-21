@@ -68,22 +68,62 @@ describe('Integration | CDN', () => {
       getAccountDetails.done();
     });
 
-    it('should throw an error when namespace does not exist', async () => {
-      // given
-      const applicationName = 'Not_existing_application';
+    context('when cache invalidation fails', function () {
+      context('when namespace does not exist', function () {
+        it('should throw an NamespaceNotFoundError error ', async () => {
+          // given
+          const applicationName = 'Not_existing_application';
 
-      const namespace = 'Pix_Namespace';
-      const namespaceKey = 'namespace-key1';
+          const namespace = 'Pix_Namespace';
+          const namespaceKey = 'namespace-key1';
 
-      _stubAccountDetails(namespace);
-      _stubInvalidationCachePost(namespaceKey);
+          _stubAccountDetails(namespace);
+          _stubInvalidationCachePost(namespaceKey);
 
-      // when
-      const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+          // when
+          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
 
-      // then
-      expect(result).to.be.instanceOf(cdn.NamespaceNotFoundError);
-      expect(result.message).to.be.equal('Namespace for the application: Not_existing_application are not found');
+          // then
+          expect(result).to.be.instanceOf(cdn.NamespaceNotFoundError);
+          expect(result.message).to.be.equal('Namespace for the application: Not_existing_application are not found');
+        });
+      });
+
+      context('when API returns an error', function () {
+        it('should throw an error with statusCode and message', async () => {
+          // given
+          const applicationName = 'Pix_Test';
+          const namespace = 'Pix_Namespace';
+          const namespaceKey = 'namespace-key1';
+
+          _stubAccountDetails(namespace);
+
+          nock('https://console.baleen.cloud/api', {
+            reqheaders: {
+              'X-Api-Key': config.baleen.pat,
+              'Content-type': 'application/json',
+              Cookie: `baleen-namespace=${namespaceKey}`,
+            },
+          })
+            .post('/cache/invalidations', { patterns: ['.'] })
+            .reply(400, {
+              type: 'https://www.jhipster.tech/problem/problem-with-message',
+              title: 'Bad Request',
+              status: 400,
+              detail: 'JSON parse error: Unexpected character',
+              path: '/api/cache/invalidations',
+              message: 'error.http.400',
+            });
+
+          // when
+          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+
+          // then
+          const expected =
+            'Request failed with status code 400 and message {"type":"https://www.jhipster.tech/problem/problem-with-message","title":"Bad Request","status":400,"detail":"JSON parse error: Unexpected character","path":"/api/cache/invalidations","message":"error.http.400"}';
+          expect(result.message).to.be.equal(expected);
+        });
+      });
     });
   });
 });

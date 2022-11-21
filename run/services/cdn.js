@@ -40,19 +40,25 @@ async function invalidateCdnCache(application) {
   const namespaceKey = await _getNamespaceKey(application);
   const urlForInvalidate = `${CDN_URL}/cache/invalidations`;
 
-  await axios.post(
-    urlForInvalidate,
-    {
-      patterns: ['.'],
-    },
-    {
-      headers: {
-        'X-Api-Key': config.baleen.pat,
-        'Content-type': 'application/json',
-        Cookie: `baleen-namespace=${namespaceKey}`,
+  try {
+    await axios.post(
+      urlForInvalidate,
+      {
+        patterns: ['.'],
       },
-    }
-  );
+      {
+        headers: {
+          'X-Api-Key': config.baleen.pat,
+          'Content-type': 'application/json',
+          Cookie: `baleen-namespace=${namespaceKey}`,
+        },
+      }
+    );
+  } catch (error) {
+    const cdnResponseMessage = JSON.stringify(error.response.data);
+    const message = `Request failed with status code ${error.response.status} and message ${cdnResponseMessage}`;
+    throw new Error(message);
+  }
 
   return `Cache CDN invalidé pour l‘application ${application}.`;
 }
