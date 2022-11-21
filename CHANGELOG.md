@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.39.0 (21/11/2022)
+
+
+### :building_construction: Tech
+- [#166](https://github.com/1024pix/pix-bot/pull/166) [TECH] Tracer le message d'erreur du CDN
+
 ## v1.38.0 (18/11/2022)
 
 
