@@ -17,6 +17,7 @@
     "lint": "eslint .",
     "local:trigger-lint-on-commit": "husky install",
     "local:prevent-trigger-lint-on-commit": "git config --unset core.hooksPath",
+    "preinstall": "npx check-engine",
     "start": "node bin/www",
     "test": "NODE_ENV=test mocha --recursive --exit test"
   },
