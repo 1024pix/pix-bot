@@ -406,4 +406,33 @@ describe('Scalingo client', () => {
       expect(manualReviewApp.called).to.be.true;
     });
   });
+
+  describe('#Scalingo.createApplication', () => {
+    it('should return application identifier', async () => {
+      // given
+      const createApplicationStub = sinon.stub();
+      sinon.stub(scalingo, 'clientFromToken').resolves({ Apps: { create: createApplicationStub } });
+      createApplicationStub.resolves({ id: 1 });
+      const scalingoClient = await ScalingoClient.getInstance('recette');
+
+      // when
+      const actual = await scalingoClient.createApplication('pix-application-recette');
+
+      // then
+      expect(actual).to.equal(1);
+    });
+    it('should call create with application name', async () => {
+      // given
+      const createApplicationStub = sinon.stub();
+      sinon.stub(scalingo, 'clientFromToken').resolves({ Apps: { create: createApplicationStub } });
+      createApplicationStub.resolves({ id: 1 });
+      const scalingoClient = await ScalingoClient.getInstance('recette');
+
+      // when
+      await scalingoClient.createApplication('pix-application-recette');
+
+      // then
+      expect(createApplicationStub).to.have.been.calledOnceWithExactly({ name: 'pix-application-recette' });
+    });
+  });
 });
