@@ -47,7 +47,7 @@ class ScalingoClient {
       throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
     }
 
-    return `Deployement of ${scalingoApp} ${releaseTag} has been requested`;
+    return `Deployment of ${scalingoApp} ${releaseTag} has been requested`;
   }
 
   async getAppInfo(target) {
