@@ -49,6 +49,9 @@ module.exports = (function () {
         'router',
         'test',
       ],
+      validAppPrefix: 'pix',
+      validAppNbCharMax: 46,
+      validAppNbCharMin: 6,
       maxLogLength: process.env.MAX_LOG_LENGTH || 1000,
     },
 

@@ -15,7 +15,7 @@ function modal(applicationName, applicationEnvironment, applicationEnvironmentNa
     close: 'Annuler',
   }).blocks([
     Blocks.Section({
-      text: `Vous vous apprêtez à créer l'application *${applicationName}* dans la région : *${applicationEnvironmentName}* et à inviter cet adesse email en tant que collaborateur : *${userEmail}*`,
+      text: `Vous vous apprêtez à créer l'application *${applicationName}* dans la région : *${applicationEnvironmentName}* et à inviter cet adresse email en tant que collaborateur : *${userEmail}*`,
     }),
   ]);
 }

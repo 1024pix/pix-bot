@@ -47,7 +47,7 @@ class ScalingoClient {
       throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
     }
 
-    return `Deployement of ${scalingoApp} ${releaseTag} has been requested`;
+    return `Deployment of ${scalingoApp} ${releaseTag} has been requested`;
   }
 
   async getAppInfo(target) {
@@ -108,8 +108,13 @@ class ScalingoClient {
     const app = {
       name: name,
     };
+    const appSettings = {
+      force_https: true,
+      router_logs: true,
+    };
     try {
       const { id } = await this.client.Apps.create(app);
+      await this.client.Apps.update(id, appSettings);
       return id;
     } catch (e) {
       console.error(JSON.stringify(e));

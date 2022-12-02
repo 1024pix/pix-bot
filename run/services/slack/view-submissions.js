@@ -6,6 +6,7 @@ const slackPostMessageService = require('../../../common/services/slack/surfaces
 const slackGetUserInfos = require('../../../common/services/slack/surfaces/user-infos/get-user-infos');
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const { ScalingoAppName } = require('../../../common/models/ScalingoAppName');
+const config = require('../../../config');
 
 module.exports = {
   async submitReleaseTagSelection(payload) {
@@ -20,8 +21,14 @@ module.exports = {
     const applicationEnvironmentName =
       payload.view.state.values['application-env']['item']['selected_option']['text']['text'];
     const userEmail = await slackGetUserInfos.getUserEmail(payload.user.id);
+    const appSufixList = config.scalingo.validAppSuffix.toString();
     if (!ScalingoAppName.isApplicationNameValid(applicationName)) {
-      return `${applicationName} is incorrect`;
+      return {
+        response_action: 'errors',
+        errors: {
+          'create-app-name': `${applicationName} is incorrect, it should start with "${config.scalingo.validAppPrefix}-" and end with one of the following : ${appSufixList}. Also the length should be between ${config.scalingo.validAppNbCharMin} and ${config.scalingo.validAppNbCharMax} characters.`,
+        },
+      };
     }
     return openModalApplicationCreationConfirmation(
       applicationName,

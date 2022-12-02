@@ -406,4 +406,83 @@ describe('Scalingo client', () => {
       expect(manualReviewApp.called).to.be.true;
     });
   });
+
+  describe('#Scalingo.createApplication', () => {
+    it('should return application identifier', async () => {
+      // given
+      const createApplicationStub = sinon.stub();
+      const updateApplicationStub = sinon.stub();
+      sinon
+        .stub(scalingo, 'clientFromToken')
+        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
+      createApplicationStub.resolves({ id: 1 });
+      updateApplicationStub.resolves();
+      const scalingoClient = await ScalingoClient.getInstance('recette');
+
+      // when
+      const actual = await scalingoClient.createApplication('pix-application-recette');
+
+      // then
+      expect(actual).to.equal(1);
+    });
+    it('should call create with application name', async () => {
+      // given
+      const createApplicationStub = sinon.stub();
+      const updateApplicationStub = sinon.stub();
+      sinon
+        .stub(scalingo, 'clientFromToken')
+        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
+      createApplicationStub.resolves({ id: 1 });
+      updateApplicationStub.resolves();
+      const scalingoClient = await ScalingoClient.getInstance('recette');
+
+      // when
+      await scalingoClient.createApplication('pix-application-recette');
+
+      // then
+      expect(createApplicationStub).to.have.been.calledOnceWithExactly({ name: 'pix-application-recette' });
+    });
+    it('should call update with valid options', async () => {
+      // given
+      const createApplicationStub = sinon.stub();
+      const updateApplicationStub = sinon.stub();
+      sinon
+        .stub(scalingo, 'clientFromToken')
+        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
+      createApplicationStub.resolves({ id: 1 });
+      updateApplicationStub.resolves();
+      const scalingoClient = await ScalingoClient.getInstance('recette');
+
+      // when
+      await scalingoClient.createApplication('pix-application-recette');
+
+      // then
+      expect(updateApplicationStub).to.have.been.calledOnceWithExactly(1, { force_https: true, router_logs: true });
+    });
+
+    it('should throw when scalingo client throw an error', async () => {
+      // given
+      const createApplicationStub = sinon.stub();
+      const updateApplicationStub = sinon.stub();
+      sinon
+        .stub(scalingo, 'clientFromToken')
+        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
+      createApplicationStub.resolves({ id: 1 });
+      updateApplicationStub.rejects({
+        name: 'foo',
+      });
+      const scalingoClient = await ScalingoClient.getInstance('recette');
+
+      // when
+      let actual;
+      try {
+        await scalingoClient.createApplication('pix-application-recette');
+      } catch (error) {
+        actual = error;
+      }
+
+      // then
+      expect(actual.message).to.equal('Impossible to create pix-application-recette, foo');
+    });
+  });
 });

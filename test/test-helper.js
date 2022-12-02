@@ -144,6 +144,9 @@ function nockGithubWithConfigChanges() {
     .reply(200, [{}]);
 }
 
+function createScalingoTokenNock() {
+  nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
+}
 // eslint-disable-next-line mocha/no-exports
 module.exports = {
   catchErr,
@@ -151,6 +154,7 @@ module.exports = {
   nock,
   sinon,
   createGithubWebhookSignatureHeader,
+  createScalingoTokenNock,
   createSlackWebhookSignatureHeaders,
   nockGithubWithConfigChanges,
   nockGithubWithNoConfigChanges,

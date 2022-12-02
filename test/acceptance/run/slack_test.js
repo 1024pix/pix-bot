@@ -397,7 +397,7 @@ describe('Acceptance | Run | Slack', function () {
                 {
                   text: {
                     type: 'mrkdwn',
-                    text: "Vous vous apprêtez à créer l'application *pix-application-de-folie-recette* dans la région : *recette* et à inviter cet adesse email en tant que collaborateur : *john.doe@pix.fr*",
+                    text: "Vous vous apprêtez à créer l'application *pix-application-de-folie-recette* dans la région : *recette* et à inviter cet adresse email en tant que collaborateur : *john.doe@pix.fr*",
                   },
                   type: 'section',
                 },
