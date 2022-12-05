@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.40.0 (05/12/2022)
+
+
+### :coffee: Autre
+- [#168](https://github.com/1024pix/pix-bot/pull/168) Créer une application Scalingo avec une configuration valide via Slack
+
 ## v1.39.0 (21/11/2022)
 
 
