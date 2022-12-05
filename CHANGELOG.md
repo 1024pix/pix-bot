@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.41.0 (05/12/2022)
+
+
+### :building_construction: Tech
+- [#167](https://github.com/1024pix/pix-bot/pull/167) [TECH] Mise à jour de l'environnement
+
 ## v1.40.0 (05/12/2022)
 
 
