@@ -1,6 +1,5 @@
 const { describe, it } = require('mocha');
 const { sinon } = require('../../../test-helper');
-const scalingo = require('scalingo');
 const axios = require('axios');
 const config = require('../../../../config');
 
@@ -19,12 +18,14 @@ describe('Scalingo client', () => {
   describe('#ScalingoClient.getInstance', () => {
     it('should return the Scalingo client instance for recette', async () => {
       // given
-      sinon
-        .stub(scalingo, 'clientFromToken')
-        .withArgs('tk-us-scalingo-token-recette', { apiUrl: 'https://scalingo.recette' })
-        .resolves({ apiClient: () => {} });
+      const clientStub = {
+        clientFromToken: async () => {
+          return sinon.stub();
+        },
+      };
+
       // when
-      const scalingoClient = await ScalingoClient.getInstance('recette');
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
       // then
       expect(scalingoClient).to.be.an.instanceof(ScalingoClient);
       expect(scalingoClient.client).to.exist;
@@ -32,12 +33,14 @@ describe('Scalingo client', () => {
 
     it('should return the Scalingo client instance for production', async () => {
       // given
-      sinon
-        .stub(scalingo, 'clientFromToken')
-        .withArgs('tk-us-scalingo-token-production', { apiUrl: 'https://scalingo.production' })
-        .resolves({ apiClient: () => {} });
+      const clientStub = {
+        clientFromToken: async () => {
+          return sinon.stub();
+        },
+      };
+
       // when
-      const scalingoClient = await ScalingoClient.getInstance('production');
+      const scalingoClient = await ScalingoClient.getInstance('production', clientStub);
       // then
       expect(scalingoClient).to.be.an.instanceof(ScalingoClient);
       expect(scalingoClient.client).to.exist;
@@ -45,11 +48,16 @@ describe('Scalingo client', () => {
 
     it('should throw an error when scalingo authentication failed', async () => {
       // given
-      sinon.stub(scalingo, 'clientFromToken').rejects(new Error('Invalid credentials'));
+      const clientStub = {
+        clientFromToken: async () => {
+          throw new Error('Invalid credentials');
+        },
+      };
+
       // when
       let scalingoClient;
       try {
-        scalingoClient = await ScalingoClient.getInstance('production');
+        scalingoClient = await ScalingoClient.getInstance('production', clientStub);
         expect.fail('should raise an error when credentials are invalid');
       } catch (e) {
         expect(e.message).to.equal('Invalid credentials');
@@ -64,9 +72,13 @@ describe('Scalingo client', () => {
 
     beforeEach(async function () {
       createDeploymentStub = sinon.stub();
-      sinon.stub(scalingo, 'clientFromToken').resolves({ Deployments: { create: createDeploymentStub } });
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Deployments: { create: createDeploymentStub } };
+        },
+      };
 
-      scalingoClient = await ScalingoClient.getInstance('production');
+      scalingoClient = await ScalingoClient.getInstance('production', clientStub);
     });
 
     it('should not deploy without app given', async () => {
@@ -140,9 +152,13 @@ describe('Scalingo client', () => {
 
     beforeEach(async function () {
       manualDeployStub = sinon.stub();
-      sinon.stub(scalingo, 'clientFromToken').resolves({ SCMRepoLinks: { manualDeploy: manualDeployStub } });
+      const clientStub = {
+        clientFromToken: async () => {
+          return { SCMRepoLinks: { manualDeploy: manualDeployStub } };
+        },
+      };
 
-      scalingoClient = await ScalingoClient.getInstance('production');
+      scalingoClient = await ScalingoClient.getInstance('production', clientStub);
     });
 
     it('should deploy an application for a given tag', async () => {
@@ -173,14 +189,19 @@ describe('Scalingo client', () => {
     beforeEach(async function () {
       clientAppsFind = sinon.stub();
       clientDeploymentsFind = sinon.stub();
-      sinon.stub(scalingo, 'clientFromToken').resolves({
-        Apps: { find: clientAppsFind },
-        Deployments: { find: clientDeploymentsFind },
-      });
 
       axiosGet = sinon.stub(axios, 'get');
 
-      scalingoClient = await ScalingoClient.getInstance('production');
+      const clientStub = {
+        clientFromToken: async () => {
+          return {
+            Apps: { find: clientAppsFind },
+            Deployments: { find: clientDeploymentsFind },
+          };
+        },
+      };
+
+      scalingoClient = await ScalingoClient.getInstance('production', clientStub);
     });
 
     it('should return app info', async () => {
@@ -386,13 +407,17 @@ describe('Scalingo client', () => {
 
     beforeEach(async function () {
       manualReviewApp = sinon.stub();
-      sinon.stub(scalingo, 'clientFromToken').resolves({
-        SCMRepoLinks: {
-          manualReviewApp,
+      const clientStub = {
+        clientFromToken: async () => {
+          return {
+            SCMRepoLinks: {
+              manualReviewApp,
+            },
+          };
         },
-      });
+      };
 
-      scalingoClient = await ScalingoClient.getInstance('reviewApps');
+      scalingoClient = await ScalingoClient.getInstance('reviewApps', clientStub);
     });
 
     it('should call manualReviewApp', async () => {
@@ -412,12 +437,16 @@ describe('Scalingo client', () => {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
-      sinon
-        .stub(scalingo, 'clientFromToken')
-        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
       createApplicationStub.resolves({ id: 1 });
       updateApplicationStub.resolves();
-      const scalingoClient = await ScalingoClient.getInstance('recette');
+
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
+        },
+      };
+
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
 
       // when
       const actual = await scalingoClient.createApplication('pix-application-recette');
@@ -429,12 +458,14 @@ describe('Scalingo client', () => {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
-      sinon
-        .stub(scalingo, 'clientFromToken')
-        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
       createApplicationStub.resolves({ id: 1 });
       updateApplicationStub.resolves();
-      const scalingoClient = await ScalingoClient.getInstance('recette');
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
+        },
+      };
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
 
       // when
       await scalingoClient.createApplication('pix-application-recette');
@@ -446,12 +477,14 @@ describe('Scalingo client', () => {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
-      sinon
-        .stub(scalingo, 'clientFromToken')
-        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
       createApplicationStub.resolves({ id: 1 });
       updateApplicationStub.resolves();
-      const scalingoClient = await ScalingoClient.getInstance('recette');
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
+        },
+      };
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
 
       // when
       await scalingoClient.createApplication('pix-application-recette');
@@ -464,14 +497,16 @@ describe('Scalingo client', () => {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
-      sinon
-        .stub(scalingo, 'clientFromToken')
-        .resolves({ Apps: { create: createApplicationStub, update: updateApplicationStub } });
       createApplicationStub.resolves({ id: 1 });
       updateApplicationStub.rejects({
         name: 'foo',
       });
-      const scalingoClient = await ScalingoClient.getInstance('recette');
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
+        },
+      };
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
 
       // when
       let actual;
