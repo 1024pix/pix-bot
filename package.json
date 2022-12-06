@@ -40,7 +40,7 @@
     "dayjs": "^1.11.6",
     "dotenv": "^16.0.3",
     "lodash": "^4.17.21",
-    "scalingo": "^0.4",
+    "scalingo": "^0.8.0",
     "scalingo-review-app-manager": "^1.0.1",
     "sib-api-v3-sdk": "^8.4.2",
     "slack-block-builder": "^2.7.1",
