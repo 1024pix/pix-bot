@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.42.0 (06/12/2022)
+
+
+### :building_construction: Tech
+- [#169](https://github.com/1024pix/pix-bot/pull/169) [TECH] Mettre à jour environnement (axios, scalingo-cli, octokit/rest)
+
 ## v1.41.0 (05/12/2022)
 
 
