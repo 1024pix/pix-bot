@@ -1,13 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>1024pix/renovate-config:default"
-  ],
   "labels": ["renovate","no-review-app"],
+  "extends": [
+    "config:base",
+    ":preserveSemverRanges",
+    ":semanticCommits"
+  ],
   "schedule": ["at any time"],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
-  "ignorePresets": ["github>1024pix/renovate-config//presets/group-by-directory"],
   "enabled": true,
+  "rangeStrategy": "bump",
   "dependencyDashboard": false
 }
