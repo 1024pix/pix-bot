@@ -5,6 +5,8 @@
   ],
   "labels": ["renovate","no-review-app"],
   "schedule": ["at any time"],
+  "prHourlyLimit": 0,
+  "prConcurrentLimit": 0,
   "ignorePresets": ["github>1024pix/renovate-config//presets/group-by-directory"],
   "enabled": true,
   "dependencyDashboard": false
