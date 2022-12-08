@@ -10,9 +10,9 @@ class ScalingoClient {
     this.environment = environment;
   }
 
-  static async getInstance(environment) {
+  static async getInstance(environment, injectedClient = scalingo) {
     const { token, apiUrl } = config.scalingo[environment];
-    const client = await scalingo.clientFromToken(token, { apiUrl });
+    const client = await injectedClient.clientFromToken(token, { apiUrl });
     return new ScalingoClient(client, environment);
   }
 
