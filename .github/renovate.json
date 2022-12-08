@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>1024pix/renovate-config:default",
+  ],
+  "schedule": ["at any time"],
+  "ignorePresets": ["github>1024pix/renovate-config//presets/group-by-directory"],
+  "enabled": true,
+  "dependencyDashboard": false
+}
