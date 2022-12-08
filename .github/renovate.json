@@ -3,6 +3,7 @@
   "extends": [
     "github>1024pix/renovate-config:default"
   ],
+  "labels": ["renovate","no-review-app"],
   "schedule": ["at any time"],
   "ignorePresets": ["github>1024pix/renovate-config//presets/group-by-directory"],
   "enabled": true,
