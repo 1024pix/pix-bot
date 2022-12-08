@@ -2,7 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>1024pix/renovate-config:default",
-    ":automergeMinor"
   ],
   "labels": ["renovate","no-review-app"],
   "schedule": ["at any time"],
