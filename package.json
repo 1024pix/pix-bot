@@ -3,7 +3,7 @@
   "version": "1.43.0",
   "description": "Pix Bot application",
   "engines": {
-    "node": "16",
+    "node": "18",
     "npm": "8"
   },
   "main": "index.js",
