@@ -1,15 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "labels": ["renovate","no-review-app"],
-  "extends": [
-    "config:base",
-    ":preserveSemverRanges",
-    ":semanticCommits"
-  ],
+  "labels": ["renovate","no-review-app",":rocket: Ready to Merge"],
   "schedule": ["at any time"],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
   "enabled": true,
   "rangeStrategy": "bump",
-  "dependencyDashboard": false
+  "dependencyDashboard": true
 }
