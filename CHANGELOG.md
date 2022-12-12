@@ -1,5 +1,25 @@
 # pix-bot Changelog
 
+## v1.43.1 (12/12/2022)
+
+
+### :building_construction: Tech
+- [#186](https://github.com/1024pix/pix-bot/pull/186) [TECH] Créer automatiquement des PR de montées de version
+- [#184](https://github.com/1024pix/pix-bot/pull/184) [TECH] Utiliser les templates de configuration par défaut pour Renovate
+
+### :coffee: Autre
+- [#194](https://github.com/1024pix/pix-bot/pull/194) Update dependency slack-block-builder to ^2.7.2
+- [#195](https://github.com/1024pix/pix-bot/pull/195) Update dependency mocha to ^10.2.0
+- [#188](https://github.com/1024pix/pix-bot/pull/188) Update dependency prettier to ^2.8.1
+- [#189](https://github.com/1024pix/pix-bot/pull/189) Update dependency scalingo-review-app-manager to ^1.0.5
+- [#187](https://github.com/1024pix/pix-bot/pull/187) Update dependency nock to ^13.2.9
+- [#183](https://github.com/1024pix/pix-bot/pull/183) chore(deps): update dependency node to v16.18.1
+- [#180](https://github.com/1024pix/pix-bot/pull/180) :wrench: Désactiver les limites de PR de renovate
+- [#179](https://github.com/1024pix/pix-bot/pull/179) Signaler clairement les PR renovate
+- [#176](https://github.com/1024pix/pix-bot/pull/176) chore(deps): update node.js to v16.18.1
+- [#174](https://github.com/1024pix/pix-bot/pull/174) Configure renovate
+- [#171](https://github.com/1024pix/pix-bot/pull/171) Mettre à jour automatiquement l'environnement
+
 ## v1.43.0 (08/12/2022)
 
 
