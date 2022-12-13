@@ -44,7 +44,7 @@ describe('Acceptance | Common | Index', function () {
       expect(JSON.parse(res.payload)).to.deep.equal({
         name: 'pix-bot',
         version,
-        description: 'Pix Bot application',
+        description: 'Automating development actions',
       });
     });
   });
