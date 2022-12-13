@@ -1,5 +1,12 @@
 # pix-bot Changelog
 
+## v1.44.0 (13/12/2022)
+
+
+### :building_construction: Tech
+- [#197](https://github.com/1024pix/pix-bot/pull/197) [TECH] Tracer les appels Github
+- [#196](https://github.com/1024pix/pix-bot/pull/196) [TECH] Prévenir les incohérences de dépendances
+
 ## v1.43.1 (12/12/2022)
 
 
