@@ -14,7 +14,9 @@
     "deploy:minor": "npm version minor && npm run deploy:tag",
     "deploy:patch": "npm version patch && npm run deploy:tag",
     "deploy:tag": "git push --tags && git push",
-    "lint": "eslint .",
+    "lint": "npm run lint:dependencies && npm run lint:code",
+    "lint:code": "eslint .",
+    "lint:dependencies": "depcheck",
     "local:trigger-lint-on-commit": "husky install",
     "local:prevent-trigger-lint-on-commit": "git config --unset core.hooksPath",
     "preinstall": "npx check-engine",
@@ -48,6 +50,7 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
+    "depcheck": "^1.4.3",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-mocha": "^10.1.0",
