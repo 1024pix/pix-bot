@@ -1,18 +1,20 @@
 const { Octokit } = require('@octokit/rest');
 const settings = require('../../config');
 
+function _logRequest(message, additionalInfo){
+    console.log(message);
+}
+
 function _createOctokit() {
   const authCredentials = {};
   if (settings.github.token) {
-    authCredentials.auth = settings.github.token;
+    authCredentials.auth = "efezfzfze"//settings.github.token;
   }
   return new Octokit({
     ...authCredentials,
     log: {
-      debug: (...args) => {
-        console.debug(args[1].method, args[1].url);
-      },
-      info: console.info,
+      debug: ()=>{},
+      info: _logRequest,
       warn: console.warn,
       error: console.error,
     },
