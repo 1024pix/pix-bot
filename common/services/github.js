@@ -13,6 +13,28 @@ const color = {
   'team-acces': '#A2DCC1',
 };
 
+function _logRequest(message) {
+  const data = message.split(' ');
+  const verb = data[0];
+  const url = data[1];
+  const responseCode = data[3];
+  const responseTime = data[5];
+  const event = 'github-request';
+  const request = {
+    event,
+    verb,
+    url,
+    responseCode,
+    responseTime,
+  };
+
+  if (url.startsWith('/repos/1024pix/pix-bot-publish-test')) {
+    return;
+  }
+  const log = JSON.stringify(request);
+  console.log(log);
+}
+
 function _createOctokit() {
   const authCredentials = {};
   if (settings.github.token) {
@@ -22,7 +44,7 @@ function _createOctokit() {
     ...authCredentials,
     log: {
       debug: noop,
-      info: noop,
+      info: _logRequest,
       warn: console.warn,
       error: console.error,
     },
