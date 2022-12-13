@@ -1,12 +1,12 @@
 {
   "name": "pix-bot",
   "version": "1.44.0",
-  "description": "Pix Bot application",
+  "description": "Automating development actions",
   "engines": {
     "node": "16",
     "npm": "8"
   },
-  "main": "index.js",
+  "main": "bin/www",
   "scripts": {
     "configure": "cp sample.env .env && npm ci",
     "deploy": "npm run deploy:minor",
