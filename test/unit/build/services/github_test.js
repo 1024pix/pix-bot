@@ -1,7 +1,13 @@
-const { describe, it } = require('mocha');
-const { expect } = require('chai');
-const { nock, createGithubWebhookSignatureHeader, sinon } = require('../../../test-helper');
+const {
+  expect,
+  nock,
+  createGithubWebhookSignatureHeader,
+  catchErr,
+  sinon,
+  StatusCodes,
+} = require('../../../test-helper');
 const githubService = require('../../../../common/services/github');
+const logger = require('../../../../common/services/logger');
 
 describe('#getPullRequests', function () {
   it('should return the response for slack', async function () {
@@ -70,10 +76,46 @@ describe('#getPullRequests', function () {
     expect(scopePr.isDone());
     expect(scopeReview.isDone());
   });
+
+  describe('when Github API rate-limit is exceeded', function () {
+    it('should call logger with a properly formatted error-message', async function () {
+      // given
+      const loggerErrorStub = sinon.stub(logger, 'error');
+      nock('https://api.github.com')
+        .get(
+          '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc'
+        )
+        .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
+
+      // when
+      await catchErr(githubService.getPullRequests)('cross-team');
+
+      // then
+      expect(loggerErrorStub).to.have.been.calledOnceWithExactly({
+        event: 'github',
+        response: 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]',
+      });
+    });
+    it('should throw an error', async function () {
+      // given
+      sinon.stub(logger, 'error');
+      nock('https://api.github.com')
+        .get(
+          '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc'
+        )
+        .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
+
+      // when
+      const error = await catchErr(githubService.getPullRequests)('cross-team');
+
+      // then
+      expect(error.message).to.deep.equal('Cannot retrieve PR from Github');
+    });
+  });
 });
 
-describe('#getLatestReleaseTag', () => {
-  it('should call GitHub "Tags" API', async () => {
+describe('#getLatestReleaseTag', function () {
+  it('should call GitHub "Tags" API', async function () {
     // given
     nock('https://api.github.com')
       .get('/repos/github-owner/github-repository/tags')
@@ -86,7 +128,7 @@ describe('#getLatestReleaseTag', () => {
     expect(response).to.equal('v2.171.0');
   });
 
-  it('should call GitHub "Tags" API for the given repository', async () => {
+  it('should call GitHub "Tags" API for the given repository', async function () {
     // given
     nock('https://api.github.com')
       .get('/repos/github-owner/given-repository/tags')
@@ -100,8 +142,8 @@ describe('#getLatestReleaseTag', () => {
   });
 });
 
-describe('#getChangelogSinceLatestRelease', () => {
-  it('should return the list of PR titles since latest release', async () => {
+describe('#getChangelogSinceLatestRelease', function () {
+  it('should return the list of PR titles since latest release', async function () {
     // given
     const latestTagDate = new Date('2020-04-01T15:29:51Z');
     const afterTag1Date = new Date('2020-06-01T15:29:51Z');
@@ -145,8 +187,8 @@ describe('#getChangelogSinceLatestRelease', () => {
   });
 });
 
-describe('#getMergedPullRequestsSortedByDescendingDate', () => {
-  it('should call GitHub "Pulls" API', async () => {
+describe('#getMergedPullRequestsSortedByDescendingDate', function () {
+  it('should call GitHub "Pulls" API', async function () {
     // given
     const pullRequests = [{ merged_at: '2020-09-02T12:26:47Z' }, { merged_at: '2020-09-01T12:26:47Z' }];
     nock('https://api.github.com').get('/repos/github-owner/github-repository').reply(200, { default_branch: 'dev' });
@@ -164,7 +206,7 @@ describe('#getMergedPullRequestsSortedByDescendingDate', () => {
     expect(response).to.deep.equal(pullRequests);
   });
 
-  it('should call GitHub "Pulls" API with given branch name', async () => {
+  it('should call GitHub "Pulls" API with given branch name', async function () {
     // given
     const pullRequests = [{ merged_at: '2020-09-02T12:26:47Z' }, { merged_at: '2020-09-01T12:26:47Z' }];
     nock('https://api.github.com')
@@ -185,8 +227,8 @@ describe('#getMergedPullRequestsSortedByDescendingDate', () => {
   });
 });
 
-describe('#getCommitAtURL', () => {
-  it('should call Github "Request" API', async () => {
+describe('#getCommitAtURL', function () {
+  it('should call Github "Request" API', async function () {
     // given
     nock('https://commit-url.github.com').get('/').reply(200, {
       commit: 'some data',
@@ -200,8 +242,8 @@ describe('#getCommitAtURL', () => {
   });
 });
 
-describe('#isBuildStatusOK', () => {
-  it('should call Github "branches" API', async () => {
+describe('#isBuildStatusOK', function () {
+  it('should call Github "branches" API', async function () {
     // given
     const branchName = 'branch-name';
     nock('https://api.github.com')
@@ -224,7 +266,7 @@ describe('#isBuildStatusOK', () => {
     expect(response).to.equal(true);
   });
 
-  it('should call Github "tags" API', async () => {
+  it('should call Github "tags" API', async function () {
     // given
     const tagName = 'v1.0.9';
     nock('https://api.github.com')
@@ -257,7 +299,7 @@ describe('#isBuildStatusOK', () => {
   });
 });
 
-describe('#hasConfigFileChangedSinceLatestRelease', () => {
+describe('#hasConfigFileChangedSinceLatestRelease', function () {
   const latestReleaseDate = '2020-08-13T04:45:06Z';
   const repoOwner = 'github-owner';
   const repoName = 'github-repository';
@@ -274,7 +316,7 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
   });
 
   context('should return true when config file has been changed', function () {
-    it('should call Github "commits list" API', async () => {
+    it('should call Github "commits list" API', async function () {
       // given
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
@@ -301,7 +343,7 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
   });
 
   context('should return false when config file did not changed changed', function () {
-    it('should call Github "commits list" API', async () => {
+    it('should call Github "commits list" API', async function () {
       // given
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
@@ -324,14 +366,14 @@ describe('#hasConfigFileChangedSinceLatestRelease', () => {
   });
 });
 
-describe('#hasConfigFileChangedInLatestRelease', () => {
+describe('#hasConfigFileChangedInLatestRelease', function () {
   const latestReleaseDate = '2020-08-13T04:45:06Z';
   const secondToLastReleaseDate = '2020-08-10T12:45:06Z';
   const repoOwner = 'github-owner';
   const repoName = 'github-repository';
 
   context('should return true when config file has been changed', function () {
-    it('should call Github "commits list" API', async () => {
+    it('should call Github "commits list" API', async function () {
       // given
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
@@ -366,7 +408,7 @@ describe('#hasConfigFileChangedInLatestRelease', () => {
   });
 
   context('should return false when config file did not changed changed', function () {
-    it('should call Github "commits list" API', async () => {
+    it('should call Github "commits list" API', async function () {
       // given
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')

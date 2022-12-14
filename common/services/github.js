@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const tsscmp = require('tsscmp');
 const Boom = require('@hapi/boom');
 const settings = require('../../config');
+const logger = require('./logger');
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -40,7 +41,7 @@ function _createOctokit() {
   if (settings.github.token) {
     authCredentials.auth = settings.github.token;
   }
-  return new Octokit({
+  const octokit = new Octokit({
     ...authCredentials,
     log: {
       debug: noop,
@@ -49,6 +50,12 @@ function _createOctokit() {
       error: console.error,
     },
   });
+  octokit.hook.error('request', async (error) => {
+    const message = { event: 'github', response: error.response.data };
+    logger.error(message);
+    return error;
+  });
+  return octokit;
 }
 
 async function _getPullReviewsFromGithub(label) {
@@ -57,19 +64,17 @@ async function _getPullReviewsFromGithub(label) {
   label = label.replace(/ /g, '%20');
   const octokit = _createOctokit();
 
-  try {
-    const params = [{ is: 'pr' }, { is: 'open' }, { archived: false }, { draft: false }, { user: owner }, { label }];
-    const { data } = await octokit.search.issuesAndPullRequests({
-      q: _buildOctokitSearchQueryString(params),
-      sort: 'updated',
-      order: 'desc',
-    });
+  const params = [{ is: 'pr' }, { is: 'open' }, { archived: false }, { draft: false }, { user: owner }, { label }];
+  const response = await octokit.search.issuesAndPullRequests({
+    q: _buildOctokitSearchQueryString(params),
+    sort: 'updated',
+    order: 'desc',
+  });
 
-    return data.items;
-  } catch (err) {
-    console.error(err);
-    throw err;
+  if (response.status !== 200) {
+    throw new Error('Cannot retrieve PR from Github');
   }
+  return response.data.items;
 }
 
 async function _getReviewsFromGithub(pull_number) {
