@@ -294,10 +294,6 @@ module.exports = {
     return _getLatestReleaseTagName(settings.github.owner, repoName);
   },
 
-  async getLatestReleaseTagUrl(repoOwner, repoName = settings.github.repository) {
-    return _getLatestReleaseTagUrl(repoOwner, repoName);
-  },
-
   getLastCommitUrl,
 
   async getCommitAtURL(commitUrl) {
