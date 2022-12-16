@@ -6,8 +6,10 @@ const crypto = require('crypto');
 const config = require('../config');
 
 const { StatusCodes } = require('http-status-codes');
+const _ = require('lodash');
 
 chai.use(require('sinon-chai'));
+chai.use(require('chai-nock'));
 
 // eslint-disable-next-line mocha/no-top-level-hooks
 beforeEach(function () {
@@ -97,7 +99,15 @@ function nockGithubWithNoConfigChanges() {
     .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
     .reply(200, []);
 
-  return { tags, commit1234, commit456, commits };
+  const nocks = { tags, commit1234, commit456, commits };
+
+  const checkAllNocksHaveBeenCalled = () => {
+    _.values(nocks).map((nock) => {
+      expect(nock).to.have.been.requested;
+    });
+  };
+
+  return { nocks, checkAllNocksHaveBeenCalled };
 }
 
 function nockGithubWithConfigChanges() {

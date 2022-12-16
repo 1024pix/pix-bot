@@ -188,10 +188,7 @@ describe('Acceptance | Run | Slack', function () {
               ],
             },
           });
-          expect(nocks.tags.isDone()).to.be.true;
-          expect(nocks.commit1234.isDone()).to.be.true;
-          expect(nocks.commit456.isDone()).to.be.true;
-          expect(nocks.commits.isDone()).to.be.true;
+          nocks.checkAllNocksHaveBeenCalled();
         });
 
         it('returns the confirmation modal with a warning', async function () {
