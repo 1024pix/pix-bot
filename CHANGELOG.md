@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.46.0 (16/12/2022)
+
+
+### :building_construction: Tech
+- [#200](https://github.com/1024pix/pix-bot/pull/200) [TECH] Linter les tests de manière homogène
+
 ## v1.45.0 (13/12/2022)
 
 
