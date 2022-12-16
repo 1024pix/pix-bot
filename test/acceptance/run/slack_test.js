@@ -130,7 +130,8 @@ describe('Acceptance | Run | Slack', function () {
           });
         });
         it('returns the confirmation modal', async function () {
-          nockGithubWithNoConfigChanges();
+          // given
+          const nocks = nockGithubWithNoConfigChanges();
 
           const body = {
             type: 'view_submission',
@@ -147,12 +148,16 @@ describe('Acceptance | Run | Slack', function () {
               },
             },
           };
+
+          // when
           const res = await server.inject({
             method: 'POST',
             url: '/run/slack/interactive-endpoint',
             headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
             payload: body,
           });
+
+          // then
           expect(res.statusCode).to.equal(200);
           expect(JSON.parse(res.payload)).to.deep.equal({
             response_action: 'push',
@@ -183,6 +188,10 @@ describe('Acceptance | Run | Slack', function () {
               ],
             },
           });
+          expect(nocks.tags.isDone()).to.be.true;
+          expect(nocks.commit1234.isDone()).to.be.true;
+          expect(nocks.commit456.isDone()).to.be.true;
+          expect(nocks.commits.isDone()).to.be.true;
         });
 
         it('returns the confirmation modal with a warning', async function () {
