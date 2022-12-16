@@ -12,5 +12,10 @@ module.exports = {
   },
   rules: {
     'mocha/no-setup-in-describe': 'off',
+    'mocha/no-exclusive-tests': 'error',
+    'mocha/no-pending-tests': 'error',
+    'mocha/no-skipped-tests': 'error',
+    'mocha/no-hooks-for-single-case': 'off',
+    'mocha/no-top-level-hooks': 'error',
   },
 };
