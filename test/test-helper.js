@@ -6,8 +6,10 @@ const crypto = require('crypto');
 const config = require('../config');
 
 const { StatusCodes } = require('http-status-codes');
+const _ = require('lodash');
 
 chai.use(require('sinon-chai'));
+chai.use(require('chai-nock'));
 
 // eslint-disable-next-line mocha/no-top-level-hooks
 beforeEach(function () {
@@ -53,7 +55,7 @@ function createSlackWebhookSignatureHeaders(body) {
 }
 
 function nockGithubWithNoConfigChanges() {
-  nock('https://api.github.com')
+  const tags = nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/tags')
     .twice()
     .reply(200, [
@@ -69,7 +71,7 @@ function nockGithubWithNoConfigChanges() {
       },
     ]);
 
-  nock('https://api.github.com')
+  const commit1234 = nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/commits/1234')
     .reply(200, {
       commit: {
@@ -79,7 +81,7 @@ function nockGithubWithNoConfigChanges() {
       },
     });
 
-  nock('https://api.github.com')
+  const commit456 = nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/commits/456')
     .reply(200, {
       commit: {
@@ -89,13 +91,23 @@ function nockGithubWithNoConfigChanges() {
       },
     });
 
-  nock('https://api.github.com')
+  const commits = nock('https://api.github.com')
     .filteringPath(
       /since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g,
       'since=XXXX&until=XXXX'
     )
     .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
     .reply(200, []);
+
+  const nocks = { tags, commit1234, commit456, commits };
+
+  const checkAllNocksHaveBeenCalled = () => {
+    _.values(nocks).map((nock) => {
+      expect(nock).to.have.been.requested;
+    });
+  };
+
+  return { nocks, checkAllNocksHaveBeenCalled };
 }
 
 function nockGithubWithConfigChanges() {

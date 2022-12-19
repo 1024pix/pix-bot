@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
+    "chai-nock": "^1.3.0",
     "depcheck": "^1.4.3",
     "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",

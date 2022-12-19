@@ -4,6 +4,7 @@ const {
   createSlackWebhookSignatureHeaders,
   nockGithubWithNoConfigChanges,
   nockGithubWithConfigChanges,
+  StatusCodes,
 } = require('../../test-helper');
 const server = require('../../../server');
 
@@ -91,8 +92,46 @@ describe('Acceptance | Run | Slack', function () {
       });
 
       describe('with the callback release-tag-selection', function () {
+        describe('when the Github API returns an error', function () {
+          it('should return an INTERNAL_SERVER_ERROR (500)', async function () {
+            // given
+            const tagNock = nock('https://api.github.com')
+              .get('/repos/github-owner/github-repository/tags')
+              .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
+
+            const body = {
+              type: 'view_submission',
+              view: {
+                callback_id: 'release-tag-selection',
+                state: {
+                  values: {
+                    'deploy-release-tag': {
+                      'release-tag-value': {
+                        value: 'v2.130.0',
+                      },
+                    },
+                  },
+                },
+              },
+            };
+
+            // when
+            const error = await server.inject({
+              method: 'POST',
+              url: '/run/slack/interactive-endpoint',
+              headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+              payload: body,
+            });
+
+            // then
+            expect(error.statusCode).to.equal(StatusCodes.INTERNAL_SERVER_ERROR);
+            expect(error.statusMessage).to.equal('Internal Server Error');
+            expect(tagNock).to.have.been.requested;
+          });
+        });
         it('returns the confirmation modal', async function () {
-          nockGithubWithNoConfigChanges();
+          // given
+          const nocks = nockGithubWithNoConfigChanges();
 
           const body = {
             type: 'view_submission',
@@ -109,12 +148,16 @@ describe('Acceptance | Run | Slack', function () {
               },
             },
           };
+
+          // when
           const res = await server.inject({
             method: 'POST',
             url: '/run/slack/interactive-endpoint',
             headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
             payload: body,
           });
+
+          // then
           expect(res.statusCode).to.equal(200);
           expect(JSON.parse(res.payload)).to.deep.equal({
             response_action: 'push',
@@ -145,6 +188,7 @@ describe('Acceptance | Run | Slack', function () {
               ],
             },
           });
+          nocks.checkAllNocksHaveBeenCalled();
         });
 
         it('returns the confirmation modal with a warning', async function () {
