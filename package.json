@@ -9,11 +9,6 @@
   "main": "bin/www",
   "scripts": {
     "configure": "cp sample.env .env && npm ci",
-    "deploy": "npm run deploy:minor",
-    "deploy:major": "npm version major && npm run deploy:tag",
-    "deploy:minor": "npm version minor && npm run deploy:tag",
-    "deploy:patch": "npm version patch && npm run deploy:tag",
-    "deploy:tag": "git push --tags && git push",
     "lint": "npm run lint:dependencies && npm run lint:code",
     "lint:code": "eslint .",
     "lint:dependencies": "depcheck",
