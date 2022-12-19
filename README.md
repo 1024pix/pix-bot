@@ -65,6 +65,14 @@ Go to [https://api.slack.com/apps](https://api.slack.com/apps), and create a new
 
 Go to http://localhost:3000/slackviews to test and debug slack views.
 
+
+### Get test coverage
+
+``` shell
+cd api
+npm run local:test:coverage
+```
+
 ## Deploy
 
 Pix Bot has a Slack command that allow to release itself:
