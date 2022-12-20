@@ -28,4 +28,30 @@ describe('logger', function () {
       });
     });
   });
+  describe('info', function () {
+    describe('when an message is passed', function () {
+      it('should call injectedLogger log with stringified message', function () {
+        // given
+        const injectedLogger = { log: sinon.stub() };
+
+        // when
+        logger.info('message', injectedLogger);
+
+        // then
+        expect(injectedLogger.log).to.have.been.calledOnceWithExactly('"message"');
+      });
+    });
+    describe('when an object is passed', function () {
+      it('should call injectedLogger error with stringified object', function () {
+        // given
+        const injectedLogger = { log: sinon.stub() };
+
+        // when
+        logger.info({ foo: 'bar' }, injectedLogger);
+
+        // then
+        expect(injectedLogger.log).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
+      });
+    });
+  });
 });

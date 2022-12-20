@@ -2,6 +2,7 @@ const dayjs = require('dayjs');
 const slackPostMessageService = require('../../common/services/slack/surfaces/messages/post-message');
 const { Message, Section, Context, Attachment } = require('slack-block-builder');
 const config = require('../../config');
+const logger = require('../../common/services/logger');
 
 function getSlackMessageAttachments(payload) {
   const appName = payload.app_name;
@@ -39,18 +40,18 @@ function getSlackMessageAttachments(payload) {
 
 module.exports = {
   async deployEndpoint(request) {
-    console.log('Scalingo request received');
+    logger.info('Scalingo request received');
     if (request.payload.type_data?.status !== 'build-error') {
       return 'Slack error notification not sent';
     }
 
-    console.log(`Failed deployement on the ${request.payload.app_name} app`);
+    logger.info(`Failed deployment on the ${request.payload.app_name} app`);
 
     const { message, attachments } = getSlackMessageAttachments(request.payload);
 
     await slackPostMessageService.postMessage(message, JSON.stringify(attachments));
 
-    console.log('Slack error notification sent');
+    logger.info('Slack error notification sent');
 
     return 'Slack error notification sent';
   },
