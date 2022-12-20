@@ -29,6 +29,7 @@ describe('Acceptance | Build | Github', function () {
       const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
         .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
         .reply(201);
+      nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(200);
 
       const res = await server.inject({
         method: 'POST',
@@ -55,6 +56,7 @@ describe('Acceptance | Build | Github', function () {
       const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
         .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
         .reply(201);
+      nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(200);
 
       const res = await server.inject({
         method: 'POST',
@@ -70,6 +72,37 @@ describe('Acceptance | Build | Github', function () {
       expect(scalingoAuth.isDone()).to.be.true;
       expect(scalingoDeploy1.isDone()).to.be.true;
       expect(scalingoDeploy2.isDone()).to.be.true;
+    });
+
+    it('responds with OK (200) and add application link to pull request comments', async function () {
+      // given
+      body.pull_request.labels = [];
+      nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.CREATED);
+      nock('https://api.osc-fr1.scalingo.com')
+        .post('/v1/apps/pix-front-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
+        .reply(StatusCodes.CREATED);
+      nock('https://api.osc-fr1.scalingo.com')
+        .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
+        .reply(StatusCodes.CREATED);
+      const githubNock = nock('https://api.github.com')
+        .post('/repos/github-owner/pix/issues/2/comments')
+        .reply(StatusCodes.OK);
+
+      // when
+      const response = await server.inject({
+        method: 'POST',
+        url: '/github/webhook',
+        headers: {
+          ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+          'x-github-event': 'pull_request',
+        },
+        payload: body,
+      });
+
+      // then
+      expect(response.statusCode).to.equal(StatusCodes.OK);
+      expect(response.result).to.equal('Created RA on app pix-front-review, pix-api-review with pr 2');
+      expect(githubNock.isDone()).to.be.true;
     });
 
     it("responds with 200 and doesn't create the RA on scalingo when the PR is from a fork", async function () {
