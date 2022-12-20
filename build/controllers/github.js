@@ -1,4 +1,5 @@
 const ScalingoClient = require('../../common/services/scalingo-client');
+const gitHubService = require('../../common/services/github');
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
@@ -9,6 +10,26 @@ const repositoryToScalingoAppsReview = {
   'pix-tutos': ['pix-tutos-review'],
   'pix-ui': ['pix-ui-review'],
   pix: ['pix-front-review', 'pix-api-review'],
+};
+
+const addApplicationLinkToPullRequest = async ({ repositoryName, pullRequestId }) => {
+  if (repositoryName === 'pix') {
+    const applicationLinks = [
+      `- App (.fr): https://app-pr${pullRequestId}.review.pix.fr`,
+      `- App (.org): https://app-pr${pullRequestId}.review.pix.org`,
+      `- Orga: https://orga-pr${pullRequestId}.review.pix.fr`,
+      `- Certif: https://certif-pr${pullRequestId}.review.pix.fr`,
+      `- Admin:https://admin-pr${pullRequestId}.review.pix.fr`,
+      `- API: https://api-pr${pullRequestId}.review.pix.fr/api/`,
+    ];
+    const comment = `I'm deploying this PR to these urls: \n ${applicationLinks.join('\n')} \nPlease check it out!`;
+
+    await gitHubService.commentPullRequest({
+      repositoryName,
+      pullRequestId,
+      comment,
+    });
+  }
 };
 
 module.exports = {
@@ -45,4 +66,5 @@ module.exports = {
       return `Ignoring ${eventName} event`;
     }
   },
+  addApplicationLinkToPullRequest,
 };
