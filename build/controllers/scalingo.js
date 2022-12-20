@@ -45,7 +45,7 @@ module.exports = {
       return 'Slack error notification not sent';
     }
 
-    logger.info(`Failed deployement on the ${request.payload.app_name} app`);
+    logger.info(`Failed deployment on the ${request.payload.app_name} app`);
 
     const { message, attachments } = getSlackMessageAttachments(request.payload);
 

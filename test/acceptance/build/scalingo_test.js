@@ -24,7 +24,7 @@ describe('Acceptance | Build | Scalingo', function () {
         expect(response.payload).to.equal('Slack error notification sent');
         expect(loggerInfoStub.calledThrice).to.be.true;
         expect(loggerInfoStub.firstCall.args[0]).to.equal('Scalingo request received');
-        expect(loggerInfoStub.secondCall.args[0]).to.equal('Failed deployement on the application app');
+        expect(loggerInfoStub.secondCall.args[0]).to.equal('Failed deployment on the application app');
         expect(loggerInfoStub.thirdCall.args[0]).to.equal('Slack error notification sent');
       });
     });
