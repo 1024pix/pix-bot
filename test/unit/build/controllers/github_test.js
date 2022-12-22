@@ -1,96 +1,84 @@
 const { expect, sinon } = require('../../../test-helper');
 const githubController = require('../../../../build/controllers/github');
 const githubService = require('../../../../common/services/github');
+const fs = require('fs');
 
-describe('#addApplicationLinkToPullRequest', function () {
-  describe('when repositoryName is pix', function () {
-    it('should call gitHubService.commentPullRequest with application urls', async function () {
+describe('#addMessageToPullRequest', function () {
+  describe('when the repository template is generic', function () {
+    it('should call gitHubService.commentPullRequest with default template', async function () {
       // given
-      const data = { repositoryName: 'pix', pullRequestId: 0 };
+      const data = { repositoryName: 'pix-bot', pullRequestId: 202 };
       const commentStub = sinon.stub(githubService, 'commentPullRequest');
 
       // when
-      await githubController.addApplicationLinkToPullRequest(data);
+      await githubController.addMessageToPullRequest(data);
 
       // then
-      const expectedComment =
-        'Une fois les applications déployées, elles seront accessibles via les liens suivants :\n' +
-        '* [App .fr](https://app-pr0.review.pix.fr)\n' +
-        '* [App .org](https://app-pr0.review.pix.org)\n' +
-        '* [Orga](https://orga-pr0.review.pix.fr)\n' +
-        '* [Certif](https://certif-pr0.review.pix.fr)\n' +
-        '* [Admin](https://admin-pr0.review.pix.fr)\n' +
-        '* [API](https://api-pr0.review.pix.fr/api/)';
+      const absoluteFileName = `${__dirname}/pull-request-messages/pix-bot.md`;
+      const comment = fs.readFileSync(absoluteFileName, 'utf8');
 
-      expect(commentStub).to.have.been.calledOnceWithExactly({
-        repositoryName: 'pix',
-        pullRequestId: 0,
-        comment: expectedComment,
-      });
-    });
-  });
-  describe('when repositoryName is pix-bot', function () {
-    it('should call gitHubService.commentPullRequest with application urls', async function () {
-      // given
-      const data = { repositoryName: 'pix-bot', pullRequestId: 0 };
-      const commentStub = sinon.stub(githubService, 'commentPullRequest');
-
-      // when
-      await githubController.addApplicationLinkToPullRequest(data);
-
-      // then
-      const expectedComment =
-        'Une fois les applications déployées, elles seront accessibles via les liens suivants :\n' +
-        'pix-bot-review.pr0.osc-fr1.scalingo.io.';
       expect(commentStub).to.have.been.calledOnceWithExactly({
         repositoryName: 'pix-bot',
-        pullRequestId: 0,
-        comment: expectedComment,
+        pullRequestId: 202,
+        comment,
       });
     });
   });
-  describe('when repositoryName is pix-site', function () {
-    it('should call gitHubService.commentPullRequest with application urls', async function () {
-      // given
-      const data = { repositoryName: 'pix-site', pullRequestId: 0 };
-      const commentStub = sinon.stub(githubService, 'commentPullRequest');
+  describe('when the repository template is specific', function () {
+    describe('should call gitHubService.commentPullRequest with specific template', function () {
+      it('pix', async function () {
+        // given
+        const data = { repositoryName: 'pix', pullRequestId: 5401 };
+        const commentStub = sinon.stub(githubService, 'commentPullRequest');
 
-      // when
-      await githubController.addApplicationLinkToPullRequest(data);
+        // when
+        await githubController.addMessageToPullRequest(data);
 
-      // then
-      const expectedComment =
-        'Une fois les applications déployées, elles seront accessibles via les liens suivants :\n' +
-        'Pix Site (fr): https://site-pr0.review.pix.fr/\n' +
-        'Pix Site (org): https://site-pr0.review.pix.org/\n' +
-        'Pix Pro (fr): https://pro-pr0.review.pix.fr/\n' +
-        'Pix Pro (org): https://pro-pr0.review.pix.org/';
+        // then
+        const absoluteFileName = `${__dirname}/pull-request-messages/pix.md`;
+        const comment = fs.readFileSync(absoluteFileName, 'utf8');
 
-      expect(commentStub).to.have.been.calledOnceWithExactly({
-        repositoryName: 'pix-site',
-        pullRequestId: 0,
-        comment: expectedComment,
+        expect(commentStub).to.have.been.calledOnceWithExactly({
+          repositoryName: 'pix',
+          pullRequestId: 5401,
+          comment,
+        });
       });
-    });
-  });
-  describe('when repositoryName is pix-tutos', function () {
-    it('should call gitHubService.commentPullRequest with application urls', async function () {
-      // given
-      const data = { repositoryName: 'pix-tutos', pullRequestId: 0 };
-      const commentStub = sinon.stub(githubService, 'commentPullRequest');
+      it('pix-editor', async function () {
+        // given
+        const data = { repositoryName: 'pix-editor', pullRequestId: 49 };
+        const commentStub = sinon.stub(githubService, 'commentPullRequest');
 
-      // when
-      await githubController.addApplicationLinkToPullRequest(data);
+        // when
+        await githubController.addMessageToPullRequest(data);
 
-      // then
-      const expectedComment =
-        'Une fois les applications déployées, elles seront accessibles via les liens suivants :\n' +
-        'Pix Tutos : [tutos-pr0.review.pix.fr](https://tutos-pr0.review.pix.fr/)';
+        // then
+        const absoluteFileName = `${__dirname}/pull-request-messages/pix-editor.md`;
+        const comment = fs.readFileSync(absoluteFileName, 'utf8');
 
-      expect(commentStub).to.have.been.calledOnceWithExactly({
-        repositoryName: 'pix-tutos',
-        pullRequestId: 0,
-        comment: expectedComment,
+        expect(commentStub).to.have.been.calledOnceWithExactly({
+          repositoryName: 'pix-editor',
+          pullRequestId: 49,
+          comment,
+        });
+      });
+      it('pix-db-replication', async function () {
+        // given
+        const data = { repositoryName: 'pix-db-replication', pullRequestId: 125 };
+        const commentStub = sinon.stub(githubService, 'commentPullRequest');
+
+        // when
+        await githubController.addMessageToPullRequest(data);
+
+        // then
+        const absoluteFileName = `${__dirname}/pull-request-messages/pix-db-replication.md`;
+        const comment = fs.readFileSync(absoluteFileName, 'utf8');
+
+        expect(commentStub).to.have.been.calledOnceWithExactly({
+          repositoryName: 'pix-db-replication',
+          pullRequestId: 125,
+          comment,
+        });
       });
     });
   });
