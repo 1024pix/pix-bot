@@ -1,5 +1,13 @@
 # pix-bot Changelog
 
+## v1.48.0 (23/12/2022)
+
+
+### :building_construction: Tech
+- [#202](https://github.com/1024pix/pix-bot/pull/202) [TECH] Ajouter un lien vers la review-app dans la pull-request
+- [#203](https://github.com/1024pix/pix-bot/pull/203) [TECH] Supprimer le template de PR en doublon
+- [#201](https://github.com/1024pix/pix-bot/pull/201) [TECH] Corriger l'orthographe de la notification de déploiement en erreur
+
 ## v1.47.0 (19/12/2022)
 
 
