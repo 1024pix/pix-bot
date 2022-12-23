@@ -1,6 +1,6 @@
 Une fois les applications déployées, elles seront accessibles via les liens suivants :
-  * [App .fr](https://app-pr{{pullRequestId}}.review.pix.fr)
-  * [App .org](https://app-pr{{pullRequestId}}.review.pix.org)
+  * [App (.fr)](https://app-pr{{pullRequestId}}.review.pix.fr)
+  * [App (.org)](https://app-pr{{pullRequestId}}.review.pix.org)
   * [Orga](https://orga-pr{{pullRequestId}}.review.pix.fr)
   * [Certif](https://certif-pr{{pullRequestId}}.review.pix.fr)
   * [Admin](https://admin-pr{{pullRequestId}}.review.pix.fr)

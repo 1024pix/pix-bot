@@ -1,6 +1,6 @@
 Une fois les applications déployées, elles seront accessibles via les liens suivants :
-  * [App .fr](https://app-pr5401.review.pix.fr)
-  * [App .org](https://app-pr5401.review.pix.org)
+  * [App (.fr)](https://app-pr5401.review.pix.fr)
+  * [App (.org)](https://app-pr5401.review.pix.org)
   * [Orga](https://orga-pr5401.review.pix.fr)
   * [Certif](https://certif-pr5401.review.pix.fr)
   * [Admin](https://admin-pr5401.review.pix.fr)

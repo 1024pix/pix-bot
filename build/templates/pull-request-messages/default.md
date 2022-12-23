@@ -1,2 +1,2 @@
-Une fois l'applications déployée, elles sera accessible [ici]({{webApplicationUrl}}).
+Une fois l'application déployée, elle sera accessible [ici]({{webApplicationUrl}}).
 Les variables d'environnement seront accessibles [ici]({{scalingoDashboardUrl}}).
