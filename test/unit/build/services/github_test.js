@@ -471,3 +471,24 @@ describe('#verifyWebhookSignature', function () {
     expect(githubService.verifyWebhookSignature(request).output.payload.message).to.eql('Github signature is empty.');
   });
 });
+
+describe('#commentPullrequest', function () {
+  describe('when everything is OK', function () {
+    it('should call GitHub comment API with message', async function () {
+      // given
+      const body = '# Test \n **awesome comment**';
+      const commentNock = nock('https://api.github.com')
+        .post('/repos/github-owner/a-repository/issues/0/comments', { body })
+        .reply(200);
+      const repositoryName = 'a-repository';
+      const pullRequestId = 0;
+      const comment = '# Test \n **awesome comment**';
+
+      // when
+      await githubService.commentPullRequest({ repositoryName, pullRequestId, comment });
+
+      // then
+      expect(commentNock.isDone()).to.be.true;
+    });
+  });
+});

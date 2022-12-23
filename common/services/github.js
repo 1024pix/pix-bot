@@ -280,6 +280,17 @@ function _buildOctokitSearchQueryString(params = []) {
   return params.map((p) => `${Object.keys(p)}:${Object.values(p)}`).join('+');
 }
 
+const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) => {
+  const owner = settings.github.owner;
+  const octokit = _createOctokit();
+  await octokit.issues.createComment({
+    owner,
+    repo: repositoryName,
+    issue_number: pullRequestId,
+    body: comment,
+  });
+};
+
 module.exports = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
@@ -370,4 +381,6 @@ module.exports = {
     }
     return true;
   },
+
+  commentPullRequest,
 };
