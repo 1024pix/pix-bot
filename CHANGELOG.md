@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.48.1 (23/12/2022)
+
+
+### :bug: Correction
+- [#204](https://github.com/1024pix/pix-bot/pull/204) [BUGFIX] Les commentaires de PR non sont pas tout à fait corrects
+
 ## v1.48.0 (23/12/2022)
 
 
