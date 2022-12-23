@@ -30,7 +30,7 @@ function getMessage(repositoryName, pullRequestId, messageTemplate) {
   const shortenedRepositoryName = repositoryName.replace('pix-', '');
   const scalingoApplicationName = `${repositoryName}-review-pr${pullRequestId}`;
   const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoApplicationName}/environment`;
-  const webApplicationUrl = `${shortenedRepositoryName}-pr202.review.pix.fr`;
+  const webApplicationUrl = `https://${shortenedRepositoryName}-pr202.review.pix.fr`;
   const message = messageTemplate
     .replaceAll('{{pullRequestId}}', pullRequestId)
     .replaceAll('{{webApplicationUrl}}', webApplicationUrl)
