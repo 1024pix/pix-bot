@@ -6,7 +6,7 @@
     "node": "16",
     "npm": "8"
   },
-  "main": "bin/www",
+  "main": "index.js",
   "scripts": {
     "configure": "cp sample.env .env && npm ci",
     "deploy": "npm run deploy:minor",
@@ -20,7 +20,7 @@
     "local:trigger-lint-on-commit": "husky install",
     "local:prevent-trigger-lint-on-commit": "git config --unset core.hooksPath",
     "preinstall": "npx check-engine",
-    "start": "node bin/www",
+    "start": "node index.js",
     "test": "NODE_ENV=test mocha --recursive --exit test"
   },
   "repository": {
