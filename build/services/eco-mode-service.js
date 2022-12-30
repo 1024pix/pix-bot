@@ -5,12 +5,12 @@ module.exports = {
   async start() {
     const scalingoToken = config.scalingo.reviewApps.token;
     const scalingoApiUrl = config.scalingo.reviewApps.apiUrl;
-    const stopCronTime = process.env.STOP_CRON_TIME;
-    const restartCronTime = process.env.RESTART_CRON_TIME;
+    const stopCronTime = process.env.REVIEW_APP_STOP_SCHEDULE;
+    const restartCronTime = process.env.REVIEW_APP_START_SCHEDULE;
     const timeZone = process.env.TIME_ZONE || 'Europe/Paris';
     const ignoredReviewApps = process.env.IGNORED_REVIEW_APPS ? process.env.IGNORED_REVIEW_APPS.split(',') : [];
 
-    if (!stopCronTime || !restartCronTime) {
+    if (!config.ecoMode.stopSchedule || !config.ecoMode.startSchedule) {
       console.log('No schedule configured for eco mode - skipping.');
       return;
     }
