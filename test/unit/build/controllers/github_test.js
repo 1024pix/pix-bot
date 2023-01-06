@@ -7,7 +7,7 @@ describe('#addMessageToPullRequest', function () {
   describe('when the repository template is generic', function () {
     it('should call gitHubService.commentPullRequest with default template', async function () {
       // given
-      const data = { repositoryName: 'pix-bot', pullRequestId: 202 };
+      const data = { repositoryName: 'pix-bot', pullRequestId: 25 };
       const commentStub = sinon.stub(githubService, 'commentPullRequest');
 
       // when
@@ -19,7 +19,7 @@ describe('#addMessageToPullRequest', function () {
 
       expect(commentStub).to.have.been.calledOnceWithExactly({
         repositoryName: 'pix-bot',
-        pullRequestId: 202,
+        pullRequestId: 25,
         comment,
       });
     });
