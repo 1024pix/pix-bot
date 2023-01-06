@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.49.0 (06/01/2023)
+
+
+### :bug: Correction
+- [#208](https://github.com/1024pix/pix-bot/pull/208) [BUGFIX] Corrige le template d'urls pour les Review Apps.
+
 ## v1.48.3 (27/12/2022)
 
 
