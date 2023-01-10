@@ -4,4 +4,4 @@ Une fois les applications déployées, elles seront accessibles via les liens su
   * [Pix Pro (.fr)](https://pro-pr{{pullRequestId}}.review.pix.fr)
   * [Pix Pro (.org)](https://pro-pr{{pullRequestId}}.review.pix.org)
 
-Les variables d'environnement seront accessibles [ici]({{scalingoDashboardUrl}}).
+Les variables d'environnement seront accessibles sur scalingo {{scalingoDashboardUrl}}
