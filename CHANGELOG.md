@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.50.1 (11/01/2023)
+
+
+### :bug: Correction
+- [#211](https://github.com/1024pix/pix-bot/pull/211) [BUGFIX] Corrige le déploiement de pix-360
+
 ## v1.50.0 (11/01/2023)
 
 
