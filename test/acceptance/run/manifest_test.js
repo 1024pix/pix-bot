@@ -120,6 +120,13 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '/deploy-airflow $version',
             },
             {
+              command: '/deploy-pix-360',
+              description: 'Pour déployer pix 360 depuis la branche main',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-pix-360`,
+              usage_hint: '/deploy-pix-360',
+            },
+            {
               command: '/app-status',
               url: `http://${hostname}/slack/commands/app-status`,
               description: 'Returns the app status given the app name as parameter',

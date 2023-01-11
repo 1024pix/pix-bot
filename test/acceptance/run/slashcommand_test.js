@@ -30,6 +30,20 @@ describe('Acceptance | Run | SlashCommand', function () {
     });
   });
 
+  describe('POST /slack/commands/deploy-pix-360', function () {
+    it('responds with 200', async function () {
+      const body = {};
+      const res = await server.inject({
+        method: 'POST',
+        url: '/slack/commands/deploy-pix-360',
+        headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+        payload: body,
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.text).to.equal('Commande de déploiement de Pix 360 en production bien reçue.');
+    });
+  });
+
   describe('POST /slack/commands/deploy-airflow', function () {
     it('responds with 200 and deploys pix-airflow-production', async function () {
       const body = {

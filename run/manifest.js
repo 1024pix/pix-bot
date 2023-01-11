@@ -112,6 +112,15 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
+  command: '/deploy-pix-360',
+  path: '/slack/commands/deploy-pix-360',
+  description: 'Pour déployer pix 360 depuis la branche main',
+  usage_hint: '/deploy-pix-360',
+  should_escape: false,
+  handler: slackbotController.deployPix360,
+});
+
+manifest.registerSlashCommand({
   command: '/app-status',
   path: '/slack/commands/app-status',
   description: 'Returns the app status given the app name as parameter',
