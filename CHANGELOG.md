@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.50.0 (11/01/2023)
+
+
+### :rocket: Amélioration
+- [#210](https://github.com/1024pix/pix-bot/pull/210) [FEATURE] Déploie pix 360 depuis pix-bot
+
 ## v1.49.0 (06/01/2023)
 
 
