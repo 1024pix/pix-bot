@@ -123,7 +123,7 @@ module.exports = (function () {
     ],
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
     PIX_360_REPO_NAME: 'pix-360',
-    PIX_360_APP_NAME: 'pix-360',
+    PIX_360_APP_NAME: 'pix-360-production',
   };
 
   if (process.env.NODE_ENV === 'test') {

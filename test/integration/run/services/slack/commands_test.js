@@ -68,7 +68,7 @@ describe('Integration | Run | Services | Slack | Commands', function () {
         },
       };
       const nockDeploy = nock('https://scalingo.production')
-        .post(`/v1/apps/pix-360/deployments`, deploymentPayload)
+        .post(`/v1/apps/pix-360-production/deployments`, deploymentPayload)
         .reply(200, {});
 
       await commands.deployPix360();
