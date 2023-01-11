@@ -122,6 +122,8 @@ module.exports = (function () {
       'pix-gravitee-apim-rest-api-production',
     ],
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
+    PIX_360_REPO_NAME: 'pix-360',
+    PIX_360_APP_NAME: 'pix-360',
   };
 
   if (process.env.NODE_ENV === 'test') {

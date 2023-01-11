@@ -22,6 +22,15 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
+  command: '/deploy-ember-testing-library',
+  path: '/slack/commands/create-and-deploy-ember-testing-library-release',
+  description: 'Crée une release de Ember-testing-library',
+  usage_hint: '[patch, minor, major]',
+  should_escape: false,
+  handler: slackbotController.createAndDeployEmberTestingLibraryRelease,
+});
+
+manifest.registerSlashCommand({
   command: '/deploy-pix-lcms',
   path: '/slack/commands/create-and-deploy-pix-lcms-release',
   description: 'Crée une release de Pix-LCMS et la déploie en production (https://lcms-api.pix.fr)',
@@ -50,30 +59,12 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
-  command: '/app-status',
-  path: '/slack/commands/app-status',
-  description: 'Returns the app status given the app name as parameter',
-  usage_hint: '[pix-app-production, production]',
-  should_escape: false,
-  handler: slackbotController.getAppStatus,
-});
-
-manifest.registerSlashCommand({
   command: '/deploy-last-version',
   path: '/slack/commands/deploy-last-version',
   description: 'Deploy last version of an app',
   usage_hint: '[pix-admin-production]',
   should_escape: false,
   handler: slackbotController.deployLastVersion,
-});
-
-manifest.registerSlashCommand({
-  command: '/deploy-ember-testing-library',
-  path: '/slack/commands/create-and-deploy-ember-testing-library-release',
-  description: 'Crée une release de Ember-testing-library',
-  usage_hint: '[patch, minor, major]',
-  should_escape: false,
-  handler: slackbotController.createAndDeployEmberTestingLibraryRelease,
 });
 
 manifest.registerSlashCommand({
@@ -118,6 +109,24 @@ manifest.registerSlashCommand({
   usage_hint: '/deploy-airflow $version',
   should_escape: false,
   handler: slackbotController.deployAirflow,
+});
+
+manifest.registerSlashCommand({
+  command: '/deploy-pix-360',
+  path: '/slack/commands/deploy-pix-360',
+  description: 'Pour déployer pix 360 depuis la branche main',
+  usage_hint: '/deploy-pix-360',
+  should_escape: false,
+  handler: slackbotController.deployPix360,
+});
+
+manifest.registerSlashCommand({
+  command: '/app-status',
+  path: '/slack/commands/app-status',
+  description: 'Returns the app status given the app name as parameter',
+  usage_hint: '[pix-app-production, production]',
+  should_escape: false,
+  handler: slackbotController.getAppStatus,
 });
 
 manifest.registerShortcut({

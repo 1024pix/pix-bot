@@ -124,6 +124,14 @@ module.exports = {
     };
   },
 
+  deployPix360() {
+    commands.deployPix360();
+
+    return {
+      text: 'Commande de déploiement de Pix 360 en production bien reçue.',
+    };
+  },
+
   interactiveEndpoint(request) {
     const payload = request.pre.payload;
 

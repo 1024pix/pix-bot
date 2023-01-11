@@ -21,6 +21,8 @@ const {
   PIX_GRAVITEE_APIM_REPO_NAME,
   PIX_GRAVITEE_APIM_APPS_NAME,
   PIX_AIRFLOW_APP_NAME,
+  PIX_360_REPO_NAME,
+  PIX_360_APP_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -184,6 +186,10 @@ module.exports = {
 
   async deployGraviteeAPIM() {
     await deployFromBranch(PIX_GRAVITEE_APIM_REPO_NAME, PIX_GRAVITEE_APIM_APPS_NAME, 'main');
+  },
+
+  async deployPix360() {
+    await deployFromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main');
   },
 
   async createAndDeployPixLCMS(payload) {

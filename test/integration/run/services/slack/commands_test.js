@@ -56,6 +56,28 @@ describe('Integration | Run | Services | Slack | Commands', function () {
       });
     });
   });
+
+  describe('#deployPix360', function () {
+    it('should call Scalingo API to deploy the main branch', async function () {
+      const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
+
+      const deploymentPayload = {
+        deployment: {
+          git_ref: 'main',
+          source_url: 'https://undefined@github.com/github-owner/pix-360/archive/main.tar.gz',
+        },
+      };
+      const nockDeploy = nock('https://scalingo.production')
+        .post(`/v1/apps/pix-360/deployments`, deploymentPayload)
+        .reply(200, {});
+
+      await commands.deployPix360();
+
+      expect(scalingoTokenNock.isDone()).to.be.true;
+      expect(nockDeploy.isDone()).to.be.true;
+    });
+  });
+
   describe('#deployAirflow', function () {
     it('should call Scalingo API to deploy a specified tag', async function () {
       const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
