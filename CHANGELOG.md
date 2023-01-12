@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.50.2 (12/01/2023)
+
+
+### :rocket: Amélioration
+- [#209](https://github.com/1024pix/pix-bot/pull/209) [FEATURE] Change les liens vers les reviews app
+
 ## v1.50.1 (11/01/2023)
 
 
