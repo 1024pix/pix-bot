@@ -80,6 +80,24 @@ describe('#addMessageToPullRequest', function () {
           comment,
         });
       });
+      it('pix-data', async function () {
+        // given
+        const data = { repositoryName: 'pix-data', pullRequestId: 115 };
+        const commentStub = sinon.stub(githubService, 'commentPullRequest');
+
+        // when
+        await githubController.addMessageToPullRequest(data);
+
+        // then
+        const absoluteFileName = `${__dirname}/pull-request-messages/pix-data.md`;
+        const comment = fs.readFileSync(absoluteFileName, 'utf8');
+
+        expect(commentStub).to.have.been.calledOnceWithExactly({
+          repositoryName: 'pix-data',
+          pullRequestId: 115,
+          comment,
+        });
+      });
     });
   });
 });

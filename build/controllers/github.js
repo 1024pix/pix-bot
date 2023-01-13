@@ -15,7 +15,7 @@ const repositoryToScalingoAppsReview = {
 };
 
 function getMessageTemplate(repositoryName) {
-  const repositoriesWithSpecificMessage = ['pix-db-replication', 'pix-editor', 'pix-site', 'pix'];
+  const repositoriesWithSpecificMessage = ['pix-data', 'pix-db-replication', 'pix-editor', 'pix-site', 'pix'];
   let relativeFileName;
   if (repositoriesWithSpecificMessage.includes(repositoryName)) {
     relativeFileName = `${repositoryName}.md`;
