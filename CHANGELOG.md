@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.51.1 (13/01/2023)
+
+
+### :bug: Correction
+- [#213](https://github.com/1024pix/pix-bot/pull/213) [BUGFIX] Les liens vers l'application Airflow scalingo dans la PR sont invalides
+
 ## v1.51.0 (13/01/2023)
 
 
