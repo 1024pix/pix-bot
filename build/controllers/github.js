@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
+  'pix-data': ['pix-airflow-review'],
   'pix-db-replication': ['pix-datawarehouse-integration'],
   'pix-db-stats': ['pix-db-stats-review'],
   'pix-editor': ['pix-lcms-review'],
