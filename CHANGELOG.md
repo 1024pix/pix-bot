@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.51.0 (13/01/2023)
+
+
+### :rocket: Amélioration
+- [#212](https://github.com/1024pix/pix-bot/pull/212) [FEATURE] Déployer airflow
+
 ## v1.50.2 (12/01/2023)
 
 
