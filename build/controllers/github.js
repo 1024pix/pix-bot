@@ -1,6 +1,7 @@
+const fs = require('fs');
+const path = require('path');
 const ScalingoClient = require('../../common/services/scalingo-client');
 const gitHubService = require('../../common/services/github');
-const fs = require('fs');
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
@@ -15,15 +16,15 @@ const repositoryToScalingoAppsReview = {
 };
 
 function getMessageTemplate(repositoryName) {
-  const repositoriesWithSpecificMessage = ['pix-data', 'pix-db-replication', 'pix-editor', 'pix-site', 'pix'];
+  const baseDir = path.join(__dirname, '..', 'templates', 'pull-request-messages');
   let relativeFileName;
-  if (repositoriesWithSpecificMessage.includes(repositoryName)) {
+  if (fs.existsSync(path.join(baseDir, `${repositoryName}.md`))) {
     relativeFileName = `${repositoryName}.md`;
   } else {
     relativeFileName = 'default.md';
   }
-  const absoluteFileName = `${__dirname}/../templates/pull-request-messages/${relativeFileName}`;
-  const messageTemplate = fs.readFileSync(absoluteFileName, 'utf8');
+
+  const messageTemplate = fs.readFileSync(path.join(baseDir, relativeFileName), 'utf8');
   return messageTemplate;
 }
 
