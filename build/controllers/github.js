@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+
 const ScalingoClient = require('../../common/services/scalingo-client');
 const gitHubService = require('../../common/services/github');
 
@@ -52,6 +53,8 @@ const addMessageToPullRequest = async ({ repositoryName, pullRequestId }) => {
 };
 
 module.exports = {
+  getMessageTemplate,
+  getMessage,
   addMessageToPullRequest,
   async processWebhook(request) {
     const eventName = request.headers['x-github-event'];
