@@ -43,23 +43,23 @@ describe('#getMessageTemplate', function () {
 });
 
 describe('#getMessage', function () {
-  it('replace template placeholder with params', function () {
+  it('replace template placeholders with params', function () {
     const template = 'Hello, url {{webApplicationUrl}}, {{pullRequestId}} and {{scalingoDashboardUrl}}';
-    expect(githubController.getMessage('pix', '42', template)).to.equal(
+    expect(githubController.getMessage('pix', '42', ['pix-review', 'pix-review2'], template)).to.equal(
       'Hello, url https://pix-pr42.review.pix.fr, 42 and https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment'
     );
   });
 
   it('replace multiple values', function () {
     const template = '{{pullRequestId}}, {{pullRequestId}}';
-    expect(githubController.getMessage('pix', '43', template)).to.equal('43, 43');
+    expect(githubController.getMessage('pix', '43', ['pix-review'], template)).to.equal('43, 43');
   });
 });
 
 describe('#addMessageToPullRequest', function () {
   it('should call gitHubService.commentPullRequest', async function () {
     // given
-    const data = { repositoryName: 'pix-bot', pullRequestId: 25 };
+    const data = { repositoryName: 'pix-bot', pullRequestId: 25, scalingoReviewApps: ['pix-bot-review'] };
     const commentStub = sinon.stub(githubService, 'commentPullRequest');
 
     // when

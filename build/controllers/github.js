@@ -29,10 +29,9 @@ function getMessageTemplate(repositoryName) {
   return messageTemplate;
 }
 
-function getMessage(repositoryName, pullRequestId, messageTemplate) {
+function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate) {
+  const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoReviewApps[0]}-pr${pullRequestId}/environment`;
   const shortenedRepositoryName = repositoryName.replace('pix-', '');
-  const scalingoApplicationName = `${repositoryName}-review-pr${pullRequestId}`;
-  const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoApplicationName}/environment`;
   const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
   const message = messageTemplate
     .replaceAll('{{pullRequestId}}', pullRequestId)
@@ -41,9 +40,9 @@ function getMessage(repositoryName, pullRequestId, messageTemplate) {
   return message;
 }
 
-const addMessageToPullRequest = async ({ repositoryName, pullRequestId }) => {
+const addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingoReviewApps }) => {
   const messageTemplate = getMessageTemplate(repositoryName);
-  const message = getMessage(repositoryName, pullRequestId, messageTemplate);
+  const message = getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate);
 
   await gitHubService.commentPullRequest({
     repositoryName,
@@ -81,7 +80,11 @@ module.exports = {
         for (const appName of reviewApps) {
           await client.deployReviewApp(appName, prId);
         }
-        await addMessageToPullRequest({ repositoryName: repository, pullRequestId: prId });
+        await addMessageToPullRequest({
+          repositoryName: repository,
+          scalingoReviewApps: reviewApps,
+          pullRequestId: prId,
+        });
         return `Created RA on app ${reviewApps.join(', ')} with pr ${prId}`;
       } catch (error) {
         throw new Error(`Scalingo APIError: ${error.message}`);
