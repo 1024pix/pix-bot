@@ -101,7 +101,10 @@ module.exports = (function () {
       recette: ['pix-bot-build-production'],
     },
     PIX_LCMS_REPO_NAME: 'pix-editor',
-    PIX_LCMS_APP_NAME: 'pix-lcms',
+    PIX_LCMS_APPS: {
+      production: ['pix-lcms-production'],
+      recette: ['pix-lcms-minimal-production'],
+    },
     PIX_UI_REPO_NAME: 'pix-ui',
     PIX_EMBER_TESTING_LIBRARY_REPO_NAME: 'ember-testing-library',
     PIX_DB_STATS_REPO_NAME: 'pix-db-stats',
