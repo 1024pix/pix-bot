@@ -136,7 +136,7 @@ async function publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv,
       );
     })
   );
-  sendResponse(responseUrl, `Pix Bot deployed (${releaseTag})`);
+  sendResponse(responseUrl, getSuccessMessage(releaseTag, Object.values(appsByEnv).join(', ')));
 }
 
 async function getAndDeployLastVersion({ appName }) {
