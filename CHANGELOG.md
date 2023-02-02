@@ -1,5 +1,19 @@
 # pix-bot Changelog
 
+## v1.52.0 (02/02/2023)
+
+
+### :rocket: Amélioration
+- [#218](https://github.com/1024pix/pix-bot/pull/218) [FEATURE] Déployer pix-lcms-minimal en même temps que la production
+
+### :bug: Correction
+- [#220](https://github.com/1024pix/pix-bot/pull/220) [BUGFIX] Corriger le lien vers PixEditor dans le message automatique envoyée au Reviews Apps
+
+### :coffee: Autre
+- [#217](https://github.com/1024pix/pix-bot/pull/217) chore(deps): update node.js to v16.19.0
+- [#216](https://github.com/1024pix/pix-bot/pull/216) chore(deps): update dependency node to v16.19.0
+- [#215](https://github.com/1024pix/pix-bot/pull/215) Mettre à jour les dépendences aussi vite que possible
+
 ## v1.51.1 (13/01/2023)
 
 
