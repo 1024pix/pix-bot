@@ -156,8 +156,12 @@ describe('Services | Slack | Commands', () => {
   });
 
   describe('#createAndDeployPixLCMS', () => {
+    let client;
+
     beforeEach(async function () {
       // given
+      client = { deployFromArchive: sinon.spy() };
+      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
       const payload = { text: 'minor' };
       // when
       await createAndDeployPixLCMS(payload);
@@ -173,9 +177,14 @@ describe('Services | Slack | Commands', () => {
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-editor');
     });
 
-    it('should deploy the release', () => {
+    it('should deploy the release on production', () => {
       // then
-      sinon.assert.calledWith(releasesServices.deployPixRepo);
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-production');
+    });
+
+    it('should deploy the release on minimal', () => {
+      // then
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-minimal-production');
     });
   });
 
@@ -207,7 +216,7 @@ describe('Services | Slack | Commands', () => {
 
     it('should deploy the release for pix-bot-run', () => {
       // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-run');
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-run-production');
     });
   });
 

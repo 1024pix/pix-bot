@@ -6,10 +6,11 @@ const {
   PIX_SITE_REPO_NAME,
   PIX_SITE_APPS,
   PIX_BOT_REPO_NAME,
+  PIX_BOT_APPS,
   PIX_DATAWAREHOUSE_REPO_NAME,
   PIX_DATAWAREHOUSE_APPS_NAME,
   PIX_LCMS_REPO_NAME,
-  PIX_LCMS_APP_NAME,
+  PIX_LCMS_APPS,
   PIX_UI_REPO_NAME,
   PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
   PIX_DB_STATS_REPO_NAME,
@@ -117,20 +118,25 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
   }
 }
 
-async function publishAndDeployPixBot(repoName, releaseType, responseUrl) {
+async function publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
   }
   await releasesService.publishPixRepo(repoName, releaseType);
   const releaseTag = await githubServices.getLatestReleaseTag(repoName);
 
-  const recette = await ScalingoClient.getInstance('recette');
-  await recette.deployFromArchive('pix-bot-build-production', releaseTag, repoName, { withEnvSuffix: false });
+  await Promise.all(
+    Object.keys(appsByEnv).map(async (scalingoEnv) => {
+      const scalingoInstance = await ScalingoClient.getInstance(scalingoEnv);
 
-  const production = await ScalingoClient.getInstance('production');
-  await production.deployFromArchive('pix-bot-run', releaseTag, repoName);
-
-  sendResponse(responseUrl, `Pix Bot deployed (${releaseTag})`);
+      await Promise.all(
+        appsByEnv[scalingoEnv].map((scalingoAppName) => {
+          return scalingoInstance.deployFromArchive(scalingoAppName, releaseTag, repoName, { withEnvSuffix: false });
+        })
+      );
+    })
+  );
+  sendResponse(responseUrl, getSuccessMessage(releaseTag, Object.values(appsByEnv).join(', ')));
 }
 
 async function getAndDeployLastVersion({ appName }) {
@@ -193,7 +199,12 @@ module.exports = {
   },
 
   async createAndDeployPixLCMS(payload) {
-    await publishAndDeployRelease(PIX_LCMS_REPO_NAME, [PIX_LCMS_APP_NAME], payload.text, payload.response_url);
+    await publishAndDeployReleaseWithAppsByEnvironment(
+      PIX_LCMS_REPO_NAME,
+      PIX_LCMS_APPS,
+      payload.text,
+      payload.response_url
+    );
   },
 
   async createAndDeployPixUI(payload) {
@@ -218,7 +229,12 @@ module.exports = {
   },
 
   async createAndDeployPixBotRelease(payload) {
-    await publishAndDeployPixBot(PIX_BOT_REPO_NAME, payload.text, payload.response_url);
+    await publishAndDeployReleaseWithAppsByEnvironment(
+      PIX_BOT_REPO_NAME,
+      PIX_BOT_APPS,
+      payload.text,
+      payload.response_url
+    );
   },
 
   async getAndDeployLastVersion({ appName }) {
