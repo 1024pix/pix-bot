@@ -108,15 +108,15 @@ describe('Services | Slack | Commands', () => {
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-ui');
     });
 
-    it('should stop release if no version is given', async () => {
+    it('should create a minor version if no version is given', async () => {
       // given
       const payload = { text: '' };
 
       // when
-      const response = await catchErr(createAndDeployPixUI)(payload);
+      await createAndDeployPixUI(payload);
 
       // then
-      expect(response).to.be.instanceOf(Error);
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-ui', 'minor');
     });
   });
 
@@ -143,15 +143,15 @@ describe('Services | Slack | Commands', () => {
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'ember-testing-library');
     });
 
-    it('should stop release if no version is given', async () => {
+    it('should create a minor version if no version is given', async () => {
       // given
       const payload = { text: '' };
 
       // when
-      const response = await catchErr(createAndDeployEmberTestingLibrary)(payload);
+      await createAndDeployEmberTestingLibrary(payload);
 
       // then
-      expect(response).to.be.instanceOf(Error);
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'ember-testing-library', 'minor');
     });
   });
 
