@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.53.0 (03/02/2023)
+
+
+### :coffee: Autre
+- [#221](https://github.com/1024pix/pix-bot/pull/221) :art: Faire un bump de version mineure par défaut
+
 ## v1.52.0 (02/02/2023)
 
 
