@@ -64,12 +64,7 @@ function _isReleaseTypeInvalid(releaseType) {
 }
 async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    slackPostMessageService.postMessage(
-      'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".'
-    );
-    throw new Error(
-      'Erreur lors du choix de la nouvelle version de Pix UI. Veuillez indiquer "major", "minor" ou "patch".'
-    );
+    releaseType = 'minor';
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
   await releasesService.publishPixRepo(repoName, releaseType);
@@ -85,12 +80,7 @@ async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
 
 async function publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
-    slackPostMessageService.postMessage(
-      'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".'
-    );
-    throw new Error(
-      'Erreur lors du choix de la nouvelle version d\'ember-testing-library. Veuillez indiquer "major", "minor" ou "patch".'
-    );
+    releaseType = 'minor';
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
   await releasesService.publishPixRepo(repoName, releaseType);
