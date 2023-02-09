@@ -61,7 +61,7 @@ manifest.registerSlashCommand({
 manifest.registerSlashCommand({
   command: '/deploy-last-version',
   path: '/slack/commands/deploy-last-version',
-  description: 'Deploy last version of an app',
+  description: 'Déployer sur cette application la dernière release publiée',
   usage_hint: '[pix-admin-production]',
   should_escape: false,
   handler: slackbotController.deployLastVersion,
