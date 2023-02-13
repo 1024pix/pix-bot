@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.54.0 (13/02/2023)
+
+
+### :coffee: Autre
+- [#223](https://github.com/1024pix/pix-bot/pull/223) Corriger la suggestion de déploiement Slack
+
 ## v1.53.0 (03/02/2023)
 
 
