@@ -4,7 +4,7 @@
   "description": "Automating development actions",
   "engines": {
     "node": "16",
-    "npm": "8"
+    "npm": "9"
   },
   "main": "bin/www",
   "scripts": {
