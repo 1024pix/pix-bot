@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.55.0 (23/02/2023)
+
+
+### :bug: Correction
+- [#214](https://github.com/1024pix/pix-bot/pull/214) [BUGFIX] Corrige le nom de l'application Scalingo de review
+
+### :coffee: Autre
+- [#226](https://github.com/1024pix/pix-bot/pull/226) [BUMP] Update Node.js to v16.19.1 (.circleci)
+
 ## v1.54.0 (13/02/2023)
 
 
