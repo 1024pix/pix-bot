@@ -18,6 +18,15 @@ module.exports = {
     };
   },
 
+  deployGeoAPI(request) {
+    const payload = request.pre.payload;
+    commands.deployGeoAPI(payload);
+
+    return {
+      text: 'Commande de déploiement de GeoAPI en production bien reçue.',
+    };
+  },
+
   deployAirflow(request) {
     const payload = request.pre.payload;
     commands.deployAirflow(payload);
