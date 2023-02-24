@@ -57,6 +57,27 @@ describe('Integration | Run | Services | Slack | Commands', function () {
     });
   });
 
+  describe('#deployGeoAPI', function () {
+    it('should call Scalingo API to deploy the main branch', async function () {
+      const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
+
+      const deploymentPayload = {
+        deployment: {
+          git_ref: 'main',
+          source_url: 'https://undefined@github.com/github-owner/geoapi/archive/main.tar.gz',
+        },
+      };
+      const nockDeploy = nock('https://scalingo.production')
+        .post(`/v1/apps/pix-geoapi-production/deployments`, deploymentPayload)
+        .reply(200, {});
+
+      await commands.deployGeoAPI();
+
+      expect(scalingoTokenNock.isDone()).to.be.true;
+      expect(nockDeploy.isDone()).to.be.true;
+    });
+  });
+
   describe('#deployPix360', function () {
     it('should call Scalingo API to deploy the main branch', async function () {
       const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});

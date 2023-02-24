@@ -187,7 +187,7 @@ module.exports = {
   },
 
   async deployGeoAPI() {
-    await deployFromBranch(PIX_GEOAPI_REPO_NAME, PIX_GEOAPI_APP_NAME, 'main');
+    await deployFromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main');
   },
 
   async deployPix360() {
