@@ -112,6 +112,15 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
+  command: '/deploy-geoapi',
+  path: '/slack/commands/deploy-geoapi',
+  description: 'Déploie GeoAPI en production depuis la branche main',
+  usage_hint: '/deploy-geoapi',
+  should_escape: false,
+  handler: slackbotController.deployGeoAPI,
+});
+
+manifest.registerSlashCommand({
   command: '/deploy-pix-360',
   path: '/slack/commands/deploy-pix-360',
   description: 'Pour déployer pix 360 depuis la branche main',

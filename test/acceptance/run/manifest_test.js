@@ -120,6 +120,13 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '/deploy-airflow $version',
             },
             {
+              command: '/deploy-geoapi',
+              description: 'Déploie GeoAPI en production depuis la branche main',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-geoapi`,
+              usage_hint: '/deploy-geoapi',
+            },
+            {
               command: '/deploy-pix-360',
               description: 'Pour déployer pix 360 depuis la branche main',
               should_escape: false,
