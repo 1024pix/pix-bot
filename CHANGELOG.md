@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.56.0 (24/02/2023)
+
+
+### :coffee: Autre
+- [#228](https://github.com/1024pix/pix-bot/pull/228) :sparkles: Déployer geoapi via Pix bot
+
 ## v1.55.0 (23/02/2023)
 
 
