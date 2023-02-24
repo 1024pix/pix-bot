@@ -12,6 +12,7 @@ const {
   getAndDeployLastVersion,
   createAndDeployDbStats,
   deployMetabase,
+  deployGeoAPI,
   createAndDeployPixTutosRelease,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
@@ -344,6 +345,25 @@ describe('Services | Slack | Commands', () => {
         withEnvSuffix: false,
       });
       sinon.assert.calledWith(client.deployFromArchive, 'pix-data-metabase-production', 'master', 'metabase-deploy', {
+        withEnvSuffix: false,
+      });
+    });
+  });
+
+  describe('#deployGeoAPI', () => {
+    let client;
+
+    beforeEach(async function () {
+      // given
+      client = { deployFromArchive: sinon.spy() };
+      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
+      // when
+      await deployGeoAPI();
+    });
+
+    it('should deploy the release', () => {
+      // then
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-geoapi-production', 'main', 'geoapi', {
         withEnvSuffix: false,
       });
     });
