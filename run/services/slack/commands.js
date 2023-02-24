@@ -22,7 +22,7 @@ const {
   PIX_GRAVITEE_APIM_REPO_NAME,
   PIX_GRAVITEE_APIM_APPS_NAME,
   PIX_GEOAPI_REPO_NAME,
-  PIX_GEOAPI_APPS_NAME,
+  PIX_GEOAPI_APP_NAME,
   PIX_AIRFLOW_APP_NAME,
   PIX_360_REPO_NAME,
   PIX_360_APP_NAME,
@@ -187,7 +187,7 @@ module.exports = {
   },
 
   async deployGeoAPI() {
-    await deployFromBranch(PIX_GEOAPI_REPO_NAME, PIX_GEOAPI_APPS_NAME, 'main');
+    await deployFromBranch(PIX_GEOAPI_REPO_NAME, PIX_GEOAPI_APP_NAME, 'main');
   },
 
   async deployPix360() {

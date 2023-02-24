@@ -129,7 +129,7 @@ module.exports = (function () {
       'pix-gravitee-apim-rest-api-production',
     ],
     PIX_GEOAPI_REPO_NAME: 'geoapi',
-    PIX_GEOAPI_APPS_NAME: 'pix-geoapi-production',
+    PIX_GEOAPI_APP_NAME: 'pix-geoapi-production',
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
     PIX_360_REPO_NAME: 'pix-360',
     PIX_360_APP_NAME: 'pix-360-production',
