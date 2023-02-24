@@ -1,5 +1,12 @@
 # pix-bot Changelog
 
+## v1.57.0 (24/02/2023)
+
+
+### :coffee: Autre
+- [#227](https://github.com/1024pix/pix-bot/pull/227) [BUMP] Update dependency node to v16.19.1
+- [#229](https://github.com/1024pix/pix-bot/pull/229) :bug: Corriger le déploiement de geoapi
+
 ## v1.56.0 (24/02/2023)
 
 
