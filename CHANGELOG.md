@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.57.1 (02/03/2023)
+
+
+### :coffee: Autre
+- [#230](https://github.com/1024pix/pix-bot/pull/230) [BUMP] Lock file maintenance
+
 ## v1.57.0 (24/02/2023)
 
 
