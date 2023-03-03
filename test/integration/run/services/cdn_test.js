@@ -90,6 +90,87 @@ describe('Integration | CDN', () => {
       });
 
       context('when API returns an error', function () {
+        it('should retry request 3 times on 500', async () => {
+          // given
+          const applicationName = 'Pix_Test';
+          const namespace = 'Pix_Namespace';
+          const namespaceKey = 'namespace-key1';
+          let called = 0;
+          let expectedCallCount = 1 + config.baleen.CDNInvalidationRetryCount;
+
+          _stubAccountDetails(namespace);
+
+          nock('https://console.baleen.cloud/api', {
+            reqheaders: {
+              'X-Api-Key': config.baleen.pat,
+              'Content-type': 'application/json',
+              Cookie: `baleen-namespace=${namespaceKey}`,
+            },
+          })
+            .post('/cache/invalidations', { patterns: ['.'] })
+            .times(4)
+            .reply(500, () => {
+              called++;
+              return {
+                type: 'https://www.jhipster.tech/problem/problem-with-message',
+                title: 'SERVER_ERROR',
+                status: 500,
+                detail: 'The server could not invalidate the resources',
+                path: '/api/cache/invalidations',
+                message: 'error.http.500',
+              };
+            });
+
+          // when
+          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+
+          // then
+          const expected =
+            'Request failed with status code 500 and message {"type":"https://www.jhipster.tech/problem/problem-with-message","title":"SERVER_ERROR","status":500,"detail":"The server could not invalidate the resources","path":"/api/cache/invalidations","message":"error.http.500"}';
+          expect(result.message).to.be.equal(expected);
+          expect(called).equal(expectedCallCount);
+        });
+
+        it('should not retry request on status code different than 500', async () => {
+          // given
+          const applicationName = 'Pix_Test';
+          const namespace = 'Pix_Namespace';
+          const namespaceKey = 'namespace-key1';
+          let called = 0;
+          let expectedCallCount = 1;
+
+          _stubAccountDetails(namespace);
+
+          nock('https://console.baleen.cloud/api', {
+            reqheaders: {
+              'X-Api-Key': config.baleen.pat,
+              'Content-type': 'application/json',
+              Cookie: `baleen-namespace=${namespaceKey}`,
+            },
+          })
+            .post('/cache/invalidations', { patterns: ['.'] })
+            .reply(400, () => {
+              called++;
+              return {
+                type: 'https://www.jhipster.tech/problem/problem-with-message',
+                title: 'Bad Request',
+                status: 400,
+                detail: 'JSON parse error: Unexpected character',
+                path: '/api/cache/invalidations',
+                message: 'error.http.400',
+              };
+            });
+
+          // when
+          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+
+          // then
+          const expected =
+            'Request failed with status code 400 and message {"type":"https://www.jhipster.tech/problem/problem-with-message","title":"Bad Request","status":400,"detail":"JSON parse error: Unexpected character","path":"/api/cache/invalidations","message":"error.http.400"}';
+          expect(result.message).to.be.equal(expected);
+          expect(called).equal(expectedCallCount);
+        });
+
         it('should throw an error with statusCode and message', async () => {
           // given
           const applicationName = 'Pix_Test';

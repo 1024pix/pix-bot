@@ -24,6 +24,8 @@ module.exports = (function () {
     baleen: {
       pat: process.env.BALEEN_PERSONAL_ACCESS_TOKEN,
       appNamespaces: _getJSON(process.env.BALEEN_APP_NAMESPACES),
+      CDNInvalidationRetryCount: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_COUNT, 3),
+      CDNInvalidationRetryDelay: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_DELAY, 2000),
     },
 
     scalingo: {
@@ -145,6 +147,7 @@ module.exports = (function () {
 
     config.baleen.pat = 'baleen-pat';
     config.baleen.appNamespaces = _getJSON('{"Pix_Test":"Pix_Namespace","Pix_Test_2":"Pix Namespace 2"}');
+    config.baleen.CDNInvalidationRetryDelay = 1;
 
     config.github.token = undefined;
     config.github.owner = 'github-owner';
