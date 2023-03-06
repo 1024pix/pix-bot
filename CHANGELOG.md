@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.58.0 (06/03/2023)
+
+
+### :building_construction: Tech
+- [#232](https://github.com/1024pix/pix-bot/pull/232) [TECH] Mise à jour des dépendances
+
+### :coffee: Autre
+- [#222](https://github.com/1024pix/pix-bot/pull/222) Expliciter la configuration de l'ecoMode
+
 ## v1.57.1 (02/03/2023)
 
 
