@@ -16,6 +16,11 @@ module.exports = (function () {
     port: _getNumber(process.env.PORT, 3000),
     environment: process.env.NODE_ENV || 'development',
 
+    ecoMode: {
+      stopSchedule: process.env.REVIEW_APP_STOP_SCHEDULE,
+      startSchedule: process.env.REVIEW_APP_START_SCHEDULE,
+    },
+
     baleen: {
       pat: process.env.BALEEN_PERSONAL_ACCESS_TOKEN,
       appNamespaces: _getJSON(process.env.BALEEN_APP_NAMESPACES),
