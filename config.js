@@ -147,7 +147,6 @@ module.exports = (function () {
 
     config.baleen.pat = 'baleen-pat';
     config.baleen.appNamespaces = _getJSON('{"Pix_Test":"Pix_Namespace","Pix_Test_2":"Pix Namespace 2"}');
-    config.baleen.CDNInvalidationRetryDelay = 1;
 
     config.github.token = undefined;
     config.github.owner = 'github-owner';

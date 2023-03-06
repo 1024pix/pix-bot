@@ -1,6 +1,7 @@
 const axios = require('axios');
 const axiosRetry = require('axios-retry');
 const config = require('../../config');
+const logger = require('../../common/services/logger');
 const _ = require('lodash');
 
 const CDN_URL = 'https://console.baleen.cloud/api';
@@ -44,7 +45,7 @@ async function invalidateCdnCache(application) {
   axiosRetry(axios, {
     retries: config.baleen.CDNInvalidationRetryCount,
     retryDelay: (retryCount) => {
-      console.log(`Cache invalidation retry for application ${application}: ${retryCount}`);
+      logger.info(`Cache invalidation retry for application ${application}: ${retryCount}`);
       return retryCount * config.baleen.CDNInvalidationRetryDelay;
     },
     retryCondition: (error) => {

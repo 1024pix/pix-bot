@@ -33,6 +33,20 @@ function _stubInvalidationCachePost(namespaceKey) {
 }
 
 describe('Integration | CDN', () => {
+  let defaultRetryCount, defaultRetryDelay;
+
+  before(function () {
+    defaultRetryCount = config.baleen.CDNInvalidationRetryCount;
+    defaultRetryDelay = config.baleen.CDNInvalidationRetryDelay;
+    config.baleen.CDNInvalidationRetryCount = 3;
+    config.baleen.CDNInvalidationRetryDelay = 1;
+  });
+
+  after(function () {
+    config.baleen.CDNInvalidationRetryCount = defaultRetryCount;
+    config.baleen.CDNInvalidationRetryDelay = defaultRetryDelay;
+  });
+
   describe('#invalidateCdnCache', () => {
     it('should call Baleen cache invalidation API', async () => {
       // given
