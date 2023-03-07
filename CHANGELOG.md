@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.59.0 (07/03/2023)
+
+
+### :building_construction: Tech
+- [#231](https://github.com/1024pix/pix-bot/pull/231) [TECH] :sparkles: Réessayer l'invalidation de cache en cas d'échec
+
 ## v1.58.0 (06/03/2023)
 
 
