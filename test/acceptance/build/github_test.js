@@ -5,7 +5,7 @@ describe('Acceptance | Build | Github', function () {
   describe('POST /github/webhook', function () {
     let body;
 
-    describe('on pull request event', function () {
+    describe('on pull request opened event', function () {
       beforeEach(function () {
         body = {
           action: 'opened',
@@ -168,6 +168,49 @@ describe('Acceptance | Build | Github', function () {
           expect(response.statusCode).to.equal(StatusCodes.INTERNAL_SERVER_ERROR);
           expect(response.result.message).to.equal('An internal server error occurred');
         });
+      });
+    });
+
+    describe('on pull request synchronize event', function () {
+      beforeEach(function () {
+        body = {
+          action: 'synchronize',
+          number: 2,
+          pull_request: {
+            labels: [],
+            head: {
+              ref: 'my-branch',
+              repo: {
+                name: 'pix',
+              },
+            },
+          },
+        };
+      });
+
+      it('responds with 200 and create a deployment on scalingo', async function () {
+        const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+        const scalingoDeploy1 = nock('https://api.osc-fr1.scalingo.com')
+          .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+          .reply(200);
+        const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
+          .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+          .reply(200);
+
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(200);
+        expect(res.result).to.eql('Triggered deployment of RA on app pix-front-review, pix-api-review with pr 2');
+        expect(scalingoAuth.isDone()).to.be.true;
+        expect(scalingoDeploy1.isDone()).to.be.true;
+        expect(scalingoDeploy2.isDone()).to.be.true;
       });
     });
 

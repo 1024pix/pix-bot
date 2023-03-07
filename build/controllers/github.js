@@ -51,7 +51,7 @@ const addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingo
   });
 };
 
-async function pullRequestWebhook(request) {
+async function pullRequestOpenedWebhook(request) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
   const prId = payload.number;
@@ -59,9 +59,6 @@ async function pullRequestWebhook(request) {
   const labelsList = payload.pull_request.labels;
   if (payload.pull_request.head.repo.fork) {
     return 'No RA for a fork';
-  }
-  if (payload.action !== 'opened') {
-    return `Ignoring ${payload.action} action`;
   }
   if (!reviewApps) {
     return 'No RA configured for this repository';
@@ -85,6 +82,22 @@ async function pullRequestWebhook(request) {
   }
 }
 
+async function pullRequestSynchronizeWebhook(request) {
+  const payload = request.payload;
+  const repository = payload.pull_request.head.repo.name;
+  const ref = payload.pull_request.head.ref;
+  const reviewApps = repositoryToScalingoAppsReview[repository];
+  const prId = payload.number;
+
+  const client = await ScalingoClient.getInstance('reviewApps');
+  for (const appName of reviewApps) {
+    const reviewAppName = `${appName}-pr${prId}`;
+    await client.deployUsingSCM(reviewAppName, ref);
+  }
+
+  return `Triggered deployment of RA on app ${reviewApps.join(', ')} with pr ${prId}`;
+}
+
 module.exports = {
   getMessageTemplate,
   getMessage,
@@ -92,7 +105,13 @@ module.exports = {
   async processWebhook(request) {
     const eventName = request.headers['x-github-event'];
     if (eventName === 'pull_request') {
-      return pullRequestWebhook(request);
+      switch (request.payload.action) {
+        case 'opened':
+          return pullRequestOpenedWebhook(request);
+        case 'synchronize':
+          return pullRequestSynchronizeWebhook(request);
+      }
+      return `Ignoring ${request.payload.action} action`;
     } else {
       return `Ignoring ${eventName} event`;
     }
