@@ -38,6 +38,7 @@
     "@hapi/hapi": "^21.1.0",
     "@octokit/rest": "^19.0.5",
     "axios": "^1.2.1",
+    "axios-retry": "^3.4.0",
     "cron": "^2.1.0",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",

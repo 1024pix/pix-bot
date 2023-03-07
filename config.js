@@ -24,6 +24,8 @@ module.exports = (function () {
     baleen: {
       pat: process.env.BALEEN_PERSONAL_ACCESS_TOKEN,
       appNamespaces: _getJSON(process.env.BALEEN_APP_NAMESPACES),
+      CDNInvalidationRetryCount: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_COUNT, 3),
+      CDNInvalidationRetryDelay: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_DELAY, 2000),
     },
 
     scalingo: {
