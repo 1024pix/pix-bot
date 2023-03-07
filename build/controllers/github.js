@@ -89,10 +89,14 @@ async function pullRequestSynchronizeWebhook(request) {
   const reviewApps = repositoryToScalingoAppsReview[repository];
   const prId = payload.number;
 
-  const client = await ScalingoClient.getInstance('reviewApps');
-  for (const appName of reviewApps) {
-    const reviewAppName = `${appName}-pr${prId}`;
-    await client.deployUsingSCM(reviewAppName, ref);
+  try {
+    const client = await ScalingoClient.getInstance('reviewApps');
+    for (const appName of reviewApps) {
+      const reviewAppName = `${appName}-pr${prId}`;
+      await client.deployUsingSCM(reviewAppName, ref);
+    }
+  } catch (error) {
+    throw new Error(`Scalingo APIError: ${error.message}`);
   }
 
   return `Triggered deployment of RA on app ${reviewApps.join(', ')} with pr ${prId}`;
