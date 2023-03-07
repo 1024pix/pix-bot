@@ -85,6 +85,11 @@ async function pullRequestSynchronizeWebhook(request) {
   const reviewApps = repositoryToScalingoAppsReview[repository];
   const prId = payload.number;
 
+  const { shouldContinue, message } = _handleNoRACase(request);
+  if (!shouldContinue) {
+    return message;
+  }
+
   try {
     const client = await ScalingoClient.getInstance('reviewApps');
     for (const appName of reviewApps) {

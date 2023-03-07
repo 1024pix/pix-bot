@@ -182,6 +182,7 @@ describe('Acceptance | Build | Github', function () {
               ref: 'my-branch',
               repo: {
                 name: 'pix',
+                fork: false,
               },
             },
           },
@@ -211,6 +212,69 @@ describe('Acceptance | Build | Github', function () {
         expect(scalingoAuth.isDone()).to.be.true;
         expect(scalingoDeploy1.isDone()).to.be.true;
         expect(scalingoDeploy2.isDone()).to.be.true;
+      });
+
+      it("responds with 200 and doesn't trigger deployment when the PR is from a fork", async function () {
+        body.pull_request.head.repo.fork = true;
+
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(200);
+        expect(res.result).to.eql('No RA for a fork');
+      });
+
+      it("responds with 200 and doesn't trigger deployment the RA on scalingo when the PR is not from a configured repo", async function () {
+        body.pull_request.head.repo.name = 'pix-repository-that-dont-exist';
+
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(200);
+        expect(res.result).to.eql('No RA configured for this repository');
+      });
+
+      it('responds with 200 and do nothing for other action on pull request', async function () {
+        body.action = 'edited';
+
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(200);
+        expect(res.result).to.eql('Ignoring edited action');
+      });
+
+      it('responds with 200 and do nothing for a pr labelled with no-review-app', async function () {
+        body.pull_request.labels = [{ name: 'no-review-app' }];
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(200);
+        expect(res.result).to.eql('RA disabled for this PR');
       });
     });
 
