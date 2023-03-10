@@ -62,6 +62,11 @@ class ScalingoClient {
     return this.client.SCMRepoLinks.manualReviewApp(appName, prId);
   }
 
+  disableAutoDeploy(appName) {
+    const opts = { auto_deploy_enabled: false };
+    return this.client.SCMRepoLinks.update(appName, opts);
+  }
+
   async _getAllAppsInfo(environment) {
     const apps = ['api', 'app', 'orga', 'certif', 'admin'];
     const promises = apps.map((appName) => this._getSingleAppInfo(appName, environment));

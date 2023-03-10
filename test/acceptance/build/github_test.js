@@ -22,13 +22,19 @@ describe('Acceptance | Build | Github', function () {
         };
       });
 
-      it('responds with 200 and create the RA on scalingo', async function () {
+      it('responds with 200 and create the RA on scalingo and disable autodeploy', async function () {
         const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
         const scalingoDeploy1 = nock('https://api.osc-fr1.scalingo.com')
           .post('/v1/apps/pix-front-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
           .reply(201);
         const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
           .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
+          .reply(201);
+        const scalingoUpdateOpts1 = nock('https://api.osc-fr1.scalingo.com')
+          .patch('/v1/apps/pix-front-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+          .reply(201);
+        const scalingoUpdateOpts2 = nock('https://api.osc-fr1.scalingo.com')
+          .patch('/v1/apps/pix-api-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
           .reply(201);
         nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(200);
 
@@ -46,6 +52,8 @@ describe('Acceptance | Build | Github', function () {
         expect(scalingoAuth.isDone()).to.be.true;
         expect(scalingoDeploy1.isDone()).to.be.true;
         expect(scalingoDeploy2.isDone()).to.be.true;
+        expect(scalingoUpdateOpts1.isDone()).to.be.true;
+        expect(scalingoUpdateOpts2.isDone()).to.be.true;
       });
 
       it('responds with OK (200) and add application link to pull request comments', async function () {
@@ -58,6 +66,12 @@ describe('Acceptance | Build | Github', function () {
         nock('https://api.osc-fr1.scalingo.com')
           .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
           .reply(StatusCodes.CREATED);
+        nock('https://api.osc-fr1.scalingo.com')
+          .patch('/v1/apps/pix-front-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+          .reply(201);
+        nock('https://api.osc-fr1.scalingo.com')
+          .patch('/v1/apps/pix-api-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+          .reply(201);
         const githubNock = nock('https://api.github.com')
           .post('/repos/github-owner/pix/issues/2/comments')
           .reply(StatusCodes.OK);
