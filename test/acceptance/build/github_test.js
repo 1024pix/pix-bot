@@ -31,10 +31,10 @@ describe('Acceptance | Build | Github', function () {
           .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
           .reply(201);
         const scalingoUpdateOpts1 = nock('https://api.osc-fr1.scalingo.com')
-          .patch('/v1/apps/pix-front-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+          .patch('/v1/apps/pix-front-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
           .reply(201);
         const scalingoUpdateOpts2 = nock('https://api.osc-fr1.scalingo.com')
-          .patch('/v1/apps/pix-api-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+          .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
           .reply(201);
         nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(200);
 
@@ -67,10 +67,10 @@ describe('Acceptance | Build | Github', function () {
           .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
           .reply(StatusCodes.CREATED);
         nock('https://api.osc-fr1.scalingo.com')
-          .patch('/v1/apps/pix-front-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+          .patch('/v1/apps/pix-front-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
           .reply(201);
         nock('https://api.osc-fr1.scalingo.com')
-          .patch('/v1/apps/pix-api-review/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+          .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
           .reply(201);
         const githubNock = nock('https://api.github.com')
           .post('/repos/github-owner/pix/issues/2/comments')
