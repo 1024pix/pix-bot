@@ -65,8 +65,8 @@ async function pullRequestOpenedWebhook(request) {
   try {
     const client = await ScalingoClient.getInstance('reviewApps');
     for (const appName of reviewApps) {
-      await client.deployReviewApp(appName, prId);
-      await client.disableAutoDeploy(appName);
+      const { app_name: reviewAppName } = await client.deployReviewApp(appName, prId);
+      await client.disableAutoDeploy(reviewAppName);
     }
     await addMessageToPullRequest({
       repositoryName: repository,
