@@ -432,6 +432,37 @@ describe('Scalingo client', () => {
     });
   });
 
+  describe('#Scalingo.disableAutoDeploy', () => {
+    let update;
+    let scalingoClient;
+
+    beforeEach(async function () {
+      update = sinon.stub();
+      const clientStub = {
+        clientFromToken: async () => {
+          return {
+            SCMRepoLinks: {
+              update,
+            },
+          };
+        },
+      };
+
+      scalingoClient = await ScalingoClient.getInstance('reviewApps', clientStub);
+    });
+
+    it('should call update', async () => {
+      // given
+      update.withArgs('pix-app-review').resolves();
+
+      // when
+      await scalingoClient.disableAutoDeploy('pix-app-review');
+
+      // then
+      expect(update.called).to.be.true;
+    });
+  });
+
   describe('#Scalingo.createApplication', () => {
     it('should return application identifier', async () => {
       // given
