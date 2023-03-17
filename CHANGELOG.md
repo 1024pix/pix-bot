@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.60.0 (17/03/2023)
+
+
+### :coffee: Autre
+- [#234](https://github.com/1024pix/pix-bot/pull/234) :sparkles:  Ajout de l'URL des review-app de scalingo de pix1d    sur les messages github
+
 ## v1.59.0 (07/03/2023)
 
 
