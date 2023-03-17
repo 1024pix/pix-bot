@@ -55,6 +55,7 @@ async function pullRequestOpenedWebhook(request) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
   const prId = payload.number;
+  const ref = payload.pull_request.head.ref;
   const reviewApps = repositoryToScalingoAppsReview[repository];
 
   const { shouldContinue, message } = _handleNoRACase(request);
@@ -67,6 +68,7 @@ async function pullRequestOpenedWebhook(request) {
     for (const appName of reviewApps) {
       const { app_name: reviewAppName } = await client.deployReviewApp(appName, prId);
       await client.disableAutoDeploy(reviewAppName);
+      await client.deployUsingSCM(reviewAppName, ref);
     }
     await addMessageToPullRequest({
       repositoryName: repository,
