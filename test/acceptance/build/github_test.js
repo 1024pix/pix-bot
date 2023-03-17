@@ -13,6 +13,7 @@ describe('Acceptance | Build | Github', function () {
           pull_request: {
             labels: [{ name: 'test-label' }],
             head: {
+              ref: 'my-branch',
               repo: {
                 name: 'pix',
                 fork: false,
@@ -22,7 +23,7 @@ describe('Acceptance | Build | Github', function () {
         };
       });
 
-      it('responds with 200 and create the RA on scalingo and disable autodeploy', async function () {
+      it('responds with 200, creates the RA on scalingo, disables autodeploy and pushes the git ref', async function () {
         const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
         const replyBody1 = {
           review_app: {
@@ -46,6 +47,12 @@ describe('Acceptance | Build | Github', function () {
         const scalingoUpdateOpts2 = nock('https://api.osc-fr1.scalingo.com')
           .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
           .reply(StatusCodes.CREATED);
+        const scalingoSCMDeploy1 = nock('https://api.osc-fr1.scalingo.com')
+          .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+          .reply(200);
+        const scalingoSCMDeploy2 = nock('https://api.osc-fr1.scalingo.com')
+          .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+          .reply(200);
         nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(StatusCodes.OK);
 
         const res = await server.inject({
@@ -64,6 +71,8 @@ describe('Acceptance | Build | Github', function () {
         expect(scalingoDeploy2.isDone()).to.be.true;
         expect(scalingoUpdateOpts1.isDone()).to.be.true;
         expect(scalingoUpdateOpts2.isDone()).to.be.true;
+        expect(scalingoSCMDeploy1.isDone()).to.be.true;
+        expect(scalingoSCMDeploy2.isDone()).to.be.true;
       });
 
       it('responds with OK (200) and add application link to pull request comments', async function () {
@@ -92,6 +101,12 @@ describe('Acceptance | Build | Github', function () {
         nock('https://api.osc-fr1.scalingo.com')
           .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
           .reply(StatusCodes.CREATED);
+        nock('https://api.osc-fr1.scalingo.com')
+          .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+          .reply(200);
+        nock('https://api.osc-fr1.scalingo.com')
+          .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+          .reply(200);
         const githubNock = nock('https://api.github.com')
           .post('/repos/github-owner/pix/issues/2/comments')
           .reply(StatusCodes.OK);
