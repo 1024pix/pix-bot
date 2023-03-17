@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.61.0 (17/03/2023)
+
+
+### :rocket: Amélioration
+- [#233](https://github.com/1024pix/pix-bot/pull/233) [FEATURE] Au push sur une PR, on déploie nous même la review app
+
 ## v1.60.0 (17/03/2023)
 
 
