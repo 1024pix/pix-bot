@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.61.1 (17/03/2023)
+
+
+### :coffee: Autre
+- [#235](https://github.com/1024pix/pix-bot/pull/235) Déployer le code à la création de la RA
+
 ## v1.61.0 (17/03/2023)
 
 
