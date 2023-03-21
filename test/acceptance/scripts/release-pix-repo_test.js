@@ -76,6 +76,7 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function () {
       'Created annotated tag',
       'Pushed release commit to the origin',
       'Release publication for 1024pix/pix-bot-publish-test \x1B[1;32msucceeded\x1B[0m (minor).',
+      'v0.2.0',
       '',
     ];
     const expectedStderr = [/^Cloning into/, /To (.+)/, /dev -> dev/, /v0.2.0 -> v0.2.0/, ''];
