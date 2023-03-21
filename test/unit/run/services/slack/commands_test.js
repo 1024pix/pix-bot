@@ -106,7 +106,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       await createAndDeployPixUI(payload);
 
       // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-ui');
+      sinon.assert.calledOnceWithExactly(githubServices.getLatestReleaseTag, 'pix-ui');
     });
 
     it('should create a minor version if no version is given', async () => {
