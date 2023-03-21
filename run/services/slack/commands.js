@@ -65,7 +65,7 @@ function _isReleaseTypeInvalid(releaseType) {
   return !['major', 'minor', 'patch'].includes(releaseType);
 }
 
-async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
+async function publishPixUI(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
   }
@@ -205,7 +205,7 @@ module.exports = {
   },
 
   async createAndDeployPixUI(payload) {
-    await publishAndDeployPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
+    await publishPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createAndDeployEmberTestingLibrary(payload) {
