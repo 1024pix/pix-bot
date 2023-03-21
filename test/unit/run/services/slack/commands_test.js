@@ -19,12 +19,12 @@ const releasesServices = require('../../../../../common/services/releases');
 const githubServices = require('../../../../../common/services/github');
 const ScalingoClient = require('../../../../../common/services/scalingo-client');
 
-describe('Services | Slack | Commands', () => {
+describe('Unit | Run | Services | Slack | Commands', () => {
   beforeEach(function () {
     // given
     sinon.stub(axios, 'post');
     sinon.stub(releasesServices, 'deployPixRepo').resolves();
-    sinon.stub(releasesServices, 'publishPixRepo').resolves();
+    sinon.stub(releasesServices, 'publishPixRepo').resolves('v1.0.0');
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
   });
 
@@ -173,19 +173,19 @@ describe('Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-editor', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', () => {
+    it('should not retrieve the last release tag from GitHub', () => {
       // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-editor');
+      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
     });
 
     it('should deploy the release on production', () => {
       // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-production');
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-production', 'v1.0.0');
     });
 
     it('should deploy the release on minimal', () => {
       // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-minimal-production');
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-minimal-production', 'v1.0.0');
     });
   });
 
@@ -205,19 +205,19 @@ describe('Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-bot', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', () => {
+    it('should not retrieve the last release tag from GitHub', () => {
       // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-bot');
+      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
     });
 
     it('should deploy the release for pix-bot-build', () => {
       // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build-production');
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build-production', 'v1.0.0');
     });
 
     it('should deploy the release for pix-bot-run', () => {
       // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-run-production');
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-run-production', 'v1.0.0');
     });
   });
 

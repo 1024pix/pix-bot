@@ -64,13 +64,13 @@ function getErrorAppMessage(appName) {
 function _isReleaseTypeInvalid(releaseType) {
   return !['major', 'minor', 'patch'].includes(releaseType);
 }
+
 async function publishAndDeployPixUI(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
-  await releasesService.publishPixRepo(repoName, releaseType);
-  const releaseTagAfterRelease = await githubServices.getLatestReleaseTag(repoName);
+  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
 
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
@@ -85,8 +85,7 @@ async function publishAndDeployEmberTestingLibrary(repoName, releaseType, respon
     releaseType = 'minor';
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
-  await releasesService.publishPixRepo(repoName, releaseType);
-  const releaseTagAfterRelease = await githubServices.getLatestReleaseTag(repoName);
+  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
 
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
@@ -114,8 +113,8 @@ async function publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv,
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
   }
-  await releasesService.publishPixRepo(repoName, releaseType);
-  const releaseTag = await githubServices.getLatestReleaseTag(repoName);
+
+  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
 
   await Promise.all(
     Object.keys(appsByEnv).map(async (scalingoEnv) => {
@@ -123,12 +122,14 @@ async function publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv,
 
       await Promise.all(
         appsByEnv[scalingoEnv].map((scalingoAppName) => {
-          return scalingoInstance.deployFromArchive(scalingoAppName, releaseTag, repoName, { withEnvSuffix: false });
+          return scalingoInstance.deployFromArchive(scalingoAppName, releaseTagAfterRelease, repoName, {
+            withEnvSuffix: false,
+          });
         })
       );
     })
   );
-  sendResponse(responseUrl, getSuccessMessage(releaseTag, Object.values(appsByEnv).join(', ')));
+  sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, Object.values(appsByEnv).join(', ')));
 }
 
 async function getAndDeployLastVersion({ appName }) {
