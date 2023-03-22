@@ -100,10 +100,10 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
-    await releasesService.publishPixRepo(repoName, releaseType);
-    const releaseTag = await deploy(repoName, appNamesList);
+    const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
+    await deploy(repoName, appNamesList, releaseTagAfterRelease);
 
-    sendResponse(responseUrl, getSuccessMessage(releaseTag, appNamesList.join(', ')));
+    sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, appNamesList.join(', ')));
   } catch (e) {
     sendResponse(responseUrl, getErrorAppMessage(appNamesList.join(', ')));
   }

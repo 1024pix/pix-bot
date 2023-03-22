@@ -42,9 +42,9 @@ describe('Unit | Run | Services | Slack | Commands', () => {
         sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site', 'minor');
       });
 
-      it('should retrieve the last release tag from GitHub', () => {
+      it('should not retrieve the last release tag from GitHub', () => {
         // then
-        sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-site');
+        sinon.assert.notCalled(githubServices.getLatestReleaseTag);
       });
 
       it('should deploy the release for pix-site and pix-pro', () => {
@@ -234,9 +234,9 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-replication', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', () => {
+    it('should not retrieve the last release tag from GitHub', () => {
       // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-db-replication');
+      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
     });
 
     it('should deploy the release', () => {
@@ -293,9 +293,9 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-stats', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', () => {
+    it('should not retrieve the last release tag from GitHub', () => {
       // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-db-stats');
+      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
     });
 
     it('should deploy the release', () => {
@@ -317,9 +317,9 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-tutos', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', () => {
+    it('should not retrieve the last release tag from GitHub', () => {
       // then
-      sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'pix-tutos');
+      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
     });
 
     it('should deploy the release', () => {
