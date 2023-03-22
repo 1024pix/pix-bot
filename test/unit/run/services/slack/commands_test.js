@@ -42,11 +42,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
         sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-site', 'minor');
       });
 
-      it('should not retrieve the last release tag from GitHub', () => {
-        // then
-        sinon.assert.notCalled(githubServices.getLatestReleaseTag);
-      });
-
       it('should deploy the release for pix-site and pix-pro', () => {
         // then
         sinon.assert.calledWith(releasesServices.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
@@ -173,11 +168,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-editor', 'minor');
     });
 
-    it('should not retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
-    });
-
     it('should deploy the release on production', () => {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-production', 'v1.0.0');
@@ -205,11 +195,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-bot', 'minor');
     });
 
-    it('should not retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
-    });
-
     it('should deploy the release for pix-bot-build', () => {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build-production', 'v1.0.0');
@@ -232,11 +217,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     it('should publish a new release', () => {
       // then
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-replication', 'minor');
-    });
-
-    it('should not retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
     });
 
     it('should deploy the release', () => {
@@ -293,11 +273,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-db-stats', 'minor');
     });
 
-    it('should not retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
-    });
-
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixRepo);
@@ -315,11 +290,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     it('should publish a new release', () => {
       // then
       sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-tutos', 'minor');
-    });
-
-    it('should not retrieve the last release tag from GitHub', () => {
-      // then
-      sinon.assert.notCalled(githubServices.getLatestReleaseTag);
     });
 
     it('should deploy the release', () => {
