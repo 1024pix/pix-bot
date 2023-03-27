@@ -54,7 +54,8 @@ module.exports = {
       const branchName = await github.getDefaultBranch(config.github.owner, sanitizedRepoName);
       const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${sanitizedRepoName}.git`;
       const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType, branchName, repositoryURL];
-      await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
+      const newPackageVersion = await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
+      return newPackageVersion;
     } catch (err) {
       console.error(err);
       throw err;

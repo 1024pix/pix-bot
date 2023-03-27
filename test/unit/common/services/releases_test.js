@@ -106,10 +106,12 @@ describe('releases', function () {
   });
 
   describe('#publishPixRepo', function () {
-    it("should call the release pix script with 'minor'", async function () {
+    beforeEach(function () {
       // given
       sinon.stub(github, 'getDefaultBranch').resolves('dev');
+    });
 
+    it("should call the release pix script with 'minor'", async function () {
       //when
       await releasesService.publishPixRepo('pix-site', 'minor');
 
@@ -122,6 +124,14 @@ describe('releases', function () {
           )
         )
       );
+    });
+
+    it('should retrieve new package version', async function () {
+      //when
+      const newPackageVersion = await releasesService.publishPixRepo('pix-site', 'minor');
+
+      // then
+      expect(newPackageVersion).to.equal('3.14.0');
     });
   });
 });

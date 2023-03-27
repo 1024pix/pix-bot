@@ -45,3 +45,4 @@ tag_release_commit
 push_commit_and_tag_to_remote
 
 echo -e "Release publication for ${GITHUB_OWNER}/${GITHUB_REPOSITORY} ${GREEN}succeeded${RESET_COLOR} (${VERSION_TYPE})."
+echo "v${NEW_PACKAGE_VERSION}"

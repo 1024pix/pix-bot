@@ -15,8 +15,7 @@ module.exports = {
     const releaseType = payload.view.private_metadata;
 
     async function _publishAndDeploy({ releaseType, environment }) {
-      await publish(releaseType);
-      const latestReleaseTag = await githubService.getLatestReleaseTag();
+      const latestReleaseTag = await publish(releaseType);
       return deploy(environment, latestReleaseTag);
     }
 
