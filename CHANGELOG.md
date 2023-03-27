@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.62.0 (27/03/2023)
+
+
+### :building_construction: Tech
+- [#236](https://github.com/1024pix/pix-bot/pull/236) [TECH] Utiliser la version de release qui vient d'être crée plutôt que d'appeler l'API Github
+
+### :coffee: Autre
+- [#207](https://github.com/1024pix/pix-bot/pull/207)  [TECH] Renommer www en index.js
+
 ## v1.61.1 (17/03/2023)
 
 
