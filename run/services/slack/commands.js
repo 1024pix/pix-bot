@@ -65,7 +65,7 @@ function _isReleaseTypeInvalid(releaseType) {
   return !['major', 'minor', 'patch'].includes(releaseType);
 }
 
-async function publishPixUI(repoName, releaseType, responseUrl) {
+async function _publishPixUI(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
   }
@@ -80,7 +80,7 @@ async function publishPixUI(repoName, releaseType, responseUrl) {
   }
 }
 
-async function publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
+async function _publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
   }
@@ -95,7 +95,7 @@ async function publishAndDeployEmberTestingLibrary(repoName, releaseType, respon
   }
 }
 
-async function publishAndDeployRelease(repoName, appNamesList = [], releaseType, responseUrl) {
+async function _publishAndDeployRelease(repoName, appNamesList = [], releaseType, responseUrl) {
   try {
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
@@ -109,7 +109,7 @@ async function publishAndDeployRelease(repoName, appNamesList = [], releaseType,
   }
 }
 
-async function publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv, releaseType, responseUrl) {
+async function _publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
   }
@@ -132,7 +132,7 @@ async function publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv,
   sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, Object.values(appsByEnv).join(', ')));
 }
 
-async function getAndDeployLastVersion({ appName }) {
+async function _getAndDeployLastVersion({ appName }) {
   const lastReleaseTag = await githubServices.getLatestReleaseTag(PIX_REPO_NAME);
   const sanitizedAppName = appName.trim().toLowerCase();
 
@@ -159,7 +159,7 @@ function _isAppFromPixRepo({ appName }) {
   return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
-async function deployFromBranch(repoName, appNames, branch) {
+async function _deployFromBranch(repoName, appNames, branch) {
   const client = await ScalingoClient.getInstance('production');
   return Promise.all(
     appNames.map((appName) => {
@@ -184,19 +184,19 @@ module.exports = {
   },
 
   async deployGraviteeAPIM() {
-    await deployFromBranch(PIX_GRAVITEE_APIM_REPO_NAME, PIX_GRAVITEE_APIM_APPS_NAME, 'main');
+    await _deployFromBranch(PIX_GRAVITEE_APIM_REPO_NAME, PIX_GRAVITEE_APIM_APPS_NAME, 'main');
   },
 
   async deployGeoAPI() {
-    await deployFromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main');
+    await _deployFromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main');
   },
 
   async deployPix360() {
-    await deployFromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main');
+    await _deployFromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main');
   },
 
   async createAndDeployPixLCMS(payload) {
-    await publishAndDeployReleaseWithAppsByEnvironment(
+    await _publishAndDeployReleaseWithAppsByEnvironment(
       PIX_LCMS_REPO_NAME,
       PIX_LCMS_APPS,
       payload.text,
@@ -205,19 +205,19 @@ module.exports = {
   },
 
   async createAndDeployPixUI(payload) {
-    await publishPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
+    await _publishPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createAndDeployEmberTestingLibrary(payload) {
-    await publishAndDeployEmberTestingLibrary(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
+    await _publishAndDeployEmberTestingLibrary(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createAndDeployPixSiteRelease(payload) {
-    await publishAndDeployRelease(PIX_SITE_REPO_NAME, PIX_SITE_APPS, payload.text, payload.response_url);
+    await _publishAndDeployRelease(PIX_SITE_REPO_NAME, PIX_SITE_APPS, payload.text, payload.response_url);
   },
 
   async createAndDeployPixDatawarehouse(payload) {
-    await publishAndDeployRelease(
+    await _publishAndDeployRelease(
       PIX_DATAWAREHOUSE_REPO_NAME,
       PIX_DATAWAREHOUSE_APPS_NAME,
       payload.text,
@@ -226,7 +226,7 @@ module.exports = {
   },
 
   async createAndDeployPixBotRelease(payload) {
-    await publishAndDeployReleaseWithAppsByEnvironment(
+    await _publishAndDeployReleaseWithAppsByEnvironment(
       PIX_BOT_REPO_NAME,
       PIX_BOT_APPS,
       payload.text,
@@ -235,18 +235,18 @@ module.exports = {
   },
 
   async getAndDeployLastVersion({ appName }) {
-    await getAndDeployLastVersion({ appName });
+    await _getAndDeployLastVersion({ appName });
   },
 
   async createAndDeployDbStats(payload) {
-    await publishAndDeployRelease(PIX_DB_STATS_REPO_NAME, PIX_DB_STATS_APPS_NAME, payload.text, payload.response_url);
+    await _publishAndDeployRelease(PIX_DB_STATS_REPO_NAME, PIX_DB_STATS_APPS_NAME, payload.text, payload.response_url);
   },
 
   async deployMetabase() {
-    await deployFromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
+    await _deployFromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
   },
 
   async createAndDeployPixTutosRelease(payload) {
-    await publishAndDeployRelease(PIX_TUTOS_REPO_NAME, [PIX_TUTOS_APP_NAME], payload.text, payload.response_url);
+    await _publishAndDeployRelease(PIX_TUTOS_REPO_NAME, [PIX_TUTOS_APP_NAME], payload.text, payload.response_url);
   },
 };
