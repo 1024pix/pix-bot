@@ -10,8 +10,9 @@ module.exports = {
     if (payload.secret !== config.prismic.secret) {
       throw Boom.unauthorized('Secret is missing or is incorrect');
     }
-    const releaseTag = await githubServices.getLatestReleaseTag(config.PIX_SITE_REPO_NAME);
-    await deploy(config.PIX_SITE_REPO_NAME, config.PIX_SITE_APPS, releaseTag);
+    const repoName = config.PIX_SITE_REPO_NAME;
+    const releaseTag = await githubServices.getLatestReleaseTag(repoName);
+    await deploy(repoName, config.PIX_SITE_APPS, releaseTag);
 
     return `pix.fr and pro.pix.fr deployments ${releaseTag} are in progress. Check deployment status on Scalingo`;
   },
