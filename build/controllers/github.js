@@ -126,6 +126,7 @@ function _handleNoRACase(request) {
   const reviewApps = repositoryToScalingoAppsReview[repository];
   const isFork = payload.pull_request.head.repo.fork;
   const labelsList = payload.pull_request.labels;
+  const state = payload.pull_request.state;
 
   if (isFork) {
     return { message: 'No RA for a fork', shouldContinue: false };
@@ -135,6 +136,9 @@ function _handleNoRACase(request) {
   }
   if (labelsList.some((label) => label.name == 'no-review-app')) {
     return { message: 'RA disabled for this PR', shouldContinue: false };
+  }
+  if (state !== 'open') {
+    return { message: 'No RA for closed PR', shouldContinue: false };
   }
 
   return { shouldContinue: true };
