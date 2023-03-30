@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.62.1 (30/03/2023)
+
+
+### :coffee: Autre
+- [#237](https://github.com/1024pix/pix-bot/pull/237) Prendre en compte le status ouvert d'une PR lors d'une synchro / dépoloiement de RA 
+
 ## v1.62.0 (27/03/2023)
 
 
