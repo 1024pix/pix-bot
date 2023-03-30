@@ -11,6 +11,7 @@ describe('Acceptance | Build | Github', function () {
           action: 'opened',
           number: 2,
           pull_request: {
+            state: 'open',
             labels: [{ name: 'test-label' }],
             head: {
               ref: 'my-branch',
@@ -200,7 +201,7 @@ describe('Acceptance | Build | Github', function () {
           const body = {
             action: 'opened',
             text: 'app-1',
-            pull_request: { labels: [], head: { repo: { name: 'pix-bot' } } },
+            pull_request: { state: 'open', labels: [], head: { repo: { name: 'pix-bot' } } },
           };
 
           const response = await server.inject({
@@ -226,6 +227,7 @@ describe('Acceptance | Build | Github', function () {
           action: 'synchronize',
           number: 2,
           pull_request: {
+            state: 'open',
             labels: [],
             head: {
               ref: 'my-branch',
@@ -261,6 +263,22 @@ describe('Acceptance | Build | Github', function () {
         expect(scalingoAuth.isDone()).to.be.true;
         expect(scalingoDeploy1.isDone()).to.be.true;
         expect(scalingoDeploy2.isDone()).to.be.true;
+      });
+
+      it("responds with 200 and doesn't trigger deployment when the PR state is not open", async function () {
+        body.pull_request.state = 'closed';
+
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(200);
+        expect(res.result).to.eql('No RA for closed PR');
       });
 
       it("responds with 200 and doesn't trigger deployment when the PR is from a fork", async function () {
