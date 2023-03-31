@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.63.0 (31/03/2023)
+
+
+### :coffee: Autre
+- [#238](https://github.com/1024pix/pix-bot/pull/238) Créer des RA en cas de réouverture de PR
+
 ## v1.62.1 (30/03/2023)
 
 
