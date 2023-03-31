@@ -154,6 +154,8 @@ module.exports = {
       switch (request.payload.action) {
         case 'opened':
           return pullRequestOpenedWebhook(request);
+        case 'reopened':
+          return pullRequestOpenedWebhook(request);
         case 'synchronize':
           return pullRequestSynchronizeWebhook(request);
       }
