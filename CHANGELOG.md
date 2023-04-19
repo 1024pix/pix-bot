@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.63.1 (19/04/2023)
+
+
+### :rocket: Amélioration
+- [#242](https://github.com/1024pix/pix-bot/pull/242) [FEATURE] Ajouter les URL de la RA Orga sur .org et de la RA Certif sur .org
+
+### :coffee: Autre
+- [#240](https://github.com/1024pix/pix-bot/pull/240) [BUMP] Lock file maintenance
+- [#239](https://github.com/1024pix/pix-bot/pull/239) [BUMP] Update Node.js to v16.20.0 (.circleci)
+- [#241](https://github.com/1024pix/pix-bot/pull/241) [BUMP] Update dependency node to v16.20.0
+
 ## v1.63.0 (31/03/2023)
 
 
