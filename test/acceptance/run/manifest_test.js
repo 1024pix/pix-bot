@@ -106,10 +106,10 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '[patch, minor, major]',
             },
             {
-              command: '/deploy-gravitee-apim',
-              description: 'Pour déployer les applications Gravitee APIM depuis la branche main',
+              command: '/deploy-pix-apim',
+              description: 'Pour déployer les applications Pix APIM depuis la branche main',
               should_escape: false,
-              url: `http://${hostname}/slack/commands/deploy-gravitee-apim`,
+              url: `http://${hostname}/slack/commands/deploy-pix-apim`,
               usage_hint: undefined,
             },
             {
