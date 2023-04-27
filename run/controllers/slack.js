@@ -9,12 +9,12 @@ function _getDeployStartedMessage(release, appName) {
 }
 
 module.exports = {
-  deployGraviteeAPIM(request) {
+  deployPixAPIM(request) {
     const payload = request.pre.payload;
-    commands.deployGraviteeAPIM(payload);
+    commands.deployPixAPIM(payload);
 
     return {
-      text: 'Commande de déploiement de Gravitee APIM en production bien reçue.',
+      text: 'Commande de déploiement de Pix APIM en production bien reçue.',
     };
   },
 

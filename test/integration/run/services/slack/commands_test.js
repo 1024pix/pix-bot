@@ -27,33 +27,25 @@ describe('Integration | Run | Services | Slack | Commands', function () {
     });
   });
 
-  describe('#deployGraviteeAPIM', function () {
+  describe('#deployPixAPIM', function () {
     it('should call Scalingo API to deploy the main branch', async function () {
       const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
 
       const deploymentPayload = {
         deployment: {
           git_ref: 'main',
-          source_url: 'https://undefined@github.com/github-owner/pix-gravitee-apim/archive/main.tar.gz',
+          source_url: 'https://undefined@github.com/github-owner/pix-nginx-apim/archive/main.tar.gz',
         },
       };
-      const nockDeploys = [
-        'pix-gravitee-apim-portal-ui-production',
-        'pix-gravitee-apim-gateway-production',
-        'pix-gravitee-apim-console-ui-production',
-        'pix-gravitee-apim-rest-api-production',
-      ].map((app) => {
-        return nock('https://scalingo.production')
-          .post(`/v1/apps/${app}/deployments`, deploymentPayload)
-          .reply(200, {});
-      });
+      const nockDeploys = nock('https://scalingo.production')
+        .post(`/v1/apps/pix-nginx-apim-production/deployments`, deploymentPayload)
+        .reply(200, {});
 
-      await commands.deployGraviteeAPIM();
+      await commands.deployPixAPIM();
 
       expect(scalingoTokenNock.isDone()).to.be.true;
-      nockDeploys.forEach((nockCall) => {
-        expect(nockCall.isDone()).to.be.true;
-      });
+
+      expect(nockDeploys.isDone()).to.be.true;
     });
   });
 

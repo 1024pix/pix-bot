@@ -95,11 +95,11 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
-  command: '/deploy-gravitee-apim',
-  path: '/slack/commands/deploy-gravitee-apim',
-  description: 'Pour déployer les applications Gravitee APIM depuis la branche main',
+  command: '/deploy-pix-apim',
+  path: '/slack/commands/deploy-pix-apim',
+  description: 'Pour déployer les applications Pix APIM depuis la branche main',
   should_escape: false,
-  handler: slackbotController.deployGraviteeAPIM,
+  handler: slackbotController.deployPixAPIM,
 });
 
 manifest.registerSlashCommand({

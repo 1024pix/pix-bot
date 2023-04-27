@@ -19,8 +19,8 @@ const {
   PIX_METABASE_APPS_NAME,
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
-  PIX_GRAVITEE_APIM_REPO_NAME,
-  PIX_GRAVITEE_APIM_APPS_NAME,
+  PIX_APIM_REPO_NAME,
+  PIX_APIM_APPS_NAME,
   PIX_GEOAPI_REPO_NAME,
   PIX_GEOAPI_APP_NAME,
   PIX_AIRFLOW_APP_NAME,
@@ -183,8 +183,8 @@ module.exports = {
     await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version);
   },
 
-  async deployGraviteeAPIM() {
-    await _deployFromBranch(PIX_GRAVITEE_APIM_REPO_NAME, PIX_GRAVITEE_APIM_APPS_NAME, 'main');
+  async deployPixAPIM() {
+    await _deployFromBranch(PIX_APIM_REPO_NAME, [PIX_APIM_APPS_NAME], 'main');
   },
 
   async deployGeoAPI() {
