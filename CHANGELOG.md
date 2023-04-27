@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.64.0 (27/04/2023)
+
+
+### :rocket: Amélioration
+- [#244](https://github.com/1024pix/pix-bot/pull/244) [FEATURE] Migration de l'API manager de Gravitee à Nginx (PIX-7789)
+
 ## v1.63.1 (19/04/2023)
 
 
