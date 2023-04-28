@@ -36,6 +36,15 @@ module.exports = {
     };
   },
 
+  deployDBT(request) {
+    const payload = request.pre.payload;
+    commands.deployDBT(payload);
+
+    return {
+      text: _getDeployStartedMessage(payload.text, 'DBT'),
+    };
+  },
+
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixSiteRelease(payload);

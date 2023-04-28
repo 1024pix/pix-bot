@@ -24,6 +24,7 @@ const {
   PIX_GEOAPI_REPO_NAME,
   PIX_GEOAPI_APP_NAME,
   PIX_AIRFLOW_APP_NAME,
+  PIX_DBT_APPS_NAME,
   PIX_360_REPO_NAME,
   PIX_360_APP_NAME,
 } = require('../../../config');
@@ -181,6 +182,10 @@ module.exports = {
   async deployAirflow(payload) {
     const version = payload.text;
     await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version);
+  },
+  async deployDBT(payload) {
+    const version = payload.text;
+    await deployTagUsingSCM(PIX_DBT_APPS_NAME, version);
   },
 
   async deployPixAPIM() {

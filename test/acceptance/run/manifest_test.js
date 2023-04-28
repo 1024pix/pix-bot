@@ -140,6 +140,13 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '[pix-app-production, production]',
               should_escape: false,
             },
+            {
+              command: '/deploy-dbt',
+              description: 'Déploie la version précisée de DBT en production',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-dbt`,
+              usage_hint: '/deploy-dbt $version',
+            },
           ],
         },
         oauth_config: {

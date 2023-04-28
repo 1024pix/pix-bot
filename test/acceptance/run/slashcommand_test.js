@@ -96,4 +96,46 @@ describe('Acceptance | Run | SlashCommand', function () {
       });
     });
   });
+
+  describe('POST /slack/commands/deploy-dbt', function () {
+    it('responds with 200 and deploys pix-dbt-production', async function () {
+      const body = {
+        text: 'v0.0.1',
+      };
+      const res = await server.inject({
+        method: 'POST',
+        url: '/slack/commands/deploy-dbt',
+        headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+        payload: body,
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.text).to.equal(
+        'Commande de déploiement de la release "v0.0.1" pour DBT en production bien reçue.'
+      );
+    });
+
+    it('should call Scalingo SCM', function (done) {
+      const body = {
+        text: 'v0.0.1',
+      };
+      nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
+      nock('https://scalingo.production')
+        .post(`/v1/apps/pix-dbt-external-production/scm_repo_link/manual_deploy`, { branch: 'v0.0.1' })
+        .reply(200, {});
+      const scalingo = nock('https://scalingo.production')
+        .post(`/v1/apps/pix-dbt-production/scm_repo_link/manual_deploy`, { branch: 'v0.0.1' })
+        .reply(200, {});
+
+      server.inject({
+        method: 'POST',
+        url: '/slack/commands/deploy-dbt',
+        headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+        payload: body,
+      });
+
+      scalingo.on('replied', () => {
+        done();
+      });
+    });
+  });
 });

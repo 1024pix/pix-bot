@@ -113,4 +113,31 @@ describe('Integration | Run | Services | Slack | Commands', function () {
       expect(nockCall.isDone()).to.be.true;
     });
   });
+
+  describe('#deployDBT', function () {
+    it('should call Scalingo API to deploy a specified tag', async function () {
+      const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
+      const dbtVersion = 'v0.0.1';
+      const deploymentPayload = {
+        branch: dbtVersion,
+      };
+
+      const commandPayload = {
+        text: dbtVersion,
+      };
+
+      const nockCallA = nock('https://scalingo.production')
+        .post(`/v1/apps/pix-dbt-production/scm_repo_link/manual_deploy`, deploymentPayload)
+        .reply(200, {});
+      const nockCallB = nock('https://scalingo.production')
+        .post(`/v1/apps/pix-dbt-external-production/scm_repo_link/manual_deploy`, deploymentPayload)
+        .reply(200, {});
+
+      await commands.deployDBT(commandPayload);
+
+      expect(scalingoTokenNock.isDone()).to.be.true;
+      expect(nockCallA.isDone()).to.be.true;
+      expect(nockCallB.isDone()).to.be.true;
+    });
+  });
 });
