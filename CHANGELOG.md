@@ -1,5 +1,12 @@
 # pix-bot Changelog
 
+## v1.65.0 (04/05/2023)
+
+
+### :coffee: Autre
+- [#246](https://github.com/1024pix/pix-bot/pull/246) Ajouter une slash command slack sur les déploiements de DBT
+- [#245](https://github.com/1024pix/pix-bot/pull/245) [BUMP] Lock file maintenance
+
 ## v1.64.0 (27/04/2023)
 
 
