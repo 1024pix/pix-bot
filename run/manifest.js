@@ -138,6 +138,15 @@ manifest.registerSlashCommand({
   handler: slackbotController.getAppStatus,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-dbt',
+  path: '/slack/commands/deploy-dbt',
+  description: 'Déploie la version précisée de DBT en production',
+  usage_hint: '/deploy-dbt $version',
+  should_escape: false,
+  handler: slackbotController.deployDBT,
+});
+
 manifest.registerShortcut({
   name: 'MEP/Déployer une version',
   type: 'global',
