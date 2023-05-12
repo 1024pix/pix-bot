@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.66.0 (12/05/2023)
+
+
+### :coffee: Autre
+- [#249](https://github.com/1024pix/pix-bot/pull/249) Remove mail monitoring
+
 ## v1.65.0 (04/05/2023)
 
 
