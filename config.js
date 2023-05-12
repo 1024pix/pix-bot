@@ -84,15 +84,6 @@ module.exports = (function () {
       idA11Y: process.env.GOOGLE_SHEET_A11Y,
     },
 
-    sendInBlue: {
-      apiKey: process.env.SEND_IN_BLUE_API_KEY,
-      mailingQuota: process.env.SEND_IN_BLUE_QUOTA,
-    },
-
-    thirdServicesUsageReport: {
-      schedule: process.env.THIRD_SERVICES_USAGE_REPORT_SCHEDULE,
-    },
-
     prismic: {
       secret: process.env.PRISMIC_SECRET,
     },
