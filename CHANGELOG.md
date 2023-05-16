@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.66.1 (16/05/2023)
+
+
+### :building_construction: Tech
+- [#250](https://github.com/1024pix/pix-bot/pull/250) [TECH] Ajout d'un template de commentaire pour Pix Tutos
+
 ## v1.66.0 (12/05/2023)
 
 
