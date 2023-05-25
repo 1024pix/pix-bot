@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.67.0 (25/05/2023)
+
+
+### :rocket: Amélioration
+- [#251](https://github.com/1024pix/pix-bot/pull/251) [FEATURE] Les démarrage de job ne sont pas tracés dans Pix bot (PIX-7053)
+
 ## v1.66.1 (16/05/2023)
 
 
