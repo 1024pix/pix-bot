@@ -3,6 +3,7 @@ const _ = require('lodash');
 const settings = require('../../config');
 const URL_SPREADSHEET_API = 'https://sheets.googleapis.com/v4/spreadsheets/';
 const SPREADSHEET_VALUES = 'tips!A1:E500';
+const logger = require('../../common/services/logger');
 
 function getGoogleSheetAPIURL() {
   return `${URL_SPREADSHEET_API}${settings.googleSheet.idA11Y}/values/${SPREADSHEET_VALUES}?key=${settings.googleSheet.key}`;
@@ -13,7 +14,12 @@ async function getDataFromGoogleSheet() {
   return axios
     .get(url)
     .then((response) => response.data.values)
-    .catch((error) => console.log(error));
+    .catch((error) =>
+      logger.info({
+        event: 'google-sheet',
+        message: error,
+      })
+    );
 }
 
 function createResponseForSlack(tip) {

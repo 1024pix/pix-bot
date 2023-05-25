@@ -1,4 +1,7 @@
 #! /usr/bin/env node
+
+/* eslint no-console: off */
+
 const fs = require('fs');
 
 const github = require('../common/services/github');

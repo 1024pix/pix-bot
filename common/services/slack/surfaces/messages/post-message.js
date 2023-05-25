@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('../../../../../config');
+const logger = require('../../../logger');
 
 module.exports = {
   async postMessage(message, attachments, channel = '#tech-releases') {
@@ -19,7 +20,7 @@ module.exports = {
 
     const response = await axios(options);
     if (!response.data.ok) {
-      console.error(response.data);
+      logger.error({ event: 'post-message', message: response.data });
       throw new Error('Slack error received');
     }
 

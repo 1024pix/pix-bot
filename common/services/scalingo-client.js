@@ -1,6 +1,7 @@
 const axios = require('axios');
 const scalingo = require('scalingo');
 const config = require('../../config');
+const logger = require('./logger');
 
 const DEFAULT_OPTS = { withEnvSuffix: true };
 
@@ -32,7 +33,7 @@ class ScalingoClient {
         source_url: `https://${config.github.token}@github.com/${config.github.owner}/${repository}/archive/${releaseTag}.tar.gz`,
       });
     } catch (e) {
-      console.error(e);
+      logger.error({ event: 'scalingo', message: e });
       throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
     }
 
@@ -43,7 +44,7 @@ class ScalingoClient {
     try {
       await this.client.SCMRepoLinks.manualDeploy(scalingoApp, releaseTag);
     } catch (e) {
-      console.error(e);
+      logger.error({ event: 'scalingo', message: e });
       throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
     }
 
@@ -104,7 +105,7 @@ class ScalingoClient {
       const { invitation_link } = await this.client.Collaborators.invite(applicationId, collaboratorEmail);
       return invitation_link;
     } catch (e) {
-      console.error(JSON.stringify(e));
+      logger.error({ event: 'scalingo', message: e });
       throw new Error(`Impossible to invite ${collaboratorEmail} on ${applicationId}`);
     }
   }
@@ -122,7 +123,7 @@ class ScalingoClient {
       await this.client.Apps.update(id, appSettings);
       return id;
     } catch (e) {
-      console.error(JSON.stringify(e));
+      logger.error({ event: 'scalingo', message: e });
       throw new Error(`Impossible to create ${app.name}, ${e.name}`);
     }
   }

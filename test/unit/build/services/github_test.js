@@ -91,9 +91,10 @@ describe('#getPullRequests', function () {
       await catchErr(githubService.getPullRequests)('cross-team');
 
       // then
-      expect(loggerErrorStub).to.have.been.calledOnceWithExactly({
+      expect(loggerErrorStub.calledOnce).to.be.true;
+      expect(loggerErrorStub.firstCall.args[0]).to.deep.equal({
         event: 'github',
-        response: 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]',
+        message: 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]',
       });
     });
     it('should throw an error', async function () {

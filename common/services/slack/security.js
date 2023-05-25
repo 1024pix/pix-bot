@@ -3,6 +3,7 @@ const querystring = require('querystring');
 const tsscmp = require('tsscmp');
 const Boom = require('@hapi/boom');
 const config = require('../../../config');
+const logger = require('../logger');
 
 function verifyRequestSignature(signingSecret, body, signature, requestTimestamp) {
   if (signature === undefined || requestTimestamp === undefined) {
@@ -44,12 +45,12 @@ function parseRequestBody(stringBody, contentType) {
     return JSON.parse(stringBody);
   }
 
-  console.warn(`Unexpected content-type detected: ${contentType}`);
+  logger.warn({ event: 'security', message: `Unexpected content-type detected: ${contentType}` });
   try {
     // Parse this body anyway
     return JSON.parse(stringBody);
   } catch (error) {
-    console.error(`Failed to parse body as JSON data for content-type: ${contentType}`);
+    logger.error({ event: 'security', message: `Failed to parse body as JSON data for content-type: ${contentType}` });
     throw error;
   }
 }

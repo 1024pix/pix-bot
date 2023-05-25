@@ -4,6 +4,8 @@ const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
 const slackPostMessageService = require('../../common/services/slack/surfaces/messages/post-message');
 const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
+const logger = require('../../common/services/logger');
+
 const _ = require('lodash');
 
 module.exports = {
@@ -23,7 +25,12 @@ module.exports = {
   startMobRoles(request) {
     const payload = request.pre.payload;
     const participants = payload.text.split(' ');
-    console.log(payload);
+
+    logger.info({
+      event: 'slack',
+      message: payload,
+    });
+
     const organizer = `@${payload.user_name}`;
     participants.push(organizer);
     const shuffledParticipants = _.shuffle(participants);
@@ -76,7 +83,11 @@ module.exports = {
       case 'view_closed':
       case 'block_actions':
       default:
-        console.log('This kind of interaction is not yet supported by Pix Bot.');
+        logger.warn({
+          event: 'slack',
+          message: 'This kind of interaction is not yet supported by Pix Bot.',
+        });
+
         return null;
     }
   },

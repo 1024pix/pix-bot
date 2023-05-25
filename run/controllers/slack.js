@@ -3,6 +3,7 @@ const { getAppStatusFromScalingo } = require('../services/slack/app-status-from-
 const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
 const shortcuts = require('../services/slack/shortcuts');
 const viewSubmissions = require('../services/slack/view-submissions');
+const logger = require('../../common/services/logger');
 
 function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
@@ -181,7 +182,7 @@ module.exports = {
       case 'view_closed':
       case 'block_actions':
       default:
-        console.log('This kind of interaction is not yet supported by Pix Bot.');
+        logger.info({ event: 'slack', message: 'This kind of interaction is not yet supported by Pix Bot.' });
         return null;
     }
   },
