@@ -3,7 +3,7 @@ const error = (message, injectedLogger = console) => {
 };
 
 const info = (message, injectedLogger = console) => {
-  injectedLogger.log(JSON.stringify(message));
+  injectedLogger.info(JSON.stringify(message));
 };
 
 const warn = (message, injectedLogger = console) => {
