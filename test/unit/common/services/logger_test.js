@@ -2,56 +2,44 @@ const { expect, sinon } = require('../../../test-helper');
 const logger = require('../../../../common/services/logger');
 
 describe('logger', function () {
-  describe('error', function () {
-    describe('when an message is passed', function () {
-      it('should call injectedLogger error with stringified message', function () {
-        // given
-        const injectedLogger = { error: sinon.stub() };
+  describe('when an message is passed', function () {
+    it('should call injectedLogger with stringified message', function () {
+      // given
+      const injectedLogger = {
+        info: sinon.stub(),
+        warn: sinon.stub(),
+        error: sinon.stub(),
+      };
 
-        // when
-        logger.error('message', injectedLogger);
+      // when
+      logger.info('message', injectedLogger);
+      logger.warn('message', injectedLogger);
+      logger.error('message', injectedLogger);
 
-        // then
-        expect(injectedLogger.error).to.have.been.calledOnceWithExactly('"message"');
-      });
-    });
-    describe('when an object is passed', function () {
-      it('should call injectedLogger error with stringified object', function () {
-        // given
-        const injectedLogger = { error: sinon.stub() };
-
-        // when
-        logger.error({ foo: 'bar' }, injectedLogger);
-
-        // then
-        expect(injectedLogger.error).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
-      });
+      // then
+      expect(injectedLogger.info).to.have.been.calledOnceWithExactly('"message"');
+      expect(injectedLogger.warn).to.have.been.calledOnceWithExactly('"message"');
+      expect(injectedLogger.error).to.have.been.calledOnceWithExactly('"message"');
     });
   });
-  describe('info', function () {
-    describe('when an message is passed', function () {
-      it('should call injectedLogger log with stringified message', function () {
-        // given
-        const injectedLogger = { log: sinon.stub() };
+  describe('when an object is passed', function () {
+    it('should call injectedLogger with stringified object', function () {
+      // given
+      const injectedLogger = {
+        info: sinon.stub(),
+        warn: sinon.stub(),
+        error: sinon.stub(),
+      };
 
-        // when
-        logger.info('message', injectedLogger);
+      // when
+      logger.info({ foo: 'bar' }, injectedLogger);
+      logger.warn({ foo: 'bar' }, injectedLogger);
+      logger.error({ foo: 'bar' }, injectedLogger);
 
-        // then
-        expect(injectedLogger.log).to.have.been.calledOnceWithExactly('"message"');
-      });
-    });
-    describe('when an object is passed', function () {
-      it('should call injectedLogger error with stringified object', function () {
-        // given
-        const injectedLogger = { log: sinon.stub() };
-
-        // when
-        logger.info({ foo: 'bar' }, injectedLogger);
-
-        // then
-        expect(injectedLogger.log).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
-      });
+      // then
+      expect(injectedLogger.info).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
+      expect(injectedLogger.warn).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
+      expect(injectedLogger.error).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
     });
   });
 });
