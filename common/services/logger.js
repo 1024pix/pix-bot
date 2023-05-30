@@ -27,7 +27,7 @@ function createMessage({ event, message, job, stack }, level) {
 
   obj.level = level;
 
-  return obj;
+  return JSON.stringify(obj);
 }
 
 const error = ({ event, message, job, stack }, injectedLogger = console) => {
