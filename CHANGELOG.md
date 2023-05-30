@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.68.1 (30/05/2023)
+
+
+### :bug: Correction
+- [#253](https://github.com/1024pix/pix-bot/pull/253) [BUGFIX] Un seul évènement génère plusieurs lignes de log
+
 ## v1.68.0 (30/05/2023)
 
 
