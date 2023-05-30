@@ -45,7 +45,11 @@ async function invalidateCdnCache(application) {
   axiosRetry(axios, {
     retries: config.baleen.CDNInvalidationRetryCount,
     retryDelay: (retryCount) => {
-      logger.info(`Cache invalidation retry for application ${application}: ${retryCount}`);
+      logger.info({
+        event: 'cdn',
+        message: `Cache invalidation retry for application ${application}: ${retryCount}`,
+      });
+
       return retryCount * config.baleen.CDNInvalidationRetryDelay;
     },
     retryCondition: (error) => {

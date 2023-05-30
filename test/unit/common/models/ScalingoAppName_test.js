@@ -2,6 +2,8 @@ const { expect } = require('../../../test-helper');
 
 const { ScalingoAppName } = require('../../../../common/models/ScalingoAppName');
 
+/* eslint no-console: off */
+
 describe('Unit | Common | Models | ScalingoAppName', function () {
   describe('#isApplicationNameValid', function () {
     it('should return false if appName contains non alphanum or dash char', function () {

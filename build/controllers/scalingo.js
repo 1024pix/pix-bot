@@ -40,18 +40,28 @@ function getSlackMessageAttachments(payload) {
 
 module.exports = {
   async deployEndpoint(request) {
-    logger.info('Scalingo request received');
+    logger.info({
+      event: 'scalingo',
+      message: 'Scalingo request received',
+    });
+
     if (request.payload.type_data?.status !== 'build-error') {
       return 'Slack error notification not sent';
     }
 
-    logger.info(`Failed deployment on the ${request.payload.app_name} app`);
+    logger.warn({
+      event: 'scalingo',
+      message: `Failed deployment on the ${request.payload.app_name} app`,
+    });
 
     const { message, attachments } = getSlackMessageAttachments(request.payload);
 
     await slackPostMessageService.postMessage(message, JSON.stringify(attachments));
 
-    logger.info('Slack error notification sent');
+    logger.warn({
+      event: 'scalingo',
+      message: 'Slack error notification sent',
+    });
 
     return 'Slack error notification sent';
   },

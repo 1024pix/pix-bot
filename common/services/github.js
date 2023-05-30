@@ -32,8 +32,10 @@ function _logRequest(message) {
   if (url.startsWith('/repos/1024pix/pix-bot-publish-test')) {
     return;
   }
-  const log = JSON.stringify(request);
-  console.log(log);
+  logger.info({
+    event: 'github',
+    message: request,
+  });
 }
 
 function _createOctokit() {
@@ -46,13 +48,18 @@ function _createOctokit() {
     log: {
       debug: noop,
       info: _logRequest,
+      // eslint-disable-next-line no-console
       warn: console.warn,
+      // eslint-disable-next-line no-console
       error: console.error,
     },
   });
   octokit.hook.error('request', async (error) => {
-    const message = { event: 'github', response: error.response.data };
-    logger.error(message);
+    logger.error({
+      event: 'github',
+      message: error.response.data,
+    });
+
     return error;
   });
   return octokit;

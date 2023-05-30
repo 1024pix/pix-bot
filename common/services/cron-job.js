@@ -4,11 +4,11 @@ const logger = require('./logger');
 
 function createCronJob(jobName, jobFunction, jobSchedule) {
   if (!jobSchedule) {
-    logger.warn({
+    logger.info({
       event: 'cron',
       message: `No schedule configured for cron job ${jobName} - skipping.`,
+      job: jobName,
     });
-
     return;
   }
   try {
@@ -34,15 +34,16 @@ function createCronJob(jobName, jobFunction, jobSchedule) {
       parisTimezone
     );
   } catch (e) {
-    logger.error({
+    logger.info({
       event: 'cron',
       message: e,
+      job: jobName,
     });
   }
-
   logger.info({
     event: 'cron',
     message: `Started job ${jobName} with cron time "${jobSchedule}"`,
+    job: jobName,
   });
 }
 

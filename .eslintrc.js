@@ -17,5 +17,6 @@ module.exports = {
     'mocha/no-skipped-tests': 'error',
     'mocha/no-hooks-for-single-case': 'off',
     'mocha/no-top-level-hooks': 'error',
+    'no-console': 'error',
   },
 };

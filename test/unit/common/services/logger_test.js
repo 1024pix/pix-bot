@@ -2,44 +2,118 @@ const { expect, sinon } = require('../../../test-helper');
 const logger = require('../../../../common/services/logger');
 
 describe('logger', function () {
-  describe('when an message is passed', function () {
-    it('should call injectedLogger with stringified message', function () {
-      // given
-      const injectedLogger = {
-        info: sinon.stub(),
-        warn: sinon.stub(),
-        error: sinon.stub(),
-      };
+  describe('error', function () {
+    describe('when an message is passed', function () {
+      it('should call injectedLogger error with stringified message', function () {
+        // given
+        const injectedLogger = { error: sinon.stub() };
 
-      // when
-      logger.info('message', injectedLogger);
-      logger.warn('message', injectedLogger);
-      logger.error('message', injectedLogger);
+        // when
+        logger.error({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger);
 
-      // then
-      expect(injectedLogger.info).to.have.been.calledOnceWithExactly('"message"');
-      expect(injectedLogger.warn).to.have.been.calledOnceWithExactly('"message"');
-      expect(injectedLogger.error).to.have.been.calledOnceWithExactly('"message"');
+        // then
+        expect(injectedLogger.error.calledOnce).to.be.true;
+        expect(injectedLogger.error.firstCall.args[0]).to.deep.equal({
+          level: 'error',
+          event: 'toto',
+          message: 'titi',
+          stack: 'stack',
+        });
+      });
+    });
+    describe('when an object is passed', function () {
+      it('should call injectedLogger error with stringified object', function () {
+        // given
+        const injectedLogger = { error: sinon.stub() };
+
+        // when
+        logger.error({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger);
+
+        // then
+        expect(injectedLogger.error.calledOnce).to.be.true;
+        expect(injectedLogger.error.firstCall.args[0]).to.deep.equal({
+          level: 'error',
+          event: 'toto',
+          message: JSON.stringify({ foo: 'bar' }),
+          stack: 'stack',
+        });
+      });
     });
   });
-  describe('when an object is passed', function () {
-    it('should call injectedLogger with stringified object', function () {
-      // given
-      const injectedLogger = {
-        info: sinon.stub(),
-        warn: sinon.stub(),
-        error: sinon.stub(),
-      };
+  describe('info', function () {
+    describe('when an message is passed', function () {
+      it('should call injectedLogger log with stringified message', function () {
+        // given
+        const injectedLogger = { log: sinon.stub() };
 
-      // when
-      logger.info({ foo: 'bar' }, injectedLogger);
-      logger.warn({ foo: 'bar' }, injectedLogger);
-      logger.error({ foo: 'bar' }, injectedLogger);
+        // when
+        logger.info({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger);
 
-      // then
-      expect(injectedLogger.info).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
-      expect(injectedLogger.warn).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
-      expect(injectedLogger.error).to.have.been.calledOnceWithExactly('{"foo":"bar"}');
+        // then
+        expect(injectedLogger.log.calledOnce).to.be.true;
+        expect(injectedLogger.log.firstCall.args[0]).to.deep.equal({
+          level: 'info',
+          event: 'toto',
+          message: 'titi',
+          stack: 'stack',
+        });
+      });
+    });
+    describe('when an object is passed', function () {
+      it('should call injectedLogger error with stringified object', function () {
+        // given
+        const injectedLogger = { log: sinon.stub() };
+
+        // when
+        logger.info({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger);
+
+        // then
+        expect(injectedLogger.log.calledOnce).to.be.true;
+        expect(injectedLogger.log.firstCall.args[0]).to.deep.equal({
+          level: 'info',
+          event: 'toto',
+          message: JSON.stringify({ foo: 'bar' }),
+          stack: 'stack',
+        });
+      });
+    });
+  });
+  describe('warn', function () {
+    describe('when an message is passed', function () {
+      it('should call injectedLogger log with stringified message', function () {
+        // given
+        const injectedLogger = { warn: sinon.stub() };
+
+        // when
+        logger.warn({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger);
+
+        // then
+        expect(injectedLogger.warn.calledOnce).to.be.true;
+        expect(injectedLogger.warn.firstCall.args[0]).to.deep.equal({
+          level: 'warn',
+          event: 'toto',
+          message: 'titi',
+          stack: 'stack',
+        });
+      });
+    });
+    describe('when an object is passed', function () {
+      it('should call injectedLogger error with stringified object', function () {
+        // given
+        const injectedLogger = { warn: sinon.stub() };
+
+        // when
+        logger.warn({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger);
+
+        // then
+        expect(injectedLogger.warn.calledOnce).to.be.true;
+        expect(injectedLogger.warn.firstCall.args[0]).to.deep.equal({
+          level: 'warn',
+          event: 'toto',
+          message: JSON.stringify({ foo: 'bar' }),
+          stack: 'stack',
+        });
+      });
     });
   });
 });

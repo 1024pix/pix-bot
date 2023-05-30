@@ -4,6 +4,7 @@ const exec = util.promisify(require('child_process').exec);
 const config = require('../../config');
 const github = require('./github');
 const ScalingoClient = require('./scalingo-client');
+const logger = require('./logger');
 
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 
@@ -27,7 +28,7 @@ module.exports = {
       );
       return newPackageVersion;
     } catch (err) {
-      console.error(err);
+      logger.error({ event: 'release', message: err });
       throw err;
     }
   },
@@ -57,7 +58,7 @@ module.exports = {
       const newPackageVersion = await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
       return newPackageVersion;
     } catch (err) {
-      console.error(err);
+      logger.error({ event: 'release', message: err });
       throw err;
     }
   },
@@ -77,9 +78,9 @@ module.exports = {
 async function _runScriptWithArgument(scriptFileName, ...args) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
   const { stdout, stderr } = await exec(`${scriptsDirectory}/${scriptFileName} ${args.join(' ')}`);
-  console.log(`stdout: ${stdout}`);
+  logger.error({ event: 'release', message: `stdout: ${stdout}` });
   const lastLine = stdout.split('\n').slice(-2, -1).pop();
-  console.error(`stderr: ${stderr}`);
+  logger.error({ event: 'release', message: `stderr: ${stderr}` });
   return lastLine;
 }
 
