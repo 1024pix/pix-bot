@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.68.0 (30/05/2023)
+
+
+### :building_construction: Tech
+- [#252](https://github.com/1024pix/pix-bot/pull/252) [TECH] Tracer avec le logger dédié partout (PIX-8176)
+
 ## v1.67.0 (25/05/2023)
 
 
