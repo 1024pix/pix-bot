@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.69.0 (12/06/2023)
+
+
+### :rocket: Amélioration
+- [#256](https://github.com/1024pix/pix-bot/pull/256) [FEATURE] Ajoute le suport du tag `BREAKING` en préfixe de PR.
+
 ## v1.68.2 (12/06/2023)
 
 
