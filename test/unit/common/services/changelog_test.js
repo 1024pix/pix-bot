@@ -109,6 +109,7 @@ describe('Unit | Common | Services | Changelog', function () {
         { title: '[BUGFIX] TEST' },
         { title: 'TEST' },
         { title: '[FEATURE] TEST' },
+        { title: '[BREAKING] TEST' },
         { title: '[TECH] TEST' },
       ];
 
@@ -116,10 +117,11 @@ describe('Unit | Common | Services | Changelog', function () {
       const result = orderPr(pullRequests);
 
       // then
-      expect(result[0].title).to.equal('[FEATURE] TEST');
-      expect(result[1].title).to.equal('[BUGFIX] TEST');
-      expect(result[2].title).to.equal('[TECH] TEST');
-      expect(result[3].title).to.equal('TEST');
+      expect(result[0].title).to.equal('[BREAKING] TEST');
+      expect(result[1].title).to.equal('[FEATURE] TEST');
+      expect(result[2].title).to.equal('[BUGFIX] TEST');
+      expect(result[3].title).to.equal('[TECH] TEST');
+      expect(result[4].title).to.equal('TEST');
     });
   });
 

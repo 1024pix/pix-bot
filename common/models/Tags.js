@@ -1,4 +1,5 @@
 const Tag = Object.freeze({
+  BREAKING: Symbol.for('breakingChange'),
   BUGFIX: Symbol.for('bugfix'),
   FEATURE: Symbol.for('feature'),
   OTHERS: Symbol.for('others'),

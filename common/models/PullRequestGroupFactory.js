@@ -5,6 +5,10 @@ class PullRequestGroupFactory {
   static build() {
     return [
       new PullRequestGroup({
+        tagToGrab: Tag.BREAKING,
+        groupTitle: '### :boom: BREAKING CHANGE',
+      }),
+      new PullRequestGroup({
         tagToGrab: Tag.FEATURE,
         groupTitle: '### :rocket: Amélioration',
       }),
