@@ -107,7 +107,6 @@ describe('Unit | Common | Services | Changelog', function () {
       // given
       const pullRequests = [
         { title: '[BUGFIX] TEST' },
-        { title: '[QUICK WIN] TEST' },
         { title: 'TEST' },
         { title: '[FEATURE] TEST' },
         { title: '[TECH] TEST' },
@@ -118,10 +117,9 @@ describe('Unit | Common | Services | Changelog', function () {
 
       // then
       expect(result[0].title).to.equal('[FEATURE] TEST');
-      expect(result[1].title).to.equal('[QUICK WIN] TEST');
-      expect(result[2].title).to.equal('[BUGFIX] TEST');
-      expect(result[3].title).to.equal('[TECH] TEST');
-      expect(result[4].title).to.equal('TEST');
+      expect(result[1].title).to.equal('[BUGFIX] TEST');
+      expect(result[2].title).to.equal('[TECH] TEST');
+      expect(result[3].title).to.equal('TEST');
     });
   });
 

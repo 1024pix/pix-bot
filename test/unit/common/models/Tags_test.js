@@ -21,11 +21,6 @@ describe('Unit | Common | Models | Tags', function () {
         expectedTag: Symbol.for('others'),
       },
       {
-        testTitle: 'Tag.QUICK_WIN if title include [QUICK WIN]',
-        pullRequestTitle: '[QUICK WIN] Pull Request Title',
-        expectedTag: Symbol.for('quickWin'),
-      },
-      {
         testTitle: 'Tag.TECH if title include [TECH]',
         pullRequestTitle: '[TECH] Pull Request Title',
         expectedTag: Symbol.for('tech'),
