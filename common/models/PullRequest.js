@@ -10,7 +10,8 @@ class PullRequest {
   }
 
   toString() {
-    return `- [#${this.number}](${this.htmlUrl}) ${this.title}`;
+    const titleWithDot = this.title.endsWith('.') ? this.title : `${this.title}.`;
+    return `- [#${this.number}](${this.htmlUrl}) ${titleWithDot}`;
   }
 }
 

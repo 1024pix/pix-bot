@@ -85,5 +85,21 @@ describe('Unit | Common | Models | PullRequest', function () {
       // then
       expect(createdInstance.toString()).to.equal(expectedString);
     });
+
+    it('should return a string which ends with a dot if it was not there', function () {
+      // given
+      const html_url = 'https://github.com/1024pix/pix/pull/2971';
+      const number = 2971;
+      const title = '[BREAKING] Passage en ESM (PIX-3394)';
+      const properties = { html_url, number, title };
+
+      const expectedString = `- [#${number}](${html_url}) ${title}.`;
+
+      // when
+      const createdInstance = new PullRequest(properties);
+
+      // then
+      expect(createdInstance.toString()).to.equal(expectedString);
+    });
   });
 });
