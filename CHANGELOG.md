@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.68.2 (12/06/2023)
+
+
+### :coffee: Autre
+- [#255](https://github.com/1024pix/pix-bot/pull/255) [BUMP] Lock file maintenance (dossier racine)
+
 ## v1.68.1 (30/05/2023)
 
 
