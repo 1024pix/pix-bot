@@ -6,6 +6,11 @@ describe('Unit | Common | Models | Tags', function () {
   describe('#getTagByTitle', function () {
     [
       {
+        testTitle: 'Tag.BREAKING if title include [BREAKING]',
+        pullRequestTitle: '[BREAKING] Pull Request Title',
+        expectedTag: Symbol.for('breakingChange'),
+      },
+      {
         testTitle: 'Tag.BUGFIX if title include [BUGFIX]',
         pullRequestTitle: '[BUGFIX] Pull Request Title',
         expectedTag: Symbol.for('bugfix'),
@@ -19,11 +24,6 @@ describe('Unit | Common | Models | Tags', function () {
         testTitle: 'Tag.OTHERS if title does not include listed tag',
         pullRequestTitle: '[FIX] Pull Request Title',
         expectedTag: Symbol.for('others'),
-      },
-      {
-        testTitle: 'Tag.QUICK_WIN if title include [QUICK WIN]',
-        pullRequestTitle: '[QUICK WIN] Pull Request Title',
-        expectedTag: Symbol.for('quickWin'),
       },
       {
         testTitle: 'Tag.TECH if title include [TECH]',

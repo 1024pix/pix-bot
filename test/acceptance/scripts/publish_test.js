@@ -95,7 +95,7 @@ describe('Acceptance | Scripts | publish.sh', function () {
 
 
 ### :rocket: Amélioration
-- [#1](https://github.com/1024pix/pix-bot-publish-test/pull/1) [FEATURE] Ajout d'un index pour Pix App
+- [#1](https://github.com/1024pix/pix-bot-publish-test/pull/1) [FEATURE] Ajout d'un index pour Pix App.
 `);
   });
 });

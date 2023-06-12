@@ -107,9 +107,9 @@ describe('Unit | Common | Services | Changelog', function () {
       // given
       const pullRequests = [
         { title: '[BUGFIX] TEST' },
-        { title: '[QUICK WIN] TEST' },
         { title: 'TEST' },
         { title: '[FEATURE] TEST' },
+        { title: '[BREAKING] TEST' },
         { title: '[TECH] TEST' },
       ];
 
@@ -117,8 +117,8 @@ describe('Unit | Common | Services | Changelog', function () {
       const result = orderPr(pullRequests);
 
       // then
-      expect(result[0].title).to.equal('[FEATURE] TEST');
-      expect(result[1].title).to.equal('[QUICK WIN] TEST');
+      expect(result[0].title).to.equal('[BREAKING] TEST');
+      expect(result[1].title).to.equal('[FEATURE] TEST');
       expect(result[2].title).to.equal('[BUGFIX] TEST');
       expect(result[3].title).to.equal('[TECH] TEST');
       expect(result[4].title).to.equal('TEST');
@@ -259,16 +259,16 @@ describe('Unit | Common | Services | Changelog', function () {
         '## v3.55.0 (12/05/2021)',
         '',
         '### :rocket: Amélioration',
-        '- [#100](https://github.com/foo/foo/pull/100) [FEATURE] PIX-1',
+        '- [#100](https://github.com/foo/foo/pull/100) [FEATURE] PIX-1.',
         '',
         '### :building_construction: Tech',
-        '- [#101](https://github.com/foo/foo/pull/101) [TECH] PIX-2',
+        '- [#101](https://github.com/foo/foo/pull/101) [TECH] PIX-2.',
         '',
         '### :bug: Correction',
-        '- [#102](https://github.com/foo/foo/pull/102) [BUGFIX] PIX-3',
+        '- [#102](https://github.com/foo/foo/pull/102) [BUGFIX] PIX-3.',
         '',
         '### :coffee: Autre',
-        '- [#104](https://github.com/foo/foo/pull/104) Foo PIX-4',
+        '- [#104](https://github.com/foo/foo/pull/104) Foo PIX-4.',
         '',
       ];
 

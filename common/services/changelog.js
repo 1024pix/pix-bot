@@ -20,7 +20,7 @@ function displayPullRequest(pr) {
 }
 
 function orderPr(listPR) {
-  const typeOrder = ['FEATURE', 'QUICK WIN', 'BUGFIX', 'TECH'];
+  const typeOrder = ['BREAKING', 'FEATURE', 'BUGFIX', 'TECH'];
   return sortBy(listPR, (pr) => {
     const typeOfPR = pr.title.substring(1, pr.title.indexOf(']'));
     const typeIndex = indexOf(typeOrder, typeOfPR);
