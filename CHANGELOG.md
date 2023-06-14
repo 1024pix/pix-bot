@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.70.0 (14/06/2023)
+
+
+### :rocket: Amélioration
+- [#257](https://github.com/1024pix/pix-bot/pull/257) [FEATURE] Déployer pix1d (PIX-8336).
+
 ## v1.69.0 (12/06/2023)
 
 
