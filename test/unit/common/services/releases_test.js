@@ -48,7 +48,8 @@ describe('releases', function () {
       sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-admin', 'v1.0');
       sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-orga', 'v1.0');
       sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-api', 'v1.0');
-      expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK']);
+      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-1d', 'v1.0');
+      expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK', 'OK']);
     });
 
     it('should throw an error when an application deployment fails', async () => {
