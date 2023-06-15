@@ -34,7 +34,7 @@ describe('releases', function () {
   });
 
   describe('#deploy', function () {
-    it('should trigger deployments of managed applications', async () => {
+    it('should return application deployment status', async () => {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
@@ -43,13 +43,27 @@ describe('releases', function () {
       // when
       const response = await releasesService.deploy('production', 'v1.0');
       // then
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-app', 'v1.0');
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-certif', 'v1.0');
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-admin', 'v1.0');
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-orga', 'v1.0');
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-api', 'v1.0');
-      sinon.assert.calledWithExactly(scalingoClient.deployFromArchive, 'pix-1d', 'v1.0');
       expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK', 'OK']);
+    });
+
+    it('should ask scalingo to deploy applications', async () => {
+      // given
+      const scalingoClient = new ScalingoClient(null, 'production');
+      scalingoClient.deployFromArchive = sinon.stub();
+      scalingoClient.deployFromArchive.resolves('OK');
+      sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
+      // when
+      await releasesService.deploy('production', 'v1.0 ');
+      // then
+      expect(scalingoClient.deployFromArchive.callCount).to.equal(6);
+      expect(scalingoClient.deployFromArchive.args).to.deep.equal([
+        ['pix-app', 'v1.0'],
+        ['pix-certif', 'v1.0'],
+        ['pix-admin', 'v1.0'],
+        ['pix-orga', 'v1.0'],
+        ['pix-api', 'v1.0'],
+        ['pix-1d', 'v1.0'],
+      ]);
     });
 
     it('should throw an error when an application deployment fails', async () => {
