@@ -66,6 +66,20 @@ describe('releases', function () {
       ]);
     });
 
+    it('should sanitize release tag', async () => {
+      // given
+      const scalingoClient = new ScalingoClient(null, 'production');
+      scalingoClient.deployFromArchive = sinon.stub();
+      scalingoClient.deployFromArchive.resolves('OK');
+      sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
+      const tag = ' V1.0.0 ';
+      // when
+      await releasesService.deploy('production', tag);
+      // then
+      expect(scalingoClient.deployFromArchive.callCount).to.equal(6);
+      expect(scalingoClient.deployFromArchive.firstCall.args[1]).to.equal('v1.0.0');
+    });
+
     it('should throw an error when an application deployment fails', async () => {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
