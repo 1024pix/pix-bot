@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.71.0 (15/06/2023)
+
+
+### :building_construction: Tech
+- [#258](https://github.com/1024pix/pix-bot/pull/258) [TECH] Améliorer le test du déploiement du monorepo.
+
+### :bug: Correction
+- [#259](https://github.com/1024pix/pix-bot/pull/259) [BUGFIX] Correction de l'url de Pix1d dans les commentaires de PR (PIX-8336).
+
 ## v1.70.0 (14/06/2023)
 
 
