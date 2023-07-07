@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.71.1 (07/07/2023)
+
+
+### :building_construction: Tech
+- [#263](https://github.com/1024pix/pix-bot/pull/263) [TECH] Précise la version de Node complète.
+
 ## v1.71.0 (15/06/2023)
 
 
