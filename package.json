@@ -3,7 +3,7 @@
   "version": "1.71.0",
   "description": "Automating development actions",
   "engines": {
-    "node": "^16.20.1"
+    "node": "^v18.16.1"
   },
   "main": "index.js",
   "scripts": {
