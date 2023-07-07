@@ -1,16 +1,39 @@
 version: 2.1
 
+workflows:
+  build_and_test:
+    jobs:
+      - build-and-test-current:
+          node-version: '16.20.1'
+      - build-and-test-next:
+          node-version: '18.16.1'
+
 jobs:
-  build-and-test:
+  build-and-test-current:
+    parameters:
+      node-version:
+        type: string
+
     docker:
-      - image: cimg/node:16.20.1
+      - image: cimg/node:<< parameters.node-version >>
+
+    steps:
+      - checkout
+      - run: check-engine
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
+  build-and-test-next:
+    parameters:
+      node-version:
+        type: string
+
+    docker:
+      - image: cimg/node:<< parameters.node-version >>
+
     steps:
       - checkout
       - run: npm ci
       - run: npm run lint
       - run: npm test
-
-workflows:
-  build_and_test:
-    jobs:
-      - build-and-test
