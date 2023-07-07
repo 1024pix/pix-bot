@@ -6,6 +6,7 @@ const {
   createAndDeployPixLCMS,
   createAndDeployPixUI,
   createAndDeployEmberTestingLibrary,
+  createPixActionsRelease,
   createAndDeployPixSiteRelease,
   createAndDeployPixDatawarehouse,
   createAndDeployPixBotRelease,
@@ -26,6 +27,41 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     sinon.stub(releasesServices, 'deployPixRepo').resolves();
     sinon.stub(releasesServices, 'publishPixRepo').resolves('v1.0.0');
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
+  });
+
+  describe('#createPixActionsRelease', () => {
+    it('should publish a new release', async () => {
+      // given
+      const payload = { text: 'minor' };
+
+      // when
+      await createPixActionsRelease(payload);
+
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-actions', 'minor');
+    });
+
+    it('should retrieve the last release tag from GitHub', async () => {
+      // given
+      const payload = { text: 'minor' };
+
+      // when
+      await createPixActionsRelease(payload);
+
+      // then
+      sinon.assert.calledOnceWithExactly(githubServices.getLatestReleaseTag, 'pix-actions');
+    });
+
+    it('should create a minor version if no version is given', async () => {
+      // given
+      const payload = { text: '' };
+
+      // when
+      await createPixActionsRelease(payload);
+
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-actions', 'minor');
+    });
   });
 
   describe('#createAndDeployPixSiteRelease', () => {

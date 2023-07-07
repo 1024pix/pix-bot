@@ -3,6 +3,7 @@ const {
   PIX_REPO_NAME,
   PIX_APPS,
   PIX_APPS_ENVIRONMENTS,
+  PIX_ACTIONS_REPO_NAME,
   PIX_SITE_REPO_NAME,
   PIX_SITE_APPS,
   PIX_BOT_REPO_NAME,
@@ -93,6 +94,20 @@ async function _publishAndDeployEmberTestingLibrary(repoName, releaseType, respo
   } else {
     slackPostMessageService.postMessage(`[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`);
     sendResponse(responseUrl, getSuccessReleaseMessage(releaseTagAfterRelease, repoName));
+  }
+}
+
+async function _publishRelease(repoName, releaseType, responseUrl) {
+  if (_isReleaseTypeInvalid(releaseType)) {
+    releaseType = 'minor';
+  }
+  const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
+  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
+
+  if (releaseTagBeforeRelease === releaseTagAfterRelease) {
+    sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
+  } else {
+    sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
   }
 }
 
@@ -215,6 +230,10 @@ module.exports = {
 
   async createAndDeployEmberTestingLibrary(payload) {
     await _publishAndDeployEmberTestingLibrary(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
+  },
+
+  async createPixActionsRelease(payload) {
+    await _publishRelease(PIX_ACTIONS_REPO_NAME, payload.text, payload.response_url);
   },
 
   async createAndDeployPixSiteRelease(payload) {

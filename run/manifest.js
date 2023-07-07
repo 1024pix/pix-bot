@@ -4,6 +4,15 @@ const slackbotController = require('./controllers/slack');
 const manifest = new Manifest('Pix Bot Run');
 
 manifest.registerSlashCommand({
+  command: '/deploy-pix-actions',
+  path: '/slack/commands/create-pix-actions-release',
+  description: 'Pour faire une release des actions GitHub de Pix (ex: automerge)',
+  usage_hint: 'patch|minor|major (minor par défaut)',
+  should_escape: false,
+  handler: slackbotController.createPixActionsRelease,
+});
+
+manifest.registerSlashCommand({
   command: '/deploy-pix-sites',
   path: '/slack/commands/create-and-deploy-pix-site-release',
   description: 'Pour faire une release et deployer les sites Pix, Pix Pro et Pix org',

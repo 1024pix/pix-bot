@@ -35,6 +35,13 @@ describe('Acceptance | Run | Manifest', function () {
           ],
           slash_commands: [
             {
+              command: '/deploy-pix-actions',
+              url: `http://${hostname}/slack/commands/create-pix-actions-release`,
+              description: 'Pour faire une release des actions GitHub de Pix (ex: automerge)',
+              usage_hint: 'patch|minor|major (minor par défaut)',
+              should_escape: false,
+            },
+            {
               command: '/deploy-pix-sites',
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-site-release`,
               description: 'Pour faire une release et deployer les sites Pix, Pix Pro et Pix org',

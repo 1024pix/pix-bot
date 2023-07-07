@@ -46,6 +46,15 @@ module.exports = {
     };
   },
 
+  createPixActionsRelease(request) {
+    const payload = request.pre.payload;
+    commands.createPixActionsRelease(payload);
+
+    return {
+      text: _getDeployStartedMessage(payload.text, 'PIX actions'),
+    };
+  },
+
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixSiteRelease(payload);
