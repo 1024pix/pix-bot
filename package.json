@@ -3,8 +3,7 @@
   "version": "1.71.0",
   "description": "Automating development actions",
   "engines": {
-    "node": "16",
-    "npm": "8"
+    "node": "^16.20.1"
   },
   "main": "index.js",
   "scripts": {
