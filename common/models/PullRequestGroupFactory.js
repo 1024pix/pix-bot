@@ -21,6 +21,10 @@ class PullRequestGroupFactory {
         groupTitle: '### :bug: Correction',
       }),
       new PullRequestGroup({
+        tagToGrab: Tag.BUMP,
+        groupTitle: '### :arrow_up: Montée de version',
+      }),
+      new PullRequestGroup({
         tagToGrab: Tag.OTHERS,
         groupTitle: '### :coffee: Autre',
       }),

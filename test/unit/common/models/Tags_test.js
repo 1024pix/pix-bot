@@ -16,6 +16,11 @@ describe('Unit | Common | Models | Tags', function () {
         expectedTag: Symbol.for('bugfix'),
       },
       {
+        testTitle: 'Tag.BUMP if title include [BUMP]',
+        pullRequestTitle: '[BUMP] Pull Request Title',
+        expectedTag: Symbol.for('bump'),
+      },
+      {
         testTitle: 'Tag.FEATURE if title include [FEATURE]',
         pullRequestTitle: '[FEATURE] Pull Request Title',
         expectedTag: Symbol.for('feature'),
