@@ -1,24 +1,20 @@
 # Pix Bot (ex-SAM)
 
-Pix Bot is this smart person who thinks of turning off the light when leaving the office and turning on the coffee machine when arriving in the morning.
-
-Pix Bot is this eco-responsible application that preserves resources (yours 💰 and those of the planet 🌍) while ensuring comfortable activity for the team.
-
+## Goals
 Pix Bot helps developers and teams who host their applications on [Scalingo](https://scalingo.com) to manage them pragmatically and economically.
 
-Services provided by Pix Bot:
-- shut down Review Apps, at the time you want, every day of the week
-- re-start stopped Review Apps, when you want, every day of the week
-- deploy a specific release into production via secured API
-- deploy a specific release into production via a Slack command or shortcut
+It offers the following services:
+- create a Review App;
+- shut down and restart Review Apps, at the time you want, every day of the week;
+- deploy a specific release into production via a secured API;
+- deploy a specific release into production via a Slack command or shortcut;
+- call external service after a deployment (CDN invalidation).
 
 Pix Bot is deployed into two apps:
 - Pix Bot Build: contains the commands for the development tools
 - Pix Bot Run: contains the commands related to the releases
 
-## Getting started
-
-### Run locally
+## Run locally
 
 *1/* Get the sources
 
@@ -51,6 +47,28 @@ Command to run the `publish` script:
 ```sh
 GITHUB_OWNER=#github_owner# GITHUB_REPOSITORY=#github_repository# GITHUB_PERSONAL_ACCESS_TOKEN=#github_personal_token# GIT_USER_NAME=#user_name# GIT_USER_EMAIL=#user_email# scripts/publish.sh (path|minor|major)
 ```
+
+## Deploy an application through Slack
+
+Create a Slack endpoint in [manifest](./run/manifest.js)
+```js
+manifest.registerSlashCommand({
+  command: '/deploy-pix-datawarehouse',
+  path: '/slack/commands/create-and-deploy-pix-datawarehouse-release',
+  description:
+    'Crée une release de Pix-Datawarehouse et la déploie en production (pix-datawarehouse-production & pix-datawarehouse-ex-production)',
+  usage_hint: '[patch, minor, major]',
+  should_escape: false,
+  handler: slackbotController.createAndDeployPixDatawarehouseRelease,
+});
+```
+
+
+## Activate review-application for an application
+
+
+
+## Test 
 
 ### Test the endpoint on Slack
 
