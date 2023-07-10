@@ -66,7 +66,25 @@ manifest.registerSlashCommand({
 
 ## Activate review-application for an application
 
+### Register the Scalingo application(s)
 
+Add GitHub repository and Scalingo application name in [the mapping](./build/controllers/github.js)
+```js
+const repositoryToScalingoAppsReview = {
+   <GITHUB-REPOSITORY-NAME>: [<SCALINGO-APPLICATION-NAME>],
+     (..)
+}
+```
+
+You can have more than one Scalingo application per GitHub repository.
+
+### Customize review-application comment
+A comment is added to teh pull request, including:
+- review application URL;
+- review application administration URL.
+
+Check if the [default template](./build/templates/pull-request-messages/default.md) fit your needs.
+If not, create a custom one in the folder.
 
 ## Test 
 
