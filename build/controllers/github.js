@@ -15,6 +15,7 @@ const repositoryToScalingoAppsReview = {
   'pix-tutos': ['pix-tutos-review'],
   'pix-ui': ['pix-ui-review'],
   pix: ['pix-front-review', 'pix-api-review'],
+  pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
 };
 
 function getMessageTemplate(repositoryName) {
