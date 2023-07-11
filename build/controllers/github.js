@@ -4,6 +4,7 @@ const path = require('path');
 const ScalingoClient = require('../../common/services/scalingo-client');
 const gitHubService = require('../../common/services/github');
 const logger = require('../../common/services/logger');
+const settings = require('../../config');
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
@@ -123,14 +124,16 @@ async function pullRequestSynchronizeWebhook(request) {
 
 function _handleNoRACase(request) {
   const payload = request.payload;
-  const repository = payload.pull_request.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repository];
+  const repositoryName = payload.pull_request.head.repo.name;
+  const repositoryOwner = payload.pull_request.head.repo.owner.login;
+  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
   const isFork = payload.pull_request.head.repo.fork;
   const labelsList = payload.pull_request.labels;
   const state = payload.pull_request.state;
 
-  if (isFork) {
-    return { message: 'No RA for a fork', shouldContinue: false };
+  const organization = settings.github.owner;
+  if (isFork && repositoryOwner !== organization) {
+    return { message: 'No RA for a fork not owned by the organization', shouldContinue: false };
   }
   if (!reviewApps) {
     return { message: 'No RA configured for this repository', shouldContinue: false };
