@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.72.0 (11/07/2023)
+
+
+### :coffee: Autre
+- [#273](https://github.com/1024pix/pix-bot/pull/273) Activer les review-app de l'application Pix4Pix.
+
 ## v1.71.1 (07/07/2023)
 
 
