@@ -39,8 +39,8 @@ function modal() {
           Bits.Option({
             text: 'Minor',
             value: 'minor',
-          })
-        )
+          }),
+        ),
     ),
   ]);
 }

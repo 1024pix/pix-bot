@@ -20,12 +20,12 @@ function modal() {
         actionId: 'scalingo-app-name',
         placeholder: 'application-name',
         initialValue: 'pix-super-application-recette',
-      })
+      }),
     ),
     Blocks.Input({ blockId: 'application-env', label: 'Quelle région ?' }).element(
       Elements.StaticSelect({ placeholder: 'Choisis la région' })
         .actionId('item')
-        .options(regions.map((item) => Bits.Option({ text: item.name, value: item.id })))
+        .options(regions.map((item) => Bits.Option({ text: item.name, value: item.id }))),
     ),
   ]);
 }

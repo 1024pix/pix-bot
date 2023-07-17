@@ -105,8 +105,8 @@ describe('releases', function () {
       sinon.assert.calledWith(
         exec,
         sinon.match(
-          new RegExp('.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git )$')
-        )
+          new RegExp('.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git )$'),
+        ),
       );
     });
 
@@ -119,9 +119,9 @@ describe('releases', function () {
         exec,
         sinon.match(
           new RegExp(
-            '.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git hotfix)$'
-          )
-        )
+            '.*(/scripts/publish.sh minor https://undefined@github.com/github-owner/github-repository.git hotfix)$',
+          ),
+        ),
       );
     });
 
@@ -149,9 +149,9 @@ describe('releases', function () {
         exec,
         sinon.match(
           new RegExp(
-            '.*(/scripts/release-pix-repo.sh) github-owner pix-site minor dev https://undefined@github.com/github-owner/pix-site.git$'
-          )
-        )
+            '.*(/scripts/release-pix-repo.sh) github-owner pix-site minor dev https://undefined@github.com/github-owner/pix-site.git$',
+          ),
+        ),
       );
     });
 

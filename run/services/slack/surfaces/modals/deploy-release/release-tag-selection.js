@@ -16,7 +16,7 @@ function modal() {
       Elements.TextInput({
         actionId: 'release-tag-value',
         placeholder: 'Ex : v2.130.0',
-      })
+      }),
     ),
   ]);
 }

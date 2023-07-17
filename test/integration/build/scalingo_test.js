@@ -79,7 +79,7 @@ describe('Integration | Build | Scalingo', function () {
         ];
         expect(slackPostMessageService.postMessage).to.have.been.calledWith(
           '[pix-github-actions-test] App deployment error',
-          JSON.stringify(expectedPayload)
+          JSON.stringify(expectedPayload),
         );
         expect(res.statusCode).to.equal(200);
       });

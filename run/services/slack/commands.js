@@ -42,7 +42,7 @@ function sendResponse(responseUrl, text) {
       headers: {
         'content-type': 'application/json',
       },
-    }
+    },
   );
 }
 
@@ -126,9 +126,9 @@ async function _publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv
           return scalingoInstance.deployFromArchive(scalingoAppName, releaseTagAfterRelease, repoName, {
             withEnvSuffix: false,
           });
-        })
+        }),
       );
-    })
+    }),
   );
   sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, Object.values(appsByEnv).join(', ')));
 }
@@ -165,7 +165,7 @@ async function _deployFromBranch(repoName, appNames, branch) {
   return Promise.all(
     appNames.map((appName) => {
       return client.deployFromArchive(appName, branch, repoName, { withEnvSuffix: false });
-    })
+    }),
   );
 }
 
@@ -174,7 +174,7 @@ async function deployTagUsingSCM(appNames, tag) {
   return Promise.all(
     appNames.map((appName) => {
       return client.deployUsingSCM(appName, tag);
-    })
+    }),
   );
 }
 
@@ -205,7 +205,7 @@ module.exports = {
       PIX_LCMS_REPO_NAME,
       PIX_LCMS_APPS,
       payload.text,
-      payload.response_url
+      payload.response_url,
     );
   },
 
@@ -226,7 +226,7 @@ module.exports = {
       PIX_DATAWAREHOUSE_REPO_NAME,
       PIX_DATAWAREHOUSE_APPS_NAME,
       payload.text,
-      payload.response_url
+      payload.response_url,
     );
   },
 
@@ -235,7 +235,7 @@ module.exports = {
       PIX_BOT_REPO_NAME,
       PIX_BOT_APPS,
       payload.text,
-      payload.response_url
+      payload.response_url,
     );
   },
 

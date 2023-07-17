@@ -69,7 +69,7 @@ async function invalidateCdnCache(application) {
           'Content-type': 'application/json',
           Cookie: `baleen-namespace=${namespaceKey}`,
         },
-      }
+      },
     );
   } catch (error) {
     const cdnResponseMessage = JSON.stringify(error.response.data);

@@ -354,7 +354,7 @@ module.exports = {
 
   async hasConfigFileChangedSinceLatestRelease(
     repoOwner = settings.github.owner,
-    repoName = settings.github.repository
+    repoName = settings.github.repository,
   ) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const now = new Date().toISOString();
@@ -369,7 +369,7 @@ module.exports = {
       repoOwner,
       repoName,
       secondToLastReleaseDate,
-      latestReleaseDate
+      latestReleaseDate,
     );
     return commits.length > 0;
   },

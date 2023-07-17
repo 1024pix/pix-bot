@@ -24,7 +24,7 @@ module.exports = {
         scriptFileName,
         sanitizedReleaseType,
         repositoryURL,
-        sanitizedBranchName
+        sanitizedBranchName,
       );
       return newPackageVersion;
     } catch (err) {
@@ -42,7 +42,7 @@ module.exports = {
     const results = await Promise.all(
       config.PIX_APPS.map((pixApp) => {
         return client.deployFromArchive(`pix-${pixApp}`, sanitizedReleaseTag);
-      })
+      }),
     );
 
     return results;

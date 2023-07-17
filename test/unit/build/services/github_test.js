@@ -24,7 +24,7 @@ describe('#getPullRequests', function () {
 
     nock('https://api.github.com')
       .get(
-        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Ateam-certif&sort=updated&order=desc'
+        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Ateam-certif&sort=updated&order=desc',
       )
       .reply(200, { items });
 
@@ -61,7 +61,7 @@ describe('#getPullRequests', function () {
     const items = [{ html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [{ name: 'cross-team' }] }];
     scopePr = nock('https://api.github.com')
       .get(
-        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc'
+        '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc',
       )
       .reply(200, { items });
 
@@ -83,7 +83,7 @@ describe('#getPullRequests', function () {
       const loggerErrorStub = sinon.stub(logger, 'error');
       nock('https://api.github.com')
         .get(
-          '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc'
+          '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc',
         )
         .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
 
@@ -102,7 +102,7 @@ describe('#getPullRequests', function () {
       sinon.stub(logger, 'error');
       nock('https://api.github.com')
         .get(
-          '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc'
+          '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc',
         )
         .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
 
@@ -200,7 +200,7 @@ describe('#getMergedPullRequestsSortedByDescendingDate', function () {
     // when
     const response = await githubService.getMergedPullRequestsSortedByDescendingDate(
       'github-owner',
-      'github-repository'
+      'github-repository',
     );
 
     // then
@@ -212,7 +212,7 @@ describe('#getMergedPullRequestsSortedByDescendingDate', function () {
     const pullRequests = [{ merged_at: '2020-09-02T12:26:47Z' }, { merged_at: '2020-09-01T12:26:47Z' }];
     nock('https://api.github.com')
       .get(
-        '/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=toto&per_page=100'
+        '/repos/github-owner/github-repository/pulls?state=closed&sort=updated&direction=desc&base=toto&per_page=100',
       )
       .reply(200, pullRequests);
 
@@ -220,7 +220,7 @@ describe('#getMergedPullRequestsSortedByDescendingDate', function () {
     const response = await githubService.getMergedPullRequestsSortedByDescendingDate(
       'github-owner',
       'github-repository',
-      'toto'
+      'toto',
     );
 
     // then
@@ -458,7 +458,7 @@ describe('#verifyWebhookSignature', function () {
     };
 
     expect(githubService.verifyWebhookSignature(request).output.payload.message).to.eql(
-      'Github signature verification failed. Signature mismatch.'
+      'Github signature verification failed. Signature mismatch.',
     );
   });
 

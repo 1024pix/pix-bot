@@ -31,7 +31,7 @@ function createCronJob(jobName, jobFunction, jobSchedule) {
       },
       null,
       true,
-      parisTimezone
+      parisTimezone,
     );
   } catch (e) {
     logger.info({

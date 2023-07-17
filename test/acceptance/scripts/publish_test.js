@@ -52,7 +52,7 @@ describe('Acceptance | Scripts | publish.sh', function () {
     const { stdout, stderr } = await runScriptWithArgument(
       scriptName,
       [versionType, 'file://' + testRepositoryPath, branchName],
-      { env }
+      { env },
     );
 
     // then
