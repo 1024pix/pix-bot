@@ -135,13 +135,13 @@ describe('Unit | Common | Services | Changelog', function () {
         .stub(github, 'getLastCommitUrl')
         .withArgs({ owner: repoOwner, repo: repoName, tagName })
         .resolves(
-          `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`
+          `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`,
         );
 
       sinon
         .stub(github, 'getCommitAtURL')
         .withArgs(
-          `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`
+          `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`,
         )
         .resolves({ committer: { date: '2019-01-18T15:29:51Z' } });
     });

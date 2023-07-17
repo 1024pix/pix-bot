@@ -71,7 +71,7 @@ describe('Acceptance | Run | SlashCommand', function () {
       });
       expect(res.statusCode).to.equal(200);
       expect(res.result.text).to.equal(
-        'Commande de déploiement de la release "v0.0.1" pour Airflow en production bien reçue.'
+        'Commande de déploiement de la release "v0.0.1" pour Airflow en production bien reçue.',
       );
     });
 
@@ -110,7 +110,7 @@ describe('Acceptance | Run | SlashCommand', function () {
       });
       expect(res.statusCode).to.equal(200);
       expect(res.result.text).to.equal(
-        'Commande de déploiement de la release "v0.0.1" pour DBT en production bien reçue.'
+        'Commande de déploiement de la release "v0.0.1" pour DBT en production bien reçue.',
       );
     });
 

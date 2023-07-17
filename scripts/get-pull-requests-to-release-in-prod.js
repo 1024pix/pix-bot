@@ -38,7 +38,7 @@ async function main() {
         pullRequests = await pullRequestSinceLastRelease(repoOwner, repoName, lastTagNameOnBranch, branchName);
       } catch (e) {
         console.error(
-          "Error while fetching the tag and pull-requests. If it's your first release, ensure that the version set is 0.0.0."
+          "Error while fetching the tag and pull-requests. If it's your first release, ensure that the version set is 0.0.0.",
         );
         throw e;
       }

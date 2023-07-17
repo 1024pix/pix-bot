@@ -49,7 +49,7 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function () {
     const { stdout, stderr } = await runScriptWithArgument(
       scriptName,
       [githubOwner, githubRepository, versionType, branchName, 'file://' + testRepositoryPath],
-      { env }
+      { env },
     );
 
     // then

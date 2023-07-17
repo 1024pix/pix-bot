@@ -18,7 +18,7 @@ const init = async () => {
       const releaseTag = await githubServices.getLatestReleaseTag(repoName);
       deploy(repoName, config.PIX_SITE_APPS, releaseTag);
     },
-    config.pixSiteDeploy.schedule
+    config.pixSiteDeploy.schedule,
   );
 
   await server.start();

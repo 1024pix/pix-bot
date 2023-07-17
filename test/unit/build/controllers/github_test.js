@@ -17,7 +17,7 @@ describe('#getMessageTemplate', function () {
       'build',
       'templates',
       'pull-request-messages',
-      'pix.md'
+      'pix.md',
     );
     const template = githubController.getMessageTemplate('pix');
     const comment = fs.readFileSync(filePath, 'utf8');
@@ -34,7 +34,7 @@ describe('#getMessageTemplate', function () {
       'build',
       'templates',
       'pull-request-messages',
-      'default.md'
+      'default.md',
     );
     const template = githubController.getMessageTemplate('no-repository-named-like-that');
     const comment = fs.readFileSync(filePath, 'utf8');
@@ -46,7 +46,7 @@ describe('#getMessage', function () {
   it('replace template placeholders with params', function () {
     const template = 'Hello, url {{webApplicationUrl}}, {{pullRequestId}} and {{scalingoDashboardUrl}}';
     expect(githubController.getMessage('pix', '42', ['pix-review', 'pix-review2'], template)).to.equal(
-      'Hello, url https://pix-pr42.review.pix.fr, 42 and https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment'
+      'Hello, url https://pix-pr42.review.pix.fr, 42 and https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment',
     );
   });
 

@@ -34,7 +34,7 @@ module.exports = {
       applicationName,
       applicationEnvironment,
       applicationEnvironmentName,
-      userEmail
+      userEmail,
     );
   },
 

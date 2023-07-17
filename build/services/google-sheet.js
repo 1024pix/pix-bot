@@ -18,7 +18,7 @@ async function getDataFromGoogleSheet() {
       logger.info({
         event: 'google-sheet',
         message: error,
-      })
+      }),
     );
 }
 

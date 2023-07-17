@@ -27,12 +27,12 @@ function getSlackMessageAttachments(payload) {
             }),
             Section().fields(
               `*Deployment failed*\nWith status '${deploymentStatus}'`,
-              `*Deployment logs*\n<${appDeploymentUrl}|${appName}>`
+              `*Deployment logs*\n<${appDeploymentUrl}|${appName}>`,
             ),
             Section().fields(`*Pusher*\n${pusher}`, `*Git SHA*\n${gitRef}`),
-            Context().elements(`By ${userName} | ${eventDate}`)
+            Context().elements(`By ${userName} | ${eventDate}`),
           )
-          .fallback(message)
+          .fallback(message),
       )
       .buildToObject().attachments,
   };

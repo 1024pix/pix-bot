@@ -13,7 +13,7 @@ describe('logger', function () {
         // then
         expect(injectedLogger.error.calledOnce).to.be.true;
         expect(injectedLogger.error.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"titi","stack":"stack","level":"error"}'
+          '{"event":"toto","message":"titi","stack":"stack","level":"error"}',
         );
       });
     });
@@ -28,7 +28,7 @@ describe('logger', function () {
         // then
         expect(injectedLogger.error.calledOnce).to.be.true;
         expect(injectedLogger.error.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"error"}'
+          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"error"}',
         );
       });
     });
@@ -45,7 +45,7 @@ describe('logger', function () {
         // then
         expect(injectedLogger.log.calledOnce).to.be.true;
         expect(injectedLogger.log.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"titi","stack":"stack","level":"info"}'
+          '{"event":"toto","message":"titi","stack":"stack","level":"info"}',
         );
       });
     });
@@ -60,7 +60,7 @@ describe('logger', function () {
         // then
         expect(injectedLogger.log.calledOnce).to.be.true;
         expect(injectedLogger.log.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"info"}'
+          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"info"}',
         );
       });
     });
@@ -77,7 +77,7 @@ describe('logger', function () {
         // then
         expect(injectedLogger.warn.calledOnce).to.be.true;
         expect(injectedLogger.warn.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"titi","stack":"stack","level":"warn"}'
+          '{"event":"toto","message":"titi","stack":"stack","level":"warn"}',
         );
       });
     });
@@ -92,7 +92,7 @@ describe('logger', function () {
         // then
         expect(injectedLogger.warn.calledOnce).to.be.true;
         expect(injectedLogger.warn.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"warn"}'
+          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"warn"}',
         );
       });
     });
