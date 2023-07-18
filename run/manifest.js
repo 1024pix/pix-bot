@@ -77,15 +77,6 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
-  command: '/deploy-metabase',
-  path: '/slack/commands/deploy-metabase',
-  description: 'Déploie metabase',
-  usage_hint: '/deploy-metabase',
-  should_escape: false,
-  handler: slackbotController.deployMetabase,
-});
-
-manifest.registerSlashCommand({
   command: '/deploy-pix-tutos',
   path: '/slack/commands/create-and-deploy-pix-tutos-release',
   description: 'Crée une release de Pix Tutos',

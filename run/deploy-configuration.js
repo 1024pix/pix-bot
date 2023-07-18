@@ -1,7 +1,7 @@
 const { fromBranch } = require('../common/deployer');
 
-module.exports = {
-  metabase: {
+module.exports = [
+  {
     slashCommand: {
       command: '/deploy-metabase',
       description: 'Déploie metabase',
@@ -9,4 +9,4 @@ module.exports = {
     },
     deployFunction: fromBranch('metabase-deploy', ['pix-metabase-production', 'pix-data-metabase-production'], 'master'),
   },
-};
+];

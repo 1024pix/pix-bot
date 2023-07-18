@@ -5,6 +5,7 @@ require('dotenv').config();
 const path = require('path');
 const Hapi = require('@hapi/hapi');
 const config = require('./config');
+const runDeployConfiguration = require('./run/deploy-configuration');
 const runManifest = require('./run/manifest');
 const buildManifest = require('./build/manifest');
 const { slackConfig } = require('./common/config');
@@ -27,6 +28,15 @@ setupErrorHandling(server);
     .readdirSync(routesDir)
     .filter((file) => path.extname(file) === '.js')
     .forEach((file) => server.route(require(path.join(routesDir, file))));
+});
+
+runDeployConfiguration.forEach((configuration) => {
+  runManifest.registerSlashCommand({
+    ...configuration.slashCommand
+    path: `/slack/commands${configuration.slashCommand.command}`,
+    should_escape: false,
+    handler: () => {}
+  });
 });
 
 manifests.forEach((manifest) => {
