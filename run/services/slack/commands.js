@@ -17,19 +17,12 @@ const {
   PIX_DB_STATS_APPS_NAME,
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
-  PIX_APIM_REPO_NAME,
-  PIX_APIM_APPS_NAME,
-  PIX_GEOAPI_REPO_NAME,
-  PIX_GEOAPI_APP_NAME,
   PIX_AIRFLOW_APP_NAME,
   PIX_DBT_APPS_NAME,
-  PIX_360_REPO_NAME,
-  PIX_360_APP_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const githubServices = require('../../../common/services/github');
-const deployer = require('../../../common/deployer');
 const axios = require('axios');
 const slackPostMessageService = require('../../../common/services/slack/surfaces/messages/post-message');
 
@@ -176,18 +169,6 @@ module.exports = {
   async deployDBT(payload) {
     const version = payload.text;
     await deployTagUsingSCM(PIX_DBT_APPS_NAME, version);
-  },
-
-  async deployPixAPIM() {
-    await deployer.fromBranch(PIX_APIM_REPO_NAME, [PIX_APIM_APPS_NAME], 'main')();
-  },
-
-  async deployGeoAPI() {
-    await deployer.fromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main')();
-  },
-
-  async deployPix360() {
-    await deployer.fromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main')();
   },
 
   async createAndDeployPixLCMS(payload) {

@@ -86,38 +86,12 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
-  command: '/deploy-pix-apim',
-  path: '/slack/commands/deploy-pix-apim',
-  description: 'Pour déployer les applications Pix APIM depuis la branche main',
-  should_escape: false,
-  handler: slackbotController.deployPixAPIM,
-});
-
-manifest.registerSlashCommand({
   command: '/deploy-airflow',
   path: '/slack/commands/deploy-airflow',
   description: 'Déploie la version précisée de Airflow en production',
   usage_hint: '/deploy-airflow $version',
   should_escape: false,
   handler: slackbotController.deployAirflow,
-});
-
-manifest.registerSlashCommand({
-  command: '/deploy-geoapi',
-  path: '/slack/commands/deploy-geoapi',
-  description: 'Déploie GeoAPI en production depuis la branche main',
-  usage_hint: '/deploy-geoapi',
-  should_escape: false,
-  handler: slackbotController.deployGeoAPI,
-});
-
-manifest.registerSlashCommand({
-  command: '/deploy-pix-360',
-  path: '/slack/commands/deploy-pix-360',
-  description: 'Pour déployer pix 360 depuis la branche main',
-  usage_hint: '/deploy-pix-360',
-  should_escape: false,
-  handler: slackbotController.deployPix360,
 });
 
 manifest.registerSlashCommand({

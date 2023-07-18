@@ -13,7 +13,7 @@ const { slackConfig } = require('./common/config');
 const manifests = [runManifest, buildManifest];
 const preResponseHandler = require('./common/pre-response-handler');
 
-const setupErrorHandling = function(server) {
+const setupErrorHandling = function (server) {
   server.ext('onPreResponse', preResponseHandler.handleErrors);
 };
 
@@ -31,7 +31,7 @@ setupErrorHandling(server);
     .forEach((file) => server.route(require(path.join(routesDir, file))));
 });
 
-registerSlashCommands(runDeployConfiguration, runManifest)
+registerSlashCommands(runDeployConfiguration, runManifest);
 
 manifests.forEach((manifest) => {
   const routes = manifest.getHapiRoutes().map((route) => {

@@ -11,7 +11,6 @@ const {
   createAndDeployPixBotRelease,
   getAndDeployLastVersion,
   createAndDeployDbStats,
-  deployGeoAPI,
   createAndDeployPixTutosRelease,
 } = require('../../../../../run/services/slack/commands');
 const releasesServices = require('../../../../../common/services/releases');
@@ -294,25 +293,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixRepo);
-    });
-  });
-
-  describe('#deployGeoAPI', () => {
-    let client;
-
-    beforeEach(async function () {
-      // given
-      client = { deployFromArchive: sinon.spy() };
-      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
-      // when
-      await deployGeoAPI();
-    });
-
-    it('should deploy the release', () => {
-      // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-geoapi-production', 'main', 'geoapi', {
-        withEnvSuffix: false,
-      });
     });
   });
 });
