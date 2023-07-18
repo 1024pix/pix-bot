@@ -11,6 +11,8 @@ const {
   PIX_DATAWAREHOUSE_APPS_NAME,
   PIX_LCMS_REPO_NAME,
   PIX_LCMS_APPS,
+  PIX_API_DATA_REPO_NAME,
+  PIX_API_DATA_APPS,
   PIX_UI_REPO_NAME,
   PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
   PIX_DB_STATS_REPO_NAME,
@@ -175,6 +177,15 @@ module.exports = {
     await _publishAndDeployReleaseWithAppsByEnvironment(
       PIX_LCMS_REPO_NAME,
       PIX_LCMS_APPS,
+      payload.text,
+      payload.response_url,
+    );
+  },
+
+  async createAndDeployPixAPIData(payload) {
+    await _publishAndDeployReleaseWithAppsByEnvironment(
+      PIX_API_DATA_REPO_NAME,
+      PIX_API_DATA_APPS,
       payload.text,
       payload.response_url,
     );

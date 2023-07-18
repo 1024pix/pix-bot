@@ -103,6 +103,10 @@ module.exports = (function () {
       production: ['pix-lcms-production'],
       recette: ['pix-lcms-minimal-production'],
     },
+    PIX_API_DATA_REPO_NAME: 'pix-api-data',
+    PIX_API_DATA_APPS: {
+      production: ['pix-api-data-production'],
+    },
     PIX_UI_REPO_NAME: 'pix-ui',
     PIX_EMBER_TESTING_LIBRARY_REPO_NAME: 'ember-testing-library',
     PIX_DB_STATS_REPO_NAME: 'pix-db-stats',
