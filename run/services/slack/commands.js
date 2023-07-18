@@ -15,8 +15,6 @@ const {
   PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
   PIX_DB_STATS_REPO_NAME,
   PIX_DB_STATS_APPS_NAME,
-  PIX_METABASE_REPO_NAME,
-  PIX_METABASE_APPS_NAME,
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
   PIX_APIM_REPO_NAME,
@@ -181,15 +179,15 @@ module.exports = {
   },
 
   async deployPixAPIM() {
-    await deployer.fromBranch(PIX_APIM_REPO_NAME, [PIX_APIM_APPS_NAME], 'main');
+    await deployer.fromBranch(PIX_APIM_REPO_NAME, [PIX_APIM_APPS_NAME], 'main')();
   },
 
   async deployGeoAPI() {
-    await deployer.fromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main');
+    await deployer.fromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main')();
   },
 
   async deployPix360() {
-    await deployer.fromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main');
+    await deployer.fromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main')();
   },
 
   async createAndDeployPixLCMS(payload) {
@@ -237,10 +235,6 @@ module.exports = {
 
   async createAndDeployDbStats(payload) {
     await _publishAndDeployRelease(PIX_DB_STATS_REPO_NAME, PIX_DB_STATS_APPS_NAME, payload.text, payload.response_url);
-  },
-
-  async deployMetabase() {
-    await deployer.fromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
   },
 
   async createAndDeployPixTutosRelease(payload) {

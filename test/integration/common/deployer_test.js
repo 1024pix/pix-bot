@@ -19,7 +19,7 @@ describe('Integration | Common | Deployer', function () {
         .post('/v1/apps/my-app-2/deployments', deploymentPayload)
         .reply(200, {});
 
-      await fromBranch('my-repository', ['my-app-1', 'my-app-2'], 'my-branch');
+      await fromBranch('my-repository', ['my-app-1', 'my-app-2'], 'my-branch')();
 
       expect(scalingoTokenNock.isDone()).to.be.true;
       expect(scalingoDeploy1Nock.isDone()).to.be.true;

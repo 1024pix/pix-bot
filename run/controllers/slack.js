@@ -135,14 +135,6 @@ module.exports = {
     };
   },
 
-  deployMetabase() {
-    commands.deployMetabase();
-
-    return {
-      text: 'Commande de déploiement de Metabase en production bien reçue.',
-    };
-  },
-
   deployPix360() {
     commands.deployPix360();
 

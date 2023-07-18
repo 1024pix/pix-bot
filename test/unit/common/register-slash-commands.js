@@ -3,7 +3,7 @@ const { expect, sinon } = require('../../test-helper');
 const { registerSlashCommands } = require('../../../common/register-slash-commands');
 const { Manifest } = require('../../../common/models/Manifest');
 
-describe.only('Unit | Common | Models | Manifest', function() {
+describe('Unit | Common | register-slack-commands', function() {
 
   describe('#registerSlashCommand', function() {
     it('registers a slash commands', function() {
@@ -27,7 +27,7 @@ describe.only('Unit | Common | Models | Manifest', function() {
 
       // then
       expect(manifest.slashCommands).to.have.lengthOf(1);
-      expect(manifest.slashCommands).to.match([
+      expect(manifest.slashCommands[0]).to.include(
         {
           command: '/test',
           path: '/slack/commands/test',
@@ -35,11 +35,11 @@ describe.only('Unit | Common | Models | Manifest', function() {
           usage_hint: 'this is a test',
           should_escape: false,
         },
-      ]);
+      );
 
       const result = manifest.slashCommands[0].handler();
 
-      expect(deployFunctionSpy).to.haveBeenCalled();
+      expect(deployFunctionSpy).to.have.been.called;
       expect(result).to.eql({ text: 'Commande de test envoyée' });
     });
   });

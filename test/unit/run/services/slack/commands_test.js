@@ -11,7 +11,6 @@ const {
   createAndDeployPixBotRelease,
   getAndDeployLastVersion,
   createAndDeployDbStats,
-  deployMetabase,
   deployGeoAPI,
   createAndDeployPixTutosRelease,
 } = require('../../../../../run/services/slack/commands');
@@ -295,28 +294,6 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     it('should deploy the release', () => {
       // then
       sinon.assert.calledWith(releasesServices.deployPixRepo);
-    });
-  });
-
-  describe('#deployMetabase', () => {
-    let client;
-
-    beforeEach(async function () {
-      // given
-      client = { deployFromArchive: sinon.spy() };
-      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
-      // when
-      await deployMetabase();
-    });
-
-    it('should deploy the release', () => {
-      // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-metabase-production', 'master', 'metabase-deploy', {
-        withEnvSuffix: false,
-      });
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-data-metabase-production', 'master', 'metabase-deploy', {
-        withEnvSuffix: false,
-      });
     });
   });
 
