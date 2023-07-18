@@ -1,4 +1,5 @@
 const { fromBranch } = require('../common/deployer');
+
 module.exports = {
   metabase: {
     slashCommand: {

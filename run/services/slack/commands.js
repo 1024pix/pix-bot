@@ -31,6 +31,7 @@ const {
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const githubServices = require('../../../common/services/github');
+const deployer = require('../../../common/deployer');
 const axios = require('axios');
 const slackPostMessageService = require('../../../common/services/slack/surfaces/messages/post-message');
 
@@ -160,15 +161,6 @@ function _isAppFromPixRepo({ appName }) {
   return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
-async function _deployFromBranch(repoName, appNames, branch) {
-  const client = await ScalingoClient.getInstance('production');
-  return Promise.all(
-    appNames.map((appName) => {
-      return client.deployFromArchive(appName, branch, repoName, { withEnvSuffix: false });
-    }),
-  );
-}
-
 async function deployTagUsingSCM(appNames, tag) {
   const client = await ScalingoClient.getInstance('production');
   return Promise.all(
@@ -189,15 +181,15 @@ module.exports = {
   },
 
   async deployPixAPIM() {
-    await _deployFromBranch(PIX_APIM_REPO_NAME, [PIX_APIM_APPS_NAME], 'main');
+    await deployer.fromBranch(PIX_APIM_REPO_NAME, [PIX_APIM_APPS_NAME], 'main');
   },
 
   async deployGeoAPI() {
-    await _deployFromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main');
+    await deployer.fromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main');
   },
 
   async deployPix360() {
-    await _deployFromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main');
+    await deployer.fromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main');
   },
 
   async createAndDeployPixLCMS(payload) {
@@ -248,7 +240,7 @@ module.exports = {
   },
 
   async deployMetabase() {
-    await _deployFromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
+    await deployer.fromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
   },
 
   async createAndDeployPixTutosRelease(payload) {
