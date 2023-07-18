@@ -6,13 +6,14 @@ const path = require('path');
 const Hapi = require('@hapi/hapi');
 const config = require('./config');
 const runDeployConfiguration = require('./run/deploy-configuration');
+const { registerSlashCommands } = require('./common/register-slash-commands');
 const runManifest = require('./run/manifest');
 const buildManifest = require('./build/manifest');
 const { slackConfig } = require('./common/config');
 const manifests = [runManifest, buildManifest];
 const preResponseHandler = require('./common/pre-response-handler');
 
-const setupErrorHandling = function (server) {
+const setupErrorHandling = function(server) {
   server.ext('onPreResponse', preResponseHandler.handleErrors);
 };
 
@@ -30,14 +31,7 @@ setupErrorHandling(server);
     .forEach((file) => server.route(require(path.join(routesDir, file))));
 });
 
-runDeployConfiguration.forEach((configuration) => {
-  runManifest.registerSlashCommand({
-    ...configuration.slashCommand
-    path: `/slack/commands${configuration.slashCommand.command}`,
-    should_escape: false,
-    handler: () => {}
-  });
-});
+registerSlashCommands(runDeployConfiguration, runManifest)
 
 manifests.forEach((manifest) => {
   const routes = manifest.getHapiRoutes().map((route) => {
