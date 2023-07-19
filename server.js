@@ -5,6 +5,8 @@ require('dotenv').config();
 const path = require('path');
 const Hapi = require('@hapi/hapi');
 const config = require('./config');
+const runDeployConfiguration = require('./run/deploy-configuration');
+const { registerSlashCommands } = require('./common/register-slash-commands');
 const runManifest = require('./run/manifest');
 const buildManifest = require('./build/manifest');
 const { slackConfig } = require('./common/config');
@@ -28,6 +30,8 @@ setupErrorHandling(server);
     .filter((file) => path.extname(file) === '.js')
     .forEach((file) => server.route(require(path.join(routesDir, file))));
 });
+
+registerSlashCommands(runDeployConfiguration, runManifest);
 
 manifests.forEach((manifest) => {
   const routes = manifest.getHapiRoutes().map((route) => {

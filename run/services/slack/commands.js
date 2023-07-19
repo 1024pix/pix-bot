@@ -15,18 +15,10 @@ const {
   PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
   PIX_DB_STATS_REPO_NAME,
   PIX_DB_STATS_APPS_NAME,
-  PIX_METABASE_REPO_NAME,
-  PIX_METABASE_APPS_NAME,
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
-  PIX_APIM_REPO_NAME,
-  PIX_APIM_APPS_NAME,
-  PIX_GEOAPI_REPO_NAME,
-  PIX_GEOAPI_APP_NAME,
   PIX_AIRFLOW_APP_NAME,
   PIX_DBT_APPS_NAME,
-  PIX_360_REPO_NAME,
-  PIX_360_APP_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -160,15 +152,6 @@ function _isAppFromPixRepo({ appName }) {
   return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
-async function _deployFromBranch(repoName, appNames, branch) {
-  const client = await ScalingoClient.getInstance('production');
-  return Promise.all(
-    appNames.map((appName) => {
-      return client.deployFromArchive(appName, branch, repoName, { withEnvSuffix: false });
-    }),
-  );
-}
-
 async function deployTagUsingSCM(appNames, tag) {
   const client = await ScalingoClient.getInstance('production');
   return Promise.all(
@@ -186,18 +169,6 @@ module.exports = {
   async deployDBT(payload) {
     const version = payload.text;
     await deployTagUsingSCM(PIX_DBT_APPS_NAME, version);
-  },
-
-  async deployPixAPIM() {
-    await _deployFromBranch(PIX_APIM_REPO_NAME, [PIX_APIM_APPS_NAME], 'main');
-  },
-
-  async deployGeoAPI() {
-    await _deployFromBranch(PIX_GEOAPI_REPO_NAME, [PIX_GEOAPI_APP_NAME], 'main');
-  },
-
-  async deployPix360() {
-    await _deployFromBranch(PIX_360_REPO_NAME, [PIX_360_APP_NAME], 'main');
   },
 
   async createAndDeployPixLCMS(payload) {
@@ -245,10 +216,6 @@ module.exports = {
 
   async createAndDeployDbStats(payload) {
     await _publishAndDeployRelease(PIX_DB_STATS_REPO_NAME, PIX_DB_STATS_APPS_NAME, payload.text, payload.response_url);
-  },
-
-  async deployMetabase() {
-    await _deployFromBranch(PIX_METABASE_REPO_NAME, PIX_METABASE_APPS_NAME, 'master');
   },
 
   async createAndDeployPixTutosRelease(payload) {

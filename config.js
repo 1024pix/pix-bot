@@ -112,21 +112,12 @@ module.exports = (function () {
     PIX_DATAWAREHOUSE_REPO_NAME: 'pix-db-replication',
     PIX_DATAWAREHOUSE_APPS_NAME: ['pix-datawarehouse', 'pix-datawarehouse-ex', 'pix-datawarehouse-data'],
 
-    PIX_METABASE_REPO_NAME: 'metabase-deploy',
-    PIX_METABASE_APPS_NAME: ['pix-metabase-production', 'pix-data-metabase-production'],
-
     PIX_APPS: ['app', 'certif', 'admin', 'orga', 'api', '1d'],
     PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
     PIX_TUTOS_APP_NAME: 'pix-tutos',
-    PIX_APIM_REPO_NAME: 'pix-nginx-apim',
-    PIX_APIM_APPS_NAME: 'pix-nginx-apim-production',
-    PIX_GEOAPI_REPO_NAME: 'geoapi',
-    PIX_GEOAPI_APP_NAME: 'pix-geoapi-production',
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
     PIX_DBT_APPS_NAME: ['pix-dbt-production', 'pix-dbt-external-production'],
-    PIX_360_REPO_NAME: 'pix-360',
-    PIX_360_APP_NAME: 'pix-360-production',
   };
 
   if (process.env.NODE_ENV === 'test') {

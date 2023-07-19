@@ -10,24 +10,6 @@ function _getDeployStartedMessage(release, appName) {
 }
 
 module.exports = {
-  deployPixAPIM(request) {
-    const payload = request.pre.payload;
-    commands.deployPixAPIM(payload);
-
-    return {
-      text: 'Commande de déploiement de Pix APIM en production bien reçue.',
-    };
-  },
-
-  deployGeoAPI(request) {
-    const payload = request.pre.payload;
-    commands.deployGeoAPI(payload);
-
-    return {
-      text: 'Commande de déploiement de GeoAPI en production bien reçue.',
-    };
-  },
-
   deployAirflow(request) {
     const payload = request.pre.payload;
     commands.deployAirflow(payload);
@@ -132,22 +114,6 @@ module.exports = {
 
     return {
       text: _getDeployStartedMessage(payload.text, 'DB stats'),
-    };
-  },
-
-  deployMetabase() {
-    commands.deployMetabase();
-
-    return {
-      text: 'Commande de déploiement de Metabase en production bien reçue.',
-    };
-  },
-
-  deployPix360() {
-    commands.deployPix360();
-
-    return {
-      text: 'Commande de déploiement de Pix 360 en production bien reçue.',
     };
   },
 
