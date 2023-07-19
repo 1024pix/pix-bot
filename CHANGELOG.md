@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.73.0 (19/07/2023)
+
+
+### :building_construction: Tech
+- [#278](https://github.com/1024pix/pix-bot/pull/278) [TECH] Rend les déploiements déclaratif plutot qu'impératif.
+
+### :coffee: Autre
+- [#276](https://github.com/1024pix/pix-bot/pull/276) [BUMP] Lock file maintenance (dossier racine).
+- [#275](https://github.com/1024pix/pix-bot/pull/275) [BUMP] Update dependency prettier to v3 (dossier racine).
+
 ## v1.72.0 (11/07/2023)
 
 
