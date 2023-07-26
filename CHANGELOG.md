@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.74.0 (26/07/2023)
+
+
+### :rocket: Amélioration
+- [#271](https://github.com/1024pix/pix-bot/pull/271) [FEATURE] Ajoute le suport du tag `BUMP` en préfixe de PR.
+
+### :coffee: Autre
+- [#277](https://github.com/1024pix/pix-bot/pull/277) Ajout d'une commande slack de déploiement pour pix-api-data.
+
 ## v1.73.0 (19/07/2023)
 
 
