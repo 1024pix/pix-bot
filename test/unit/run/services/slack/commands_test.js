@@ -4,6 +4,7 @@ const axios = require('axios');
 const { catchErr, sinon } = require('../../../../test-helper');
 const {
   createAndDeployPixLCMS,
+  createAndDeployPixAPIData,
   createAndDeployPixUI,
   createAndDeployEmberTestingLibrary,
   createAndDeployPixSiteRelease,
@@ -174,6 +175,29 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     it('should deploy the release on minimal', () => {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-minimal-production', 'v1.0.0');
+    });
+  });
+
+  describe('#createAndDeployPixAPIData', () => {
+    let client;
+
+    beforeEach(async function () {
+      // given
+      client = { deployFromArchive: sinon.spy() };
+      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPixAPIData(payload);
+    });
+
+    it('should publish a new release', () => {
+      // then
+      sinon.assert.calledWith(releasesServices.publishPixRepo, 'pix-api-data', 'minor');
+    });
+
+    it('should deploy the release on production', () => {
+      // then
+      sinon.assert.calledWith(client.deployFromArchive, 'pix-api-data-production', 'v1.0.0');
     });
   });
 

@@ -40,6 +40,15 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
+  command: '/deploy-pix-api-data',
+  path: '/slack/commands/create-and-deploy-pix-api-data-release',
+  description: 'Crée une release de pix-api-data et la déploie en production (https://api-data.pix.fr)',
+  usage_hint: '[patch, minor, major]',
+  should_escape: false,
+  handler: slackbotController.createAndDeployPixAPIDataRelease,
+});
+
+manifest.registerSlashCommand({
   command: '/deploy-pix-datawarehouse',
   path: '/slack/commands/create-and-deploy-pix-datawarehouse-release',
   description:

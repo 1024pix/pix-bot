@@ -55,6 +55,15 @@ module.exports = {
     };
   },
 
+  createAndDeployPixAPIDataRelease(request) {
+    const payload = request.pre.payload;
+    commands.createAndDeployPixAPIData(payload);
+
+    return {
+      text: _getDeployStartedMessage(payload.text, 'PIX API DATA'),
+    };
+  },
+
   createAndDeployPixDatawarehouseRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixDatawarehouse(payload);
