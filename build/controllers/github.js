@@ -14,7 +14,7 @@ const repositoryToScalingoAppsReview = {
   'pix-site': ['pix-site-review', 'pix-pro-review'],
   'pix-tutos': ['pix-tutos-review'],
   'pix-ui': ['pix-ui-review'],
-  pix: ['pix-front-review', 'pix-api-review'],
+  pix: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
   pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
 };
 
