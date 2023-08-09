@@ -24,7 +24,7 @@ describe('Acceptance | Build | Github', function () {
           };
         });
 
-        it('responds with 200, creates the RA on scalingo, disables autodeploy and pushes the git ref', async function () {
+        it('responds with 200, creates the RA on scalingo, disables autodeploy, pushes the git ref and comments the PR', async function () {
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
           const replyBody1 = {
             review_app: {
@@ -36,17 +36,30 @@ describe('Acceptance | Build | Github', function () {
               app_name: 'pix-api-review-pr2',
             },
           };
+          const replyBody3 = {
+            review_app: {
+              app_name: 'pix-audit-logger-review-pr2',
+            },
+          };
           const scalingoDeploy1 = nock('https://api.osc-fr1.scalingo.com')
             .post('/v1/apps/pix-front-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
             .reply(StatusCodes.CREATED, replyBody1);
           const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
             .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
             .reply(StatusCodes.CREATED, replyBody2);
+          const scalingoDeploy3 = nock('https://api.osc-fr1.scalingo.com')
+            .post('/v1/apps/pix-audit-logger-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
+            .reply(StatusCodes.CREATED, replyBody3);
           const scalingoUpdateOpts1 = nock('https://api.osc-fr1.scalingo.com')
             .patch('/v1/apps/pix-front-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
             .reply(StatusCodes.CREATED);
           const scalingoUpdateOpts2 = nock('https://api.osc-fr1.scalingo.com')
             .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+            .reply(StatusCodes.CREATED);
+          const scalingoUpdateOpts3 = nock('https://api.osc-fr1.scalingo.com')
+            .patch('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link', {
+              scm_repo_link: { auto_deploy_enabled: false },
+            })
             .reply(StatusCodes.CREATED);
           const scalingoSCMDeploy1 = nock('https://api.osc-fr1.scalingo.com')
             .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
@@ -54,7 +67,14 @@ describe('Acceptance | Build | Github', function () {
           const scalingoSCMDeploy2 = nock('https://api.osc-fr1.scalingo.com')
             .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
             .reply(200);
-          nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(StatusCodes.OK);
+          const scalingoSCMDeploy3 = nock('https://api.osc-fr1.scalingo.com')
+            .post('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link/manual_deploy', {
+              branch: 'my-branch',
+            })
+            .reply(200);
+          const githubNock = nock('https://api.github.com')
+            .post('/repos/github-owner/pix/issues/2/comments')
+            .reply(StatusCodes.OK);
 
           const res = await server.inject({
             method: 'POST',
@@ -66,66 +86,19 @@ describe('Acceptance | Build | Github', function () {
             payload: body,
           });
           expect(res.statusCode).to.equal(StatusCodes.OK);
-          expect(res.result).to.eql('Created RA on app pix-front-review, pix-api-review with pr 2');
+          expect(res.result).to.eql(
+            'Created RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
+          );
           expect(scalingoAuth.isDone()).to.be.true;
           expect(scalingoDeploy1.isDone()).to.be.true;
           expect(scalingoDeploy2.isDone()).to.be.true;
+          expect(scalingoDeploy3.isDone()).to.be.true;
           expect(scalingoUpdateOpts1.isDone()).to.be.true;
           expect(scalingoUpdateOpts2.isDone()).to.be.true;
+          expect(scalingoUpdateOpts3.isDone()).to.be.true;
           expect(scalingoSCMDeploy1.isDone()).to.be.true;
           expect(scalingoSCMDeploy2.isDone()).to.be.true;
-        });
-
-        it('responds with OK (200) and add application link to pull request comments', async function () {
-          // given
-          const replyBody1 = {
-            review_app: {
-              app_name: 'pix-front-review-pr2',
-            },
-          };
-          const replyBody2 = {
-            review_app: {
-              app_name: 'pix-api-review-pr2',
-            },
-          };
-          body.pull_request.labels = [];
-          nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.CREATED);
-          nock('https://api.osc-fr1.scalingo.com')
-            .post('/v1/apps/pix-front-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
-            .reply(StatusCodes.CREATED, replyBody1);
-          nock('https://api.osc-fr1.scalingo.com')
-            .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
-            .reply(StatusCodes.CREATED, replyBody2);
-          nock('https://api.osc-fr1.scalingo.com')
-            .patch('/v1/apps/pix-front-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
-            .reply(StatusCodes.CREATED);
-          nock('https://api.osc-fr1.scalingo.com')
-            .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
-            .reply(StatusCodes.CREATED);
-          nock('https://api.osc-fr1.scalingo.com')
-            .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
-            .reply(200);
-          nock('https://api.osc-fr1.scalingo.com')
-            .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
-            .reply(200);
-          const githubNock = nock('https://api.github.com')
-            .post('/repos/github-owner/pix/issues/2/comments')
-            .reply(StatusCodes.OK);
-
-          // when
-          const response = await server.inject({
-            method: 'POST',
-            url: '/github/webhook',
-            headers: {
-              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
-              'x-github-event': 'pull_request',
-            },
-            payload: body,
-          });
-
-          // then
-          expect(response.statusCode).to.equal(StatusCodes.OK);
-          expect(response.result).to.equal('Created RA on app pix-front-review, pix-api-review with pr 2');
+          expect(scalingoSCMDeploy3.isDone()).to.be.true;
           expect(githubNock.isDone()).to.be.true;
         });
 
@@ -249,6 +222,9 @@ describe('Acceptance | Build | Github', function () {
         const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
           .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
           .reply(200);
+        const scalingoDeploy3 = nock('https://api.osc-fr1.scalingo.com')
+          .post('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+          .reply(200);
 
         const res = await server.inject({
           method: 'POST',
@@ -260,10 +236,13 @@ describe('Acceptance | Build | Github', function () {
           payload: body,
         });
         expect(res.statusCode).to.equal(200);
-        expect(res.result).to.eql('Triggered deployment of RA on app pix-front-review, pix-api-review with pr 2');
+        expect(res.result).to.eql(
+          'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
+        );
         expect(scalingoAuth.isDone()).to.be.true;
         expect(scalingoDeploy1.isDone()).to.be.true;
         expect(scalingoDeploy2.isDone()).to.be.true;
+        expect(scalingoDeploy3.isDone()).to.be.true;
       });
 
       it("responds with 200 and doesn't trigger deployment when the PR state is not open", async function () {
