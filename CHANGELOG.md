@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.75.0 (09/08/2023)
+
+
+### :building_construction: Tech
+- [#285](https://github.com/1024pix/pix-bot/pull/285) [TECH] :sparkles: Ajouter l'application audit-logger dans la configuration des RA du monorepo .
+
 ## v1.74.0 (26/07/2023)
 
 
