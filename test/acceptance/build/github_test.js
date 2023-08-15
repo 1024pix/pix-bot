@@ -1,5 +1,6 @@
 const { expect, StatusCodes, createGithubWebhookSignatureHeader, nock } = require('../../test-helper');
 const server = require('../../../server');
+const { PIX_MONOREPO_APPS }= require('../../../config').scalingo;
 
 describe('Acceptance | Build | Github', function () {
   describe('POST /github/webhook', function () {
@@ -322,6 +323,65 @@ describe('Acceptance | Build | Github', function () {
         });
         expect(res.statusCode).to.equal(200);
         expect(res.result).to.eql('RA disabled for this PR');
+      });
+    });
+
+    describe('on pull request push event', function () {
+      beforeEach(function () {
+        body = {
+          "ref": "refs/heads/main",
+          "repository": {
+            "name": "pix-bot",
+            "full_name": "1024pix/pix-bot",
+            "owner": {
+              "name": "1024pix",
+              "login": "1024pix",
+            },
+            "fork": false,
+            "visibility": "public",
+            "default_branch": "main",
+            "master_branch": "main",
+            "organization": "1024pix",
+          },
+        };
+      });
+
+      it.only('responds with 200 and deploys the integration branch on scalingo', async function () {
+        const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+        let scalingoDeployNocks=[];
+        let expectedOutput="Triggered deployment of integration on";
+        PIX_MONOREPO_APPS.forEach(application => {
+          expectedOutput+=` pix-${application}-integration`;
+        });
+        const deployedArchive={
+          git_ref: 'dev',
+          source_url: `https://github.com/github-owner/github-repository/archive/dev.tar.gz`,
+        }
+        expectedOutput+=" for project Pix";
+        console.log(PIX_MONOREPO_APPS);
+        PIX_MONOREPO_APPS.forEach(application => {
+          scalingoDeployNocks[application]=nock('https://api.osc-fr1.scalingo.com')
+          .post(`/v1/apps/pix-${application}-integration/deployments`, deployedArchive)
+          .reply(200); 
+        });
+
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'push',
+          },
+          payload: body,
+        });
+
+        expect(res.statusCode).to.equal(200);
+        expect(scalingoAuth.isDone()).to.be.true;
+        scalingoDeployNocks.forEach(nock => {
+          expect(nock.isDone()).to.be.true;
+        });
+
+        expect(res.result).to.eql(expectedOutput);
       });
     });
 

@@ -145,24 +145,32 @@ function _handleNoRACase(request) {
   return { shouldContinue: true };
 }
 
+function deployMonorepoIntegration(){
+
+}
+
 module.exports = {
   getMessageTemplate,
   getMessage,
   addMessageToPullRequest,
   async processWebhook(request) {
     const eventName = request.headers['x-github-event'];
-    if (eventName === 'pull_request') {
-      switch (request.payload.action) {
-        case 'opened':
-          return pullRequestOpenedWebhook(request);
-        case 'reopened':
-          return pullRequestOpenedWebhook(request);
-        case 'synchronize':
-          return pullRequestSynchronizeWebhook(request);
-      }
-      return `Ignoring ${request.payload.action} action`;
-    } else {
-      return `Ignoring ${eventName} event`;
+    switch (eventName) {
+      case 'pull_request':
+        switch (request.payload.action) {
+          case 'opened':
+            return pullRequestOpenedWebhook(request);
+          case 'reopened':
+            return pullRequestOpenedWebhook(request);
+          case 'synchronize':
+            return pullRequestSynchronizeWebhook(request);
+        }
+        return `Ignoring ${request.payload.action} action`;
+      case 'push':
+        deployMonorepoIntegration();
+        break;
+      default:
+        return `Ignoring ${eventName} event`;
     }
   },
 };

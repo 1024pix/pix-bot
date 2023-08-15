@@ -143,6 +143,7 @@ module.exports = (function () {
     config.scalingo.recette.apiUrl = 'https://scalingo.recette';
     config.scalingo.production.token = 'tk-us-scalingo-token-production';
     config.scalingo.production.apiUrl = 'https://scalingo.production';
+    config.scalingo.PIX_MONOREPO_APPS=['app', 'certif', 'admin', 'orga', 'api', '1d','audit-logger'],
 
     config.prismic.secret = 'prismic-secret';
   }
