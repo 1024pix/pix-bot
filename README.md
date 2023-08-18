@@ -79,7 +79,7 @@ const repositoryToScalingoAppsReview = {
 You can have more than one Scalingo application per GitHub repository.
 
 ### Customize review-application comment
-A comment is added to teh pull request, including:
+A comment is added to the pull request, including:
 - review application URL;
 - review application administration URL.
 
