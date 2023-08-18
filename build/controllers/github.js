@@ -4,6 +4,7 @@ const path = require('path');
 const ScalingoClient = require('../../common/services/scalingo-client');
 const gitHubService = require('../../common/services/github');
 const logger = require('../../common/services/logger');
+const config = require('../../config');
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
@@ -121,6 +122,25 @@ async function pullRequestSynchronizeWebhook(request) {
   return `Triggered deployment of RA on app ${reviewApps.join(', ')} with pr ${prId}`;
 }
 
+async function pushOnDefaultBranchWebhook(request) {
+  const branchName = request.payload.ref.split('/').slice(-1)[0];
+  if (request.payload.repository.default_branch != branchName) {
+    return `Ignoring push event on branch ${branchName} as it is not the default branch`;
+  }
+
+  const repositoryName = request.payload.repository.name;
+
+  if (!(repositoryName in config.scalingo.repositoryToScalingoIntegration)) {
+    return `Ignoring push event on repository ${repositoryName} as it is not configured`;
+  }
+  const client = await ScalingoClient.getInstance('integration');
+  for (const applicationName of config.scalingo.repositoryToScalingoIntegration[repositoryName]) {
+    await client.deployFromArchive(applicationName, branchName, repositoryName, { withEnvSuffix: false });
+  }
+
+  return 'Deploying branch default_branch_name on integration applications : front1-integration, front2-integration, api-integration';
+}
+
 function _handleNoRACase(request) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
@@ -151,7 +171,9 @@ module.exports = {
   addMessageToPullRequest,
   async processWebhook(request) {
     const eventName = request.headers['x-github-event'];
-    if (eventName === 'pull_request') {
+    if (eventName === 'push') {
+      return pushOnDefaultBranchWebhook(request);
+    } else if (eventName === 'pull_request') {
       switch (request.payload.action) {
         case 'opened':
           return pullRequestOpenedWebhook(request);
