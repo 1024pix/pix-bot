@@ -389,6 +389,67 @@ describe('Acceptance | Build | Github', function () {
           expect(scalingoDeployFront2.isDone()).to.be.true;
           expect(scalingoDeployApi.isDone()).to.be.true;
         });
+        describe('when scalingo returns an error during deployment', function () {
+          it('responds with 500', async function () {
+            // given
+            sinon.stub(config.scalingo, 'repositoryToScalingoIntegration').value({
+              'pix-repo': ['pix-front1-integration', 'pix-front2-integration', 'pix-api-integration'],
+            });
+            const default_branch = 'default_branch_name';
+            const branch = 'default_branch_name';
+            const scalingoDeploymentPayload = {
+              deployment: {
+                git_ref: 'default_branch_name',
+                source_url: 'https://undefined@github.com/github-owner/pix-repo/archive/default_branch_name.tar.gz',
+              },
+            };
+            nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+            const scalingoDeployFront1 = nock('https://api.osc-fr1.scalingo.com')
+              .post('/v1/apps/pix-front1-integration/deployments', scalingoDeploymentPayload)
+              .reply(200);
+            const scalingoDeployFront2 = nock('https://api.osc-fr1.scalingo.com')
+              .post('/v1/apps/pix-front2-integration/deployments', scalingoDeploymentPayload)
+              .reply(500, { message: 'error' });
+            const scalingoDeployApi = nock('https://api.osc-fr1.scalingo.com')
+              .post('/v1/apps/pix-api-integration/deployments', scalingoDeploymentPayload)
+              .reply(200);
+
+            const body = {
+              ref: `refs/heads/${branch}`,
+              repository: {
+                name: 'pix-repo',
+                full_name: '1024pix/pix-repo',
+                owner: {
+                  name: '1024pix',
+                  login: '1024pix',
+                },
+                fork: false,
+                visibility: 'public',
+                default_branch,
+                master_branch: 'main',
+                organization: '1024pix',
+              },
+            };
+
+            //when
+            const res = await server.inject({
+              method: 'POST',
+              url: '/github/webhook',
+              headers: {
+                ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+                'x-github-event': 'push',
+              },
+              payload: body,
+            });
+
+            // then
+            expect(res.statusCode).to.equal(StatusCodes.INTERNAL_SERVER_ERROR);
+            expect(res.result.message).to.equal('An internal server error occurred');
+            expect(scalingoDeployFront1.isDone()).to.be.true;
+            expect(scalingoDeployFront2.isDone()).to.be.true;
+            expect(scalingoDeployApi.isDone()).to.be.false;
+          });
+        });
       });
 
       describe('on any branch but the default one', function () {
