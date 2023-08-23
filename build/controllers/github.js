@@ -135,7 +135,11 @@ async function pushOnDefaultBranchWebhook(request) {
   }
   const client = await ScalingoClient.getInstance('integration');
   for (const applicationName of config.scalingo.repositoryToScalingoIntegration[repositoryName]) {
-    await client.deployFromArchive(applicationName, branchName, repositoryName, { withEnvSuffix: false });
+    try {
+      await client.deployFromArchive(applicationName, branchName, repositoryName, { withEnvSuffix: false });
+    } catch (error) {
+      throw new Error(`Error during Scalingo deployment of application ${applicationName} : ${error.message}`);
+    }
   }
 
   return 'Deploying branch default_branch_name on integration applications : front1-integration, front2-integration, api-integration';
