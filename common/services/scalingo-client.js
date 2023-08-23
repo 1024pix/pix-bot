@@ -13,6 +13,9 @@ class ScalingoClient {
 
   static async getInstance(environment, injectedClient = scalingo) {
     const { token, apiUrl } = config.scalingo[environment];
+    if (!token || !apiUrl) {
+      throw new Error(`Scalingo credentials missing for environment ${environment}`);
+    }
     const client = await injectedClient.clientFromToken(token, { apiUrl });
     return new ScalingoClient(client, environment);
   }
