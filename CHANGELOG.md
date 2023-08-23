@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.76.0 (23/08/2023)
+
+
+### :rocket: Amélioration
+- [#290](https://github.com/1024pix/pix-bot/pull/290) [FEATURE] Déployer l'intégration du monorepo avec Pix Bot (PIX-8933).
+
+### :arrow_up: Montée de version
+- [#291](https://github.com/1024pix/pix-bot/pull/291) [BUMP] Lock file maintenance (dossier racine).
+- [#289](https://github.com/1024pix/pix-bot/pull/289) [BUMP] Update node.
+- [#288](https://github.com/1024pix/pix-bot/pull/288) [BUMP] Update dependency lint-staged to v14 (dossier racine).
+- [#287](https://github.com/1024pix/pix-bot/pull/287) [BUMP] Update dependency eslint-config-prettier to v9 (dossier racine).
+
 ## v1.75.0 (09/08/2023)
 
 
