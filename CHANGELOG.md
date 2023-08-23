@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.76.1 (23/08/2023)
+
+
+### :bug: Correction
+- [#292](https://github.com/1024pix/pix-bot/pull/292) [BUGFIX] Gérer les erreurs Scalingo lors du déploiement des applications d'integration.
+
 ## v1.76.0 (23/08/2023)
 
 
