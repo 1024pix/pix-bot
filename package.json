@@ -16,6 +16,7 @@
     "lint": "npm run lint:dependencies && npm run lint:code",
     "lint:code": "eslint .",
     "lint:dependencies": "depcheck",
+    "lint:fix": "eslint --fix .",
     "local:trigger-lint-on-commit": "husky install",
     "local:prevent-trigger-lint-on-commit": "git config --unset core.hooksPath",
     "preinstall": "npx check-engine",

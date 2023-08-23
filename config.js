@@ -60,6 +60,17 @@ module.exports = (function () {
       validAppNbCharMax: 46,
       validAppNbCharMin: 6,
       maxLogLength: process.env.MAX_LOG_LENGTH || 1000,
+      repositoryToScalingoIntegration: {
+        pix: [
+          'pix-api-integration',
+          'pix-audit-logger-integration',
+          'pix-app-integration',
+          'pix-certif-integration',
+          'pix-orga-integration',
+          'pix-admin-integration',
+          'pix-1d-integration',
+        ],
+      },
     },
 
     openApi: {

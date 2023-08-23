@@ -1,5 +1,6 @@
-const { expect, StatusCodes, createGithubWebhookSignatureHeader, nock } = require('../../test-helper');
+const { expect, sinon, StatusCodes, createGithubWebhookSignatureHeader, nock } = require('../../test-helper');
 const server = require('../../../server');
+const config = require('../../../config');
 
 describe('Acceptance | Build | Github', function () {
   describe('POST /github/webhook', function () {
@@ -322,6 +323,150 @@ describe('Acceptance | Build | Github', function () {
         });
         expect(res.statusCode).to.equal(200);
         expect(res.result).to.eql('RA disabled for this PR');
+      });
+    });
+
+    describe('on push event', function () {
+      describe('on the default branch', function () {
+        it('responds with 200 and deploys the corresponding integration applications', async function () {
+          // given
+          sinon.stub(config.scalingo, 'repositoryToScalingoIntegration').value({
+            'pix-repo': ['pix-front1-integration', 'pix-front2-integration', 'pix-api-integration'],
+          });
+          const default_branch = 'default_branch_name';
+          const branch = 'default_branch_name';
+          const scalingoDeploymentPayload = {
+            deployment: {
+              git_ref: 'default_branch_name',
+              source_url: 'https://undefined@github.com/github-owner/pix-repo/archive/default_branch_name.tar.gz',
+            },
+          };
+          nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+          const scalingoDeployFront1 = nock('https://api.osc-fr1.scalingo.com')
+            .post('/v1/apps/pix-front1-integration/deployments', scalingoDeploymentPayload)
+            .reply(200);
+          const scalingoDeployFront2 = nock('https://api.osc-fr1.scalingo.com')
+            .post('/v1/apps/pix-front2-integration/deployments', scalingoDeploymentPayload)
+            .reply(200);
+          const scalingoDeployApi = nock('https://api.osc-fr1.scalingo.com')
+            .post('/v1/apps/pix-api-integration/deployments', scalingoDeploymentPayload)
+            .reply(200);
+
+          const body = {
+            ref: `refs/heads/${branch}`,
+            repository: {
+              name: 'pix-repo',
+              full_name: '1024pix/pix-repo',
+              owner: {
+                name: '1024pix',
+                login: '1024pix',
+              },
+              fork: false,
+              visibility: 'public',
+              default_branch,
+              master_branch: 'main',
+              organization: '1024pix',
+            },
+          };
+
+          //when
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'push',
+            },
+            payload: body,
+          });
+
+          // then
+          expect(res.statusCode).to.equal(200);
+          expect(res.result).to.equal(
+            'Deploying branch default_branch_name on integration applications : front1-integration, front2-integration, api-integration',
+          );
+          expect(scalingoDeployFront1.isDone()).to.be.true;
+          expect(scalingoDeployFront2.isDone()).to.be.true;
+          expect(scalingoDeployApi.isDone()).to.be.true;
+        });
+      });
+
+      describe('on any branch but the default one', function () {
+        it('responds with 200 and do nothing', async function () {
+          // when
+          const default_branch = 'main';
+          const branch = 'pushedBranch';
+
+          const body = {
+            ref: `refs/heads/${branch}`,
+            repository: {
+              name: 'pix-repo',
+              full_name: '1024pix/pix-repo',
+              owner: {
+                name: '1024pix',
+                login: '1024pix',
+              },
+              fork: false,
+              visibility: 'public',
+              default_branch,
+              master_branch: 'main',
+              organization: '1024pix',
+            },
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'push',
+            },
+            payload: body,
+          });
+          // then
+          expect(res.statusCode).to.equal(200);
+          expect(res.result).to.equal('Ignoring push event on branch pushedBranch as it is not the default branch');
+        });
+      });
+
+      describe('on a unconfigured repository', function () {
+        it('responds with 200 and do nothing', async function () {
+          // when
+          sinon.stub(config.scalingo, 'repositoryToScalingoIntegration').value({
+            repository: ['pix-front1-integration', 'pix-front2-integration', 'pix-api-integration'],
+          });
+          const repositoryName = 'not-configured-repository';
+
+          const body = {
+            ref: `refs/heads/main`,
+            repository: {
+              name: repositoryName,
+              full_name: '1024pix/${repositoryName}',
+              owner: {
+                name: '1024pix',
+                login: '1024pix',
+              },
+              fork: false,
+              visibility: 'public',
+              default_branch: 'main',
+              master_branch: 'main',
+              organization: '1024pix',
+            },
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'push',
+            },
+            payload: body,
+          });
+          // then
+          expect(res.statusCode).to.equal(200);
+          expect(res.result).to.equal(
+            'Ignoring push event on repository not-configured-repository as it is not configured',
+          );
+        });
       });
     });
 

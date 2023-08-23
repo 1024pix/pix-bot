@@ -88,6 +88,27 @@ If not, create a custom one in the folder.
 
 ## Test 
 
+### GitHub integration
+
+Generate a secret and store it in `.env`file `GITHUB_WEBHOOK_SECRET` variable.
+
+Start the server.
+`npm start`
+
+Expose it.
+`ngrok http 3000`
+
+Create a webhook on Github organization (or repository) :
+- Payload URL = https://<SOMETHING>.ngrok.io/github/webhook
+- Content type: application/JSON
+- secret = <GITHUB_WEBHOOK_SECRET>
+- SSL verification = Disabled
+- Which events would you like to trigger this webhook? send me everything
+
+Perform some action on Github and check
+- ngrok receive Github request
+- pix-bot API process them
+
 ### Test the endpoint on Slack
 
 If you want to test your new endpoint before deploying it, 
