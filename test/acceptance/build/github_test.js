@@ -383,7 +383,7 @@ describe('Acceptance | Build | Github', function () {
           // then
           expect(res.statusCode).to.equal(200);
           expect(res.result).to.equal(
-            'Deploying branch default_branch_name on integration applications : front1-integration, front2-integration, api-integration',
+            'Deploying branch default_branch_name on integration applications : pix-front1-integration, pix-front2-integration, pix-api-integration',
           );
           expect(scalingoDeployFront1.isDone()).to.be.true;
           expect(scalingoDeployFront2.isDone()).to.be.true;
