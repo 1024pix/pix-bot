@@ -150,6 +150,10 @@ module.exports = (function () {
 
     config.openApi.authorizationToken = 'open-api-token';
 
+    config.scalingo.reviewApps.token = 'tk-us-scalingo-token-reviewApps';
+    config.scalingo.reviewApps.apiUrl = 'https://scalingo.reviewApps';
+    config.scalingo.integration.token = 'tk-us-scalingo-token-integration';
+    config.scalingo.integration.apiUrl = 'https://scalingo.integration';
     config.scalingo.recette.token = 'tk-us-scalingo-token-recette';
     config.scalingo.recette.apiUrl = 'https://scalingo.recette';
     config.scalingo.production.token = 'tk-us-scalingo-token-production';

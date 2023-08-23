@@ -42,33 +42,33 @@ describe('Acceptance | Build | Github', function () {
               app_name: 'pix-audit-logger-review-pr2',
             },
           };
-          const scalingoDeploy1 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoDeploy1 = nock('https://scalingo.reviewApps')
             .post('/v1/apps/pix-front-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
             .reply(StatusCodes.CREATED, replyBody1);
-          const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoDeploy2 = nock('https://scalingo.reviewApps')
             .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
             .reply(StatusCodes.CREATED, replyBody2);
-          const scalingoDeploy3 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoDeploy3 = nock('https://scalingo.reviewApps')
             .post('/v1/apps/pix-audit-logger-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
             .reply(StatusCodes.CREATED, replyBody3);
-          const scalingoUpdateOpts1 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoUpdateOpts1 = nock('https://scalingo.reviewApps')
             .patch('/v1/apps/pix-front-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
             .reply(StatusCodes.CREATED);
-          const scalingoUpdateOpts2 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoUpdateOpts2 = nock('https://scalingo.reviewApps')
             .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
             .reply(StatusCodes.CREATED);
-          const scalingoUpdateOpts3 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoUpdateOpts3 = nock('https://scalingo.reviewApps')
             .patch('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link', {
               scm_repo_link: { auto_deploy_enabled: false },
             })
             .reply(StatusCodes.CREATED);
-          const scalingoSCMDeploy1 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoSCMDeploy1 = nock('https://scalingo.reviewApps')
             .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
             .reply(200);
-          const scalingoSCMDeploy2 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoSCMDeploy2 = nock('https://scalingo.reviewApps')
             .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
             .reply(200);
-          const scalingoSCMDeploy3 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoSCMDeploy3 = nock('https://scalingo.reviewApps')
             .post('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link/manual_deploy', {
               branch: 'my-branch',
             })
@@ -217,13 +217,13 @@ describe('Acceptance | Build | Github', function () {
 
       it('responds with 200 and create a deployment on scalingo', async function () {
         const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
-        const scalingoDeploy1 = nock('https://api.osc-fr1.scalingo.com')
+        const scalingoDeploy1 = nock('https://scalingo.reviewApps')
           .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
           .reply(200);
-        const scalingoDeploy2 = nock('https://api.osc-fr1.scalingo.com')
+        const scalingoDeploy2 = nock('https://scalingo.reviewApps')
           .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
           .reply(200);
-        const scalingoDeploy3 = nock('https://api.osc-fr1.scalingo.com')
+        const scalingoDeploy3 = nock('https://scalingo.reviewApps')
           .post('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
           .reply(200);
 
@@ -342,13 +342,13 @@ describe('Acceptance | Build | Github', function () {
             },
           };
           nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
-          const scalingoDeployFront1 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoDeployFront1 = nock('https://scalingo.integration')
             .post('/v1/apps/pix-front1-integration/deployments', scalingoDeploymentPayload)
             .reply(200);
-          const scalingoDeployFront2 = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoDeployFront2 = nock('https://scalingo.integration')
             .post('/v1/apps/pix-front2-integration/deployments', scalingoDeploymentPayload)
             .reply(200);
-          const scalingoDeployApi = nock('https://api.osc-fr1.scalingo.com')
+          const scalingoDeployApi = nock('https://scalingo.integration')
             .post('/v1/apps/pix-api-integration/deployments', scalingoDeploymentPayload)
             .reply(200);
 
@@ -404,13 +404,13 @@ describe('Acceptance | Build | Github', function () {
               },
             };
             nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
-            const scalingoDeployFront1 = nock('https://api.osc-fr1.scalingo.com')
+            const scalingoDeployFront1 = nock('https://scalingo.integration')
               .post('/v1/apps/pix-front1-integration/deployments', scalingoDeploymentPayload)
               .reply(200);
-            const scalingoDeployFront2 = nock('https://api.osc-fr1.scalingo.com')
+            const scalingoDeployFront2 = nock('https://scalingo.integration')
               .post('/v1/apps/pix-front2-integration/deployments', scalingoDeploymentPayload)
               .reply(500, { message: 'error' });
-            const scalingoDeployApi = nock('https://api.osc-fr1.scalingo.com')
+            const scalingoDeployApi = nock('https://scalingo.integration')
               .post('/v1/apps/pix-api-integration/deployments', scalingoDeploymentPayload)
               .reply(200);
 
