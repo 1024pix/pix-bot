@@ -46,6 +46,21 @@ describe('Scalingo client', () => {
       expect(scalingoClient.client).to.exist;
     });
 
+    it('should throw an error when no token is provided', async () => {
+      // given
+      sinon.stub(config.scalingo, 'integration').value({
+        token: undefined,
+        url: 'https://api.osc-fr1.scalingo.com',
+      });
+      // when
+      try {
+        await ScalingoClient.getInstance('integration');
+        expect.fail('should raise an error when credentials are missing');
+      } catch (e) {
+        expect(e.message).to.equal('Scalingo credentials missing for environment integration');
+      }
+    });
+
     it('should throw an error when scalingo authentication failed', async () => {
       // given
       const clientStub = {

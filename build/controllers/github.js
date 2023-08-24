@@ -133,8 +133,9 @@ async function pushOnDefaultBranchWebhook(request) {
   if (!(repositoryName in config.scalingo.repositoryToScalingoIntegration)) {
     return `Ignoring push event on repository ${repositoryName} as it is not configured`;
   }
+  const scalingoApps = config.scalingo.repositoryToScalingoIntegration[repositoryName];
   const client = await ScalingoClient.getInstance('integration');
-  for (const applicationName of config.scalingo.repositoryToScalingoIntegration[repositoryName]) {
+  for (const applicationName of scalingoApps) {
     try {
       await client.deployFromArchive(applicationName, branchName, repositoryName, { withEnvSuffix: false });
     } catch (error) {
@@ -142,7 +143,7 @@ async function pushOnDefaultBranchWebhook(request) {
     }
   }
 
-  return 'Deploying branch default_branch_name on integration applications : front1-integration, front2-integration, api-integration';
+  return `Deploying branch ${branchName} on integration applications : ` + scalingoApps.join(', ');
 }
 
 function _handleNoRACase(request) {
