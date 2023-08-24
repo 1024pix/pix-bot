@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.77.0 (24/08/2023)
+
+
+### :bug: Correction
+- [#293](https://github.com/1024pix/pix-bot/pull/293) [BUGFIX] Vérifier que la configuration Scalingo est fournie avant l'appel d'authentification.
+
 ## v1.76.1 (23/08/2023)
 
 
