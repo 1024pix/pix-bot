@@ -1,10 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const { expect, sinon } = require('../../../test-helper');
+const { catchErr, expect, sinon } = require('../../../test-helper');
 const githubController = require('../../../../build/controllers/github');
 
 const githubService = require('../../../../common/services/github');
+const config = require('../../../../config');
 
 describe('#getMessageTemplate', function () {
   it('get a specific message per repository', function () {
@@ -97,7 +98,7 @@ describe('#processWebhook', function () {
   });
 
   describe('when event is handled', function () {
-    describe('when event is pushed', function () {
+    describe('when event is push', function () {
       it('should call pushOnDefaultBranchWebhook() method', async function () {
         // given
         const request = {
@@ -115,6 +116,7 @@ describe('#processWebhook', function () {
         expect(injectedPushOnDefaultBranchWebhook.calledOnceWithExactly(request)).to.be.true;
       });
     });
+
     describe('when event is pull_request', function () {
       const request = {
         headers: {
@@ -149,6 +151,7 @@ describe('#processWebhook', function () {
         // then
         expect(injectedPullRequestSynchronizeWebhook.calledOnceWithExactly(request)).to.be.true;
       });
+
       it('should ignore the action', async function () {
         // given
         sinon.stub(request, 'payload').value({ action: 'unhandled-action' });
@@ -159,6 +162,113 @@ describe('#processWebhook', function () {
         // then
         expect(result).to.equal('Ignoring unhandled-action action');
       });
+    });
+  });
+});
+
+describe('#pushOnDefaultBranchWebhook', function () {
+  const default_branch = 'default_branch_name';
+  const request = {
+    payload: {
+      ref: `refs/heads/${default_branch}`,
+      repository: {
+        name: 'pix-repo',
+        full_name: '1024pix/pix-repo',
+        owner: {
+          name: '1024pix',
+          login: '1024pix',
+        },
+        fork: false,
+        visibility: 'public',
+        default_branch,
+        master_branch: 'main',
+        organization: '1024pix',
+      },
+    },
+  };
+
+  describe('when push is not on the default branch', function () {
+    it('should ignore the push', async function () {
+      // given
+      sinon.stub(request.payload, 'ref').value('ref/heads/non_default_branch');
+
+      // when
+      const result = await githubController.pushOnDefaultBranchWebhook(request);
+
+      // then
+      expect(result).to.equal('Ignoring push event on branch non_default_branch as it is not the default branch');
+    });
+  });
+
+  describe('when push is not on a configured repository', function () {
+    it('should ignore the push', async function () {
+      // given
+      sinon.stub(request.payload.repository, 'name').value('unhandled_repo');
+
+      // when
+      const result = await githubController.pushOnDefaultBranchWebhook(request);
+
+      // then
+      expect(result).to.equal('Ignoring push event on repository unhandled_repo as it is not configured');
+    });
+  });
+
+  describe('when deploying main branch on configured repository', function () {
+    it('calls scalingo to deploy the corresponding applications', async function () {
+      // given
+      const injectedScalingoClientStub = sinon.stub();
+      const deployFromArchiveStub = sinon.stub();
+      injectedScalingoClientStub.getInstance = sinon.stub().returns({
+        deployFromArchive: deployFromArchiveStub,
+      });
+
+      sinon.stub(config.scalingo, 'repositoryToScalingoIntegration').value({
+        'pix-repo': ['pix-front1-integration', 'pix-front2-integration', 'pix-api-integration'],
+      });
+
+      // when
+      const result = await githubController.pushOnDefaultBranchWebhook(request, injectedScalingoClientStub);
+
+      // then
+      expect(result).to.equal(
+        'Deploying branch default_branch_name on integration applications : pix-front1-integration, pix-front2-integration, pix-api-integration',
+      );
+      expect(
+        deployFromArchiveStub.firstCall.calledWith('pix-front1-integration', 'default_branch_name', 'pix-repo', {
+          withEnvSuffix: false,
+        }),
+      ).to.be.true;
+      expect(
+        deployFromArchiveStub.secondCall.calledWith('pix-front2-integration', 'default_branch_name', 'pix-repo', {
+          withEnvSuffix: false,
+        }),
+      ).to.be.true;
+      expect(
+        deployFromArchiveStub.thirdCall.calledWith('pix-api-integration', 'default_branch_name', 'pix-repo', {
+          withEnvSuffix: false,
+        }),
+      ).to.be.true;
+    });
+    it('throws an error on scalingo deployment fails', async function () {
+      // given
+      const injectedScalingoClientStub = sinon.stub();
+      const deployFromArchiveStub = sinon.stub().rejects(new Error('Deployment error'));
+      injectedScalingoClientStub.getInstance = sinon.stub().returns({
+        deployFromArchive: deployFromArchiveStub,
+      });
+
+      sinon.stub(config.scalingo, 'repositoryToScalingoIntegration').value({
+        'pix-repo': ['pix-front1-integration', 'pix-front2-integration', 'pix-api-integration'],
+      });
+
+      // when
+      const result = await catchErr(githubController.pushOnDefaultBranchWebhook)(request, injectedScalingoClientStub);
+
+      // then
+      expect(result).to.be.instanceOf(Error);
+      expect(result.message).to.equal(
+        'Error during Scalingo deployment of application pix-front1-integration : Deployment error',
+      );
     });
   });
 });

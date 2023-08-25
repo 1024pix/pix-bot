@@ -201,4 +201,5 @@ module.exports = {
   getMessage,
   addMessageToPullRequest,
   processWebhook,
+  pushOnDefaultBranchWebhook,
 };
