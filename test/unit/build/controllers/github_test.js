@@ -419,3 +419,117 @@ describe('#pullRequestOpenedWebhook', function () {
     });
   });
 });
+
+describe('#pullRequestSynchronizeWebhook', function () {
+  const request = {
+    payload: {
+      number: 3,
+      pull_request: {
+        state: 'open',
+        labels: [],
+        head: {
+          ref: 'my-branch',
+          repo: {
+            name: 'pix',
+            fork: false,
+          },
+        },
+      },
+    },
+  };
+
+  describe('when the Review App creation conditions are not met', function () {
+    describe('when the project is a fork', function () {
+      it('should not create a Review App', async function () {
+        // given
+        sinon.stub(request.payload.pull_request.head.repo, 'fork').value(true);
+
+        // when
+        const response = await githubController.pullRequestSynchronizeWebhook(request);
+
+        // then
+        expect(response).to.equal('No RA for a fork');
+      });
+    });
+
+    describe('when there is no RA configured for this repository', function () {
+      it('should not create a Review App', async function () {
+        // given
+        sinon.stub(request.payload.pull_request.head.repo, 'name').value('no-ra-app-repo-name');
+
+        // when
+        const response = await githubController.pullRequestSynchronizeWebhook(request);
+
+        // then
+        expect(response).to.equal('No RA configured for this repository');
+      });
+    });
+
+    describe('when there is a no-review-app label on the PR', function () {
+      it('should not create a Review App', async function () {
+        // given
+        sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'no-review-app' }]);
+
+        // when
+        const response = await githubController.pullRequestSynchronizeWebhook(request);
+
+        // then
+        expect(response).to.equal('RA disabled for this PR');
+      });
+    });
+
+    describe('when the PR is not opened', function () {
+      it('should not create a Review App', async function () {
+        // given
+        sinon.stub(request.payload.pull_request, 'state').value('closed');
+
+        // when
+        const response = await githubController.pullRequestSynchronizeWebhook(request);
+
+        // then
+        expect(response).to.equal('No RA for closed PR');
+      });
+    });
+  });
+
+  describe('when the Review App creation conditions are met', function () {
+    it('should calls scalingo to deploy the corresponding applications', async function () {
+      // given
+      const injectedScalingoClientStub = sinon.stub();
+      const deployUsingSCMStub = sinon.stub();
+      injectedScalingoClientStub.getInstance = sinon.stub().returns({
+        deployUsingSCM: deployUsingSCMStub,
+      });
+
+      // when
+      const response = await githubController.pullRequestSynchronizeWebhook(request, injectedScalingoClientStub);
+
+      // then
+      expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
+      expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
+      expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+      expect(response).to.equal(
+        'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 3',
+      );
+    });
+
+    it('throws an error on scalingo deployment fails', async function () {
+      // given
+      const injectedScalingoClientStub = sinon.stub();
+      const deployUsingSCMStub = sinon.stub().rejects(new Error('Deployment error'));
+      injectedScalingoClientStub.getInstance = sinon.stub().returns({
+        deployUsingSCM: deployUsingSCMStub,
+      });
+
+      // when
+      const result = await catchErr(githubController.pullRequestSynchronizeWebhook)(
+        request,
+        injectedScalingoClientStub,
+      );
+
+      // then
+      expect(result).to.be.instanceOf(Error);
+      expect(result.message).to.equal('Scalingo APIError: Deployment error');
+    });
+  });
+});

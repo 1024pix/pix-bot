@@ -96,7 +96,7 @@ async function pullRequestOpenedWebhook(
   }
 }
 
-async function pullRequestSynchronizeWebhook(request) {
+async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = ScalingoClient) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
   const ref = payload.pull_request.head.ref;
@@ -109,7 +109,7 @@ async function pullRequestSynchronizeWebhook(request) {
   }
 
   try {
-    const client = await ScalingoClient.getInstance('reviewApps');
+    const client = await injectedScalingoClient.getInstance('reviewApps');
     for (const appName of reviewApps) {
       const reviewAppName = `${appName}-pr${prId}`;
       await client.deployUsingSCM(reviewAppName, ref);
@@ -201,10 +201,11 @@ function _handleNoRACase(request) {
 }
 
 module.exports = {
-  getMessageTemplate,
-  getMessage,
   addMessageToPullRequest,
+  getMessage,
+  getMessageTemplate,
   processWebhook,
-  pushOnDefaultBranchWebhook,
   pullRequestOpenedWebhook,
+  pullRequestSynchronizeWebhook,
+  pushOnDefaultBranchWebhook,
 };
