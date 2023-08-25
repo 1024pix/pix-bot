@@ -240,7 +240,7 @@ describe('Acceptance | Build | Slack', function () {
                   type: 'section',
                   text: {
                     type: 'mrkdwn',
-                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
+                    text: `:warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Voici les équipes qui semblent concernées : cross-team,team-eval. À confirmer dans les PRs suivantes :\n- <https://github.com/undefined/undefined/pull/1327|PR #1327>\n- <https://github.com/undefined/undefined/pull/2438|PR #2438>. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.`,
                   },
                 },
                 {
