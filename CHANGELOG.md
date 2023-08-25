@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.78.0 (25/08/2023)
+
+
+### :coffee: Autre
+- [#294](https://github.com/1024pix/pix-bot/pull/294) Déployer audit-logger automatiquement lors de MER / MEP.
+
 ## v1.77.0 (24/08/2023)
 
 
