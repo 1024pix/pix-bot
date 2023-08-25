@@ -43,7 +43,7 @@ describe('releases', function () {
       // when
       const response = await releasesService.deploy('production', 'v1.0');
       // then
-      expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK', 'OK']);
+      expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK']);
     });
 
     it('should ask scalingo to deploy applications', async () => {
@@ -55,7 +55,7 @@ describe('releases', function () {
       // when
       await releasesService.deploy('production', 'v1.0 ');
       // then
-      expect(scalingoClient.deployFromArchive.callCount).to.equal(6);
+      expect(scalingoClient.deployFromArchive.callCount).to.equal(7);
       expect(scalingoClient.deployFromArchive.args).to.deep.equal([
         ['pix-app', 'v1.0'],
         ['pix-certif', 'v1.0'],
@@ -63,6 +63,7 @@ describe('releases', function () {
         ['pix-orga', 'v1.0'],
         ['pix-api', 'v1.0'],
         ['pix-1d', 'v1.0'],
+        ['pix-audit-logger', 'v1.0'],
       ]);
     });
 
@@ -76,7 +77,7 @@ describe('releases', function () {
       // when
       await releasesService.deploy('production', tag);
       // then
-      expect(scalingoClient.deployFromArchive.callCount).to.equal(6);
+      expect(scalingoClient.deployFromArchive.callCount).to.equal(7);
       expect(scalingoClient.deployFromArchive.firstCall.args[1]).to.equal('v1.0.0');
     });
 
