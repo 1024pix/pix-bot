@@ -11,7 +11,8 @@ const config = require('../../../config');
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-    const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestRelease();
+    const configFilesChangedCommits = await githubService.getConfigFileChangedCommitsInLatestRelease();
+    const hasConfigFileChanged = configFilesChangedCommits.length > 0;
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 

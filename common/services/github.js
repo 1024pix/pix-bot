@@ -392,17 +392,20 @@ module.exports = {
     return pullRequestsSinceLatestRelease.map((PR) => `${PR.title}`);
   },
 
-  async hasConfigFileChangedSinceLatestRelease(
+  async getConfigFileChangedCommitsSinceLatestRelease(
     repoOwner = settings.github.owner,
     repoName = settings.github.repository,
   ) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const now = new Date().toISOString();
     const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
-    return commits.length > 0;
+    return commits;
   },
 
-  async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
+  async getConfigFileChangedCommitsInLatestRelease(
+    repoOwner = settings.github.owner,
+    repoName = settings.github.repository,
+  ) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const secondToLastReleaseDate = await _getSecondToLastReleaseDate(repoOwner, repoName);
     const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(
@@ -411,7 +414,7 @@ module.exports = {
       secondToLastReleaseDate,
       latestReleaseDate,
     );
-    return commits.length > 0;
+    return commits;
   },
 
   async getPullRequestsFromCommitsShas(

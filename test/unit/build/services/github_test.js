@@ -300,7 +300,7 @@ describe('#isBuildStatusOK', function () {
   });
 });
 
-describe('#hasConfigFileChangedSinceLatestRelease', function () {
+describe('#getConfigFileChangedCommitsSinceLatestRelease', function () {
   const latestReleaseDate = '2020-08-13T04:45:06Z';
   const repoOwner = 'github-owner';
   const repoName = 'github-repository';
@@ -319,14 +319,15 @@ describe('#hasConfigFileChangedSinceLatestRelease', function () {
   context('should return true when config file has been changed', function () {
     it('should call Github "commits list" API', async function () {
       // given
+      const commits = [
+        {
+          sha: '5ec2f42',
+        },
+      ];
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
         .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
-        .reply(200, [
-          {
-            sha: '5ec2f42',
-          },
-        ]);
+        .reply(200, commits);
 
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/tags')
@@ -337,19 +338,21 @@ describe('#hasConfigFileChangedSinceLatestRelease', function () {
         .reply(200, { commit: { committer: { date: latestReleaseDate } } });
 
       // when
-      const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+      const response = await githubService.getConfigFileChangedCommitsSinceLatestRelease(repoOwner, repoName);
+
       // then
-      expect(response).to.be.true;
+      expect(response).to.deep.equal(commits);
     });
   });
 
   context('should return false when config file did not changed changed', function () {
     it('should call Github "commits list" API', async function () {
       // given
+      const commits = [];
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
         .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
-        .reply(200, []);
+        .reply(200, commits);
 
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/tags')
@@ -360,14 +363,15 @@ describe('#hasConfigFileChangedSinceLatestRelease', function () {
         .reply(200, { commit: { committer: { date: latestReleaseDate } } });
 
       // when
-      const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+      const response = await githubService.getConfigFileChangedCommitsSinceLatestRelease(repoOwner, repoName);
+
       // then
-      expect(response).to.be.false;
+      expect(response).to.deep.equal(commits);
     });
   });
 });
 
-describe('#hasConfigFileChangedInLatestRelease', function () {
+describe('#getConfigFileChangedCommitsInLatestRelease', function () {
   const latestReleaseDate = '2020-08-13T04:45:06Z';
   const secondToLastReleaseDate = '2020-08-10T12:45:06Z';
   const repoOwner = 'github-owner';
@@ -376,14 +380,15 @@ describe('#hasConfigFileChangedInLatestRelease', function () {
   context('should return true when config file has been changed', function () {
     it('should call Github "commits list" API', async function () {
       // given
+      const commits = [
+        {
+          sha: '5ec2f42',
+        },
+      ];
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
         .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/lib/config.js' })
-        .reply(200, [
-          {
-            sha: '5ec2f42',
-          },
-        ]);
+        .reply(200, commits);
 
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/tags')
@@ -402,19 +407,21 @@ describe('#hasConfigFileChangedInLatestRelease', function () {
         .reply(200, { commit: { committer: { date: secondToLastReleaseDate } } });
 
       // when
-      const response = await githubService.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
+      const response = await githubService.getConfigFileChangedCommitsInLatestRelease(repoOwner, repoName);
+
       // then
-      expect(response).to.be.true;
+      expect(response).to.deep.equal(commits);
     });
   });
 
   context('should return false when config file did not changed changed', function () {
     it('should call Github "commits list" API', async function () {
       // given
+      const commits = [];
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/commits')
         .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/lib/config.js' })
-        .reply(200, []);
+        .reply(200, commits);
 
       nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/tags')
@@ -433,9 +440,10 @@ describe('#hasConfigFileChangedInLatestRelease', function () {
         .reply(200, { commit: { committer: { date: secondToLastReleaseDate } } });
 
       // when
-      const response = await githubService.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
+      const response = await githubService.getConfigFileChangedCommitsInLatestRelease(repoOwner, repoName);
+
       // then
-      expect(response).to.be.false;
+      expect(response).to.deep.equal(commits);
     });
   });
 });
