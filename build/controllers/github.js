@@ -54,7 +54,11 @@ const addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingo
   });
 };
 
-async function pullRequestOpenedWebhook(request) {
+async function pullRequestOpenedWebhook(
+  request,
+  injectedScalingoClient = ScalingoClient,
+  injectedAddMessageToPullRequest = addMessageToPullRequest,
+) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
   const prId = payload.number;
@@ -67,7 +71,7 @@ async function pullRequestOpenedWebhook(request) {
   }
 
   try {
-    const client = await ScalingoClient.getInstance('reviewApps');
+    const client = await injectedScalingoClient.getInstance('reviewApps');
     logger.info({
       event: 'review-app',
       message: `Creating RA for repo ${repository} PR ${prId}`,
@@ -77,7 +81,7 @@ async function pullRequestOpenedWebhook(request) {
       await client.disableAutoDeploy(reviewAppName);
       await client.deployUsingSCM(reviewAppName, ref);
     }
-    await addMessageToPullRequest({
+    await injectedAddMessageToPullRequest({
       repositoryName: repository,
       scalingoReviewApps: reviewApps,
       pullRequestId: prId,
@@ -202,4 +206,5 @@ module.exports = {
   addMessageToPullRequest,
   processWebhook,
   pushOnDefaultBranchWebhook,
+  pullRequestOpenedWebhook,
 };
