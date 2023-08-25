@@ -146,18 +146,25 @@ async function pushOnDefaultBranchWebhook(request, injectedScalingoClient = Scal
   return `Deploying branch ${branchName} on integration applications : ` + scalingoApps.join(', ');
 }
 
-async function processWebhook(request) {
+async function processWebhook(
+  request,
+  {
+    injectedPushOnDefaultBranchWebhook = pushOnDefaultBranchWebhook,
+    injectedPullRequestOpenedWebhook = pullRequestOpenedWebhook,
+    injectedPullRequestSynchronizeWebhook = pullRequestSynchronizeWebhook,
+  } = {},
+) {
   const eventName = request.headers['x-github-event'];
   if (eventName === 'push') {
-    return pushOnDefaultBranchWebhook(request);
+    return injectedPushOnDefaultBranchWebhook(request);
   } else if (eventName === 'pull_request') {
     switch (request.payload.action) {
       case 'opened':
-        return pullRequestOpenedWebhook(request);
+        return injectedPullRequestOpenedWebhook(request);
       case 'reopened':
-        return pullRequestOpenedWebhook(request);
+        return injectedPullRequestOpenedWebhook(request);
       case 'synchronize':
-        return pullRequestSynchronizeWebhook(request);
+        return injectedPullRequestSynchronizeWebhook(request);
     }
     return `Ignoring ${request.payload.action} action`;
   } else {

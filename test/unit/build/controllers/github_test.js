@@ -77,3 +77,88 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
     });
   });
 });
+
+describe('#processWebhook', function () {
+  describe('when event is not handled', function () {
+    it('should ignore the event', async function () {
+      // given
+      const request = {
+        headers: {
+          'x-github-event': 'unhandled-event',
+        },
+      };
+
+      // when
+      const result = await githubController.processWebhook(request);
+
+      // then
+      expect(result).to.equal('Ignoring unhandled-event event');
+    });
+  });
+
+  describe('when event is handled', function () {
+    describe('when event is pushed', function () {
+      it('should call pushOnDefaultBranchWebhook() method', async function () {
+        // given
+        const request = {
+          headers: {
+            'x-github-event': 'push',
+          },
+        };
+
+        let injectedPushOnDefaultBranchWebhook = sinon.stub();
+
+        // when
+        await githubController.processWebhook(request, { injectedPushOnDefaultBranchWebhook });
+
+        // then
+        expect(injectedPushOnDefaultBranchWebhook.calledOnceWithExactly(request)).to.be.true;
+      });
+    });
+    describe('when event is pull_request', function () {
+      const request = {
+        headers: {
+          'x-github-event': 'pull_request',
+        },
+        payload: { action: 'nothing' },
+      };
+      ['opened', 'reopened'].forEach((action) => {
+        it(`should call pullRequestOpenedWebhook() method on ${action} action`, async function () {
+          // given
+          sinon.stub(request, 'payload').value({ action });
+
+          let injectedPullRequestOpenedWebhook = sinon.stub();
+
+          // when
+          await githubController.processWebhook(request, { injectedPullRequestOpenedWebhook });
+
+          // then
+          expect(injectedPullRequestOpenedWebhook.calledOnceWithExactly(request)).to.be.true;
+        });
+      });
+
+      it('should call pullRequestSynchronizeWebhook() method on synchronize action', async function () {
+        // given
+        sinon.stub(request, 'payload').value({ action: 'synchronize' });
+
+        let injectedPullRequestSynchronizeWebhook = sinon.stub();
+
+        // when
+        await githubController.processWebhook(request, { injectedPullRequestSynchronizeWebhook });
+
+        // then
+        expect(injectedPullRequestSynchronizeWebhook.calledOnceWithExactly(request)).to.be.true;
+      });
+      it('should ignore the action', async function () {
+        // given
+        sinon.stub(request, 'payload').value({ action: 'unhandled-action' });
+
+        // when
+        const result = await githubController.processWebhook(request);
+
+        // then
+        expect(result).to.equal('Ignoring unhandled-action action');
+      });
+    });
+  });
+});
