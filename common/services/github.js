@@ -272,6 +272,44 @@ async function _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoNa
   return data;
 }
 
+async function _getPullRequestsFromCommitSha(repoOwner, repoName, commitSha) {
+  const { repos } = _createOctokit();
+  const { data } = await repos.listPullRequestsAssociatedWithCommit({
+    owner: repoOwner,
+    repo: repoName,
+    commit_sha: commitSha,
+  });
+
+  if (data && data.length > 0) {
+    const pulls = data.reduce((prs, pr) => {
+      prs.set(
+        pr.number,
+        pr.labels.filter((label) => label.name.includes('team')).map((label) => label.name),
+      );
+      return prs;
+    }, new Map());
+
+    return pulls;
+  }
+
+  return [];
+}
+
+async function _getPullRequestsFromCommitShas(repoOwner, repoName, commitShas) {
+  const allPullRequests = await Promise.all(
+    commitShas.map((commitSha) => _getPullRequestsFromCommitSha(repoOwner, repoName, commitSha)),
+  );
+
+  const pullRequests = allPullRequests.reduce((nonDuplicatePrs, prs) => {
+    for (const [prNumber, prLabels] of prs.entries()) {
+      nonDuplicatePrs.set(prNumber, prLabels);
+    }
+    return nonDuplicatePrs;
+  }, new Map());
+
+  return pullRequests;
+}
+
 function _verifyRequestSignature(webhookSecret, body, signature) {
   if (!signature) {
     throw Boom.unauthorized('Github signature is empty.');
@@ -374,6 +412,14 @@ module.exports = {
       latestReleaseDate,
     );
     return commits.length > 0;
+  },
+
+  async getPullRequestsFromCommitsShas(
+    repoOwner = settings.github.owner,
+    repoName = settings.github.repository,
+    commitShas,
+  ) {
+    return await _getPullRequestsFromCommitShas(repoOwner, repoName, commitShas);
   },
 
   verifyWebhookSignature(request) {

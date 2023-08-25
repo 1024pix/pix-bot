@@ -440,6 +440,37 @@ describe('#hasConfigFileChangedInLatestRelease', function () {
   });
 });
 
+describe('#getPullRequestsFromCommitsShas', function () {
+  it('should return team labels used in PRs associated to commits', async function () {
+    // Given
+    const repoOwner = 'github-owner';
+    const repoName = 'github-repository';
+    const commitShas = ['commitSHA1', 'commitSHA2', 'commitSHA3'];
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/commits/commitSHA1/pulls')
+      .reply(200, [{ number: 1327, labels: [{ name: 'team-devcomp' }, { name: 'team-prescription' }] }]);
+
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/commits/commitSHA2/pulls')
+      .reply(200, [{ number: 2438, labels: [{ name: 'team-devcomp' }] }]);
+
+    nock('https://api.github.com')
+      .get('/repos/github-owner/github-repository/commits/commitSHA3/pulls')
+      .reply(200, [{ number: 3569, labels: [] }]);
+
+    // When
+    const pullRequests = await githubService.getPullRequestsFromCommitsShas(repoOwner, repoName, commitShas);
+
+    // Then
+    const expectedPullRequests = new Map([
+      [1327, ['team-devcomp', 'team-prescription']],
+      [2438, ['team-devcomp']],
+      [3569, []],
+    ]);
+    expect(pullRequests).to.deep.equal(expectedPullRequests);
+  });
+});
+
 describe('#verifyWebhookSignature', function () {
   it('return true when the signature match', function () {
     const body = {};
