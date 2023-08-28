@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.79.0 (28/08/2023)
+
+
+### :building_construction: Tech
+- [#296](https://github.com/1024pix/pix-bot/pull/296) [TECH] Tester unitairement la gestion des appels webhook de Github.
+
 ## v1.78.0 (25/08/2023)
 
 
