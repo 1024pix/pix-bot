@@ -1,4 +1,4 @@
-const { fromBranch } = require('../../../common/deployer');
+const { fromBranch, deployTagUsingSCM } = require('../../../common/deployer');
 const { expect, nock } = require('../../test-helper');
 
 describe('Integration | Common | Deployer', function () {
@@ -20,6 +20,27 @@ describe('Integration | Common | Deployer', function () {
         .reply(200, {});
 
       await fromBranch('my-repository', ['my-app-1', 'my-app-2'], 'my-branch')();
+
+      expect(scalingoTokenNock.isDone()).to.be.true;
+      expect(scalingoDeploy1Nock.isDone()).to.be.true;
+      expect(scalingoDeploy2Nock.isDone()).to.be.true;
+    });
+  });
+
+  describe('#deployTagUsingSCM', function () {
+    it('should call Scalingo API to deploy the tag from the linked repository', async function () {
+      const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
+      const deploymentPayload = {
+        branch: 'v0.0.1',
+      };
+      const scalingoDeploy1Nock = nock('https://scalingo.production')
+        .post('/v1/apps/my-app-1/scm_repo_link/manual_deploy', deploymentPayload)
+        .reply(200, {});
+      const scalingoDeploy2Nock = nock('https://scalingo.production')
+        .post('/v1/apps/my-app-2/scm_repo_link/manual_deploy', deploymentPayload)
+        .reply(200, {});
+
+      await deployTagUsingSCM(['my-app-1', 'my-app-2'], 'v0.0.1')();
 
       expect(scalingoTokenNock.isDone()).to.be.true;
       expect(scalingoDeploy1Nock.isDone()).to.be.true;

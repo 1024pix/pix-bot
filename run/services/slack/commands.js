@@ -1,4 +1,5 @@
 const { deploy } = require('../deploy');
+const { deployTagUsingSCM } = require('../../../common/deployer');
 const {
   PIX_REPO_NAME,
   PIX_APPS,
@@ -154,23 +155,14 @@ function _isAppFromPixRepo({ appName }) {
   return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
-async function deployTagUsingSCM(appNames, tag) {
-  const client = await ScalingoClient.getInstance('production');
-  return Promise.all(
-    appNames.map((appName) => {
-      return client.deployUsingSCM(appName, tag);
-    }),
-  );
-}
-
 module.exports = {
   async deployAirflow(payload) {
     const version = payload.text;
-    await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version);
+    await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version)();
   },
   async deployDBT(payload) {
     const version = payload.text;
-    await deployTagUsingSCM(PIX_DBT_APPS_NAME, version);
+    await deployTagUsingSCM(PIX_DBT_APPS_NAME, version)();
   },
 
   async createAndDeployPixLCMS(payload) {

@@ -11,4 +11,15 @@ function fromBranch(repoName, appNames, branch) {
   };
 }
 
-module.exports = { fromBranch };
+function deployTagUsingSCM(appNames, tag) {
+  return async () => {
+    const client = await ScalingoClient.getInstance('production');
+    return Promise.all(
+      appNames.map((appName) => {
+        return client.deployUsingSCM(appName, tag);
+      }),
+    );
+  };
+}
+
+module.exports = { fromBranch, deployTagUsingSCM };
