@@ -566,4 +566,188 @@ describe('Scalingo client', () => {
       expect(actual.message).to.equal('Impossible to create pix-application-recette, foo');
     });
   });
+
+  describe('#Scalingo.updateAutoscaler', () => {
+    it('should update web autoscaler for one application', async () => {
+      // given
+      const forAutoscalerStub = sinon.stub();
+      const updateAutoscalerStub = sinon.stub();
+
+      forAutoscalerStub.resolves([
+        {
+          id: 'au-123456789',
+          container_type: 'web',
+        },
+        {
+          id: 'au-111111111',
+          container_type: 'worker',
+        },
+      ]);
+
+      updateAutoscalerStub.resolves();
+
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
+        },
+      };
+
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
+
+      const autoscalerUpdateParams = {
+        min_containers: 1,
+        max_containers: 2,
+      };
+
+      // when
+      await scalingoClient.updateAutoscaler('pix-application-recette', autoscalerUpdateParams);
+
+      // then
+      expect(forAutoscalerStub.calledOnceWith('pix-application-recette')).to.be.true;
+      expect(updateAutoscalerStub.calledOnceWith('pix-application-recette', 'au-123456789', autoscalerUpdateParams)).to
+        .be.true;
+    });
+
+    it('should throw when web autoscaler not found', async () => {
+      // given
+      const forAutoscalerStub = sinon.stub();
+      const updateAutoscalerStub = sinon.stub();
+
+      forAutoscalerStub.resolves([
+        {
+          id: 'au-111111111',
+          container_type: 'worker',
+        },
+      ]);
+
+      updateAutoscalerStub.resolves();
+
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
+        },
+      };
+
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
+
+      const autoscalerUpdateParams = {
+        min_containers: 1,
+        max_containers: 2,
+      };
+
+      // when
+      let actual;
+      try {
+        await scalingoClient.updateAutoscaler('pix-application-recette', autoscalerUpdateParams);
+      } catch (error) {
+        actual = error;
+      }
+
+      // then
+      expect(actual.message).to.equal("Aucun autoscaler web trouvé pour l'application 'pix-application-recette'");
+      expect(updateAutoscalerStub.called).to.be.false;
+    });
+
+    it('should throw when autoscaler not found', async () => {
+      // given
+      const forAutoscalerStub = sinon.stub();
+      const updateAutoscalerStub = sinon.stub();
+
+      forAutoscalerStub.resolves([]);
+
+      updateAutoscalerStub.resolves();
+
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
+        },
+      };
+
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
+
+      const autoscalerUpdateParams = {
+        min_containers: 1,
+        max_containers: 2,
+      };
+
+      // when
+      let actual;
+      try {
+        await scalingoClient.updateAutoscaler('pix-application-recette', autoscalerUpdateParams);
+      } catch (error) {
+        actual = error;
+      }
+
+      // then
+      expect(actual.message).to.equal("Aucun autoscaler trouvé pour l'application 'pix-application-recette'");
+    });
+
+    it('should throw when autoscaler api return undefined', async () => {
+      // given
+      const forAutoscalerStub = sinon.stub();
+      const updateAutoscalerStub = sinon.stub();
+
+      forAutoscalerStub.resolves(undefined);
+
+      updateAutoscalerStub.resolves();
+
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
+        },
+      };
+
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
+
+      const autoscalerUpdateParams = {
+        min_containers: 1,
+        max_containers: 2,
+      };
+
+      // when
+      let actual;
+      try {
+        await scalingoClient.updateAutoscaler('pix-application-recette', autoscalerUpdateParams);
+      } catch (error) {
+        actual = error;
+      }
+
+      // then
+      expect(actual.message).to.equal("Aucun autoscaler trouvé pour l'application 'pix-application-recette'");
+    });
+
+    it('should throw when autoscaler api return null', async () => {
+      // given
+      const forAutoscalerStub = sinon.stub();
+      const updateAutoscalerStub = sinon.stub();
+
+      forAutoscalerStub.resolves(null);
+
+      updateAutoscalerStub.resolves();
+
+      const clientStub = {
+        clientFromToken: async () => {
+          return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
+        },
+      };
+
+      const scalingoClient = await ScalingoClient.getInstance('recette', clientStub);
+
+      const autoscalerUpdateParams = {
+        min_containers: 1,
+        max_containers: 2,
+      };
+
+      // when
+      let actual;
+      try {
+        await scalingoClient.updateAutoscaler('pix-application-recette', autoscalerUpdateParams);
+      } catch (error) {
+        actual = error;
+      }
+
+      // then
+      expect(actual.message).to.equal("Aucun autoscaler trouvé pour l'application 'pix-application-recette'");
+    });
+  });
 });
