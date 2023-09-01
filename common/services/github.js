@@ -1,4 +1,5 @@
 const { Octokit } = require('@octokit/rest');
+const fetch = require('node-fetch');
 const { zipWith, countBy, entries, noop } = require('lodash');
 const crypto = require('crypto');
 const tsscmp = require('tsscmp');
@@ -45,6 +46,7 @@ function _createOctokit() {
   }
   const octokit = new Octokit({
     ...authCredentials,
+    request: { fetch },
     log: {
       debug: noop,
       info: _logRequest,
