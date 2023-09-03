@@ -21,7 +21,6 @@ const {
   PIX_TUTOS_REPO_NAME,
   PIX_TUTOS_APP_NAME,
   PIX_AIRFLOW_APP_NAME,
-  PIX_DBT_APPS_NAME,
 } = require('../../../config');
 const releasesService = require('../../../common/services/releases');
 const ScalingoClient = require('../../../common/services/scalingo-client');
@@ -158,11 +157,7 @@ function _isAppFromPixRepo({ appName }) {
 module.exports = {
   async deployAirflow(payload) {
     const version = payload.text;
-    await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version)();
-  },
-  async deployDBT(payload) {
-    const version = payload.text;
-    await deployTagUsingSCM(PIX_DBT_APPS_NAME, version)();
+    await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version);
   },
 
   async createAndDeployPixLCMS(payload) {

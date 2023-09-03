@@ -120,13 +120,6 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
             },
             {
-              command: '/deploy-dbt',
-              description: 'Déploie la version précisée de DBT en production',
-              should_escape: false,
-              url: `http://${hostname}/slack/commands/deploy-dbt`,
-              usage_hint: '/deploy-dbt $version',
-            },
-            {
               command: '/deploy-metabase',
               description: 'Déploie metabase',
               should_escape: false,
@@ -153,6 +146,13 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
               url: `http://${hostname}/slack/commands/deploy-pix-360`,
               usage_hint: '/deploy-pix-360',
+            },
+            {
+              command: '/deploy-dbt',
+              description: 'Déploie la version précisée de DBT en production',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-dbt`,
+              usage_hint: '/deploy-dbt $version',
             },
           ],
         },

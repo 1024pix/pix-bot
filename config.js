@@ -132,7 +132,6 @@ module.exports = (function () {
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
     PIX_TUTOS_APP_NAME: 'pix-tutos',
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
-    PIX_DBT_APPS_NAME: ['pix-dbt-production', 'pix-dbt-external-production'],
   };
 
   if (process.env.NODE_ENV === 'test') {

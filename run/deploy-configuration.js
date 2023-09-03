@@ -1,4 +1,4 @@
-const { fromBranch } = require('../common/deployer');
+const { fromBranch, deployTagUsingSCM } = require('../common/deployer');
 
 module.exports = [
   {
@@ -40,5 +40,17 @@ module.exports = [
     },
     slackReturnText: 'Commande de déploiement de Pix 360 en production bien reçue.',
     deployFunction: fromBranch('pix-360', ['pix-360-production'], 'main'),
+  },
+  {
+    slashCommand: {
+      command: '/deploy-dbt',
+      description: 'Déploie la version précisée de DBT en production',
+      usage_hint: '/deploy-dbt $version',
+    },
+    slackReturnText: 'Commande de déploiement de DBT en production bien reçue.',
+    async deployFunction(request) {
+      const tag = request.pre.payload.text;
+      await deployTagUsingSCM(['pix-dbt-production', 'pix-dbt-external-production'], tag);
+    },
   },
 ];

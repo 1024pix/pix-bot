@@ -40,8 +40,7 @@ describe('Integration | Common | Deployer', function () {
         .post('/v1/apps/my-app-2/scm_repo_link/manual_deploy', deploymentPayload)
         .reply(200, {});
 
-      await deployTagUsingSCM(['my-app-1', 'my-app-2'], 'v0.0.1')();
-
+      await deployTagUsingSCM(['my-app-1', 'my-app-2'], 'v0.0.1');
       expect(scalingoTokenNock.isDone()).to.be.true;
       expect(scalingoDeploy1Nock.isDone()).to.be.true;
       expect(scalingoDeploy2Nock.isDone()).to.be.true;

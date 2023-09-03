@@ -4,8 +4,8 @@ function registerSlashCommands(deployConfiguration, manifest) {
       ...configuration.slashCommand,
       path: `/slack/commands${configuration.slashCommand.command}`,
       should_escape: false,
-      handler: () => {
-        configuration.deployFunction();
+      handler: (request) => {
+        configuration.deployFunction(request);
         return {
           text: configuration.slackReturnText,
         };
