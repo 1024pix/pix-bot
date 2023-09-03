@@ -53,4 +53,16 @@ module.exports = [
       await deployTagUsingSCM(['pix-dbt-production', 'pix-dbt-external-production'], tag);
     },
   },
+  {
+    slashCommand: {
+      command: '/deploy-airflow',
+      description: 'Déploie la version précisée de Airflow en production',
+      usage_hint: '/deploy-airflow $version',
+    },
+    slackReturnText: 'Commande de déploiement de Airflow en production bien reçue.',
+    async deployFunction(request) {
+      const tag = request.pre.payload.text;
+      await deployTagUsingSCM(['pix-airflow-production'], tag);
+    },
+  },
 ];

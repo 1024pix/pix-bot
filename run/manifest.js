@@ -95,15 +95,6 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
-  command: '/deploy-airflow',
-  path: '/slack/commands/deploy-airflow',
-  description: 'Déploie la version précisée de Airflow en production',
-  usage_hint: '/deploy-airflow $version',
-  should_escape: false,
-  handler: slackbotController.deployAirflow,
-});
-
-manifest.registerSlashCommand({
   command: '/app-status',
   path: '/slack/commands/app-status',
   description: 'Returns the app status given the app name as parameter',

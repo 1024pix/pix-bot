@@ -10,24 +10,6 @@ function _getDeployStartedMessage(release, appName) {
 }
 
 module.exports = {
-  deployAirflow(request) {
-    const payload = request.pre.payload;
-    commands.deployAirflow(payload);
-
-    return {
-      text: _getDeployStartedMessage(payload.text, 'Airflow'),
-    };
-  },
-
-  deployDBT(request) {
-    const payload = request.pre.payload;
-    commands.deployDBT(payload);
-
-    return {
-      text: _getDeployStartedMessage(payload.text, 'DBT'),
-    };
-  },
-
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixSiteRelease(payload);

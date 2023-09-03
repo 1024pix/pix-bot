@@ -70,9 +70,7 @@ describe('Acceptance | Run | SlashCommand', function () {
         payload: body,
       });
       expect(res.statusCode).to.equal(200);
-      expect(res.result.text).to.equal(
-        'Commande de déploiement de la release "v0.0.1" pour Airflow en production bien reçue.',
-      );
+      expect(res.result.text).to.equal('Commande de déploiement de Airflow en production bien reçue.');
     });
 
     it('should call Scalingo SCM', function (done) {

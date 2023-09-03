@@ -106,13 +106,6 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '[patch, minor, major]',
             },
             {
-              command: '/deploy-airflow',
-              description: 'Déploie la version précisée de Airflow en production',
-              should_escape: false,
-              url: `http://${hostname}/slack/commands/deploy-airflow`,
-              usage_hint: '/deploy-airflow $version',
-            },
-            {
               command: '/app-status',
               url: `http://${hostname}/slack/commands/app-status`,
               description: 'Returns the app status given the app name as parameter',
@@ -153,6 +146,13 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
               url: `http://${hostname}/slack/commands/deploy-dbt`,
               usage_hint: '/deploy-dbt $version',
+            },
+            {
+              command: '/deploy-airflow',
+              description: 'Déploie la version précisée de Airflow en production',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-airflow`,
+              usage_hint: '/deploy-airflow $version',
             },
           ],
         },
