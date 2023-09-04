@@ -36,7 +36,7 @@
   "dependencies": {
     "@hapi/boom": "^10.0.0",
     "@hapi/hapi": "^21.1.0",
-    "@octokit/rest": "^19.0.5",
+    "@octokit/rest": "^20.0.0",
     "axios": "^1.2.1",
     "axios-retry": "^3.4.0",
     "cron": "^2.1.0",
