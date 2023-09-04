@@ -48,8 +48,8 @@ module.exports = [
       usage_hint: '/deploy-dbt $version',
     },
     slackReturnText: 'Commande de déploiement de DBT en production bien reçue.',
-    async deployFunction(request) {
-      const tag = request.pre.payload.text;
+    async deployFunction(payload) {
+      const tag = payload.text;
       await deployTagUsingSCM(['pix-dbt-production', 'pix-dbt-external-production'], tag);
     },
   },
@@ -60,8 +60,8 @@ module.exports = [
       usage_hint: '/deploy-airflow $version',
     },
     slackReturnText: 'Commande de déploiement de Airflow en production bien reçue.',
-    async deployFunction(request) {
-      const tag = request.pre.payload.text;
+    async deployFunction(payload) {
+      const tag = payload.text;
       await deployTagUsingSCM(['pix-airflow-production'], tag);
     },
   },
