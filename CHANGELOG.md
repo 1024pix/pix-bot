@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.80.0 (04/09/2023)
+
+
+### :building_construction: Tech
+- [#300](https://github.com/1024pix/pix-bot/pull/300) [TECH] Forcer l'utilisation de node-fetch par Octokit.
+
+### :arrow_up: Montée de version
+- [#299](https://github.com/1024pix/pix-bot/pull/299) [BUMP] Lock file maintenance (dossier racine).
+- [#279](https://github.com/1024pix/pix-bot/pull/279) [BUMP] Update dependency @octokit/rest to v20 (dossier racine).
+- [#284](https://github.com/1024pix/pix-bot/pull/284) [BUMP] Update node to v18 (major).
+
 ## v1.79.0 (28/08/2023)
 
 
