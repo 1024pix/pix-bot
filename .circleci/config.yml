@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: cimg/node:18.17.0@sha256:14a6f870f08bf5322123835abca18b6319d6bb7439221e81744497cb20606934
+      - image: cimg/node:18.17.1
     steps:
       - checkout
       - run: npm ci
