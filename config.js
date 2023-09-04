@@ -103,6 +103,22 @@ module.exports = (function () {
       schedule: process.env.PIX_SITE_DEPLOY_SCHEDULE,
     },
 
+    tasks: {
+      autoScaleEnabled: process.env.FT_AUTOSCALE_WEB || false,
+      scheduleAutoScaleUp: process.env.SCHEDULE_AUTOSCALE_UP || '* 0 8 * * *',
+      scheduleAutoScaleDown: process.env.SCHEDULE_AUTOSCALE_DOWN || '* 0 19 * * *',
+      autoScaleApplicationName: process.env.SCHEDULE_AUTOSCALE_APP_NAME,
+      autoScaleRegion: process.env.SCHEDULE_AUTOSCALE_REGION,
+      autoScaleUpSettings: {
+        min: process.env.SCHEDULE_AUTOSCALE_UP_SETTINGS_MIN,
+        max: process.env.SCHEDULE_AUTOSCALE_UP_SETTINGS_MAX,
+      },
+      autoScaleDownSettings: {
+        min: process.env.SCHEDULE_AUTOSCALE_DOWN_SETTINGS_MIN,
+        max: process.env.SCHEDULE_AUTOSCALE_DOWN_SETTINGS_MAX,
+      },
+    },
+
     PIX_REPO_NAME: 'pix',
     PIX_BOT_REPO_NAME: 'pix-bot',
     PIX_BOT_APPS: {
