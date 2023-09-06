@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/1024pix/pix-bot#readme",
   "dependencies": {
+    "@1024pix/scalingo-review-app-manager": "^2.0.0",
     "@hapi/boom": "^10.0.0",
     "@hapi/hapi": "^21.1.0",
     "@octokit/rest": "^20.0.0",
@@ -45,7 +46,6 @@
     "lodash": "^4.17.21",
     "node-fetch": "^2.7.0",
     "scalingo": "^0.8.0",
-    "scalingo-review-app-manager": "^1.0.5",
     "slack-block-builder": "^2.7.2",
     "tsscmp": "^1.0.6"
   },
