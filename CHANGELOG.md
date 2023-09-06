@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.81.0 (06/09/2023)
+
+
+### :arrow_up: Montée de version
+- [#302](https://github.com/1024pix/pix-bot/pull/302) [BUMP] :arrow_up: Mettre à jour scalingo-review-app-manager en utilisant le nouveau paquet.
+
 ## v1.80.0 (04/09/2023)
 
 
