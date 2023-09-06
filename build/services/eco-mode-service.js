@@ -1,4 +1,4 @@
-const ReviewAppManager = require('scalingo-review-app-manager').ReviewAppManager;
+const ReviewAppManager = require('@1024pix/scalingo-review-app-manager').ReviewAppManager;
 const config = require('../../config');
 const logger = require('../../common/services/logger');
 
