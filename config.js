@@ -11,6 +11,10 @@ function _getJSON(value) {
   return JSON.parse(value);
 }
 
+function isFeatureEnabled(environmentVariable) {
+  return environmentVariable === 'true';
+}
+
 module.exports = (function () {
   const config = {
     port: _getNumber(process.env.PORT, 3000),
@@ -104,7 +108,7 @@ module.exports = (function () {
     },
 
     tasks: {
-      autoScaleEnabled: process.env.FT_AUTOSCALE_WEB || false,
+      autoScaleEnabled: isFeatureEnabled(process.env.FT_AUTOSCALE_WEB),
       scheduleAutoScaleUp: process.env.SCHEDULE_AUTOSCALE_UP || '* 0 8 * * *',
       scheduleAutoScaleDown: process.env.SCHEDULE_AUTOSCALE_DOWN || '* 0 19 * * *',
       autoScaleApplicationName: process.env.SCHEDULE_AUTOSCALE_APP_NAME,
