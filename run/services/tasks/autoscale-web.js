@@ -5,6 +5,10 @@ async function taskAutoScaleWeb(
   { applicationName, region, autoScalingParameters },
   injectedScalingoClient = ScalingoClient,
 ) {
+  logger.info({
+    event: 'scalingo-autoscaler',
+    message: `Starting autoscaling for ${applicationName} with min: ${autoScalingParameters.min} and max: ${autoScalingParameters.max}`,
+  });
   try {
     const client = await injectedScalingoClient.getInstance(region);
     await client.updateAutoscaler(applicationName, autoScalingParameters);

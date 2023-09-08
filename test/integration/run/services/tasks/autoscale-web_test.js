@@ -25,8 +25,12 @@ describe('#task-autoscale-web', function () {
     // then
     expect(getInstanceStub.calledOnceWithExactly(region)).to.be.true;
     expect(updateAutoscalerStub.calledOnceWithExactly(applicationName, autoScalingParameters)).to.be.true;
-    expect(loggerInfoStub.calledOnce).to.be.true;
+    expect(loggerInfoStub.calledTwice).to.be.true;
     expect(loggerInfoStub.firstCall.args[0]).to.deep.equal({
+      event: 'scalingo-autoscaler',
+      message: 'Starting autoscaling for pix-api-test with min: 2 and max: 4',
+    });
+    expect(loggerInfoStub.secondCall.args[0]).to.deep.equal({
       event: 'scalingo-autoscaler',
       message: 'pix-api-test has been austocaled with sucess to min: 2 and max: 4',
     });
