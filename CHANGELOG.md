@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.82.1 (08/09/2023)
+
+
+### :building_construction: Tech
+- [#303](https://github.com/1024pix/pix-bot/pull/303) [TECH] Ajout de logs quand l'autoscaler démarre.
+
 ## v1.82.0 (08/09/2023)
 
 
