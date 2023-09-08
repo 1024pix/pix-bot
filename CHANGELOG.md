@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.82.0 (08/09/2023)
+
+
+### :building_construction: Tech
+- [#298](https://github.com/1024pix/pix-bot/pull/298) [TECH] Ajout d'un job pour configurer automatiquement l'autoscaler d'applications sur Scalingo (PIX-8638).
+
 ## v1.81.0 (06/09/2023)
 
 
