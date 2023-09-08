@@ -97,4 +97,36 @@ describe('logger', function () {
       });
     });
   });
+  describe('ok', function () {
+    describe('when an message is passed', function () {
+      it('should call injectedLogger ok', function () {
+        // given
+        const injectedLogger = { ok: sinon.stub() };
+
+        // when
+        logger.ok({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger);
+
+        // then
+        expect(injectedLogger.ok.calledOnce).to.be.true;
+        expect(injectedLogger.ok.firstCall.args[0]).to.equal(
+          '{"event":"toto","message":"titi","stack":"stack","level":"ok"}',
+        );
+      });
+    });
+    describe('when an object is passed', function () {
+      it('should call injectedLogger warn with object in message', function () {
+        // given
+        const injectedLogger = { ok: sinon.stub() };
+
+        // when
+        logger.ok({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger);
+
+        // then
+        expect(injectedLogger.ok.calledOnce).to.be.true;
+        expect(injectedLogger.ok.firstCall.args[0]).to.equal(
+          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"ok"}',
+        );
+      });
+    });
+  });
 });

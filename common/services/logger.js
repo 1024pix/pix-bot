@@ -21,9 +21,13 @@ const info = ({ event, message, job, stack }, injectedLogger = console) => {
 const warn = ({ event, message, job, stack }, injectedLogger = console) => {
   injectedLogger.warn(serialize({ event, message, job, stack, level: 'warn' }));
 };
+const ok = ({ event, message, job, stack }, injectedLogger = console) => {
+  injectedLogger.ok(serialize({ event, message, job, stack, level: 'ok' }));
+};
 
 module.exports = {
   error,
   info,
   warn,
+  ok,
 };
