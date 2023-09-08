@@ -11,6 +11,10 @@ function _getJSON(value) {
   return JSON.parse(value);
 }
 
+function isFeatureEnabled(environmentVariable) {
+  return environmentVariable === 'true';
+}
+
 module.exports = (function () {
   const config = {
     port: _getNumber(process.env.PORT, 3000),
@@ -101,6 +105,22 @@ module.exports = (function () {
 
     pixSiteDeploy: {
       schedule: process.env.PIX_SITE_DEPLOY_SCHEDULE,
+    },
+
+    tasks: {
+      autoScaleEnabled: isFeatureEnabled(process.env.FT_AUTOSCALE_WEB),
+      scheduleAutoScaleUp: process.env.SCHEDULE_AUTOSCALE_UP || '* 0 8 * * *',
+      scheduleAutoScaleDown: process.env.SCHEDULE_AUTOSCALE_DOWN || '* 0 19 * * *',
+      autoScaleApplicationName: process.env.SCHEDULE_AUTOSCALE_APP_NAME,
+      autoScaleRegion: process.env.SCHEDULE_AUTOSCALE_REGION,
+      autoScaleUpSettings: {
+        min: process.env.SCHEDULE_AUTOSCALE_UP_SETTINGS_MIN,
+        max: process.env.SCHEDULE_AUTOSCALE_UP_SETTINGS_MAX,
+      },
+      autoScaleDownSettings: {
+        min: process.env.SCHEDULE_AUTOSCALE_DOWN_SETTINGS_MIN,
+        max: process.env.SCHEDULE_AUTOSCALE_DOWN_SETTINGS_MAX,
+      },
     },
 
     PIX_REPO_NAME: 'pix',

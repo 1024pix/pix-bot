@@ -7,6 +7,8 @@ const githubServices = require('./common/services/github');
 const { deploy } = require('./run/services/deploy');
 const ecoModeService = require('./build/services/eco-mode-service');
 const logger = require('./common/services/logger');
+const taskScheluder = require('./run/services/task-scheduler');
+const { tasks } = require('./run/services/tasks');
 
 const init = async () => {
   await ecoModeService.start();
@@ -20,6 +22,8 @@ const init = async () => {
     },
     config.pixSiteDeploy.schedule,
   );
+
+  taskScheluder(tasks);
 
   await server.start();
 

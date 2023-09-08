@@ -130,6 +130,21 @@ class ScalingoClient {
       throw new Error(`Impossible to create ${app.name}, ${e.name}`);
     }
   }
+
+  async updateAutoscaler(appname, updateParams) {
+    const autoscalers = await this.client.Autoscalers.for(appname);
+
+    if (!Array.isArray(autoscalers) || !autoscalers.length) {
+      throw new Error(`Aucun autoscaler trouvé pour l'application '${appname}'`);
+    }
+
+    const [webAutoscaler] = autoscalers.filter((autoscaler) => autoscaler.container_type == 'web');
+    if (webAutoscaler) {
+      await this.client.Autoscalers.update(appname, webAutoscaler.id, updateParams);
+    } else {
+      throw new Error(`Aucun autoscaler web trouvé pour l'application '${appname}'`);
+    }
+  }
 }
 
 async function _isUrlReachable(url) {
