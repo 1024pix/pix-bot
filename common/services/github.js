@@ -300,7 +300,25 @@ const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) =>
   });
 };
 
+const getPullRequestDetailsForCommitSha = async ({ repoOwner, repoName, commit_sha, repos }) => {
+  const { data } = await repos.listPullRequestsAssociatedWithCommit({ repoOwner, repoName, commit_sha });
+  let allPullRequests;
+  if (data && data.length > 0) {
+    allPullRequests = data.reduce((pullRequests, pr) => {
+      pullRequests.set(
+        pr.number,
+        pr.labels.filter((label) => label.name.includes('team')).map((label) => label.name),
+      );
+      return pullRequests;
+    }, new Map());
+  } else {
+    allPullRequests = [];
+  }
+  return allPullRequests;
+};
+
 module.exports = {
+  _createOctokit,
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
     const reviewsByPR = await Promise.all(pullRequests.map(({ number }) => _getReviewsFromGithub(number)));
@@ -392,4 +410,28 @@ module.exports = {
   },
 
   commentPullRequest,
+
+  async getPullRequestsFromCommitsShas({
+    repoOwner = settings.github.owner,
+    repoName = settings.github.repository,
+    commitShas,
+    createOctokit = _createOctokit,
+  }) {
+    const { repos } = createOctokit();
+
+    const pullRequestsDetails = await Promise.all(
+      commitShas.map((commitSha) =>
+        getPullRequestDetailsForCommitSha({ repoOwner, repoName, commit_sha: commitSha, repos }),
+      ),
+    );
+
+    const noDuplicatedPullRequestsDetails = pullRequestsDetails.reduce((nonDuplicatePrs, prs) => {
+      for (const [prNumber, prLabels] of prs.entries()) {
+        nonDuplicatePrs.set(prNumber, prLabels);
+      }
+      return nonDuplicatePrs;
+    }, new Map());
+
+    return noDuplicatedPullRequestsDetails;
+  },
 };
