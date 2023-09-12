@@ -1,49 +1,33 @@
-function createMessage({ event, message, job, stack }, level) {
-  let obj = {};
+function serialize({ event, message, job, stack, level }) {
+  const log = {
+    event,
+    message: typeof message === 'object' ? JSON.stringify(message) : message,
+    job,
+    stack: typeof stack === 'object' ? JSON.stringify(stack) : stack,
+    level,
+  };
 
-  if (event) {
-    obj.event = event;
-  }
-
-  if (message) {
-    if (typeof message === 'object') {
-      message = JSON.stringify(message);
-    }
-
-    obj.message = message;
-  }
-
-  if (job) {
-    obj.job = job;
-  }
-
-  if (stack) {
-    if (typeof stack === 'object') {
-      stack = JSON.stringify(message);
-    }
-
-    obj.stack = stack;
-  }
-
-  obj.level = level;
-
-  return JSON.stringify(obj);
+  return JSON.stringify(log);
 }
 
 const error = ({ event, message, job, stack }, injectedLogger = console) => {
-  injectedLogger.error(createMessage({ event, message, job, stack }, 'error'));
+  injectedLogger.error(serialize({ event, message, job, stack, level: 'error' }));
 };
 
 const info = ({ event, message, job, stack }, injectedLogger = console) => {
-  injectedLogger.log(createMessage({ event, message, job, stack }, 'info'));
+  injectedLogger.log(serialize({ event, message, job, stack, level: 'info' }));
 };
 
 const warn = ({ event, message, job, stack }, injectedLogger = console) => {
-  injectedLogger.warn(createMessage({ event, message, job, stack }, 'warn'));
+  injectedLogger.warn(serialize({ event, message, job, stack, level: 'warn' }));
+};
+const ok = ({ event, message, job, stack }, injectedLogger = console) => {
+  injectedLogger.ok(serialize({ event, message, job, stack, level: 'ok' }));
 };
 
 module.exports = {
   error,
   info,
   warn,
+  ok,
 };
