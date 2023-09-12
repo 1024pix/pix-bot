@@ -372,14 +372,22 @@ module.exports = {
     return pullRequestsSinceLatestRelease.map((PR) => `${PR.title}`);
   },
 
-  async hasConfigFileChangedSinceLatestRelease(
+  async getCommitsWithChangedConfigFileSinceLatestRelease(
     repoOwner = settings.github.owner,
     repoName = settings.github.repository,
   ) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const now = new Date().toISOString();
-    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
-    return commits.length > 0;
+
+    const { repos } = _createOctokit();
+    const { data } = await repos.listCommits({
+      owner: repoOwner,
+      repo: repoName,
+      since: latestReleaseDate,
+      until: now,
+      path: 'api/lib/config.js',
+    });
+    return data;
   },
 
   async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {

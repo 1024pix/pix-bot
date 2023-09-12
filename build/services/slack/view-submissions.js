@@ -5,7 +5,9 @@ const githubService = require('../../../common/services/github');
 module.exports = {
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
-    const hasConfigFileChanged = await githubService.hasConfigFileChangedSinceLatestRelease();
+    const commitsWithChangedConfigFiles = await githubService.getCommitsWithChangedConfigFileSinceLatestRelease();
+    const hasConfigFileChanged = commitsWithChangedConfigFiles.length > 0;
+
     return openModalReleasePublicationConfirmation(releaseType, hasConfigFileChanged);
   },
 
