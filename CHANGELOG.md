@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.83.0 (12/09/2023)
+
+
+### :building_construction: Tech
+- [#254](https://github.com/1024pix/pix-bot/pull/254) [TECH] Refactorer le logger.
+
 ## v1.82.1 (08/09/2023)
 
 
