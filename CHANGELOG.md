@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.83.1 (12/09/2023)
+
+
+### :building_construction: Tech
+- [#306](https://github.com/1024pix/pix-bot/pull/306) [TECH] Correction de la propriété timezone en timeZone dans le cron de l'autoscaler.
+
 ## v1.83.0 (12/09/2023)
 
 
