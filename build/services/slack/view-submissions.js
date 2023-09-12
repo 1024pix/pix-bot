@@ -1,12 +1,19 @@
 const openModalReleasePublicationConfirmation = require('./surfaces/modals/publish-release/release-publication-confirmation');
 const { environments, deploy, publish } = require('../../../common/services/releases');
 const githubService = require('../../../common/services/github');
+const config = require('../../../config');
 
 module.exports = {
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
     const commitsWithChangedConfigFiles = await githubService.getCommitsWithChangedConfigFileSinceLatestRelease();
     const hasConfigFileChanged = commitsWithChangedConfigFiles.length > 0;
+
+    await githubService.getPullRequestsFromCommitsShas({
+      repoOwner: config.github.owner,
+      repoName: config.github.repository,
+      commitShas: commitsWithChangedConfigFiles,
+    });
 
     return openModalReleasePublicationConfirmation(releaseType, hasConfigFileChanged);
   },

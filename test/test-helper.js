@@ -154,6 +154,19 @@ function nockGithubWithConfigChanges() {
     )
     .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
     .reply(200, [{}]);
+
+  //TODO
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/1234/pulls')
+    .reply(200, [{ number: 1327, labels: [{ name: 'cross-team' }] }]);
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/456/pulls')
+    .reply(200, [{ number: 2438, labels: [{ name: 'team-eval' }] }]);
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/pulls?repoOwner=github-owner&repoName=github-repository')
+    .reply(200, [{ number: 2438, labels: [{ name: 'team-eval' }] }]);
 }
 
 function createScalingoTokenNock() {

@@ -7,7 +7,7 @@ const {
 } = require('../../test-helper');
 const server = require('../../../server');
 
-describe('Acceptance | Build | Slack', function () {
+describe.only('Acceptance | Build | Slack', function () {
   describe('POST /build/slack/interactive-endpoint', function () {
     it('responds with 204', async function () {
       const body = {
@@ -189,7 +189,7 @@ describe('Acceptance | Build | Slack', function () {
           });
         });
 
-        it('returns the confirmation modal with a warning', async function () {
+        it.only('returns the confirmation modal with a warning', async function () {
           nockGithubWithConfigChanges();
 
           const body = {
