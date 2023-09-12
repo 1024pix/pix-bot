@@ -9,7 +9,7 @@ const taskScheluder = function (tasksList) {
       onTick: handler,
       onComplete: null,
       start: true,
-      timezone: parisTimezone,
+      timeZone: parisTimezone,
     });
   };
 
