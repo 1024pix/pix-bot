@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.84.0 (13/09/2023)
+
+
+### :rocket: Amélioration
+- [#307](https://github.com/1024pix/pix-bot/pull/307) [FEATURE] Ajouter un lien vers la diff lors de la création de la release.
+
 ## v1.83.1 (12/09/2023)
 
 
