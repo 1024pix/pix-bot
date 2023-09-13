@@ -133,6 +133,16 @@ describe('Acceptance | Run | Slack', function () {
           // given
           const nocks = nockGithubWithNoConfigChanges();
 
+          const pixApiNock = nock('https://app.pix.fr').get('/api/').reply(200, {
+            name: 'pix-api',
+            version: '6.6.5',
+            description: "Plateforme d'évaluation et de certification des compétences numériques",
+            environment: 'production',
+            'container-version': 'v6.6.5',
+            'container-app-name': 'pix-api-production',
+            'current-lang': 'fr',
+          });
+
           const body = {
             type: 'view_submission',
             view: {
@@ -189,11 +199,21 @@ describe('Acceptance | Run | Slack', function () {
             },
           });
           nocks.checkAllNocksHaveBeenCalled();
+          expect(pixApiNock.isDone()).to.be.true;
         });
 
         it('returns the confirmation modal with a warning', async function () {
+          //given
           nockGithubWithConfigChanges();
-
+          const pixApiNock = nock('https://app.pix.fr').get('/api/').reply(200, {
+            name: 'pix-api',
+            version: '6.6.5',
+            description: "Plateforme d'évaluation et de certification des compétences numériques",
+            environment: 'production',
+            'container-version': 'v6.6.5',
+            'container-app-name': 'pix-api-production',
+            'current-lang': 'fr',
+          });
           const body = {
             type: 'view_submission',
             view: {
@@ -202,26 +222,30 @@ describe('Acceptance | Run | Slack', function () {
                 values: {
                   'deploy-release-tag': {
                     'release-tag-value': {
-                      value: 'v2.130.0',
+                      value: 'v6.6.6',
                     },
                   },
                 },
               },
             },
           };
+
+          //when
           const res = await server.inject({
             method: 'POST',
             url: '/run/slack/interactive-endpoint',
             headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
             payload: body,
           });
+
+          //then
           expect(res.statusCode).to.equal(200);
           expect(JSON.parse(res.payload)).to.deep.equal({
             response_action: 'push',
             view: {
               type: 'modal',
               callback_id: 'release-deployment-confirmation',
-              private_metadata: 'v2.130.0',
+              private_metadata: 'v6.6.6',
               title: {
                 type: 'plain_text',
                 text: 'Confirmation',
@@ -239,19 +263,20 @@ describe('Acceptance | Run | Slack', function () {
                   type: 'section',
                   text: {
                     type: 'mrkdwn',
-                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
+                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/v6.6.5...v6.6.6). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
                   },
                 },
                 {
                   type: 'section',
                   text: {
                     type: 'mrkdwn',
-                    text: "Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+                    text: "Vous vous apprêtez à déployer la version *v6.6.6* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
                   },
                 },
               ],
             },
           });
+          expect(pixApiNock.isDone()).to.be.true;
         });
       });
 

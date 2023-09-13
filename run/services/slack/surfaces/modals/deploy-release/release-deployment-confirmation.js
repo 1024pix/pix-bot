@@ -2,7 +2,7 @@ const { Modal, Blocks } = require('slack-block-builder');
 
 const callbackId = 'release-deployment-confirmation';
 
-function modal(releaseTag, hasConfigFileChanged) {
+function modal(releaseTag, hasConfigFileChanged, previousReleaseTag) {
   return Modal({
     title: 'Confirmation',
     callbackId,
@@ -13,7 +13,7 @@ function modal(releaseTag, hasConfigFileChanged) {
     ...(hasConfigFileChanged
       ? [
           Blocks.Section({
-            text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
+            text: `:warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/${previousReleaseTag}...${releaseTag}). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.`,
           }),
         ]
       : []),
@@ -23,15 +23,15 @@ function modal(releaseTag, hasConfigFileChanged) {
   ]);
 }
 
-module.exports = (releaseTag, hasConfigFileChanged) => {
+module.exports = (releaseTag, hasConfigFileChanged, previousReleaseTag) => {
   return {
     response_action: 'push',
-    view: modal(releaseTag, hasConfigFileChanged).buildToObject(),
+    view: modal(releaseTag, hasConfigFileChanged, previousReleaseTag).buildToObject(),
   };
 };
 
 module.exports.sampleView = () => {
-  return modal('v6.6.6', true);
+  return modal('v6.6.6', true, 'v6.6.5');
 };
 
 module.exports.callbackId = callbackId;

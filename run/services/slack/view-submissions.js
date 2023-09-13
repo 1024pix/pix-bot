@@ -7,12 +7,15 @@ const slackGetUserInfos = require('../../../common/services/slack/surfaces/user-
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const { ScalingoAppName } = require('../../../common/models/ScalingoAppName');
 const config = require('../../../config');
+const axios = require('axios');
 
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
     const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestRelease();
-    return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
+    const response = await axios.get('https://app.pix.fr/api/');
+    const releaseCurrentlyInProduction = `v${response.data.version}`;
+    return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged, releaseCurrentlyInProduction);
   },
 
   async submitApplicationNameSelection(payload) {
