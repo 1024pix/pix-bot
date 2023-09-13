@@ -2,7 +2,7 @@ const { Modal, Blocks } = require('slack-block-builder');
 
 const callbackId = 'release-publication-confirmation';
 
-function modal(releaseType, hasConfigFileChanged) {
+function _createModal({ releaseType, hasConfigFileChanged, latestTag }) {
   return Modal({
     title: 'Confirmation',
     callbackId,
@@ -13,7 +13,7 @@ function modal(releaseType, hasConfigFileChanged) {
     ...(hasConfigFileChanged
       ? [
           Blocks.Section({
-            text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
+            text: `:warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/${latestTag}...dev). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.`,
           }),
         ]
       : []),
@@ -23,15 +23,21 @@ function modal(releaseType, hasConfigFileChanged) {
   ]);
 }
 
-module.exports = (releaseType, hasConfigFileChanged) => {
+const releasePublicationConfirmation = ({ releaseType, hasConfigFileChanged, latestTag }) => {
+  const modal = _createModal({ releaseType, hasConfigFileChanged, latestTag });
   return {
     response_action: 'push',
-    view: modal(releaseType, hasConfigFileChanged).buildToObject(),
+    view: modal.buildToObject(),
   };
 };
 
-module.exports.sampleView = () => {
-  return modal('minor', true);
+const sampleView = () => {
+  const modal = _createModal({ releaseType: 'minor', hasConfigFileChanged: true, latestTag: 'v4.0.0' });
+  return modal;
 };
+
+module.exports = releasePublicationConfirmation;
+
+module.exports.sampleView = sampleView;
 
 module.exports.callbackId = callbackId;
