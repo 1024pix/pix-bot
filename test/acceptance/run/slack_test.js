@@ -132,17 +132,6 @@ describe('Acceptance | Run | Slack', function () {
         it('returns the confirmation modal', async function () {
           // given
           const nocks = nockGithubWithNoConfigChanges();
-
-          const pixApiNock = nock('https://app.pix.fr').get('/api/').reply(200, {
-            name: 'pix-api',
-            version: '6.6.5',
-            description: "Plateforme d'évaluation et de certification des compétences numériques",
-            environment: 'production',
-            'container-version': 'v6.6.5',
-            'container-app-name': 'pix-api-production',
-            'current-lang': 'fr',
-          });
-
           const body = {
             type: 'view_submission',
             view: {
@@ -199,7 +188,6 @@ describe('Acceptance | Run | Slack', function () {
             },
           });
           nocks.checkAllNocksHaveBeenCalled();
-          expect(pixApiNock.isDone()).to.be.true;
         });
 
         it('returns the confirmation modal with a warning', async function () {

@@ -11,10 +11,14 @@ const axios = require('axios');
 
 module.exports = {
   async submitReleaseTagSelection(payload) {
+    let releaseCurrentlyInProduction = '';
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
     const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestRelease();
-    const response = await axios.get('https://app.pix.fr/api/');
-    const releaseCurrentlyInProduction = `v${response.data.version}`;
+    if (hasConfigFileChanged) {
+      const response = await axios.get('https://app.pix.fr/api/');
+      releaseCurrentlyInProduction = `v${response.data.version}`;
+    }
+
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged, releaseCurrentlyInProduction);
   },
 
