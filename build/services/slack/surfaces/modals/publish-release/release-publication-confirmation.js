@@ -2,7 +2,7 @@ const { Modal, Blocks } = require('slack-block-builder');
 
 const callbackId = 'release-publication-confirmation';
 
-function modal({ releaseType, hasConfigFileChanged, latestTag }) {
+function _createModal({ releaseType, hasConfigFileChanged, latestTag }) {
   return Modal({
     title: 'Confirmation',
     callbackId,
@@ -23,15 +23,21 @@ function modal({ releaseType, hasConfigFileChanged, latestTag }) {
   ]);
 }
 
-module.exports = (releaseType, hasConfigFileChanged, latestTag) => {
+const releasePublicationConfirmation = (releaseType, hasConfigFileChanged, latestTag) => {
+  const modal = _createModal({ releaseType, hasConfigFileChanged, latestTag });
   return {
     response_action: 'push',
-    view: modal({ releaseType, hasConfigFileChanged, latestTag }).buildToObject(),
+    view: modal.buildToObject(),
   };
 };
 
-module.exports.sampleView = () => {
-  return modal({ releaseType: 'minor', hasConfigFileChanged: true, latestTag: 'v4.0.0' });
+const sampleView = () => {
+  const modal = _createModal({ releaseType: 'minor', hasConfigFileChanged: true, latestTag: 'v4.0.0' });
+  return modal;
 };
+
+module.exports = releasePublicationConfirmation;
+
+module.exports.sampleView = sampleView;
 
 module.exports.callbackId = callbackId;
