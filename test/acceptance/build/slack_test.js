@@ -282,7 +282,7 @@ describe('Acceptance | Build | Slack', function () {
                   type: 'section',
                   text: {
                     type: 'mrkdwn',
-                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/v6.6.6...dev). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
+                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier <https://github.com/1024pix/pix/compare/v6.6.6...dev|*config.js*>. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
                   },
                 },
                 {
