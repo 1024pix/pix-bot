@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.84.1 (13/09/2023)
+
+
+### :bug: Correction
+- [#309](https://github.com/1024pix/pix-bot/pull/309) [BUGFIX] :bug: Corriger le lien vers le diff dans la vue Slack release-publication-confirmation.
+
 ## v1.84.0 (13/09/2023)
 
 
