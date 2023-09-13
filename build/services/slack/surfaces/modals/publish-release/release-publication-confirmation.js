@@ -23,7 +23,7 @@ function _createModal({ releaseType, hasConfigFileChanged, latestTag }) {
   ]);
 }
 
-const releasePublicationConfirmation = (releaseType, hasConfigFileChanged, latestTag) => {
+const releasePublicationConfirmation = ({ releaseType, hasConfigFileChanged, latestTag }) => {
   const modal = _createModal({ releaseType, hasConfigFileChanged, latestTag });
   return {
     response_action: 'push',

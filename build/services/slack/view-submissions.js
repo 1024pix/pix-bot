@@ -6,7 +6,7 @@ module.exports = {
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
     const { hasConfigFileChanged, latestTag } = await githubService.hasConfigFileChangedSinceLatestRelease();
-    return openModalReleasePublicationConfirmation(releaseType, hasConfigFileChanged, latestTag);
+    return openModalReleasePublicationConfirmation({ releaseType, hasConfigFileChanged, latestTag });
   },
 
   submitReleaseTypeSelectionCallbackId: openModalReleasePublicationConfirmation.callbackId,
