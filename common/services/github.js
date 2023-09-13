@@ -361,7 +361,9 @@ module.exports = {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const now = new Date().toISOString();
     const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
-    return commits.length > 0;
+    const hasConfigFileChanged = commits.length > 0;
+    const latestTag = await _getLatestReleaseTagName(repoOwner, repoName);
+    return { hasConfigFileChanged, latestTag };
   },
 
   async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {

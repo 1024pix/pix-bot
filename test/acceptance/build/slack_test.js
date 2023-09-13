@@ -3,7 +3,6 @@ const {
   nock,
   createSlackWebhookSignatureHeaders,
   nockGithubWithNoConfigChanges,
-  nockGithubWithConfigChanges,
 } = require('../../test-helper');
 const server = require('../../../server');
 
@@ -190,7 +189,42 @@ describe('Acceptance | Build | Slack', function () {
         });
 
         it('returns the confirmation modal with a warning', async function () {
-          nockGithubWithConfigChanges();
+          // given
+          const tagNock = nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/tags')
+            .twice()
+            .reply(200, [
+              {
+                commit: {
+                  url: 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
+                },
+                name: 'v6.6.6',
+              },
+              {
+                commit: {
+                  url: 'https://api.github.com/repos/github-owner/github-repository/commits/456',
+                },
+                name: 'v6.6.5',
+              },
+            ]);
+
+          const firstCommitNock = nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits/1234')
+            .reply(200, {
+              commit: {
+                committer: {
+                  date: '2021-04-14T12:40:50.326Z',
+                },
+              },
+            });
+
+          const commitsNock = nock('https://api.github.com')
+            .filteringPath(
+              /since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g,
+              'since=XXXX&until=XXXX',
+            )
+            .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
+            .reply(200, [{}]);
 
           const body = {
             type: 'view_submission',
@@ -210,12 +244,20 @@ describe('Acceptance | Build | Slack', function () {
             },
           };
 
+          // when
           const res = await server.inject({
             method: 'POST',
             url: '/build/slack/interactive-endpoint',
             headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
             payload: body,
           });
+
+          //then
+
+          expect(tagNock.isDone()).to.be.true;
+          expect(firstCommitNock.isDone()).to.be.true;
+          expect(commitsNock.isDone()).to.be.true;
+
           expect(res.statusCode).to.equal(200);
           expect(JSON.parse(res.payload)).to.deep.equal({
             response_action: 'push',
@@ -240,7 +282,7 @@ describe('Acceptance | Build | Slack', function () {
                   type: 'section',
                   text: {
                     type: 'mrkdwn',
-                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
+                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/v6.6.6...dev). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
                   },
                 },
                 {
@@ -258,6 +300,7 @@ describe('Acceptance | Build | Slack', function () {
 
       describe('callback release-publication-confirmation', function () {
         it('publish and deploy the app', async function () {
+          // given
           const body = {
             type: 'view_submission',
             view: {
@@ -265,12 +308,16 @@ describe('Acceptance | Build | Slack', function () {
               private_metadata: 'major',
             },
           };
+
+          // when
           const res = await server.inject({
             method: 'POST',
             url: '/build/slack/interactive-endpoint',
             headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
             payload: body,
           });
+
+          // then
           expect(res.statusCode).to.equal(200);
           expect(JSON.parse(res.payload)).to.deep.equal({
             response_action: 'clear',
