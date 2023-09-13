@@ -129,142 +129,217 @@ describe('Acceptance | Run | Slack', function () {
             expect(tagNock).to.have.been.requested;
           });
         });
-        it('returns the confirmation modal', async function () {
-          // given
-          const nocks = nockGithubWithNoConfigChanges();
-          const body = {
-            type: 'view_submission',
-            view: {
-              callback_id: 'release-tag-selection',
-              state: {
-                values: {
-                  'deploy-release-tag': {
-                    'release-tag-value': {
-                      value: 'v2.130.0',
+        context('when the configuration file has not changed', () => {
+          it('returns the confirmation modal', async function () {
+            // given
+            const nocks = nockGithubWithNoConfigChanges();
+            const body = {
+              type: 'view_submission',
+              view: {
+                callback_id: 'release-tag-selection',
+                state: {
+                  values: {
+                    'deploy-release-tag': {
+                      'release-tag-value': {
+                        value: 'v2.130.0',
+                      },
                     },
                   },
                 },
               },
-            },
-          };
+            };
 
-          // when
-          const res = await server.inject({
-            method: 'POST',
-            url: '/run/slack/interactive-endpoint',
-            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
-            payload: body,
-          });
+            // when
+            const res = await server.inject({
+              method: 'POST',
+              url: '/run/slack/interactive-endpoint',
+              headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+              payload: body,
+            });
 
-          // then
-          expect(res.statusCode).to.equal(200);
-          expect(JSON.parse(res.payload)).to.deep.equal({
-            response_action: 'push',
-            view: {
-              type: 'modal',
-              callback_id: 'release-deployment-confirmation',
-              private_metadata: 'v2.130.0',
-              title: {
-                type: 'plain_text',
-                text: 'Confirmation',
-              },
-              submit: {
-                type: 'plain_text',
-                text: '🚀 Go !',
-              },
-              close: {
-                type: 'plain_text',
-                text: 'Annuler',
-              },
-              blocks: [
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: "Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
-                  },
+            // then
+            expect(res.statusCode).to.equal(200);
+            expect(JSON.parse(res.payload)).to.deep.equal({
+              response_action: 'push',
+              view: {
+                type: 'modal',
+                callback_id: 'release-deployment-confirmation',
+                private_metadata: 'v2.130.0',
+                title: {
+                  type: 'plain_text',
+                  text: 'Confirmation',
                 },
-              ],
-            },
+                submit: {
+                  type: 'plain_text',
+                  text: '🚀 Go !',
+                },
+                close: {
+                  type: 'plain_text',
+                  text: 'Annuler',
+                },
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: "Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+                    },
+                  },
+                ],
+              },
+            });
+            nocks.checkAllNocksHaveBeenCalled();
           });
-          nocks.checkAllNocksHaveBeenCalled();
         });
-
-        it('returns the confirmation modal with a warning', async function () {
-          //given
-          nockGithubWithConfigChanges();
-          const pixApiNock = nock('https://app.pix.fr').get('/api/').reply(200, {
-            name: 'pix-api',
-            version: '6.6.5',
-            description: "Plateforme d'évaluation et de certification des compétences numériques",
-            environment: 'production',
-            'container-version': 'v6.6.5',
-            'container-app-name': 'pix-api-production',
-            'current-lang': 'fr',
-          });
-          const body = {
-            type: 'view_submission',
-            view: {
-              callback_id: 'release-tag-selection',
-              state: {
-                values: {
-                  'deploy-release-tag': {
-                    'release-tag-value': {
-                      value: 'v6.6.6',
+        context('when the configuration file has changed', () => {
+          context('when production API is available', function () {
+            it('returns the confirmation modal with a warning containing a diff', async function () {
+              //given
+              nockGithubWithConfigChanges();
+              const pixApiNock = nock('https://app.pix.fr').get('/api/').reply(200, {
+                name: 'pix-api',
+                version: '6.6.5',
+                description: "Plateforme d'évaluation et de certification des compétences numériques",
+                environment: 'production',
+                'container-version': 'v6.6.5',
+                'container-app-name': 'pix-api-production',
+                'current-lang': 'fr',
+              });
+              const body = {
+                type: 'view_submission',
+                view: {
+                  callback_id: 'release-tag-selection',
+                  state: {
+                    values: {
+                      'deploy-release-tag': {
+                        'release-tag-value': {
+                          value: 'v6.6.6',
+                        },
+                      },
                     },
                   },
                 },
-              },
-            },
-          };
+              };
 
-          //when
-          const res = await server.inject({
-            method: 'POST',
-            url: '/run/slack/interactive-endpoint',
-            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
-            payload: body,
+              //when
+              const res = await server.inject({
+                method: 'POST',
+                url: '/run/slack/interactive-endpoint',
+                headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+                payload: body,
+              });
+
+              //then
+              expect(res.statusCode).to.equal(200);
+              expect(JSON.parse(res.payload)).to.deep.equal({
+                response_action: 'push',
+                view: {
+                  type: 'modal',
+                  callback_id: 'release-deployment-confirmation',
+                  private_metadata: 'v6.6.6',
+                  title: {
+                    type: 'plain_text',
+                    text: 'Confirmation',
+                  },
+                  submit: {
+                    type: 'plain_text',
+                    text: '🚀 Go !',
+                  },
+                  close: {
+                    type: 'plain_text',
+                    text: 'Annuler',
+                  },
+                  blocks: [
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/v6.6.5...v6.6.6). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
+                      },
+                    },
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: "Vous vous apprêtez à déployer la version *v6.6.6* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+                      },
+                    },
+                  ],
+                },
+              });
+              expect(pixApiNock.isDone()).to.be.true;
+            });
           });
-
-          //then
-          expect(res.statusCode).to.equal(200);
-          expect(JSON.parse(res.payload)).to.deep.equal({
-            response_action: 'push',
-            view: {
-              type: 'modal',
-              callback_id: 'release-deployment-confirmation',
-              private_metadata: 'v6.6.6',
-              title: {
-                type: 'plain_text',
-                text: 'Confirmation',
-              },
-              submit: {
-                type: 'plain_text',
-                text: '🚀 Go !',
-              },
-              close: {
-                type: 'plain_text',
-                text: 'Annuler',
-              },
-              blocks: [
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/v6.6.5...v6.6.6). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
+          context('when production API is not available', () => {
+            it('returns the confirmation modal with a warning without diff', async function () {
+              // given
+              const nocks = nockGithubWithConfigChanges();
+              const pixApiNock = nock('https://app.pix.fr').get('/api/').replyWithError('Unavailable');
+              const body = {
+                type: 'view_submission',
+                view: {
+                  callback_id: 'release-tag-selection',
+                  state: {
+                    values: {
+                      'deploy-release-tag': {
+                        'release-tag-value': {
+                          value: 'v2.130.0',
+                        },
+                      },
+                    },
                   },
                 },
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: "Vous vous apprêtez à déployer la version *v6.6.6* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+              };
+
+              // when
+              const res = await server.inject({
+                method: 'POST',
+                url: '/run/slack/interactive-endpoint',
+                headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+                payload: body,
+              });
+
+              // then
+              expect(res.statusCode).to.equal(200);
+              expect(JSON.parse(res.payload)).to.deep.equal({
+                response_action: 'push',
+                view: {
+                  type: 'modal',
+                  callback_id: 'release-deployment-confirmation',
+                  private_metadata: 'v6.6.6',
+                  title: {
+                    type: 'plain_text',
+                    text: 'Confirmation',
                   },
+                  submit: {
+                    type: 'plain_text',
+                    text: '🚀 Go !',
+                  },
+                  close: {
+                    type: 'plain_text',
+                    text: 'Annuler',
+                  },
+                  blocks: [
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/v6.6.5...v6.6.6). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
+                      },
+                    },
+                    {
+                      type: 'section',
+                      text: {
+                        type: 'mrkdwn',
+                        text: "Vous vous apprêtez à déployer la version *v6.6.6* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+                      },
+                    },
+                  ],
                 },
-              ],
-            },
+              });
+              expect(pixApiNock.isDone()).to.be.true;
+            });
           });
-          expect(pixApiNock.isDone()).to.be.true;
         });
       });
 
