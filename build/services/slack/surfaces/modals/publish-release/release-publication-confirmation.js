@@ -13,7 +13,7 @@ function _createModal({ releaseType, hasConfigFileChanged, latestTag }) {
     ...(hasConfigFileChanged
       ? [
           Blocks.Section({
-            text: `:warning: Il y a eu des ajout(s)/suppression(s) dans le fichier [config.js](https://github.com/1024pix/pix/compare/${latestTag}...dev). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.`,
+            text: `:warning: Il y a eu des ajout(s)/suppression(s) dans le fichier <https://github.com/1024pix/pix/compare/${latestTag}...dev|*config.js*>. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.`,
           }),
         ]
       : []),
