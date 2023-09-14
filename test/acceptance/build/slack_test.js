@@ -188,7 +188,7 @@ describe('Acceptance | Build | Slack', function () {
           });
         });
 
-        it('returns the confirmation modal with a warning', async function () {
+        it('returns the confirmation modal with a warning and sends a slack message to tech-releases', async function () {
           // given
           const tagNock = nock('https://api.github.com')
             .get('/repos/github-owner/github-repository/tags')
@@ -226,6 +226,15 @@ describe('Acceptance | Build | Slack', function () {
             .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
             .reply(200, [{}]);
 
+          const slackMessageNock = nock('https://slack.com')
+            .post('/api/chat.postMessage', {
+              channel: '#tech-releases',
+              text: 'Changements détéctés sur le fichier config.js dans la release : liens des commits',
+            })
+            .reply(200, {
+              ok: true,
+            });
+
           const body = {
             type: 'view_submission',
             view: {
@@ -257,6 +266,7 @@ describe('Acceptance | Build | Slack', function () {
           expect(tagNock.isDone()).to.be.true;
           expect(firstCommitNock.isDone()).to.be.true;
           expect(commitsNock.isDone()).to.be.true;
+          expect(slackMessageNock.isDone()).to.be.true;
 
           expect(res.statusCode).to.equal(200);
           expect(JSON.parse(res.payload)).to.deep.equal({
