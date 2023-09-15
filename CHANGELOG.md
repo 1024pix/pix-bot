@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.86.0 (15/09/2023)
+
+
+### :rocket: Amélioration
+- [#310](https://github.com/1024pix/pix-bot/pull/310) [FEATURE] :sparkles: Envoyer un message sur slack en cas de changements sur le fichier config.js.
+
 ## v1.85.0 (15/09/2023)
 
 
