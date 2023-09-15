@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.85.0 (15/09/2023)
+
+
+### :building_construction: Tech
+- [#311](https://github.com/1024pix/pix-bot/pull/311) [TECH] Utiliser un client HTTP pour communiquer avec Slack.
+
 ## v1.84.1 (13/09/2023)
 
 
