@@ -77,10 +77,10 @@ describe('Integration | Build | Scalingo', function () {
             fallback: '[pix-github-actions-test] App deployment error',
           },
         ];
-        expect(slackPostMessageService.postMessage).to.have.been.calledWith(
-          '[pix-github-actions-test] App deployment error',
-          JSON.stringify(expectedPayload),
-        );
+        expect(slackPostMessageService.postMessage).to.have.been.calledWith({
+          message: '[pix-github-actions-test] App deployment error',
+          attachments: JSON.stringify(expectedPayload),
+        });
         expect(res.statusCode).to.equal(200);
       });
     });

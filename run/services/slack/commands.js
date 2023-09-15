@@ -70,7 +70,8 @@ async function _publishPixUI(repoName, releaseType, responseUrl) {
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
-    slackPostMessageService.postMessage(`[PIX-UI] App deployed (${releaseTagAfterRelease})`);
+    const message = `[PIX-UI] App deployed (${releaseTagAfterRelease})`;
+    slackPostMessageService.postMessage({ message });
     sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
   }
 }
@@ -85,7 +86,8 @@ async function _publishAndDeployEmberTestingLibrary(repoName, releaseType, respo
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
   } else {
-    slackPostMessageService.postMessage(`[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`);
+    const message = `[EMBER-TESTING-LIBRARY] Lib deployed (${releaseTagAfterRelease})`;
+    slackPostMessageService.postMessage({ message });
     sendResponse(responseUrl, getSuccessReleaseMessage(releaseTagAfterRelease, repoName));
   }
 }

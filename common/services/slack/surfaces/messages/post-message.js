@@ -1,29 +1,20 @@
-const axios = require('axios');
 const config = require('../../../../../config');
-const logger = require('../../../logger');
+const { httpAgent } = require('../../../../http-agent');
 
 module.exports = {
-  async postMessage(message, attachments, channel = '#tech-releases') {
-    const options = {
-      method: 'POST',
-      url: 'https://slack.com/api/chat.postMessage',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${config.slack.botToken}`,
-      },
-      data: {
-        channel: channel,
-        text: message,
-        attachments: attachments,
-      },
+  async postMessage({ message, attachments, channel = '#tech-releases', injectedHttpAgent = httpAgent }) {
+    const url = 'https://slack.com/api/chat.postMessage';
+
+    const headers = {
+      'content-type': 'application/json',
+      authorization: `Bearer ${config.slack.botToken}`,
+    };
+    const payload = {
+      channel: channel,
+      text: message,
+      attachments: attachments,
     };
 
-    const response = await axios(options);
-    if (!response.data.ok) {
-      logger.error({ event: 'post-message', message: response.data });
-      throw new Error('Slack error received');
-    }
-
-    return response;
+    await injectedHttpAgent.post({ url, payload, headers });
   },
 };
