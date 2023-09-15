@@ -11,7 +11,12 @@ describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message'
       sinon.stub(config.slack, 'botToken').value('faketoken');
       const httpAgent = { post: sinon.stub() };
       //when
-      await postMessage(messageToSend, {}, destinationChannel, httpAgent);
+      await postMessage({
+        message: messageToSend,
+        attachments: {},
+        channel: destinationChannel,
+        injectedHttpAgent: httpAgent,
+      });
 
       //then
       expect(httpAgent.post).to.have.been.calledOnceWith({

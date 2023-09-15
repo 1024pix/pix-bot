@@ -56,7 +56,7 @@ module.exports = {
 
     const { message, attachments } = getSlackMessageAttachments(request.payload);
 
-    await slackPostMessageService.postMessage(message, JSON.stringify(attachments));
+    await slackPostMessageService.postMessage({ message, attachments: JSON.stringify(attachments) });
 
     logger.warn({
       event: 'scalingo',

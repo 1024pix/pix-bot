@@ -93,7 +93,8 @@ module.exports = {
   },
 
   _interruptRelease() {
-    slackPostMessageService.postMessage('MER bloquée. Etat de l‘environnement d‘intégration à vérifier.');
+    const message = 'MER bloquée. Etat de l‘environnement d‘intégration à vérifier.';
+    slackPostMessageService.postMessage({ message });
     return {
       response_action: 'clear',
     };

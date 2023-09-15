@@ -45,7 +45,8 @@ module.exports = {
   submitReleaseDeploymentConfirmation(payload) {
     const releaseTag = payload.view.private_metadata;
     if (!githubService.isBuildStatusOK({ tagName: releaseTag.trim().toLowerCase() })) {
-      slackPostMessageService.postMessage('MEP bloquée. Etat de l‘environnement de recette à vérifier.');
+      const message = 'MEP bloquée. Etat de l‘environnement de recette à vérifier.';
+      slackPostMessageService.postMessage({ message });
     } else {
       deploy(environments.production, releaseTag);
     }
@@ -61,7 +62,7 @@ module.exports = {
     const invitationLink = await client.inviteCollaborator(appId, userEmail);
     const message = `app ${applicationName} created <${invitationLink}|invitation link>`;
     const channel = `@${payload.user.id}`;
-    slackPostMessageService.postMessage(message, null, channel);
+    slackPostMessageService.postMessage({ message, channel });
     return {
       response_action: 'clear',
     };
