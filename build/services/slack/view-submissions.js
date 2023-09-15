@@ -8,8 +8,9 @@ module.exports = {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
     const { hasConfigFileChanged, latestTag } = await githubService.hasConfigFileChangedSinceLatestRelease();
     if (hasConfigFileChanged) {
+      const message = `:warning: Il y a eu des ajout(s)/suppression(s) [dans le fichier config.js](https://github.com/1024pix/pix/compare/${latestTag}...dev). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.`;
       await slackPostMessageService.postMessage({
-        message: 'Changements détéctés sur le fichier config.js dans la release : liens des commits',
+        message,
         channel: '#tech-releases',
       });
     }

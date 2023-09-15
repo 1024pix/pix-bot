@@ -226,10 +226,12 @@ describe('Acceptance | Build | Slack', function () {
             .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
             .reply(200, [{}]);
 
+          const message = `:warning: Il y a eu des ajout(s)/suppression(s) [dans le fichier config.js](https://github.com/1024pix/pix/compare/v6.6.6...dev). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.`;
+
           const slackMessageNock = nock('https://slack.com')
             .post('/api/chat.postMessage', {
               channel: '#tech-releases',
-              text: 'Changements détéctés sur le fichier config.js dans la release : liens des commits',
+              text: message,
             })
             .reply(200, {
               ok: true,
