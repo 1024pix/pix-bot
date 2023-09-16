@@ -226,12 +226,20 @@ describe('Acceptance | Build | Slack', function () {
             .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
             .reply(200, [{}]);
 
-          const message = `:warning: Il y a eu des ajout(s)/suppression(s) [dans le fichier config.js](https://github.com/1024pix/pix/compare/v6.6.6...dev). Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.`;
+          const message =
+            ':warning: Il y a eu des ajout(s)/suppression(s) ' +
+            '<https://github.com/1024pix/pix/compare/v6.6.6...dev|dans le fichier config.js>. ' +
+            "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.";
+
+          const expectedRequestBody = {
+            channel: '#tech-releases',
+            text: message,
+          };
 
           const slackMessageNock = nock('https://slack.com')
-            .post('/api/chat.postMessage', {
-              channel: '#tech-releases',
-              text: message,
+            .post('/api/chat.postMessage', (body) => {
+              expect(body).to.deep.equal(expectedRequestBody);
+              return true;
             })
             .reply(200, {
               ok: true,
