@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.86.1 (16/09/2023)
+
+
+### :bug: Correction
+- [#312](https://github.com/1024pix/pix-bot/pull/312) [BUGFIX] Corriger le message envoyé sur slack lors de changements du fichier config.js.
+
 ## v1.86.0 (15/09/2023)
 
 
