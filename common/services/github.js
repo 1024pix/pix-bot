@@ -303,6 +303,45 @@ const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) =>
   });
 };
 
+async function _getPullRequestsFromCommitShaFromGithub({ repoOwner, repoName, commitSha }) {
+  const { repos } = _createOctokit();
+  const { data } = await repos.listPullRequestsAssociatedWithCommit({
+    owner: repoOwner,
+    repo: repoName,
+    commit_sha: commitSha,
+  });
+
+  return data ? data : [];
+}
+
+async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commitsShaList }) {
+  let pullRequests = [];
+
+  await Promise.all(
+    commitsShaList.map(async (commitSha) => {
+      const pullRequestsByCommitSha = await _getPullRequestsFromCommitShaFromGithub({
+        repoOwner,
+        repoName,
+        commitSha,
+      });
+      pullRequestsByCommitSha.map((pullRequestDetails) => {
+        pullRequests.push(pullRequestDetails);
+      });
+    }),
+  );
+
+  const pullRequestsForCommitShaFilteredDetails = Array.from(new Set(pullRequests.map(JSON.stringify))).map(JSON.parse);
+
+  pullRequestsForCommitShaFilteredDetails.forEach((pullRequest) => {
+    pullRequest.labels = pullRequest.labels
+      .filter((label) => label.name.includes('team'))
+      .map((label) => label.name)
+      .join(',');
+  });
+
+  return pullRequestsForCommitShaFilteredDetails;
+}
+
 module.exports = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
@@ -364,9 +403,17 @@ module.exports = {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const now = new Date().toISOString();
     const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
+    const commitsShaList = commits.map((commit) => commit.sha);
     const hasConfigFileChanged = commits.length > 0;
     const latestTag = await _getLatestReleaseTagName(repoOwner, repoName);
-    return { hasConfigFileChanged, latestTag };
+
+    const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
+      repoOwner,
+      repoName,
+      commitsShaList,
+    });
+
+    return { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails };
   },
 
   async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {

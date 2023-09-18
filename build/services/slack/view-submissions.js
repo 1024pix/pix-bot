@@ -6,12 +6,23 @@ const slackPostMessageService = require('../../../common/services/slack/surfaces
 module.exports = {
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
-    const { hasConfigFileChanged, latestTag } = await githubService.hasConfigFileChangedSinceLatestRelease();
+    const { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails } =
+      await githubService.hasConfigFileChangedSinceLatestRelease();
+
     if (hasConfigFileChanged) {
+      let pRsAndTeamLabelsMessageList = 'Les Pr et équipes concernées sont : ';
+      pullRequestsForCommitShaDetails.forEach((pullRequestDetails) => {
+        pRsAndTeamLabelsMessageList = pRsAndTeamLabelsMessageList.concat(
+          `<${pullRequestDetails.html_url}|${pullRequestDetails.labels}> `,
+        );
+      });
+
       const message =
         ':warning: Il y a eu des ajout(s)/suppression(s) ' +
         `<https://github.com/1024pix/pix/compare/${latestTag}...dev|dans le fichier config.js>. ` +
-        "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.";
+        "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*. " +
+        `${pRsAndTeamLabelsMessageList}`;
+
       await slackPostMessageService.postMessage({
         message,
         channel: '#tech-releases',
