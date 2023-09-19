@@ -9,7 +9,7 @@ const {
 const githubService = require('../../../../common/services/github');
 const logger = require('../../../../common/services/logger');
 
-describe('github-test', function () {
+describe('Unit | Build | github-test', function () {
   describe('#getPullRequests', function () {
     it('should return the response for slack', async function () {
       // given
