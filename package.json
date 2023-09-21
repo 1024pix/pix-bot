@@ -21,7 +21,7 @@
     "local:prevent-trigger-lint-on-commit": "git config --unset core.hooksPath",
     "preinstall": "npx check-engine",
     "start": "node index.js",
-    "test": "NODE_ENV=test mocha --recursive --exit test"
+    "test": "NODE_ENV=test mocha --recursive --exit --reporter=${MOCHA_REPORTER:-dot} test"
   },
   "repository": {
     "type": "git",
@@ -62,6 +62,7 @@
     "husky": "^8.0.2",
     "lint-staged": "^14.0.0",
     "mocha": "^10.2.0",
+    "mocha-junit-reporter": "^2.2.1",
     "nock": "^13.2.9",
     "prettier": "^3.0.0",
     "proxyquire": "^2.1.3",

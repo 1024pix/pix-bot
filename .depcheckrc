@@ -1,3 +1,10 @@
-ignores: ["lint-staged"]
+ignores: [
+  "lint-staged",
+  "mocha-junit-reporter"
+ ]
 
 # "lint-staged" is used in npm task local:trigger-lint-on-commit
+
+# "mocha-junit-reporter" is used in ../.circleci/config.yml
+# code =>  MOCHA_REPORTER: mocha-junit-reporter
+# see https://github.com/michaelleeallen/mocha-junit-reporter#usage
