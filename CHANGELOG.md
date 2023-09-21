@@ -1,5 +1,19 @@
 # pix-bot Changelog
 
+## v1.87.0 (21/09/2023)
+
+
+### :building_construction: Tech
+- [#318](https://github.com/1024pix/pix-bot/pull/318) [TECH] Amélioration de la gestion des appels en échec lors de la récupération des derniers tags.
+
+### :arrow_up: Montée de version
+- [#317](https://github.com/1024pix/pix-bot/pull/317) [BUMP] Update dependency sinon to v16 (dossier racine).
+
+### :coffee: Autre
+- [#314](https://github.com/1024pix/pix-bot/pull/314) Afficher la progression synthétique des tests.
+- [#316](https://github.com/1024pix/pix-bot/pull/316) Ne pas tracer durant les tests.
+- [#315](https://github.com/1024pix/pix-bot/pull/315) Empêcher le crash de l'API en cas de configuration incorrecte.
+
 ## v1.86.1 (16/09/2023)
 
 
