@@ -184,7 +184,10 @@ async function _getTagCommitUrl({ owner, repo, tagName }) {
 
 async function getLatestRelease(repoOwner, repoName) {
   const tags = await _getTags(repoOwner, repoName);
-  return tags[0];
+  if (tags) {
+    return tags[0];
+  }
+  throw Boom.serverUnavailable('tto');
 }
 
 async function getSecondToLastRelease(repoOwner, repoName) {

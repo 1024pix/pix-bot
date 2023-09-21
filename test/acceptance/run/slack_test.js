@@ -124,8 +124,8 @@ describe('Acceptance | Run | Slack', function () {
             });
 
             // then
-            expect(error.statusCode).to.equal(StatusCodes.INTERNAL_SERVER_ERROR);
-            expect(error.statusMessage).to.equal('Internal Server Error');
+            expect(error.statusCode).to.equal(StatusCodes.SERVICE_UNAVAILABLE);
+            expect(error.statusMessage).to.equal('Service Unavailable');
             expect(tagNock).to.have.been.requested;
           });
         });
