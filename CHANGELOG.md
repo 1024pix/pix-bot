@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.88.0 (26/09/2023)
+
+
+### :building_construction: Tech
+- [#313](https://github.com/1024pix/pix-bot/pull/313) [TECH] Afficher le label de la team concernée et le lien vers la PR associée au changement de config.
+
 ## v1.87.0 (21/09/2023)
 
 
