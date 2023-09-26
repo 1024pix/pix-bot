@@ -322,6 +322,18 @@ describe('Unit | Build | github-test', function () {
     context('should return true when config file has been changed', function () {
       it('should call Github "commits list" API', async function () {
         // given
+        const pullRequestsForCommitShaDetails = [
+          {
+            number: 1327,
+            labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
+            html_url: 'https://github.com/octocat/Hello-World/pull/1327',
+          },
+          {
+            number: 4567,
+            labels: [{ name: 'cross-team' }, { name: 'team-dev-com' }],
+            html_url: 'https://github.com/octocat/Hello-World/pull/4567',
+          },
+        ];
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
           .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
@@ -342,16 +354,44 @@ describe('Unit | Build | github-test', function () {
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/tags')
           .reply(200, [{ name: 'v6.6.6' }, { name: 'v6.6.5' }]);
+
+        nock('https://api.github.com')
+          .get('/repos/github-owner/github-repository/commits/5ec2f42/pulls')
+          .reply(200, pullRequestsForCommitShaDetails);
+
         // when
         const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+
         // then
-        expect(response).to.be.deep.equal({ hasConfigFileChanged: true, latestTag: 'v6.6.6' });
+        expect(response).to.be.deep.equal({
+          hasConfigFileChanged: true,
+          latestTag: 'v6.6.6',
+          pullRequestsForCommitShaDetails: [
+            {
+              number: 1327,
+              labels: 'team-captains,team-acces',
+              html_url: 'https://github.com/octocat/Hello-World/pull/1327',
+            },
+            {
+              number: 4567,
+              labels: 'cross-team,team-dev-com',
+              html_url: 'https://github.com/octocat/Hello-World/pull/4567',
+            },
+          ],
+        });
       });
     });
 
     context('should return false when config file did not changed changed', function () {
       it('should call Github "commits list" API', async function () {
         // given
+        const pullRequestsForCommitShaDetails = [
+          {
+            number: 1327,
+            labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
+            html_url: 'https://github.com/octocat/Hello-World/pull/1327',
+          },
+        ];
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
           .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
@@ -368,10 +408,20 @@ describe('Unit | Build | github-test', function () {
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/tags')
           .reply(200, [{ name: 'v6.6.6' }, { name: 'v6.6.5' }]);
+
+        nock('https://api.github.com')
+          .get('/repos/github-owner/github-repository/commits/5ec2f42/pulls')
+          .reply(200, pullRequestsForCommitShaDetails);
+
         // when
         const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+
         // then
-        expect(response).to.be.deep.equal({ hasConfigFileChanged: false, latestTag: 'v6.6.6' });
+        expect(response).to.be.deep.equal({
+          hasConfigFileChanged: false,
+          latestTag: 'v6.6.6',
+          pullRequestsForCommitShaDetails: [],
+        });
       });
     });
   });
