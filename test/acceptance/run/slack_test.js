@@ -191,66 +191,71 @@ describe('Acceptance | Run | Slack', function () {
           nocks.checkAllNocksHaveBeenCalled();
         });
 
-        it('returns the confirmation modal with a warning', async function () {
-          nockGithubWithConfigChanges();
+        describe('when config file has been changed', function () {
+          it('returns the confirmation modal with a warning', async function () {
+            nockGithubWithConfigChanges();
 
-          const body = {
-            type: 'view_submission',
-            view: {
-              callback_id: 'release-tag-selection',
-              state: {
-                values: {
-                  'deploy-release-tag': {
-                    'release-tag-value': {
-                      value: 'v2.130.0',
+            const body = {
+              type: 'view_submission',
+              view: {
+                callback_id: 'release-tag-selection',
+                state: {
+                  values: {
+                    'deploy-release-tag': {
+                      'release-tag-value': {
+                        value: 'v2.130.0',
+                      },
                     },
                   },
                 },
               },
-            },
-          };
-          const res = await server.inject({
-            method: 'POST',
-            url: '/run/slack/interactive-endpoint',
-            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
-            payload: body,
-          });
-          expect(res.statusCode).to.equal(200);
-          expect(JSON.parse(res.payload)).to.deep.equal({
-            response_action: 'push',
-            view: {
-              type: 'modal',
-              callback_id: 'release-deployment-confirmation',
-              private_metadata: 'v2.130.0',
-              title: {
-                type: 'plain_text',
-                text: 'Confirmation',
-              },
-              submit: {
-                type: 'plain_text',
-                text: '🚀 Go !',
-              },
-              close: {
-                type: 'plain_text',
-                text: 'Annuler',
-              },
-              blocks: [
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
-                  },
+            };
+            const res = await server.inject({
+              method: 'POST',
+              url: '/run/slack/interactive-endpoint',
+              headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+              payload: body,
+            });
+            expect(res.statusCode).to.equal(200);
+            expect(JSON.parse(res.payload)).to.deep.equal({
+              response_action: 'push',
+              view: {
+                type: 'modal',
+                callback_id: 'release-deployment-confirmation',
+                private_metadata: 'v2.130.0',
+                title: {
+                  type: 'plain_text',
+                  text: 'Confirmation',
                 },
-                {
-                  type: 'section',
-                  text: {
-                    type: 'mrkdwn',
-                    text: "Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
-                  },
+                submit: {
+                  type: 'plain_text',
+                  text: '🚀 Go !',
                 },
-              ],
-            },
+                close: {
+                  type: 'plain_text',
+                  text: 'Annuler',
+                },
+                blocks: [
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text:
+                        ':warning: Il y a eu des ajout(s)/suppression(s)' +
+                        ' dans le fichier' +
+                        " <https://github.com/1024pix/pix/compare/v7.7.6...v.7.7.7|*config.js*>. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
+                    },
+                  },
+                  {
+                    type: 'section',
+                    text: {
+                      type: 'mrkdwn',
+                      text: "Vous vous apprêtez à déployer la version *v2.130.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+                    },
+                  },
+                ],
+              },
+            });
           });
         });
       });

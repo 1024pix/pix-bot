@@ -552,4 +552,84 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#hasConfigFileChangedInLatestReleaseCompareToProdTag', function () {
+    const repoOwner = 'github-owner';
+    const repoName = 'github-repository';
+
+    context('when api is not responding', function () {
+      it('should log an error', async function () {
+        // given
+        const errorLoggerStub = sinon.stub(logger, 'error');
+        const injectedHttpAgentStub = {
+          get: sinon.stub().rejects(),
+        };
+
+        // when
+        await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
+          repoOwner,
+          repoName,
+          injectedHttpAgent: injectedHttpAgentStub,
+        });
+
+        // then
+        expect(errorLoggerStub.calledOnce).to.be.true;
+        expect(errorLoggerStub.firstCall.args[0]).to.deep.equal({
+          event: 'github',
+          message: 'error message',
+        });
+      });
+    });
+
+    context('should return true when config file has been changed', function () {
+      it('should call Github "commits list" API', async function () {
+        // given
+        const injectedHttpAgentStub = {
+          get: sinon.stub().resolves({
+            isSuccessful: true,
+            data: {
+              version: '4.37.0',
+            },
+          }),
+        };
+        const getComparedCommits = nock('https://api.github.com')
+          .get('/repos/github-owner/a-repository/compare/v4.37.0...dev')
+          .reply(200, {
+            files: [
+              {
+                sha: 'fe6e25becd86f5d3d8034f48474cde452840b6a9',
+                filename: 'package.json',
+                status: 'modified',
+                additions: 1,
+                deletions: 1,
+                changes: 2,
+                blob_url: 'https://github.com/1024pix/pix/blob/d48443706b321820e7c8c5ba457befa10f4a1d04/package.json',
+                raw_url: 'https://github.com/1024pix/pix/raw/d48443706b321820e7c8c5ba457befa10f4a1d04/package.json',
+                contents_url:
+                  'https://api.github.com/repos/1024pix/pix/contents/package.json?ref=d48443706b321820e7c8c5ba457befa10f4a1d04',
+                patch:
+                  '@@ -1,6 +1,6 @@\n {\n   "name": "pix",\n-  "version": "4.37.0",\n+  "version": "4.38.0",\n   "private": false,\n   "description": "Plateforme d\'évaluation et de certification des compétences numériques",\n   "license": "AGPL-3.0",',
+              },
+            ],
+          });
+
+        // when
+        const response = await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
+          repoOwner,
+          repoName,
+          injectedHttpAgent: injectedHttpAgentStub,
+        });
+
+        // then
+        expect(response).to.deep.equal({
+          commits: [
+            {
+              sha: '5ec2f42',
+            },
+          ],
+          currentProductionTag: '4.37.0',
+        });
+      });
+    });
+  });
 });

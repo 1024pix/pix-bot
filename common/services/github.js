@@ -6,6 +6,7 @@ const tsscmp = require('tsscmp');
 const Boom = require('@hapi/boom');
 const settings = require('../../config');
 const logger = require('./logger');
+const { httpAgent } = require('../../common/http-agent');
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -342,6 +343,12 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
+async function getFilesModifiedBeetwenTwoReleases({ endpoint }) {
+  const octokit = _createOctokit();
+  const { data } = await octokit.repos.compareCommits(endpoint);
+  return data.commit.files;
+}
+
 module.exports = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
@@ -444,4 +451,27 @@ module.exports = {
   },
 
   commentPullRequest,
+
+  async hasConfigFileChangedInLatestReleaseCompareToProdTag({ releaseTag, injectedHttpAgent = httpAgent }) {
+    const apiUrl = 'https://api.pix.fr/api';
+    let currentProductionTag;
+    let commits = [
+      {
+        sha: '5ec2f42',
+      },
+    ];
+
+    try {
+      const { data } = await injectedHttpAgent.get({ url: apiUrl });
+      currentProductionTag = data.version;
+    } catch (error) {
+      logger.error({ event: 'github', message: 'error message' });
+    }
+    const versionsToCompare = `${releaseTag}...${currentProductionTag}`;
+    const endpoint = `https://api.github.com/repos/1024pix/pix/compare/${versionsToCompare}`;
+
+    const changedFiles = await getFilesModifiedBeetwenTwoReleases({ endpoint });
+
+    return { commits, currentProductionTag };
+  },
 };
