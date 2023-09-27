@@ -9,6 +9,28 @@ class HttpResponse {
   }
 }
 
+const httpError = function ({ httpErr, method, url }) {
+  let code;
+  let data;
+
+  if (httpErr.response) {
+    code = httpErr.response.status;
+    data = httpErr.response.data;
+  } else {
+    code = null;
+    data = httpErr.message;
+  }
+
+  const message = `End ${method} request to ${url} error: ${code || ''} ${JSON.stringify(data)}`;
+  logger.error({ event: 'http-client-request', message });
+
+  return new HttpResponse({
+    code,
+    data,
+    isSuccessful: false,
+  });
+};
+
 const httpAgent = {
   async post({ url, payload, headers }) {
     try {
@@ -23,25 +45,24 @@ const httpAgent = {
         isSuccessful: true,
       });
     } catch (httpErr) {
-      let code;
-      let data;
+      return httpError({ httpErr, method: 'POST', url });
+    }
+  },
 
-      if (httpErr.response) {
-        code = httpErr.response.status;
-        data = httpErr.response.data;
-      } else {
-        code = null;
-        data = httpErr.message;
-      }
-
-      const message = `End POST request to ${url} error: ${code || ''} ${JSON.stringify(data)}`;
-      logger.error({ event: 'http-client-request', message });
+  async get({ url, headers }) {
+    try {
+      const config = {
+        headers,
+      };
+      const httpResponse = await axios.get(url, config);
 
       return new HttpResponse({
-        code,
-        data,
-        isSuccessful: false,
+        code: httpResponse.status,
+        data: httpResponse.data,
+        isSuccessful: true,
       });
+    } catch (httpErr) {
+      return httpError({ httpErr, method: 'GET', url });
     }
   },
 };
