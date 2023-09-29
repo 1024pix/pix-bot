@@ -336,7 +336,7 @@ describe('Unit | Build | github-test', function () {
         ];
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
+          .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/src/shared/config.js' })
           .reply(200, [
             {
               sha: '5ec2f42',
@@ -394,7 +394,7 @@ describe('Unit | Build | github-test', function () {
         ];
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/lib/config.js' })
+          .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/src/shared/config.js' })
           .reply(200, []);
 
         nock('https://api.github.com')
@@ -437,7 +437,7 @@ describe('Unit | Build | github-test', function () {
         // given
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/lib/config.js' })
+          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/src/shared/config.js' })
           .reply(200, [
             {
               sha: '5ec2f42',
@@ -472,7 +472,7 @@ describe('Unit | Build | github-test', function () {
         // given
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/lib/config.js' })
+          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/src/shared/config.js' })
           .reply(200, []);
 
         nock('https://api.github.com')

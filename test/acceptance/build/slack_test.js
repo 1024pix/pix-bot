@@ -225,7 +225,9 @@ describe('Acceptance | Build | Slack', function () {
                 /since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g,
                 'since=XXXX&until=XXXX',
               )
-              .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Flib%2Fconfig.js')
+              .get(
+                '/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Fsrc%2Fshared%2Fconfig.js',
+              )
               .reply(200, [
                 {
                   sha: '6dcb09',
