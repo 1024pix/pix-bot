@@ -557,32 +557,33 @@ describe('Unit | Build | github-test', function () {
     const repoOwner = 'github-owner';
     const repoName = 'github-repository';
 
-    context('when api is not responding', function () {
+    context('when PIX api is not responding', function () {
       it('should log an error', async function () {
         // given
+        nock('https://api.pix.fr')
+          .get('/api')
+          .reply(500, {});
+        
         const errorLoggerStub = sinon.stub(logger, 'error');
-        const injectedHttpAgentStub = {
-          get: sinon.stub().rejects(),
-        };
 
         // when
-        await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
+        const response = await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
           repoOwner,
           repoName,
-          injectedHttpAgent: injectedHttpAgentStub,
         });
 
         // then
         expect(errorLoggerStub.calledOnce).to.be.true;
         expect(errorLoggerStub.firstCall.args[0]).to.deep.equal({
-          event: 'github',
-          message: 'error message',
+          event: 'http-client-request',
+          message: 'End GET request to https://api.pix.fr/api error: 500 {}',
         });
+        expect(response).to.be.deep.equal({ commits: [], currentProductionTag: '' });
       });
     });
 
     context('should return true when config file has been changed', function () {
-      it('should call Github "commits list" API', async function () {
+      it.only('should call Github "commits list" API', async function () {
         // given
         const injectedHttpAgentStub = {
           get: sinon.stub().resolves({
@@ -592,25 +593,127 @@ describe('Unit | Build | github-test', function () {
             },
           }),
         };
+
         const getComparedCommits = nock('https://api.github.com')
-          .get('/repos/github-owner/a-repository/compare/v4.37.0...dev')
-          .reply(200, {
+          .get('/repos/github-owner/github-repository/compare/v4.37.0...dev')
+          .reply(200,{
+            url: "https://api.github.com/repos/....",
+            html_url: "https://github.com/1024pix/....",
+            permalink_url: "https://github.com/1024pix/pix/compare/1024pix:105217b...1024pix:7ece473",
+            diff_url: "https://github.com/1024pix/pix/compare/v4.37.0...v4.38.0.diff",
+            patch_url: "https://github.com/1024pix/...",
+            base_commit: {},
+            merge_base_commit: {},
+            status: "ahead",
+            ahead_by: 61,
+            behind_by: 0,
+            total_commits: 61,
+            commits: [
+              {
+                sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
+                node_id: "C_kwDOB4-c69oAKDNmNjM4MTAzNDNmYTcwNmVmOTRjOTE1YTkyMmZmYzg4YzQ0MmU0ZTY",
+                commit: {
+                  author: {
+                    name: "titi",
+                    email: "titi@pix.fr",
+                    date: "2023-09-01T15:26:09Z"
+                  },
+                  committer: {
+                    name: "GitHub",
+                    email: "noreply@github.com",
+                    date: "2023-09-25T09:15:54Z"
+                  },
+                  message: ":sparkles: api: add minimum success rate configuration in FlashAlgorithm",
+                  tree: {
+                    sha: "3223f2873aeded6fa72212df223565546df8bda2",
+                    url: "https://api.github.com/repos/1024pix/pix/git/trees/3223f2873aeded6fa72212df223565546df8bda2"
+                  },
+                  url: "https://api.github.com/repos/1024pix/pix/git/commits/3f63810343fa706ef94c915a922ffc88c442e4e6",
+                  comment_count: 0,
+                  verification: {
+                    verified: false,
+                    reason: "unsigned",
+                    signature: null,
+                    payload: null
+                  }
+                },
+                url: "https://api.github.com/repos/1024pix/pix/commits/3f63810343fa706ef94c915a922ffc88c442e4e6",
+                html_url: "https://github.com/1024pix/pix/commit/3f63810343fa706ef94c915a922ffc88c442e4e6",
+                comments_url: "https://api.github.com/repos/1024pix/pix/commits/3f63810343fa706ef94c915a922ffc88c442e4e6/comments",
+                author: {
+                  login: "titi",
+                  id: 6661925,
+                  node_id: "MDQ6VXNlcjY2NjE5MjU=",
+                  avatar_url: "https://avatars.githubusercontent.com/u/6661925?v=4",
+                  gravatar_id: "",
+                  url: "https://api.github.com/users/titi",
+                  html_url: "https://github.com/titi",
+                  followers_url: "https://api.github.com/users/titi/followers",
+                  following_url: "https://api.github.com/users/titi/following{/other_user}",
+                  gists_url: "https://api.github.com/users/titi/gists{/gist_id}",
+                  starred_url: "https://api.github.com/users/titi/starred{/owner}{/repo}",
+                  subscriptions_url: "https://api.github.com/users/titi/subscriptions",
+                  organizations_url: "https://api.github.com/users/titi/orgs",
+                  repos_url: "https://api.github.com/users/titi/repos",
+                  events_url: "https://api.github.com/users/titi/events{/privacy}",
+                  received_events_url: "https://api.github.com/users/titi/received_events",
+                  type: "User",
+                  site_admin: false
+                },
+                committer: {
+                  login: "web-flow",
+                  id: 19864447,
+                  node_id: "MDQ6VXNlcjE5ODY0NDQ3",
+                  avatar_url: "https://avatars.githubusercontent.com/u/19864447?v=4",
+                  gravatar_id: "",
+                  url: "https://api.github.com/users/web-flow",
+                  html_url: "https://github.com/web-flow",
+                  followers_url: "https://api.github.com/users/web-flow/followers",
+                  following_url: "https://api.github.com/users/web-flow/following{/other_user}",
+                  gists_url: "https://api.github.com/users/web-flow/gists{/gist_id}",
+                  starred_url: "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+                  subscriptions_url: "https://api.github.com/users/web-flow/subscriptions",
+                  organizations_url: "https://api.github.com/users/web-flow/orgs",
+                  repos_url: "https://api.github.com/users/web-flow/repos",
+                  events_url: "https://api.github.com/users/web-flow/events{/privacy}",
+                  received_events_url: "https://api.github.com/users/web-flow/received_events",
+                  type: "User",
+                  site_admin: false
+                },
+                parents: [
+                  {
+                    sha: "105217bf01219f6889461a5f00c1800a764140f2",
+                    url: "https://api.github.com/repos/1024pix/pix/commits/105217bf01219f6889461a5f00c1800a764140f2",
+                    html_url: "https://github.com/1024pix/pix/commit/105217bf01219f6889461a5f00c1800a764140f2"
+                  }
+                ]
+              }
+            ],
             files: [
               {
-                sha: 'fe6e25becd86f5d3d8034f48474cde452840b6a9',
-                filename: 'package.json',
-                status: 'modified',
-                additions: 1,
-                deletions: 1,
-                changes: 2,
-                blob_url: 'https://github.com/1024pix/pix/blob/d48443706b321820e7c8c5ba457befa10f4a1d04/package.json',
-                raw_url: 'https://github.com/1024pix/pix/raw/d48443706b321820e7c8c5ba457befa10f4a1d04/package.json',
-                contents_url:
-                  'https://api.github.com/repos/1024pix/pix/contents/package.json?ref=d48443706b321820e7c8c5ba457befa10f4a1d04',
-                patch:
-                  '@@ -1,6 +1,6 @@\n {\n   "name": "pix",\n-  "version": "4.37.0",\n+  "version": "4.38.0",\n   "private": false,\n   "description": "Plateforme d\'évaluation et de certification des compétences numériques",\n   "license": "AGPL-3.0",',
+                sha: "4c4d6d14ccc48f42ad3efee6a4424cf2f8363790",
+                filename: "1d/package-lock.json",
+                status: "modified",
+                additions: 22797,
+                deletions: 29242,
+                changes: 52039,
+                blob_url: "https://github.com/1024pix/pix/blob/7ece47336075bb5e2813c85c99879ead2a14791c/1d%2Fpackage-lock.json",
+                raw_url: "https://github.com/1024pix/pix/raw/7ece47336075bb5e2813c85c99879ead2a14791c/1d%2Fpackage-lock.json",
+                contents_url: "https://api.github.com/repos/1024pix/pix/contents/1d%2Fpackage-lock.json?ref=7ece47336075bb5e2813c85c99879ead2a14791c"
               },
-            ],
+              {
+                sha: "4ee73e664498c1accd85fdb1da5822dfe8d6f984",
+                filename: "1d/package.json",
+                status: "modified",
+                additions: 3,
+                deletions: 5,
+                changes: 8,
+                blob_url: "https://github.com/1024pix/pix/blob/7ece47336075bb5e2813c85c99879ead2a14791c/1d%2Fpackage.json",
+                raw_url: "https://github.com/1024pix/pix/raw/7ece47336075bb5e2813c85c99879ead2a14791c/1d%2Fpackage.json",
+                contents_url: "https://api.github.com/repos/1024pix/pix/contents/1d%2Fpackage.json?ref=7ece47336075bb5e2813c85c99879ead2a14791c",
+                patch: "dsfsfsdf",
+              }
+            ]
           });
 
         // when
@@ -623,9 +726,7 @@ describe('Unit | Build | github-test', function () {
         // then
         expect(response).to.deep.equal({
           commits: [
-            {
-              sha: '5ec2f42',
-            },
+            '3f63810343fa706ef94c915a922ffc88c442e4e6'
           ],
           currentProductionTag: '4.37.0',
         });

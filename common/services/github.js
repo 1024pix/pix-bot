@@ -346,7 +346,7 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
 async function getFilesModifiedBeetwenTwoReleases({ endpoint }) {
   const octokit = _createOctokit();
   const { data } = await octokit.repos.compareCommits(endpoint);
-  return data.commit.files;
+  return { files: data.files, commits: data.commits};
 }
 
 module.exports = {
@@ -452,26 +452,19 @@ module.exports = {
 
   commentPullRequest,
 
-  async hasConfigFileChangedInLatestReleaseCompareToProdTag({ releaseTag, injectedHttpAgent = httpAgent }) {
+  async hasConfigFileChangedInLatestReleaseCompareToProdTag({ repoOwner, repoName, injectedHttpAgent = httpAgent }) {
     const apiUrl = 'https://api.pix.fr/api';
-    let currentProductionTag;
-    let commits = [
-      {
-        sha: '5ec2f42',
-      },
-    ];
+    const response = await injectedHttpAgent.get({ url: apiUrl });
 
-    try {
-      const { data } = await injectedHttpAgent.get({ url: apiUrl });
-      currentProductionTag = data.version;
-    } catch (error) {
-      logger.error({ event: 'github', message: 'error message' });
+    if (response.isSuccessful) {
+      const currentProductionTag = response.data.version;
+      const versionsToCompare = `v${currentProductionTag}...dev`;
+      const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
+      const { files, commits } = await getFilesModifiedBeetwenTwoReleases({ endpoint });
+
+      return { commits: commits.map(c => c.sha), currentProductionTag };
     }
-    const versionsToCompare = `${releaseTag}...${currentProductionTag}`;
-    const endpoint = `https://api.github.com/repos/1024pix/pix/compare/${versionsToCompare}`;
 
-    const changedFiles = await getFilesModifiedBeetwenTwoReleases({ endpoint });
-
-    return { commits, currentProductionTag };
+    return { commits: [], currentProductionTag: '' };
   },
 };
