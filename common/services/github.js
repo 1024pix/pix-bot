@@ -349,6 +349,12 @@ async function getFilesModifiedBeetwenTwoReleases({ endpoint }) {
   return { files: data.files, commits: data.commits};
 }
 
+function hasConfigBeenModified(files) {
+    const result = files.filter(f => f.filename === 'api/lib/config.js');
+
+    return result.length > 0;
+}
+
 module.exports = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
@@ -452,19 +458,88 @@ module.exports = {
 
   commentPullRequest,
 
-  async hasConfigFileChangedInLatestReleaseCompareToProdTag({ repoOwner, repoName, injectedHttpAgent = httpAgent }) {
+  async hasConfigFileChangedInLatestReleaseCompareToProdTag({
+    repoOwner = settings.github.owner,
+    repoName = settings.github.repository,
+    injectedHttpAgent = httpAgent
+  }) {
     const apiUrl = 'https://api.pix.fr/api';
     const response = await injectedHttpAgent.get({ url: apiUrl });
 
-    if (response.isSuccessful) {
-      const currentProductionTag = response.data.version;
-      const versionsToCompare = `v${currentProductionTag}...dev`;
-      const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
-      const { files, commits } = await getFilesModifiedBeetwenTwoReleases({ endpoint });
-
-      return { commits: commits.map(c => c.sha), currentProductionTag };
+    if (!response.isSuccessful) {
+      return false;
     }
 
-    return { commits: [], currentProductionTag: '' };
+    const currentProductionTag = response.data.version;
+    const versionsToCompare = `v${currentProductionTag}...dev`;
+    const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
+    const { files } = await getFilesModifiedBeetwenTwoReleases({ endpoint });
+
+    return hasConfigBeenModified(files);
+
+
+    // On veut la liste des equipe qui on modifié le fichier config.js
+    // on récupère le commit id
+    // on récupère la pr associé au commit
+    // on récupère le tag team- lié à la pr
   },
+
+
+  /*
+  async hasConfigFileChangedInLatestReleaseCompareToProdTag({
+    repoOwner = settings.github.owner,
+    repoName = settings.github.repository,
+    injectedHttpAgent = httpAgent
+  }) {
+    const apiUrl = 'https://api.pix.fr/api';
+    const response = await injectedHttpAgent.get({ url: apiUrl });
+
+    if (!response.isSuccessful) {
+      return { hasConfigFileChanged: false, currentProductionTag: '', pullRequestsForCommitShaDetails: [] };
+    }
+
+    const currentProductionTag = response.data.version;
+    const versionsToCompare = `v${currentProductionTag}...dev`;
+    const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
+    const { files, commits } = await getFilesModifiedBeetwenTwoReleases({ endpoint });
+
+    commitsShaList = commits.map(c => c.sha);
+
+    const hasConfigFileChanged = hasConfigBeenModified(files);
+
+    const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
+      repoOwner,
+      repoName,
+      commitsShaList,
+    });
+
+    return { hasConfigFileChanged, currentProductionTag, pullRequestsForCommitShaDetails };
+
+
+    // On veut la liste des equipe qui on modifié le fichier config.js
+    // on récupère le commit id
+    // on récupère la pr associé au commit
+    // on récupère le tag team- lié à la pr
+  },
+  */
+/*
+  async hasConfigFileChangedSinceLatestRelease(
+    repoOwner = settings.github.owner,
+    repoName = settings.github.repository,
+  ) {
+    const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
+    const now = new Date().toISOString();
+    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
+    const commitsShaList = commits.map((commit) => commit.sha);
+    const hasConfigFileChanged = commits.length > 0;
+    const latestTag = await _getLatestReleaseTagName(repoOwner, repoName);
+
+    const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
+      repoOwner,
+      repoName,
+      commitsShaList,
+    });
+
+    return { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails };
+  },*/
 };
