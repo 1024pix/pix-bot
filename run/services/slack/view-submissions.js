@@ -21,7 +21,7 @@ async function getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({
 }
 
 function hasConfigBeenModified(files) {
-  const result = files.filter(f => f.filename === 'api/lib/config.js');
+  const result = files.filter(f => f.filename === 'api/src/shared/config.js');
 
   return result.length > 0;
 }
@@ -29,11 +29,12 @@ function hasConfigBeenModified(files) {
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-
+console.log(releaseTag)
     // TODO catch exception ?
-    const pixApiVersion = getPixApiVersion();
-    const { files, commits } = getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch(pixApiVersion);
-    
+    const pixApiVersion = await getPixApiVersion();
+    const { files, commits } = await getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch(pixApiVersion);
+console.log(pixApiVersion)
+console.log(files)
     const hasConfigFileChanged = hasConfigBeenModified(files);
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
