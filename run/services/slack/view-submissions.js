@@ -17,7 +17,8 @@ async function getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({
 }) {
   const versionsToCompare = `v${pixApiVersion}...dev`;
   const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
-  return await githubService.getFilesModifiedBeetwenTwoReleases({ endpoint });
+
+  return await githubService.getFilesModifiedBeetwenTwoReleases(endpoint);
 }
 
 function hasConfigBeenModified(files) {
@@ -29,13 +30,12 @@ function hasConfigBeenModified(files) {
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-console.log(releaseTag)
+
     // TODO catch exception ?
     const pixApiVersion = await getPixApiVersion();
-    const { files, commits } = await getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch(pixApiVersion);
-console.log(pixApiVersion)
-console.log(files)
+    const { files, commits } = await getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({ pixApiVersion });
     const hasConfigFileChanged = hasConfigBeenModified(files);
+
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 

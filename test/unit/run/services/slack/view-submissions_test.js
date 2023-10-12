@@ -16,7 +16,7 @@ describe('#submitReleaseTagSelection', () => {
         values: {
           'deploy-release-tag': {
             'release-tag-value': {
-              value: '',
+              value: '10.0.0',
             }
           }
         }
@@ -26,7 +26,7 @@ describe('#submitReleaseTagSelection', () => {
 
   context('when Pix API return a version', function () {
     context('when Github return files and commits', function () {
-      it.only('config file was changed', function () {
+      it.only('and config file was not changed', async function () {
         // given
         nock('https://api.pix.fr')
           .get('/api')
@@ -46,12 +46,46 @@ describe('#submitReleaseTagSelection', () => {
             },
           ]
         };
-  
+
         nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/compare/v4.37.0...dev')
+          .get('/repos/github-owner/github-repository/compare/v4.37.1...dev')
           .reply(200, responseWithoutConfigFile);
 
-        submitReleaseTagSelection(payload);
+        // when
+        const modal = await submitReleaseTagSelection(payload);
+
+        // then
+        expectedResponse = {
+          response_action: 'push',
+          view: {
+            title: {
+              type: 'plain_text',
+              text: 'Confirmation'
+            },
+            callback_id: 'release-deployment-confirmation',
+            private_metadata: '10.0.0',
+            submit: {
+              type: 'plain_text',
+              text: '🚀 Go !'
+            },
+            close: {
+              type: 'plain_text',
+              text: 'Annuler'
+            },
+            blocks: [
+              {
+                text: {
+                  type: 'mrkdwn',
+                  text: "Vous vous apprêtez à déployer la version *10.0.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?"
+                },
+                type: 'section'
+              }
+            ],
+            type: 'modal'
+          }
+        };
+
+        expect(modal).to.deep.equal(expectedResponse);
       });
     });
   });

@@ -447,7 +447,8 @@ module.exports = {
 
   async getFilesModifiedBeetwenTwoReleases(endpoint) {
     const octokit = _createOctokit();
-    const data = await octokit.repos.compareCommits(endpoint)?.data;
+    const response = await octokit.repos.compareCommits(endpoint)
+    const data = response?.data;
     return { files: data?.files, commits: data?.commits};
   },
 
