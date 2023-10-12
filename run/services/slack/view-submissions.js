@@ -8,10 +8,11 @@ const ScalingoClient = require('../../../common/services/scalingo-client');
 const { ScalingoAppName } = require('../../../common/models/ScalingoAppName');
 const config = require('../../../config');
 const { getPixApiVersion } = require('../../../common/services/pix-api');
+const settings = require('../../../config');
 
 const CONFIG_FILE_PATH = 'api/src/shared/config.js';
 
-async function getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({
+async function getFilesBetweenCurrentApiVersionAndDevBranch({
   repoOwner = config.github.owner,
   repoName = config.github.repository,
   pixApiVersion,
@@ -19,7 +20,7 @@ async function getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({
   const versionsToCompare = `v${pixApiVersion}...dev`;
   const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
 
-  return await githubService.getFilesModifiedBeetwenTwoReleases(endpoint);
+  return await githubService.getFilesModifiedBetweenTwoReleases(endpoint);
 }
 
 function hasConfigBeenModified(files) {
@@ -28,14 +29,47 @@ function hasConfigBeenModified(files) {
   return result.length > 0;
 }
 
+function extractCommitShasOfConfigFile(files) {
+  return files.filter((file) => file.filename === CONFIG_FILE_PATH).map((filteredFile) => filteredFile.sha);
+}
+
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
 
     // TODO catch exception ?
     const pixApiVersion = await getPixApiVersion();
-    const { files, commits } = await getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({ pixApiVersion });
+    const files = await getFilesBetweenCurrentApiVersionAndDevBranch({ pixApiVersion });
     const hasConfigFileChanged = hasConfigBeenModified(files);
+
+    if (hasConfigFileChanged) {
+      const commitsShaList = extractCommitShasOfConfigFile(files);
+      const repoOwner = settings.github.owner;
+      const repoName = settings.github.repository;
+      const pullRequestsForCommitShaDetails = await githubService.getPullRequestsDetailsByCommitShas({
+        repoOwner,
+        repoName,
+        commitsShaList,
+      });
+      let pRsAndTeamLabelsMessageList = 'Les Pr et équipes concernées sont : ';
+
+      pullRequestsForCommitShaDetails.forEach((pullRequestDetails) => {
+        pRsAndTeamLabelsMessageList = pRsAndTeamLabelsMessageList.concat(
+          `<${pullRequestDetails.html_url}|${pullRequestDetails.labels}> `,
+        );
+      });
+
+      const message =
+        ':warning: Il y a eu des ajout(s)/suppression(s) ' +
+        `<https://github.com/1024pix/pix/compare/v${pixApiVersion}...dev|dans le fichier config.js>. ` +
+        "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*. " +
+        `${pRsAndTeamLabelsMessageList}`;
+
+      await slackPostMessageService.postMessage({
+        message,
+        channel: '#tech-releases',
+      });
+    }
 
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
@@ -70,7 +104,7 @@ module.exports = {
   submitReleaseDeploymentConfirmation(payload) {
     const releaseTag = payload.view.private_metadata;
     if (!githubService.isBuildStatusOK({ tagName: releaseTag.trim().toLowerCase() })) {
-      const message = 'MEP bloquée. Etat de l‘environnement de recette à vérifier.';
+      const message = "MEP bloquée. Etat de l'environnement de recette à vérifier.";
       slackPostMessageService.postMessage({ message });
     } else {
       deploy(environments.production, releaseTag);
@@ -92,8 +126,5 @@ module.exports = {
       response_action: 'clear',
     };
   },
-
-  extractCommitShasOfConfigFile(files) {
-    return files.filter((file) => file.filename === CONFIG_FILE_PATH).map((filteredFile) => filteredFile.sha);
-  },
+  extractCommitShasOfConfigFile,
 };

@@ -1,10 +1,8 @@
-const { expect, nock } = require('../../../../test-helper');
+const { expect, nock, sinon } = require('../../../../test-helper');
 const { describe, it } = require('mocha');
 
-const {
-  submitReleaseTagSelection,
-  extractCommitShasOfConfigFile,
-} = require('../../../../../run/services/slack/view-submissions');
+const slackPostMessageService = require('../../../../../common/services/slack/surfaces/messages/post-message');
+const githubService = require('../../../../../common/services/github');
 
 describe('#submitReleaseTagSelection', () => {
   const payload = {
@@ -84,6 +82,7 @@ describe('#submitReleaseTagSelection', () => {
           expect(modal).to.deep.equal(expectedResponse);
         });
       });
+    
       context('when config file was changed', function () {
         it('should call "openModalReleaseDeploymentConfirmation" with "hasConfigFileChanged" parameter at true', async function () {
           // given
@@ -112,6 +111,19 @@ describe('#submitReleaseTagSelection', () => {
           nock('https://api.github.com')
             .get('/repos/github-owner/github-repository/compare/v4.37.1...dev')
             .reply(200, responseWithConfigFile);
+
+          sinon.stub(slackPostMessageService, 'postMessage').resolves('ok');
+          sinon.stub(githubService, 'getPullRequestsDetailsByCommitShas').resolves([
+            {
+              html_url: 'http://hello.world',
+              labels: [
+                'cross-team',
+                'team-dev-com'
+              ]
+            }
+          ])
+
+          const { submitReleaseTagSelection } = require('../../../../../run/services/slack/view-submissions');
 
           // when
           const modal = await submitReleaseTagSelection(payload);
@@ -154,12 +166,25 @@ describe('#submitReleaseTagSelection', () => {
             },
           };
 
+          const message =
+            ':warning: Il y a eu des ajout(s)/suppression(s) ' +
+            '<https://github.com/1024pix/pix/compare/v4.37.1...dev|dans le fichier config.js>. ' +
+            "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*. " +
+            'Les Pr et équipes concernées sont : <http://hello.world|cross-team,team-dev-com> ';
+
+          expect(slackPostMessageService.postMessage).to.have.been.calledWith({
+            message,
+            channel: '#tech-releases',
+          });
+          expect(githubService.getPullRequestsDetailsByCommitShas).has.been.calledOnce();
+
           expect(modal).to.deep.equal(expectedResponse);
         });
       });
     });
   });
 });
+
 describe('#extractCommitShasOfConfigFile', () => {
   context('when config file is not present', function () {
     it('should return an empty array', function () {
@@ -172,6 +197,8 @@ describe('#extractCommitShasOfConfigFile', () => {
         },
       ];
 
+      const { extractCommitShasOfConfigFile } = require('../../../../../run/services/slack/view-submissions');
+
       // when
       const result = extractCommitShasOfConfigFile(files);
 
@@ -179,6 +206,7 @@ describe('#extractCommitShasOfConfigFile', () => {
       expect(result).is.empty;
     });
   });
+
   context('when there is one config file is in the list of files', function () {
     it('should return commit sha of the config file', function () {
       // given
@@ -195,6 +223,8 @@ describe('#extractCommitShasOfConfigFile', () => {
         },
       ];
 
+      const { extractCommitShasOfConfigFile } = require('../../../../../run/services/slack/view-submissions');
+
       // when
       const result = extractCommitShasOfConfigFile(files);
 
@@ -202,6 +232,7 @@ describe('#extractCommitShasOfConfigFile', () => {
       expect(result).to.deep.equal(['3f63810343fa706ef94c915a922ffc88c442e4e6']);
     });
   });
+
   context('when there is multiples config files is in the list of files', function () {
     it('should return commit sha of the config file', function () {
       // given
@@ -227,6 +258,8 @@ describe('#extractCommitShasOfConfigFile', () => {
           status: 'modified',
         },
       ];
+
+      const { extractCommitShasOfConfigFile } = require('../../../../../run/services/slack/view-submissions');
 
       // when
       const result = extractCommitShasOfConfigFile(files);

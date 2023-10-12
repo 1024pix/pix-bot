@@ -314,7 +314,7 @@ async function _getPullRequestsFromCommitShaFromGithub({ repoOwner, repoName, co
   return data ? data : [];
 }
 
-async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commitsShaList }) {
+async function getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commitsShaList }) {
   let pullRequests = [];
 
   await Promise.all(
@@ -407,7 +407,7 @@ module.exports = {
     const hasConfigFileChanged = commits.length > 0;
     const latestTag = await _getLatestReleaseTagName(repoOwner, repoName);
 
-    const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
+    const pullRequestsForCommitShaDetails = await getPullRequestsDetailsByCommitShas({
       repoOwner,
       repoName,
       commitsShaList,
@@ -445,77 +445,11 @@ module.exports = {
 
   commentPullRequest,
 
-  async getFilesModifiedBeetwenTwoReleases(endpoint) {
+  async getFilesModifiedBetweenTwoReleases(endpoint) {
     const octokit = _createOctokit();
-    const response = await octokit.repos.compareCommits(endpoint)
+    const response = await octokit.repos.compareCommits(endpoint);
     const data = response?.data;
-    return { files: data?.files, commits: data?.commits};
+    return data?.files || [];
   },
-
-
-
-    // On veut la liste des equipe qui on modifié le fichier config.js
-    // on récupère le commit id
-    // on récupère la pr associé au commit
-    // on récupère le tag team- lié à la pr
-
-
-
-  /*
-  async hasConfigFileChangedInLatestReleaseCompareToProdTag({
-    repoOwner = settings.github.owner,
-    repoName = settings.github.repository,
-    injectedHttpAgent = httpAgent
-  }) {
-    const apiUrl = 'https://api.pix.fr/api';
-    const response = await injectedHttpAgent.get({ url: apiUrl });
-
-    if (!response.isSuccessful) {
-      return { hasConfigFileChanged: false, currentProductionTag: '', pullRequestsForCommitShaDetails: [] };
-    }
-
-    const currentProductionTag = response.data.version;
-    const versionsToCompare = `v${currentProductionTag}...dev`;
-    const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
-    const { files, commits } = await getFilesModifiedBeetwenTwoReleases({ endpoint });
-
-    commitsShaList = commits.map(c => c.sha);
-
-    const hasConfigFileChanged = hasConfigBeenModified(files);
-
-    const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
-      repoOwner,
-      repoName,
-      commitsShaList,
-    });
-
-    return { hasConfigFileChanged, currentProductionTag, pullRequestsForCommitShaDetails };
-
-
-    // On veut la liste des equipe qui on modifié le fichier config.js
-    // on récupère le commit id
-    // on récupère la pr associé au commit
-    // on récupère le tag team- lié à la pr
-  },
-  */
-/*
-  async hasConfigFileChangedSinceLatestRelease(
-    repoOwner = settings.github.owner,
-    repoName = settings.github.repository,
-  ) {
-    const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
-    const now = new Date().toISOString();
-    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
-    const commitsShaList = commits.map((commit) => commit.sha);
-    const hasConfigFileChanged = commits.length > 0;
-    const latestTag = await _getLatestReleaseTagName(repoOwner, repoName);
-
-    const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
-      repoOwner,
-      repoName,
-      commitsShaList,
-    });
-
-    return { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails };
-  },*/
+  getPullRequestsDetailsByCommitShas,
 };

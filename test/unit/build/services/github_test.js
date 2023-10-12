@@ -560,16 +560,16 @@ describe('Unit | Build | github-test', function () {
         const responseWithoutConfigFile = {
           commits: [
             {
-              sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-            }
+              sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+            },
           ],
           files: [
             {
-              sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-              filename: "1d/package-lock.json",
-              status: "modified",
+              sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+              filename: '1d/package-lock.json',
+              status: 'modified',
             },
-          ]
+          ],
         };
 
         nock('https://api.github.com')
@@ -577,7 +577,9 @@ describe('Unit | Build | github-test', function () {
           .reply(200, responseWithoutConfigFile);
 
         // when
-        const response = await githubService.getFilesModifiedBeetwenTwoReleases('https://api.github.com/repos/github-owner/github-repository/compare/v4.37.0...dev');
+        const response = await githubService.getFilesModifiedBetweenTwoReleases(
+          'https://api.github.com/repos/github-owner/github-repository/compare/v4.37.0...dev',
+        );
 
         // then
         expect(response).to.deep.equal(responseWithoutConfigFile);
