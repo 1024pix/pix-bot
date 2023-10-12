@@ -553,46 +553,9 @@ describe('Unit | Build | github-test', function () {
     });
   });
 
-  describe('#hasConfigFileChangedInLatestReleaseCompareToProdTag', function () {
-    const repoOwner = 'github-owner';
-    const repoName = 'github-repository';
-
-    const injectedHttpAgentStub = {
-      get: sinon.stub().resolves({
-        isSuccessful: true,
-        data: {
-          version: '4.37.0',
-        },
-      }),
-    };
-
-    context('when PIX api is not responding', function () {
-      it('should log an error', async function () {
-        // given
-        nock('https://api.pix.fr')
-          .get('/api')
-          .reply(500, {});
-
-        const errorLoggerStub = sinon.stub(logger, 'error');
-
-        // when
-        const response = await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
-          repoOwner,
-          repoName,
-        });
-
-        // then
-        expect(errorLoggerStub.calledOnce).to.be.true;
-        expect(errorLoggerStub.firstCall.args[0]).to.deep.equal({
-          event: 'http-client-request',
-          message: 'End GET request to https://api.pix.fr/api error: 500 {}',
-        });
-        expect(response).to.be.deep.equal(false);
-      });
-    });
-
-    context('when config file has not been changed', function () {
-      it.only('should return false', async function () {
+  describe('#getFilesModifiedBeetwenTwoReleases', function () {
+    context('when Github return files and commits', function () {
+      it('should return false', async function () {
         // given
         const responseWithoutConfigFile = {
           commits: [
@@ -611,127 +574,14 @@ describe('Unit | Build | github-test', function () {
 
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/compare/v4.37.0...dev')
-          .reply(200,responseWithoutConfigFile);
+          .reply(200, responseWithoutConfigFile);
 
         // when
-        const response = await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
-          repoOwner,
-          repoName,
-          injectedHttpAgent: injectedHttpAgentStub,
-        });
+        const response = await githubService.getFilesModifiedBeetwenTwoReleases('https://api.github.com/repos/github-owner/github-repository/compare/v4.37.0...dev');
 
         // then
-        expect(response).to.deep.equal(false);
+        expect(response).to.deep.equal(responseWithoutConfigFile);
       });
     });
-
-    context('when config file has been changed', function () {
-      it.only('should return true', async function () {
-        // given
-        const responseWithConfigFile = {
-
-          commits: [
-            {
-              sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-            }
-          ],
-          files: [
-            {
-              sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-              filename: "1d/package-lock.json",
-              status: "modified",
-            },
-            {
-              sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-              filename: "api/lib/config.js",
-              status: "modified",
-            }
-          ]
-        };
-
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/compare/v4.37.0...dev')
-          .reply(200,responseWithConfigFile);
-
-        // when
-        const response = await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
-          repoOwner,
-          repoName,
-          injectedHttpAgent: injectedHttpAgentStub,
-        });
-
-        // then
-        expect(response).to.deep.equal(true);
-      });
-    });
-
-    /*
-        context('should return true when config file has been changed', function () {
-      it.only('should call Github "commits list" API', async function () {
-        // given
-        const injectedHttpAgentStub = {
-          get: sinon.stub().resolves({
-            isSuccessful: true,
-            data: {
-              version: '4.37.0',
-            },
-          }),
-        };
-
-        nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/compare/v4.37.0...dev')
-          .reply(200,{
-
-            commits: [
-              {
-                sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-              }
-            ],
-            files: [
-              {
-                sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-                filename: "1d/package-lock.json",
-                status: "modified",
-              },
-              {
-                sha: "3f63810343fa706ef94c915a922ffc88c442e4e6",
-                filename: "api/lib/config.js",
-                status: "modified",
-              }
-            ]
-          });
-
-          nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/commits/3f63810343fa706ef94c915a922ffc88c442e4e6/pulls')
-          .reply(200, [
-            {
-              number: 1327,
-              labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
-              html_url: 'https://github.com/octocat/Hello-World/pull/1327',
-            },
-          ]);
-
-        // when
-        const response = await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
-          repoOwner,
-          repoName,
-          injectedHttpAgent: injectedHttpAgentStub,
-        });
-
-        // then
-        expect(response).to.deep.equal({
-          currentProductionTag: "4.37.0",
-          hasConfigFileChanged: true,
-          pullRequestsForCommitShaDetails: [
-            {
-              "html_url": "https://github.com/octocat/Hello-World/pull/1327",
-              "labels": "team-captains,team-acces",
-              "number": 1327,
-            },
-          ]
-        });
-      });
-    });
-    */
   });
 });

@@ -6,7 +6,6 @@ const tsscmp = require('tsscmp');
 const Boom = require('@hapi/boom');
 const settings = require('../../config');
 const logger = require('./logger');
-const { httpAgent } = require('../../common/http-agent');
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -343,18 +342,6 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
-async function getFilesModifiedBeetwenTwoReleases({ endpoint }) {
-  const octokit = _createOctokit();
-  const { data } = await octokit.repos.compareCommits(endpoint);
-  return { files: data.files, commits: data.commits};
-}
-
-function hasConfigBeenModified(files) {
-    const result = files.filter(f => f.filename === 'api/lib/config.js');
-
-    return result.length > 0;
-}
-
 module.exports = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
@@ -458,31 +445,19 @@ module.exports = {
 
   commentPullRequest,
 
-  async hasConfigFileChangedInLatestReleaseCompareToProdTag({
-    repoOwner = settings.github.owner,
-    repoName = settings.github.repository,
-    injectedHttpAgent = httpAgent
-  }) {
-    const apiUrl = 'https://api.pix.fr/api';
-    const response = await injectedHttpAgent.get({ url: apiUrl });
+  async getFilesModifiedBeetwenTwoReleases(endpoint) {
+    const octokit = _createOctokit();
+    const data = await octokit.repos.compareCommits(endpoint)?.data;
+    return { files: data?.files, commits: data?.commits};
+  },
 
-    if (!response.isSuccessful) {
-      return false;
-    }
-
-    const currentProductionTag = response.data.version;
-    const versionsToCompare = `v${currentProductionTag}...dev`;
-    const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
-    const { files } = await getFilesModifiedBeetwenTwoReleases({ endpoint });
-
-    return hasConfigBeenModified(files);
 
 
     // On veut la liste des equipe qui on modifié le fichier config.js
     // on récupère le commit id
     // on récupère la pr associé au commit
     // on récupère le tag team- lié à la pr
-  },
+
 
 
   /*

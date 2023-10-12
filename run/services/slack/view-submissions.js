@@ -7,13 +7,34 @@ const slackGetUserInfos = require('../../../common/services/slack/surfaces/user-
 const ScalingoClient = require('../../../common/services/scalingo-client');
 const { ScalingoAppName } = require('../../../common/models/ScalingoAppName');
 const config = require('../../../config');
+const { getPixApiVersion } = require('../../../common/services/pix-api');
+
+
+async function getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({
+  repoOwner = config.github.owner,
+  repoName = config.github.repository,
+  pixApiVersion
+}) {
+  const versionsToCompare = `v${pixApiVersion}...dev`;
+  const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
+  return await githubService.getFilesModifiedBeetwenTwoReleases({ endpoint });
+}
+
+function hasConfigBeenModified(files) {
+  const result = files.filter(f => f.filename === 'api/lib/config.js');
+
+  return result.length > 0;
+}
 
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-    const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestReleaseCompareToProdTag({
-      releaseTag,
-    });
+
+    // TODO catch exception ?
+    const pixApiVersion = getPixApiVersion();
+    const { files, commits } = getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch(pixApiVersion);
+    
+    const hasConfigFileChanged = hasConfigBeenModified(files);
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 
