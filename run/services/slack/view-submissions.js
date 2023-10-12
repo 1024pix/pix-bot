@@ -9,11 +9,12 @@ const { ScalingoAppName } = require('../../../common/models/ScalingoAppName');
 const config = require('../../../config');
 const { getPixApiVersion } = require('../../../common/services/pix-api');
 
+const CONFIG_FILE_PATH = 'api/src/shared/config.js';
 
 async function getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({
   repoOwner = config.github.owner,
   repoName = config.github.repository,
-  pixApiVersion
+  pixApiVersion,
 }) {
   const versionsToCompare = `v${pixApiVersion}...dev`;
   const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
@@ -22,7 +23,7 @@ async function getFilesAndCommitsBeetwenCurrentApiVersionAndDevBranch({
 }
 
 function hasConfigBeenModified(files) {
-  const result = files.filter(f => f.filename === 'api/src/shared/config.js');
+  const result = files.filter((f) => f.filename === CONFIG_FILE_PATH);
 
   return result.length > 0;
 }
@@ -90,5 +91,9 @@ module.exports = {
     return {
       response_action: 'clear',
     };
+  },
+
+  extractCommitShasOfConfigFile(files) {
+    return files.filter((file) => file.filename === CONFIG_FILE_PATH).map((filteredFile) => filteredFile.sha);
   },
 };
