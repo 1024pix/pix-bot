@@ -558,11 +558,6 @@ describe('Unit | Build | github-test', function () {
       it('should return false', async function () {
         // given
         const responseWithoutConfigFile = {
-          commits: [
-            {
-              sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-            },
-          ],
           files: [
             {
               sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
@@ -582,7 +577,15 @@ describe('Unit | Build | github-test', function () {
         );
 
         // then
-        expect(response).to.deep.equal(responseWithoutConfigFile);
+        const expectedResponse = [
+          {
+            sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+            filename: '1d/package-lock.json',
+            status: 'modified',
+          },
+        ];
+
+        expect(response).to.deep.equal(expectedResponse);
       });
     });
   });
