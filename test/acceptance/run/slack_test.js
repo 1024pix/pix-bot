@@ -137,31 +137,6 @@ describe('Acceptance | Run | Slack', function () {
 
           nock('https://api.pix.fr').get('/api').reply(200, { version: '4.37.1' });
 
-          const responseWithoutConfigFile = {
-            commits: [
-              {
-                sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-              },
-            ],
-            files: [
-              {
-                sha: '1234',
-                filename: '1d/package-lock.json',
-                status: 'modified',
-              },
-              {
-                sha: '456',
-                filename: 'api/titi',
-                status: 'modified',
-              },
-            ],
-          };
-
-          nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
-            .reply(StatusCodes.OK, responseWithoutConfigFile);
-
-
           const body = {
             type: 'view_submission',
             view: {
