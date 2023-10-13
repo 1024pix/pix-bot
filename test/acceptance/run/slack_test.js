@@ -93,10 +93,12 @@ describe('Acceptance | Run | Slack', function () {
 
       describe('with the callback release-tag-selection', function () {
         describe('when the Github API returns an error', function () {
-          it('should return an INTERNAL_SERVER_ERROR (500)', async function () {
+          it('should return an SERVICE_UNAVAILABLE (503)', async function () {
             // given
+            nock('https://api.pix.fr').get('/api').reply(200, { version: '4.37.1' });
+
             const tagNock = nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/tags')
+              .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
               .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
 
             const body = {
@@ -132,6 +134,33 @@ describe('Acceptance | Run | Slack', function () {
         it('returns the confirmation modal', async function () {
           // given
           const nocks = nockGithubWithNoConfigChanges();
+
+          nock('https://api.pix.fr').get('/api').reply(200, { version: '4.37.1' });
+
+          const responseWithoutConfigFile = {
+            commits: [
+              {
+                sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+              },
+            ],
+            files: [
+              {
+                sha: '1234',
+                filename: '1d/package-lock.json',
+                status: 'modified',
+              },
+              {
+                sha: '456',
+                filename: 'api/titi',
+                status: 'modified',
+              },
+            ],
+          };
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
+            .reply(StatusCodes.OK, responseWithoutConfigFile);
+
 
           const body = {
             type: 'view_submission',
@@ -195,6 +224,47 @@ describe('Acceptance | Run | Slack', function () {
           it('returns the confirmation modal with a warning', async function () {
             nockGithubWithConfigChanges();
 
+            nock('https://api.pix.fr').get('/api').reply(200, { version: '4.37.1' });
+
+            const responseWithConfigFile = {
+              commits: [
+                {
+                  sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+                },
+              ],
+              files: [
+                {
+                  sha: '1234',
+                  filename: '1d/package-lock.json',
+                  status: 'modified',
+                },
+                {
+                  sha: '456',
+                  filename: 'api/src/shared/config.js',
+                  status: 'modified',
+                },
+              ],
+            };
+
+            nock('https://api.github.com')
+              .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
+              .reply(StatusCodes.OK, responseWithConfigFile);
+
+            nock('https://api.github.com')
+              .get('/repos/github-owner/github-repository/commits/456/pulls')
+              .reply(200, [
+                {
+                  number: 1327,
+                  labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
+                  html_url: 'https://github.com/octocat/Hello-World/pull/1327',
+                },
+                {
+                  number: 4567,
+                  labels: [{ name: 'cross-team' }, { name: 'team-dev-com' }],
+                  html_url: 'https://github.com/octocat/Hello-World/pull/4567',
+                },
+              ]);
+
             const body = {
               type: 'view_submission',
               view: {
@@ -240,10 +310,7 @@ describe('Acceptance | Run | Slack', function () {
                     type: 'section',
                     text: {
                       type: 'mrkdwn',
-                      text:
-                        ':warning: Il y a eu des ajout(s)/suppression(s)' +
-                        ' dans le fichier' +
-                        " <https://github.com/1024pix/pix/compare/v7.7.6...v.7.7.7|*config.js*>. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
+                      text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier *config.js*. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*.",
                     },
                   },
                   {

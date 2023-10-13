@@ -449,7 +449,12 @@ module.exports = {
     const octokit = _createOctokit();
     const response = await octokit.repos.compareCommits(endpoint);
     const data = response?.data;
-    return data?.files || [];
+
+    if (!data?.files) {
+      throw Boom.serverUnavailable('tto');
+    }
+
+    return data.files;
   },
   getPullRequestsDetailsByCommitShas,
 };

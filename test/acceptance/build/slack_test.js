@@ -188,183 +188,180 @@ describe('Acceptance | Build | Slack', function () {
           });
         });
 
-        it(
-          'returns the confirmation modal with a warning and sends a' + ' slack message to tech-releases',
-          async function () {
-            // given
-            const tagNock = nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/tags')
-              .twice()
-              .reply(200, [
-                {
-                  commit: {
-                    url: 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
-                  },
-                  name: 'v6.6.6',
-                },
-                {
-                  commit: {
-                    url: 'https://api.github.com/repos/github-owner/github-repository/commits/456',
-                  },
-                  name: 'v6.6.5',
-                },
-              ]);
-
-            const firstCommitNock = nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/commits/1234')
-              .reply(200, {
+        it('returns the confirmation modal with a warning and sends a slack message to tech-releases', async function () {
+          // given
+          const tagNock = nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/tags')
+            .twice()
+            .reply(200, [
+              {
                 commit: {
-                  committer: {
-                    date: '2021-04-14T12:40:50.326Z',
-                  },
+                  url: 'https://api.github.com/repos/github-owner/github-repository/commits/1234',
                 },
-              });
+                name: 'v6.6.6',
+              },
+              {
+                commit: {
+                  url: 'https://api.github.com/repos/github-owner/github-repository/commits/456',
+                },
+                name: 'v6.6.5',
+              },
+            ]);
 
-            const commitsNock = nock('https://api.github.com')
-              .filteringPath(
-                /since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g,
-                'since=XXXX&until=XXXX',
-              )
-              .get(
-                '/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Fsrc%2Fshared%2Fconfig.js',
-              )
-              .reply(200, [
-                {
-                  sha: '6dcb09',
+          const firstCommitNock = nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits/1234')
+            .reply(200, {
+              commit: {
+                committer: {
+                  date: '2021-04-14T12:40:50.326Z',
                 },
-                {
-                  sha: '4193db5e',
-                },
-              ]);
+              },
+            });
 
-            nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/commits/6dcb09/pulls')
-              .reply(200, [
-                {
-                  number: 1327,
-                  labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
-                  html_url: 'https://github.com/octocat/Hello-World/pull/1327',
-                },
-                {
-                  number: 4567,
-                  labels: [{ name: 'cross-team' }, { name: 'team-dev-com' }],
-                  html_url: 'https://github.com/octocat/Hello-World/pull/4567',
-                },
-              ]);
+          const commitsNock = nock('https://api.github.com')
+            .filteringPath(
+              /since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g,
+              'since=XXXX&until=XXXX',
+            )
+            .get(
+              '/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Fsrc%2Fshared%2Fconfig.js',
+            )
+            .reply(200, [
+              {
+                sha: '6dcb09',
+              },
+              {
+                sha: '4193db5e',
+              },
+            ]);
 
-            nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/commits/4193db5e/pulls')
-              .reply(200, [
-                {
-                  number: 2438,
-                  labels: [{ name: 'team-eval' }],
-                  html_url: 'https://github.com/octocat/Hello-World/pull/2438',
-                },
-                {
-                  number: 6934,
-                  labels: [{ name: 'fake' }, { name: 'team-prescription' }],
-                  html_url: 'https://github.com/octocat/Hello-World/pull/6934',
-                },
-                {
-                  number: 1327,
-                  labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
-                  html_url: 'https://github.com/octocat/Hello-World/pull/1327',
-                },
-              ]);
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits/6dcb09/pulls')
+            .reply(200, [
+              {
+                number: 1327,
+                labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
+                html_url: 'https://github.com/octocat/Hello-World/pull/1327',
+              },
+              {
+                number: 4567,
+                labels: [{ name: 'cross-team' }, { name: 'team-dev-com' }],
+                html_url: 'https://github.com/octocat/Hello-World/pull/4567',
+              },
+            ]);
 
-            const message =
-              ':warning: Il y a eu des ajout(s)/suppression(s) ' +
-              '<https://github.com/1024pix/pix/compare/v6.6.6...dev|dans le fichier config.js>. ' +
-              "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*. " +
-              'Les Pr et équipes concernées sont : ' +
-              '<https://github.com/octocat/Hello-World/pull/1327|team-captains,team-acces> <https://github.com/octocat/Hello-World/pull/4567|cross-team,team-dev-com> <https://github.com/octocat/Hello-World/pull/2438|team-eval> <https://github.com/octocat/Hello-World/pull/6934|team-prescription> ';
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits/4193db5e/pulls')
+            .reply(200, [
+              {
+                number: 2438,
+                labels: [{ name: 'team-eval' }],
+                html_url: 'https://github.com/octocat/Hello-World/pull/2438',
+              },
+              {
+                number: 6934,
+                labels: [{ name: 'fake' }, { name: 'team-prescription' }],
+                html_url: 'https://github.com/octocat/Hello-World/pull/6934',
+              },
+              {
+                number: 1327,
+                labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
+                html_url: 'https://github.com/octocat/Hello-World/pull/1327',
+              },
+            ]);
 
-            const expectedRequestBody = {
-              channel: '#tech-releases',
-              text: message,
-            };
+          const message =
+            ':warning: Il y a eu des ajout(s)/suppression(s) ' +
+            '<https://github.com/1024pix/pix/compare/v6.6.6...dev|dans le fichier config.js>. ' +
+            "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*. " +
+            'Les Pr et équipes concernées sont : ' +
+            '<https://github.com/octocat/Hello-World/pull/1327|team-captains,team-acces> <https://github.com/octocat/Hello-World/pull/4567|cross-team,team-dev-com> <https://github.com/octocat/Hello-World/pull/2438|team-eval> <https://github.com/octocat/Hello-World/pull/6934|team-prescription> ';
 
-            const slackMessageNock = nock('https://slack.com')
-              .post('/api/chat.postMessage', (body) => {
-                expect(body).to.deep.equal(expectedRequestBody);
-                return true;
-              })
-              .reply(200, {
-                ok: true,
-              });
+          const expectedRequestBody = {
+            channel: '#tech-releases',
+            text: message,
+          };
 
-            const body = {
-              type: 'view_submission',
-              view: {
-                callback_id: 'release-type-selection',
-                state: {
-                  values: {
-                    'publish-release-type': {
-                      'release-type-option': {
-                        selected_option: {
-                          value: 'major',
-                        },
+          const slackMessageNock = nock('https://slack.com')
+            .post('/api/chat.postMessage', (body) => {
+              expect(body).to.deep.equal(expectedRequestBody);
+              return true;
+            })
+            .reply(200, {
+              ok: true,
+            });
+
+          const body = {
+            type: 'view_submission',
+            view: {
+              callback_id: 'release-type-selection',
+              state: {
+                values: {
+                  'publish-release-type': {
+                    'release-type-option': {
+                      selected_option: {
+                        value: 'major',
                       },
                     },
                   },
                 },
               },
-            };
+            },
+          };
 
-            // when
-            const res = await server.inject({
-              method: 'POST',
-              url: '/build/slack/interactive-endpoint',
-              headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
-              payload: body,
-            });
+          // when
+          const res = await server.inject({
+            method: 'POST',
+            url: '/build/slack/interactive-endpoint',
+            headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+            payload: body,
+          });
 
-            //then
+          //then
 
-            expect(tagNock.isDone()).to.be.true;
-            expect(firstCommitNock.isDone()).to.be.true;
-            expect(commitsNock.isDone()).to.be.true;
-            expect(slackMessageNock.isDone()).to.be.true;
+          expect(tagNock.isDone()).to.be.true;
+          expect(firstCommitNock.isDone()).to.be.true;
+          expect(commitsNock.isDone()).to.be.true;
+          expect(slackMessageNock.isDone()).to.be.true;
 
-            expect(res.statusCode).to.equal(200);
-            expect(JSON.parse(res.payload)).to.deep.equal({
-              response_action: 'push',
-              view: {
-                type: 'modal',
-                callback_id: 'release-publication-confirmation',
-                private_metadata: 'major',
-                title: {
-                  type: 'plain_text',
-                  text: 'Confirmation',
-                },
-                submit: {
-                  type: 'plain_text',
-                  text: '🚀 Go !',
-                },
-                close: {
-                  type: 'plain_text',
-                  text: 'Annuler',
-                },
-                blocks: [
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier <https://github.com/1024pix/pix/compare/v6.6.6...dev|*config.js*>. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
-                    },
-                  },
-                  {
-                    type: 'section',
-                    text: {
-                      type: 'mrkdwn',
-                      text: 'Vous vous apprêtez à publier une version *major* et la déployer en recette. Êtes-vous sûr de vous ?',
-                    },
-                  },
-                ],
+          expect(res.statusCode).to.equal(200);
+          expect(JSON.parse(res.payload)).to.deep.equal({
+            response_action: 'push',
+            view: {
+              type: 'modal',
+              callback_id: 'release-publication-confirmation',
+              private_metadata: 'major',
+              title: {
+                type: 'plain_text',
+                text: 'Confirmation',
               },
-            });
-          },
-        );
+              submit: {
+                type: 'plain_text',
+                text: '🚀 Go !',
+              },
+              close: {
+                type: 'plain_text',
+                text: 'Annuler',
+              },
+              blocks: [
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: ":warning: Il y a eu des ajout(s)/suppression(s) dans le fichier <https://github.com/1024pix/pix/compare/v6.6.6...dev|*config.js*>. Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo RECETTE*.",
+                  },
+                },
+                {
+                  type: 'section',
+                  text: {
+                    type: 'mrkdwn',
+                    text: 'Vous vous apprêtez à publier une version *major* et la déployer en recette. Êtes-vous sûr de vous ?',
+                  },
+                },
+              ],
+            },
+          });
+        });
       });
 
       describe('callback release-publication-confirmation', function () {
