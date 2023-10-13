@@ -43,7 +43,7 @@ describe('#submitReleaseTagSelection', () => {
           };
 
           nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/compare/v10.0.0...v4.37.1')
+            .get('/repos/github-owner/github-repository/compare/v4.37.1...v10.0.0')
             .reply(200, responseWithoutConfigFile);
 
           // when
@@ -110,7 +110,7 @@ describe('#submitReleaseTagSelection', () => {
           };
 
           nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/compare/v10.0.0...v4.37.1')
+            .get('/repos/github-owner/github-repository/compare/v4.37.1...v10.0.0')
             .reply(200, responseWithConfigFile);
 
           sinon.stub(slackPostMessageService, 'postMessage').resolves('ok');
@@ -166,7 +166,7 @@ describe('#submitReleaseTagSelection', () => {
 
           const message =
             ':warning: Il y a eu des ajout(s)/suppression(s) ' +
-            '<https://github.com/1024pix/pix/compare/v4.37.1...dev|dans le fichier config.js>. ' +
+            '<https://github.com/1024pix/pix/compare/v4.37.1...v10.0.0|dans le fichier config.js>. ' +
             "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*. " +
             'Les Pr et équipes concernées sont : <http://hello.world|cross-team,team-dev-com> ';
 

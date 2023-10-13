@@ -120,7 +120,7 @@ function nockGithubWithNoConfigChanges() {
   };
 
   const compare = nock('https://api.github.com')
-    .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
+    .get('/repos/github-owner/github-repository/compare/v4.37.1...v2.130.0')
     .reply(StatusCodes.OK, responseWithoutConfigFile);
 
   const nocks = { tags, commit1234, commit456, commits, compare };
@@ -200,7 +200,7 @@ function nockGithubWithConfigChanges() {
   };
 
   nock('https://api.github.com')
-    .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
+    .get('/repos/github-owner/github-repository/compare/v4.37.1...v2.130.0')
     .reply(StatusCodes.OK, responseWithConfigFile);
 
   nock('https://api.github.com')

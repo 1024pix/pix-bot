@@ -18,7 +18,7 @@ async function getFilesBetweenCurrentApiVersionAndReleaseTag({
   pixApiVersion,
   releaseTag,
 }) {
-  const versionsToCompare = `${releaseTag}...v${pixApiVersion}`;
+  const versionsToCompare = `v${pixApiVersion}...${releaseTag}`;
   const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
 
   return await githubService.getFilesModifiedBetweenTwoReleases(endpoint);
@@ -62,7 +62,7 @@ module.exports = {
 
       const message =
         ':warning: Il y a eu des ajout(s)/suppression(s) ' +
-        `<https://github.com/1024pix/pix/compare/v${pixApiVersion}...dev|dans le fichier config.js>. ` +
+        `<https://github.com/1024pix/pix/compare/v${pixApiVersion}...${releaseTag}|dans le fichier config.js>. ` +
         "Pensez à vérifier que toutes les variables d'environnement sont bien à jour sur *Scalingo PRODUCTION*. " +
         `${pRsAndTeamLabelsMessageList}`;
 

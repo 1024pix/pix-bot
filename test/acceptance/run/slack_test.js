@@ -95,10 +95,10 @@ describe('Acceptance | Run | Slack', function () {
         describe('when the Github API returns an error', function () {
           it('should return an SERVICE_UNAVAILABLE (503)', async function () {
             // given
-            nock('https://api.pix.fr').get('/api').reply(200, { version: '4.37.1' });
+            nock('https://api.pix.fr').get('/api').reply(200, { version: '2.129.0' });
 
             const tagNock = nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
+              .get('/repos/github-owner/github-repository/compare/v2.129.0...v2.130.0')
               .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
 
             const body = {
