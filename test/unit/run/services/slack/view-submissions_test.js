@@ -3,6 +3,7 @@ const { describe, it } = require('mocha');
 
 const slackPostMessageService = require('../../../../../common/services/slack/surfaces/messages/post-message');
 const githubService = require('../../../../../common/services/github');
+const { submitReleaseTagSelection } = require('../../../../../run/services/slack/view-submissions');
 
 describe('#submitReleaseTagSelection', () => {
   const payload = {
@@ -11,7 +12,7 @@ describe('#submitReleaseTagSelection', () => {
         values: {
           'deploy-release-tag': {
             'release-tag-value': {
-              value: '10.0.0',
+              value: 'v10.0.0',
             },
           },
         },
@@ -42,7 +43,7 @@ describe('#submitReleaseTagSelection', () => {
           };
 
           nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/compare/v4.37.1...dev')
+            .get('/repos/github-owner/github-repository/compare/v10.0.0...v4.37.1')
             .reply(200, responseWithoutConfigFile);
 
           // when
@@ -57,7 +58,7 @@ describe('#submitReleaseTagSelection', () => {
                 text: 'Confirmation',
               },
               callback_id: 'release-deployment-confirmation',
-              private_metadata: '10.0.0',
+              private_metadata: 'v10.0.0',
               submit: {
                 type: 'plain_text',
                 text: '🚀 Go !',
@@ -70,7 +71,7 @@ describe('#submitReleaseTagSelection', () => {
                 {
                   text: {
                     type: 'mrkdwn',
-                    text: "Vous vous apprêtez à déployer la version *10.0.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+                    text: "Vous vous apprêtez à déployer la version *v10.0.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
                   },
                   type: 'section',
                 },
@@ -82,7 +83,7 @@ describe('#submitReleaseTagSelection', () => {
           expect(modal).to.deep.equal(expectedResponse);
         });
       });
-    
+
       context('when config file was changed', function () {
         it('should call "openModalReleaseDeploymentConfirmation" with "hasConfigFileChanged" parameter at true', async function () {
           // given
@@ -109,19 +110,16 @@ describe('#submitReleaseTagSelection', () => {
           };
 
           nock('https://api.github.com')
-            .get('/repos/github-owner/github-repository/compare/v4.37.1...dev')
+            .get('/repos/github-owner/github-repository/compare/v10.0.0...v4.37.1')
             .reply(200, responseWithConfigFile);
 
           sinon.stub(slackPostMessageService, 'postMessage').resolves('ok');
           sinon.stub(githubService, 'getPullRequestsDetailsByCommitShas').resolves([
             {
               html_url: 'http://hello.world',
-              labels: [
-                'cross-team',
-                'team-dev-com'
-              ]
-            }
-          ])
+              labels: ['cross-team', 'team-dev-com'],
+            },
+          ]);
 
           const { submitReleaseTagSelection } = require('../../../../../run/services/slack/view-submissions');
 
@@ -137,7 +135,7 @@ describe('#submitReleaseTagSelection', () => {
                 text: 'Confirmation',
               },
               callback_id: 'release-deployment-confirmation',
-              private_metadata: '10.0.0',
+              private_metadata: 'v10.0.0',
               submit: {
                 type: 'plain_text',
                 text: '🚀 Go !',
@@ -156,7 +154,7 @@ describe('#submitReleaseTagSelection', () => {
                 },
                 {
                   text: {
-                    text: "Vous vous apprêtez à déployer la version *10.0.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
+                    text: "Vous vous apprêtez à déployer la version *v10.0.0* en production. Il s'agit d'une opération critique. Êtes-vous sûr de vous ?",
                     type: 'mrkdwn',
                   },
                   type: 'section',
@@ -176,7 +174,7 @@ describe('#submitReleaseTagSelection', () => {
             message,
             channel: '#tech-releases',
           });
-          expect(githubService.getPullRequestsDetailsByCommitShas).has.been.calledOnce();
+          expect(githubService.getPullRequestsDetailsByCommitShas).to.have.been.calledOnce;
 
           expect(modal).to.deep.equal(expectedResponse);
         });

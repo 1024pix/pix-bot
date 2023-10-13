@@ -12,12 +12,13 @@ const settings = require('../../../config');
 
 const CONFIG_FILE_PATH = 'api/src/shared/config.js';
 
-async function getFilesBetweenCurrentApiVersionAndDevBranch({
+async function getFilesBetweenCurrentApiVersionAndReleaseTag({
   repoOwner = config.github.owner,
   repoName = config.github.repository,
   pixApiVersion,
+  releaseTag,
 }) {
-  const versionsToCompare = `v${pixApiVersion}...dev`;
+  const versionsToCompare = `${releaseTag}...v${pixApiVersion}`;
   const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
 
   return await githubService.getFilesModifiedBetweenTwoReleases(endpoint);
@@ -39,7 +40,7 @@ module.exports = {
 
     // TODO catch exception ?
     const pixApiVersion = await getPixApiVersion();
-    const files = await getFilesBetweenCurrentApiVersionAndDevBranch({ pixApiVersion });
+    const files = await getFilesBetweenCurrentApiVersionAndReleaseTag({ pixApiVersion, releaseTag });
     const hasConfigFileChanged = hasConfigBeenModified(files);
 
     if (hasConfigFileChanged) {
