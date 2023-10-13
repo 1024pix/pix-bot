@@ -201,45 +201,6 @@ describe('Acceptance | Run | Slack', function () {
 
             nock('https://api.pix.fr').get('/api').reply(200, { version: '4.37.1' });
 
-            const responseWithConfigFile = {
-              commits: [
-                {
-                  sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-                },
-              ],
-              files: [
-                {
-                  sha: '1234',
-                  filename: '1d/package-lock.json',
-                  status: 'modified',
-                },
-                {
-                  sha: '456',
-                  filename: 'api/src/shared/config.js',
-                  status: 'modified',
-                },
-              ],
-            };
-
-            nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
-              .reply(StatusCodes.OK, responseWithConfigFile);
-
-            nock('https://api.github.com')
-              .get('/repos/github-owner/github-repository/commits/456/pulls')
-              .reply(200, [
-                {
-                  number: 1327,
-                  labels: [{ name: 'team-captains' }, { name: 'team-acces' }],
-                  html_url: 'https://github.com/octocat/Hello-World/pull/1327',
-                },
-                {
-                  number: 4567,
-                  labels: [{ name: 'cross-team' }, { name: 'team-dev-com' }],
-                  html_url: 'https://github.com/octocat/Hello-World/pull/4567',
-                },
-              ]);
-
             const body = {
               type: 'view_submission',
               view: {

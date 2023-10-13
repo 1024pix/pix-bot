@@ -450,8 +450,12 @@ module.exports = {
     const response = await octokit.repos.compareCommits(endpoint);
     const data = response?.data;
 
-    if (!data?.files) {
-      throw Boom.serverUnavailable('tto');
+    if (!data) {
+      throw Boom.serverUnavailable('No data from Github');
+    }
+  
+    if (!data.files) {
+      throw Boom.serverUnavailable('No files from Github');
     }
 
     return data.files;
