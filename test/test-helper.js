@@ -99,25 +99,25 @@ function nockGithubWithNoConfigChanges() {
     .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Fsrc%2Fshared%2Fconfig.js')
     .reply(200, []);
 
-    const responseWithoutConfigFile = {
-      commits: [
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-        },
-      ],
-      files: [
-        {
-          sha: '1234',
-          filename: '1d/package-lock.json',
-          status: 'modified',
-        },
-        {
-          sha: '456',
-          filename: 'api/titi',
-          status: 'modified',
-        },
-      ],
-    };
+  const responseWithoutConfigFile = {
+    commits: [
+      {
+        sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+      },
+    ],
+    files: [
+      {
+        sha: '1234',
+        filename: '1d/package-lock.json',
+        status: 'modified',
+      },
+      {
+        sha: '456',
+        filename: 'api/titi',
+        status: 'modified',
+      },
+    ],
+  };
 
   const compare = nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/compare/v2.130.0...v4.37.1')
