@@ -115,13 +115,13 @@ describe('#submitReleaseTagSelection', () => {
             .reply(200, responseCompareWithConfigFile);
 
           const responseCommitWithConfigFile = {
-            "sha": "3f63810343fa706ef94c915a922ffc88c442e4e6",
-            "files": [
+            sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+            files: [
               {
-                "filename": "api/src/shared/config.js",
-              }
-            ]
-          }
+                filename: 'api/src/shared/config.js',
+              },
+            ],
+          };
 
           nock('https://api.github.com')
             .get('/repos/github-owner/github-repository/commits/3f63810343fa706ef94c915a922ffc88c442e4e6')

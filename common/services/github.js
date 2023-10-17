@@ -453,7 +453,7 @@ module.exports = {
     if (!data) {
       throw Boom.serverUnavailable(`No data from Github from ${endpoint}`);
     }
-  
+
     if (!data.files) {
       throw Boom.serverUnavailable(`No files from Github  from ${endpoint}`);
     }
@@ -462,16 +462,16 @@ module.exports = {
   },
   getPullRequestsDetailsByCommitShas,
 
-  async getCommitsDetails({
-    repoOwner,
-    repoName,
-    commits,
-  }) {
+  async getCommitsDetails({ repoOwner, repoName, commits }) {
     const octokit = _createOctokit();
-    return await Promise.all(commits.map(async (ref) => octokit.repos.getCommit({
-      owner: repoOwner,
-      repo: repoName,
-      ref,
-    })));
+    return await Promise.all(
+      commits.map(async (ref) =>
+        octokit.repos.getCommit({
+          owner: repoOwner,
+          repo: repoName,
+          ref,
+        }),
+      ),
+    );
   },
 };

@@ -585,8 +585,8 @@ describe('Unit | Build | github-test', function () {
               status: 'modified',
             },
           ],
-          commits: undefined
-       };
+          commits: undefined,
+        };
 
         expect(response).to.deep.equal(expectedResponse);
       });

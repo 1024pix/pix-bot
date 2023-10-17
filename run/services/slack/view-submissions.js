@@ -31,10 +31,12 @@ function hasConfigBeenModified(files) {
 }
 
 function filterAndMapCommitsWithConfigFile(commits) {
-  return commits.filter((commit) => {
-    const files = commit.data.files.filter((file) => file.filename === CONFIG_FILE_PATH);
-    return files.length > 0;
-  }).map((commit) => commit.data.sha)
+  return commits
+    .filter((commit) => {
+      const files = commit.data.files.filter((file) => file.filename === CONFIG_FILE_PATH);
+      return files.length > 0;
+    })
+    .map((commit) => commit.data.sha);
 }
 
 module.exports = {
@@ -45,11 +47,14 @@ module.exports = {
 
     // TODO catch exception ?
     const pixApiVersion = await getPixApiVersion();
-    const { files, commits } = await getFilesAndCommitsBetweenCurrentApiVersionAndReleaseTag({ pixApiVersion, releaseTag });
+    const { files, commits } = await getFilesAndCommitsBetweenCurrentApiVersionAndReleaseTag({
+      pixApiVersion,
+      releaseTag,
+    });
     const hasConfigFileChanged = hasConfigBeenModified(files);
 
     if (hasConfigFileChanged) {
-      const flatCommits = commits.map((commit) => commit.sha)
+      const flatCommits = commits.map((commit) => commit.sha);
       const allCommits = await githubService.getCommitsDetails({
         repoOwner,
         repoName,
