@@ -445,20 +445,33 @@ module.exports = {
 
   commentPullRequest,
 
-  async getFilesModifiedBetweenTwoReleases(endpoint) {
+  async getFilesAndCommitsModifiedBetweenTwoReleases(endpoint) {
     const octokit = _createOctokit();
     const response = await octokit.repos.compareCommits(endpoint);
     const data = response?.data;
 
     if (!data) {
-      throw Boom.serverUnavailable('No data from Github');
+      throw Boom.serverUnavailable(`No data from Github from ${endpoint}`);
     }
   
     if (!data.files) {
-      throw Boom.serverUnavailable('No files from Github');
+      throw Boom.serverUnavailable(`No files from Github  from ${endpoint}`);
     }
 
-    return data.files;
+    return { files: data.files, commits: data.commits };
   },
   getPullRequestsDetailsByCommitShas,
+
+  async getCommitsDetails({
+    repoOwner,
+    repoName,
+    commits,
+  }) {
+    const octokit = _createOctokit();
+    return await Promise.all(commits.map(async (ref) => octokit.repos.getCommit({
+      owner: repoOwner,
+      repo: repoName,
+      ref,
+    })));
+  },
 };

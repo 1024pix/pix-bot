@@ -553,7 +553,7 @@ describe('Unit | Build | github-test', function () {
     });
   });
 
-  describe('#getFilesModifiedBeetwenTwoReleases', function () {
+  describe('#getFilesAndCommitsModifiedBetweenTwoReleases', function () {
     context('when Github return files and commits', function () {
       it('should return false', async function () {
         // given
@@ -568,22 +568,25 @@ describe('Unit | Build | github-test', function () {
         };
 
         nock('https://api.github.com')
-          .get('/repos/github-owner/github-repository/compare/v4.37.0...dev')
+          .get('/repos/github-owner/github-repository/compare/v4.37.0...v4.38.0')
           .reply(200, responseWithoutConfigFile);
 
         // when
-        const response = await githubService.getFilesModifiedBetweenTwoReleases(
-          'https://api.github.com/repos/github-owner/github-repository/compare/v4.37.0...dev',
+        const response = await githubService.getFilesAndCommitsModifiedBetweenTwoReleases(
+          'https://api.github.com/repos/github-owner/github-repository/compare/v4.37.0...v4.38.0',
         );
 
         // then
-        const expectedResponse = [
-          {
-            sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-            filename: '1d/package-lock.json',
-            status: 'modified',
-          },
-        ];
+        const expectedResponse = {
+          files: [
+            {
+              sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+              filename: '1d/package-lock.json',
+              status: 'modified',
+            },
+          ],
+          commits: undefined
+       };
 
         expect(response).to.deep.equal(expectedResponse);
       });

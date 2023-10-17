@@ -12,7 +12,7 @@ const settings = require('../../../config');
 
 const CONFIG_FILE_PATH = 'api/src/shared/config.js';
 
-async function getFilesBetweenCurrentApiVersionAndReleaseTag({
+async function getFilesAndCommitsBetweenCurrentApiVersionAndReleaseTag({
   repoOwner = config.github.owner,
   repoName = config.github.repository,
   pixApiVersion,
@@ -21,7 +21,7 @@ async function getFilesBetweenCurrentApiVersionAndReleaseTag({
   const versionsToCompare = `v${pixApiVersion}...${releaseTag}`;
   const endpoint = `https://api.github.com/repos/${repoOwner}/${repoName}/compare/${versionsToCompare}`;
 
-  return await githubService.getFilesModifiedBetweenTwoReleases(endpoint);
+  return await githubService.getFilesAndCommitsModifiedBetweenTwoReleases(endpoint);
 }
 
 function hasConfigBeenModified(files) {
@@ -30,23 +30,33 @@ function hasConfigBeenModified(files) {
   return result.length > 0;
 }
 
-function extractCommitShasOfConfigFile(files) {
-  return files.filter((file) => file.filename === CONFIG_FILE_PATH).map((filteredFile) => filteredFile.sha);
+function filterAndMapCommitsWithConfigFile(commits) {
+  return commits.filter((commit) => {
+    const files = commit.data.files.filter((file) => file.filename === CONFIG_FILE_PATH);
+    return files.length > 0;
+  }).map((commit) => commit.data.sha)
 }
 
 module.exports = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
+    const repoOwner = settings.github.owner;
+    const repoName = settings.github.repository;
 
     // TODO catch exception ?
     const pixApiVersion = await getPixApiVersion();
-    const files = await getFilesBetweenCurrentApiVersionAndReleaseTag({ pixApiVersion, releaseTag });
+    const { files, commits } = await getFilesAndCommitsBetweenCurrentApiVersionAndReleaseTag({ pixApiVersion, releaseTag });
     const hasConfigFileChanged = hasConfigBeenModified(files);
 
     if (hasConfigFileChanged) {
-      const commitsShaList = extractCommitShasOfConfigFile(files);
-      const repoOwner = settings.github.owner;
-      const repoName = settings.github.repository;
+      const flatCommits = commits.map((commit) => commit.sha)
+      const allCommits = await githubService.getCommitsDetails({
+        repoOwner,
+        repoName,
+        commits: flatCommits,
+      });
+      const commitsShaList = filterAndMapCommitsWithConfigFile(allCommits);
+
       const pullRequestsForCommitShaDetails = await githubService.getPullRequestsDetailsByCommitShas({
         repoOwner,
         repoName,
@@ -127,5 +137,4 @@ module.exports = {
       response_action: 'clear',
     };
   },
-  extractCommitShasOfConfigFile,
 };

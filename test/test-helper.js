@@ -203,8 +203,21 @@ function nockGithubWithConfigChanges() {
     .get('/repos/github-owner/github-repository/compare/v4.37.1...v2.130.0')
     .reply(StatusCodes.OK, responseWithConfigFile);
 
+  const responseCommitWithConfigFile = {
+    "sha": "3f63810343fa706ef94c915a922ffc88c442e4e6",
+    "files": [
+      {
+        "filename": "api/src/shared/config.js",
+      }
+    ]
+  }
+
   nock('https://api.github.com')
-    .get('/repos/github-owner/github-repository/commits/456/pulls')
+    .get('/repos/github-owner/github-repository/commits/3f63810343fa706ef94c915a922ffc88c442e4e6')
+    .reply(200, responseCommitWithConfigFile);
+
+  nock('https://api.github.com')
+    .get('/repos/github-owner/github-repository/commits/3f63810343fa706ef94c915a922ffc88c442e4e6/pulls')
     .reply(200, [
       {
         number: 1327,

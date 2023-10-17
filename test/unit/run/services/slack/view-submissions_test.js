@@ -89,29 +89,43 @@ describe('#submitReleaseTagSelection', () => {
           // given
           nock('https://api.pix.fr').get('/api').reply(200, { version: '4.37.1' });
 
-          const responseWithConfigFile = {
+          const responseCompareWithConfigFile = {
             commits: [
               {
                 sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
               },
             ],
+            // files[].sha is sha of diff, not commit id
             files: [
               {
-                sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+                sha: '6dcb09b5b57875f334f61aebed695e2e4193db5e',
                 filename: '1d/package-lock.json',
                 status: 'modified',
               },
               {
-                sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
+                sha: '6dcb09b5b57875f334f61aebed695e2e4193db5e',
                 filename: 'api/src/shared/config.js',
-                status: 'modified',
+                status: 'modified', // TODO doit-on prendre en compte si deleted ?
               },
             ],
           };
 
           nock('https://api.github.com')
             .get('/repos/github-owner/github-repository/compare/v4.37.1...v10.0.0')
-            .reply(200, responseWithConfigFile);
+            .reply(200, responseCompareWithConfigFile);
+
+          const responseCommitWithConfigFile = {
+            "sha": "3f63810343fa706ef94c915a922ffc88c442e4e6",
+            "files": [
+              {
+                "filename": "api/src/shared/config.js",
+              }
+            ]
+          }
+
+          nock('https://api.github.com')
+            .get('/repos/github-owner/github-repository/commits/3f63810343fa706ef94c915a922ffc88c442e4e6')
+            .reply(200, responseCommitWithConfigFile);
 
           sinon.stub(slackPostMessageService, 'postMessage').resolves('ok');
           sinon.stub(githubService, 'getPullRequestsDetailsByCommitShas').resolves([
@@ -179,95 +193,6 @@ describe('#submitReleaseTagSelection', () => {
           expect(modal).to.deep.equal(expectedResponse);
         });
       });
-    });
-  });
-});
-
-describe('#extractCommitShasOfConfigFile', () => {
-  context('when config file is not present', function () {
-    it('should return an empty array', function () {
-      // given
-      const files = [
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-          filename: '1d/package-lock.json',
-          status: 'modified',
-        },
-      ];
-
-      const { extractCommitShasOfConfigFile } = require('../../../../../run/services/slack/view-submissions');
-
-      // when
-      const result = extractCommitShasOfConfigFile(files);
-
-      // then
-      expect(result).is.empty;
-    });
-  });
-
-  context('when there is one config file is in the list of files', function () {
-    it('should return commit sha of the config file', function () {
-      // given
-      const files = [
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-          filename: '1d/package-lock.json',
-          status: 'modified',
-        },
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-          filename: 'api/src/shared/config.js',
-          status: 'modified',
-        },
-      ];
-
-      const { extractCommitShasOfConfigFile } = require('../../../../../run/services/slack/view-submissions');
-
-      // when
-      const result = extractCommitShasOfConfigFile(files);
-
-      // then
-      expect(result).to.deep.equal(['3f63810343fa706ef94c915a922ffc88c442e4e6']);
-    });
-  });
-
-  context('when there is multiples config files is in the list of files', function () {
-    it('should return commit sha of the config file', function () {
-      // given
-      const files = [
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-          filename: '1d/package-lock.json',
-          status: 'modified',
-        },
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
-          filename: 'api/src/shared/config.js',
-          status: 'modified',
-        },
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e7',
-          filename: 'api/src/shared/config.js',
-          status: 'modified',
-        },
-        {
-          sha: '3f63810343fa706ef94c915a922ffc88c442e4e8',
-          filename: 'api/src/shared/config.js',
-          status: 'modified',
-        },
-      ];
-
-      const { extractCommitShasOfConfigFile } = require('../../../../../run/services/slack/view-submissions');
-
-      // when
-      const result = extractCommitShasOfConfigFile(files);
-
-      // then
-      expect(result).to.deep.equal([
-        '3f63810343fa706ef94c915a922ffc88c442e4e6',
-        '3f63810343fa706ef94c915a922ffc88c442e4e7',
-        '3f63810343fa706ef94c915a922ffc88c442e4e8',
-      ]);
     });
   });
 });
