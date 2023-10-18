@@ -4,6 +4,7 @@ const { describe, it } = require('mocha');
 const slackPostMessageService = require('../../../../../common/services/slack/surfaces/messages/post-message');
 const githubService = require('../../../../../common/services/github');
 const { submitReleaseTagSelection } = require('../../../../../run/services/slack/view-submissions');
+const config = require('../../../../../config');
 
 describe('#submitReleaseTagSelection', () => {
   const payload = {
@@ -104,7 +105,7 @@ describe('#submitReleaseTagSelection', () => {
               },
               {
                 sha: '6dcb09b5b57875f334f61aebed695e2e4193db5e',
-                filename: 'api/src/shared/config.js',
+                filename: config.api.configFilename,
                 status: 'modified', // TODO doit-on prendre en compte si deleted ?
               },
             ],
@@ -118,7 +119,7 @@ describe('#submitReleaseTagSelection', () => {
             sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
             files: [
               {
-                filename: 'api/src/shared/config.js',
+                filename: config.api.configFilename,
               },
             ],
           };

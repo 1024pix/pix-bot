@@ -8,6 +8,7 @@ const {
 } = require('../../../test-helper');
 const githubService = require('../../../../common/services/github');
 const logger = require('../../../../common/services/logger');
+const config = require('../../../../config');
 
 describe('Unit | Build | github-test', function () {
   describe('#getPullRequests', function () {
@@ -336,7 +337,7 @@ describe('Unit | Build | github-test', function () {
         ];
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/src/shared/config.js' })
+          .query({ since: latestReleaseDate, until: now.toISOString(), path: config.api.configFilename })
           .reply(200, [
             {
               sha: '5ec2f42',
@@ -394,7 +395,7 @@ describe('Unit | Build | github-test', function () {
         ];
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: latestReleaseDate, until: now.toISOString(), path: 'api/src/shared/config.js' })
+          .query({ since: latestReleaseDate, until: now.toISOString(), path: config.api.configFilename })
           .reply(200, []);
 
         nock('https://api.github.com')
@@ -437,7 +438,7 @@ describe('Unit | Build | github-test', function () {
         // given
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/src/shared/config.js' })
+          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: config.api.configFilename })
           .reply(200, [
             {
               sha: '5ec2f42',
@@ -472,7 +473,7 @@ describe('Unit | Build | github-test', function () {
         // given
         nock('https://api.github.com')
           .get('/repos/github-owner/github-repository/commits')
-          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: 'api/src/shared/config.js' })
+          .query({ since: secondToLastReleaseDate, until: latestReleaseDate, path: config.api.configFilename })
           .reply(200, []);
 
         nock('https://api.github.com')

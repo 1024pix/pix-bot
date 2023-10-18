@@ -10,8 +10,6 @@ const config = require('../../../config');
 const { getPixApiVersion } = require('../../../common/services/pix-api');
 const settings = require('../../../config');
 
-const CONFIG_FILE_PATH = 'api/src/shared/config.js';
-
 async function getFilesAndCommitsBetweenCurrentApiVersionAndReleaseTag({
   repoOwner = config.github.owner,
   repoName = config.github.repository,
@@ -25,7 +23,7 @@ async function getFilesAndCommitsBetweenCurrentApiVersionAndReleaseTag({
 }
 
 function hasConfigBeenModified(files) {
-  const result = files.filter((f) => f.filename === CONFIG_FILE_PATH);
+  const result = files.filter((f) => f.filename === settings.api.configFilename);
 
   return result.length > 0;
 }
@@ -33,7 +31,7 @@ function hasConfigBeenModified(files) {
 function filterAndMapCommitsWithConfigFile(commits) {
   return commits
     .filter((commit) => {
-      const files = commit.data.files.filter((file) => file.filename === CONFIG_FILE_PATH);
+      const files = commit.data.files.filter((file) => file.filename === settings.api.configFilename);
       return files.length > 0;
     })
     .map((commit) => commit.data.sha);

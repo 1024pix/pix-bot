@@ -96,7 +96,11 @@ function nockGithubWithNoConfigChanges() {
       /since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g,
       'since=XXXX&until=XXXX',
     )
-    .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Fsrc%2Fshared%2Fconfig.js')
+    .get(
+      `/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=${encodeURIComponent(
+        config.api.configFilename,
+      )}`,
+    )
     .reply(200, []);
 
   const responseWithoutConfigFile = {
@@ -176,7 +180,11 @@ function nockGithubWithConfigChanges() {
       /since=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z&until=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A\d{2}.\d{3}Z/g,
       'since=XXXX&until=XXXX',
     )
-    .get('/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=api%2Fsrc%2Fshared%2Fconfig.js')
+    .get(
+      `/repos/github-owner/github-repository/commits?since=XXXX&until=XXXX&path=${encodeURIComponent(
+        config.api.configFilename,
+      )}`,
+    )
     .reply(200, [{}]);
 
   const responseWithConfigFile = {
@@ -193,7 +201,7 @@ function nockGithubWithConfigChanges() {
       },
       {
         sha: '456',
-        filename: 'api/src/shared/config.js',
+        filename: config.api.configFilename,
         status: 'modified',
       },
     ],
@@ -207,7 +215,7 @@ function nockGithubWithConfigChanges() {
     sha: '3f63810343fa706ef94c915a922ffc88c442e4e6',
     files: [
       {
-        filename: 'api/src/shared/config.js',
+        filename: config.api.configFilename,
       },
     ],
   };

@@ -131,6 +131,7 @@ describe('Acceptance | Run | Slack', function () {
             expect(tagNock).to.have.been.requested;
           });
         });
+
         it('returns the confirmation modal', async function () {
           // given
           const nocks = nockGithubWithNoConfigChanges();

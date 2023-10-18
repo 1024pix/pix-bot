@@ -269,7 +269,7 @@ async function _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoNa
     repo: repoName,
     since: sinceDate,
     until: untilDate,
-    path: 'api/src/shared/config.js',
+    path: settings.api.configFilename,
   });
 
   return data;

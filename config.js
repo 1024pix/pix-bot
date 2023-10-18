@@ -20,6 +20,10 @@ module.exports = (function () {
     port: _getNumber(process.env.PORT, 3000),
     environment: process.env.NODE_ENV || 'development',
 
+    api: {
+      configFilename: 'api/src/shared/config.js',
+    },
+
     ecoMode: {
       stopSchedule: process.env.REVIEW_APP_STOP_SCHEDULE,
       startSchedule: process.env.REVIEW_APP_START_SCHEDULE,
