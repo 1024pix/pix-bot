@@ -1,5 +1,18 @@
 # pix-bot Changelog
 
+## v1.89.0 (30/10/2023)
+
+
+### :building_construction: Tech
+- [#322](https://github.com/1024pix/pix-bot/pull/322) [TECH] Mettre a jour le chemin de config.js.
+
+### :arrow_up: Montée de version
+- [#326](https://github.com/1024pix/pix-bot/pull/326) [BUMP] Update dependency lint-staged to v15 (dossier racine).
+- [#328](https://github.com/1024pix/pix-bot/pull/328) [BUMP] Update dependency sinon to v17 (dossier racine).
+- [#329](https://github.com/1024pix/pix-bot/pull/329) [BUMP] Update node to v20 (major).
+- [#324](https://github.com/1024pix/pix-bot/pull/324) [BUMP] Lock file maintenance (dossier racine).
+- [#321](https://github.com/1024pix/pix-bot/pull/321) [BUMP] Update node.
+
 ## v1.88.0 (26/09/2023)
 
 
