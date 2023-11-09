@@ -497,8 +497,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         // given
         const injectedScalingoClientStub = sinon.stub();
         const deployUsingSCMStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub().resolves(true);
+
         injectedScalingoClientStub.getInstance = sinon.stub().returns({
           deployUsingSCM: deployUsingSCMStub,
+          reviewAppExists: reviewAppExistsStub,
         });
 
         // when
@@ -517,8 +520,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         // given
         const injectedScalingoClientStub = sinon.stub();
         const deployUsingSCMStub = sinon.stub().rejects(new Error('Deployment error'));
+        const reviewAppExistsStub = sinon.stub().resolves(true);
         injectedScalingoClientStub.getInstance = sinon.stub().returns({
           deployUsingSCM: deployUsingSCMStub,
+          reviewAppExists: reviewAppExistsStub,
         });
 
         // when
