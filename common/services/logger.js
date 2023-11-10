@@ -2,7 +2,7 @@ let enabledFromConfiguration = true;
 
 if (
   process.env.NODE_ENV === 'test' &&
-  (process.env.TEST_LOG_ENABLED !== undefined || process.env.TEST_LOG_ENABLED !== 'enabled')
+  (process.env.TEST_LOG_ENABLED === undefined || process.env.TEST_LOG_ENABLED !== 'true')
 ) {
   enabledFromConfiguration = false;
 }
