@@ -493,7 +493,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
     });
 
     describe('when the Review App creation conditions are met', function () {
-      it('should calls scalingo to deploy the corresponding applications', async function () {
+      it('should call scalingo to deploy the corresponding applications', async function () {
         // given
         const injectedScalingoClientStub = sinon.stub();
         const deployUsingSCMStub = sinon.stub();
@@ -535,6 +535,38 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         // then
         expect(result).to.be.instanceOf(Error);
         expect(result.message).to.equal('Scalingo APIError: Deployment error');
+      });
+
+      describe('when the review app does not exist', function () {
+        it('should call scalingo to create and deploy the corresponding applications', async function () {
+          // given
+          const injectedScalingoClientStub = sinon.stub();
+          const deployUsingSCMStub = sinon.stub();
+          const reviewAppExistsStub = sinon.stub().resolves(true);
+          reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(false);
+          const deployReviewAppStub = sinon.stub();
+          const disableAutoDeployStub = sinon.stub();
+
+          injectedScalingoClientStub.getInstance = sinon.stub().returns({
+            deployUsingSCM: deployUsingSCMStub,
+            reviewAppExists: reviewAppExistsStub,
+            deployReviewApp: deployReviewAppStub,
+            disableAutoDeploy: disableAutoDeployStub,
+          });
+
+          // when
+          const response = await githubController.pullRequestSynchronizeWebhook(request, injectedScalingoClientStub);
+
+          // then
+          expect(deployReviewAppStub.calledOnceWithExactly('pix-api-review', 3)).to.be.true;
+          expect(disableAutoDeployStub.calledOnceWithExactly('pix-api-review-pr3')).to.be.true;
+          expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
+          expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
+          expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+          expect(response).to.equal(
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 3',
+          );
+        });
       });
     });
   });

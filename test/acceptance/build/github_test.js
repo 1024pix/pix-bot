@@ -338,13 +338,34 @@ describe('Acceptance | Build | Github', function () {
       });
 
       describe('when RA does not already exist', function () {
-        it('responds with 200 and do nothing', async function () {
+        it('responds with 200 and creates RA', async function () {
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
           const scalingoRAExists1 = nock('https://scalingo.reviewApps').get('/v1/apps/pix-front-review-pr2').reply(404);
-          const scalingoRAExists2 = nock('https://scalingo.reviewApps').get('/v1/apps/pix-api-review-pr2').reply(404);
+          const scalingoRAExists2 = nock('https://scalingo.reviewApps')
+            .get('/v1/apps/pix-api-review-pr2')
+            .reply(200, { app: { name: 'pix-api-review-pr2' } });
           const scalingoRAExists3 = nock('https://scalingo.reviewApps')
             .get('/v1/apps/pix-audit-logger-review-pr2')
-            .reply(404);
+            .reply(200, { app: { name: 'pix-audit-logger-review-pr2' } });
+          const scalingoCreate1 = nock('https://scalingo.reviewApps')
+            .post('/v1/apps/pix-front-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
+            .reply(StatusCodes.CREATED, {
+              review_app: {
+                app_name: 'pix-front-review-pr2',
+              },
+            });
+          const scalingoUpdateOpts1 = nock('https://scalingo.reviewApps')
+            .patch('/v1/apps/pix-front-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
+            .reply(StatusCodes.CREATED);
+          const scalingoDeploy1 = nock('https://scalingo.reviewApps')
+            .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+            .reply(200);
+          const scalingoDeploy2 = nock('https://scalingo.reviewApps')
+            .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+            .reply(200);
+          const scalingoDeploy3 = nock('https://scalingo.reviewApps')
+            .post('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
+            .reply(200);
 
           const res = await server.inject({
             method: 'POST',
@@ -357,12 +378,17 @@ describe('Acceptance | Build | Github', function () {
           });
           expect(res.statusCode).to.equal(200);
           expect(res.result).to.eql(
-            'No deployments triggered as RA does not exist: pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
           );
           expect(scalingoAuth.isDone()).to.be.true;
           expect(scalingoRAExists2.isDone()).to.be.true;
           expect(scalingoRAExists3.isDone()).to.be.true;
           expect(scalingoRAExists1.isDone()).to.be.true;
+          expect(scalingoDeploy2.isDone()).to.be.true;
+          expect(scalingoDeploy3.isDone()).to.be.true;
+          expect(scalingoCreate1.isDone()).to.be.true;
+          expect(scalingoUpdateOpts1.isDone()).to.be.true;
+          expect(scalingoDeploy1.isDone()).to.be.true;
         });
       });
     });
