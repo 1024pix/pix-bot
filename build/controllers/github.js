@@ -125,6 +125,17 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
         await client.deployUsingSCM(reviewAppName, ref);
       }
     } catch (error) {
+      logger.error({
+        event: 'review-app',
+        stack: error.stack,
+        message: `Deployement for application ${reviewAppName} failed : ${error.message}`,
+        data: {
+          repository,
+          reviewApp: reviewAppName,
+          pr: prId,
+          ref,
+        },
+      });
       throw new Error(`Scalingo APIError: ${error.message}`);
     }
   }
