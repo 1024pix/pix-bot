@@ -41,6 +41,7 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function () {
     const githubRepository = 'pix-bot-publish-test';
     const env = {
       ...process.env,
+      NPM_CONFIG_PRODUCTION: undefined,
       GIT_USER_NAME: gitUser,
       GIT_USER_EMAIL: gitEmail,
     };
