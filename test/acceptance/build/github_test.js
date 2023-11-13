@@ -364,6 +364,32 @@ describe('Acceptance | Build | Github', function () {
           expect(scalingoDeploy1.isDone()).to.be.true;
         });
       });
+
+      describe('when Scalingo auth API returns an error', function () {
+        it('responds with 500 and throws an error', async function () {
+          const scalingoAuth = nock('https://auth.scalingo.com')
+            .post('/v1/tokens/exchange')
+            .reply(StatusCodes.INTERNAL_SERVER_ERROR);
+
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(scalingoAuth.isDone()).to.be.true;
+          expect(res.statusCode).to.equal(500);
+          expect(res.result).to.eql({
+            statusCode: 500,
+            error: 'Internal Server Error',
+            message: 'An internal server error occurred',
+          });
+        });
+      });
     });
 
     describe('on push event', function () {

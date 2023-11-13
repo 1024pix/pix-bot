@@ -108,10 +108,15 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
     return message;
   }
 
+  let client;
   try {
-    const client = await injectedScalingoClient.getInstance('reviewApps');
-    for (const appName of reviewApps) {
-      const reviewAppName = `${appName}-pr${prId}`;
+    client = await injectedScalingoClient.getInstance('reviewApps');
+  } catch (error) {
+    throw new Error(`Scalingo auth APIError: ${error.message}`);
+  }
+  for (const appName of reviewApps) {
+    const reviewAppName = `${appName}-pr${prId}`;
+    try {
       if (await client.reviewAppExists(reviewAppName)) {
         await client.deployUsingSCM(reviewAppName, ref);
       } else {
@@ -119,9 +124,9 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
         await client.disableAutoDeploy(reviewAppName);
         await client.deployUsingSCM(reviewAppName, ref);
       }
+    } catch (error) {
+      throw new Error(`Scalingo APIError: ${error.message}`);
     }
-  } catch (error) {
-    throw new Error(`Scalingo APIError: ${error.message}`);
   }
 
   logger.info({
