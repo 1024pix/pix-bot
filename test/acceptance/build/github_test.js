@@ -390,6 +390,83 @@ describe('Acceptance | Build | Github', function () {
           });
         });
       });
+
+      describe('when Scalingo deploy API returns an error', function () {
+        describe('for every deployment', function () {
+          it('responds with 500 and throws an error', async function () {
+            const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+            const scalingoRAExists1 = getAppNock({ reviewAppName: 'pix-front-review-pr2' });
+            const scalingoRAExists2 = getAppNock({ reviewAppName: 'pix-api-review-pr2' });
+            const scalingoRAExists3 = getAppNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
+            const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2', returnCode: 500 });
+            const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2', returnCode: 500 });
+            const scalingoDeploy3 = getManualDeployNock({
+              reviewAppName: 'pix-audit-logger-review-pr2',
+              returnCode: 500,
+            });
+
+            const res = await server.inject({
+              method: 'POST',
+              url: '/github/webhook',
+              headers: {
+                ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+                'x-github-event': 'pull_request',
+              },
+              payload: body,
+            });
+
+            expect(scalingoAuth.isDone()).to.be.true;
+            expect(scalingoRAExists1.isDone()).to.be.true;
+            expect(scalingoRAExists2.isDone()).to.be.true;
+            expect(scalingoRAExists3.isDone()).to.be.true;
+            expect(scalingoDeploy1.isDone()).to.be.true;
+            expect(scalingoDeploy2.isDone()).to.be.true;
+            expect(scalingoDeploy3.isDone()).to.be.true;
+            expect(res.statusCode).to.equal(500);
+            expect(res.result).to.eql({
+              statusCode: 500,
+              error: 'Internal Server Error',
+              message: 'An internal server error occurred',
+            });
+          });
+        });
+
+        it('responds with 200 and list every app deployed', async function () {
+          const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+          const scalingoRAExists1 = getAppNock({ reviewAppName: 'pix-front-review-pr2' });
+          const scalingoRAExists2 = getAppNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoRAExists3 = getAppNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
+          const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2', returnCode: 500 });
+          const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoDeploy3 = getManualDeployNock({
+            reviewAppName: 'pix-audit-logger-review-pr2',
+          });
+
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(scalingoAuth.isDone()).to.be.true;
+          expect(scalingoRAExists1.isDone()).to.be.true;
+          expect(scalingoRAExists2.isDone()).to.be.true;
+          expect(scalingoRAExists3.isDone()).to.be.true;
+          expect(scalingoDeploy1.isDone()).to.be.true;
+          expect(scalingoDeploy2.isDone()).to.be.true;
+          expect(scalingoDeploy3.isDone()).to.be.true;
+          expect(res.statusCode).to.equal(200);
+          expect(res.result).to.eql(
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review with pr 2',
+          );
+        });
+      });
     });
 
     describe('on push event', function () {

@@ -534,7 +534,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         // then
         expect(result).to.be.instanceOf(Error);
-        expect(result.message).to.equal('Scalingo APIError: Deployment error');
+        expect(result.message).to.equal('No RA deployed for repository pix and pr3');
       });
 
       describe('when the review app does not exist', function () {
