@@ -62,6 +62,20 @@ class ScalingoClient {
     return [await this._getSingleAppInfo(target)];
   }
 
+  async reviewAppExists(reviewAppName) {
+    try {
+      const { name } = await this.client.Apps.find(reviewAppName);
+      return name == reviewAppName;
+    } catch (err) {
+      if (err.status === 404) {
+        return false;
+      }
+      throw new Error(
+        `Impossible to get info for RA ${reviewAppName}. Scalingo API returned ${err.status} : ${err.message}`,
+      );
+    }
+  }
+
   deployReviewApp(appName, prId) {
     return this.client.SCMRepoLinks.manualReviewApp(appName, prId);
   }

@@ -4,7 +4,42 @@ const config = require('../../../config');
 
 describe('Acceptance | Build | Github', function () {
   describe('POST /github/webhook', function () {
+    function getAppNock({ reviewAppName, returnCode = StatusCodes.OK }) {
+      let body = undefined;
+      if (returnCode == StatusCodes.OK) {
+        body = { app: { name: reviewAppName } };
+      }
+      return nock('https://scalingo.reviewApps').get(`/v1/apps/${reviewAppName}`).reply(returnCode, body);
+    }
+
+    function getManualReviewAppNock({ appName, prNumber, returnCode = StatusCodes.CREATED }) {
+      let body = undefined;
+      if (returnCode == StatusCodes.CREATED) {
+        body = {
+          review_app: {
+            app_name: `${appName}-pr${prNumber}`,
+          },
+        };
+      }
+      return nock('https://scalingo.reviewApps')
+        .post(`/v1/apps/${appName}/scm_repo_link/manual_review_app`, { pull_request_id: 2 })
+        .reply(returnCode, body);
+    }
+
+    function getManualDeployNock({ reviewAppName, branch = 'my-branch', returnCode = StatusCodes.OK }) {
+      return nock('https://scalingo.reviewApps')
+        .post(`/v1/apps/${reviewAppName}/scm_repo_link/manual_deploy`, { branch: branch })
+        .reply(returnCode);
+    }
+
+    function getScmRepoLinkNock({ reviewAppName, returnCode = StatusCodes.CREATED }) {
+      return nock('https://scalingo.reviewApps')
+        .patch(`/v1/apps/${reviewAppName}/scm_repo_link`, { scm_repo_link: { auto_deploy_enabled: false } })
+        .reply(returnCode);
+    }
+
     let body;
+
     ['opened', 'reopened'].forEach((action) => {
       describe(`on pull request ${action} event`, function () {
         beforeEach(function () {
@@ -27,52 +62,17 @@ describe('Acceptance | Build | Github', function () {
 
         it('responds with 200, creates the RA on scalingo, disables autodeploy, pushes the git ref and comments the PR', async function () {
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
-          const replyBody1 = {
-            review_app: {
-              app_name: 'pix-front-review-pr2',
-            },
-          };
-          const replyBody2 = {
-            review_app: {
-              app_name: 'pix-api-review-pr2',
-            },
-          };
-          const replyBody3 = {
-            review_app: {
-              app_name: 'pix-audit-logger-review-pr2',
-            },
-          };
-          const scalingoDeploy1 = nock('https://scalingo.reviewApps')
-            .post('/v1/apps/pix-front-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
-            .reply(StatusCodes.CREATED, replyBody1);
-          const scalingoDeploy2 = nock('https://scalingo.reviewApps')
-            .post('/v1/apps/pix-api-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
-            .reply(StatusCodes.CREATED, replyBody2);
-          const scalingoDeploy3 = nock('https://scalingo.reviewApps')
-            .post('/v1/apps/pix-audit-logger-review/scm_repo_link/manual_review_app', { pull_request_id: 2 })
-            .reply(StatusCodes.CREATED, replyBody3);
-          const scalingoUpdateOpts1 = nock('https://scalingo.reviewApps')
-            .patch('/v1/apps/pix-front-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
-            .reply(StatusCodes.CREATED);
-          const scalingoUpdateOpts2 = nock('https://scalingo.reviewApps')
-            .patch('/v1/apps/pix-api-review-pr2/scm_repo_link', { scm_repo_link: { auto_deploy_enabled: false } })
-            .reply(StatusCodes.CREATED);
-          const scalingoUpdateOpts3 = nock('https://scalingo.reviewApps')
-            .patch('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link', {
-              scm_repo_link: { auto_deploy_enabled: false },
-            })
-            .reply(StatusCodes.CREATED);
-          const scalingoSCMDeploy1 = nock('https://scalingo.reviewApps')
-            .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
-            .reply(200);
-          const scalingoSCMDeploy2 = nock('https://scalingo.reviewApps')
-            .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
-            .reply(200);
-          const scalingoSCMDeploy3 = nock('https://scalingo.reviewApps')
-            .post('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link/manual_deploy', {
-              branch: 'my-branch',
-            })
-            .reply(200);
+
+          const scalingoDeploy1 = getManualReviewAppNock({ appName: 'pix-api-review', prNumber: 2 });
+          const scalingoDeploy2 = getManualReviewAppNock({ appName: 'pix-front-review', prNumber: 2 });
+          const scalingoDeploy3 = getManualReviewAppNock({ appName: 'pix-audit-logger-review', prNumber: 2 });
+          const scalingoUpdateOpts1 = getScmRepoLinkNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoUpdateOpts2 = getScmRepoLinkNock({ reviewAppName: 'pix-front-review-pr2' });
+          const scalingoUpdateOpts3 = getScmRepoLinkNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+          const scalingoSCMDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoSCMDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2' });
+          const scalingoSCMDeploy3 = getManualDeployNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
           const githubNock = nock('https://api.github.com')
             .post('/repos/github-owner/pix/issues/2/comments')
             .reply(StatusCodes.OK);
@@ -217,15 +217,13 @@ describe('Acceptance | Build | Github', function () {
 
       it('responds with 200 and create a deployment on scalingo', async function () {
         const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
-        const scalingoDeploy1 = nock('https://scalingo.reviewApps')
-          .post('/v1/apps/pix-front-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
-          .reply(200);
-        const scalingoDeploy2 = nock('https://scalingo.reviewApps')
-          .post('/v1/apps/pix-api-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
-          .reply(200);
-        const scalingoDeploy3 = nock('https://scalingo.reviewApps')
-          .post('/v1/apps/pix-audit-logger-review-pr2/scm_repo_link/manual_deploy', { branch: 'my-branch' })
-          .reply(200);
+        const scalingoRAExists1 = getAppNock({ reviewAppName: 'pix-front-review-pr2' });
+        const scalingoRAExists2 = getAppNock({ reviewAppName: 'pix-api-review-pr2' });
+        const scalingoRAExists3 = getAppNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
+        const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2' });
+        const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
+        const scalingoDeploy3 = getManualDeployNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
 
         const res = await server.inject({
           method: 'POST',
@@ -241,6 +239,9 @@ describe('Acceptance | Build | Github', function () {
           'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
         );
         expect(scalingoAuth.isDone()).to.be.true;
+        expect(scalingoRAExists1.isDone()).to.be.true;
+        expect(scalingoRAExists2.isDone()).to.be.true;
+        expect(scalingoRAExists3.isDone()).to.be.true;
         expect(scalingoDeploy1.isDone()).to.be.true;
         expect(scalingoDeploy2.isDone()).to.be.true;
         expect(scalingoDeploy3.isDone()).to.be.true;
@@ -323,6 +324,148 @@ describe('Acceptance | Build | Github', function () {
         });
         expect(res.statusCode).to.equal(200);
         expect(res.result).to.eql('RA disabled for this PR');
+      });
+
+      describe('when RA does not already exist', function () {
+        it('responds with 200 and creates RA', async function () {
+          const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+          const scalingoRAExists1 = getAppNock({ reviewAppName: 'pix-front-review-pr2', returnCode: 404 });
+          const scalingoRAExists2 = getAppNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoRAExists3 = getAppNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+          const scalingoCreate1 = getManualReviewAppNock({ appName: 'pix-front-review', prNumber: 2 });
+          const scalingoUpdateOpts1 = getScmRepoLinkNock({ reviewAppName: 'pix-front-review-pr2' });
+
+          const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2' });
+          const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoDeploy3 = getManualDeployNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(res.statusCode).to.equal(200);
+          expect(res.result).to.eql(
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
+          );
+          expect(scalingoAuth.isDone()).to.be.true;
+          expect(scalingoRAExists2.isDone()).to.be.true;
+          expect(scalingoRAExists3.isDone()).to.be.true;
+          expect(scalingoRAExists1.isDone()).to.be.true;
+          expect(scalingoDeploy2.isDone()).to.be.true;
+          expect(scalingoDeploy3.isDone()).to.be.true;
+          expect(scalingoCreate1.isDone()).to.be.true;
+          expect(scalingoUpdateOpts1.isDone()).to.be.true;
+          expect(scalingoDeploy1.isDone()).to.be.true;
+        });
+      });
+
+      describe('when Scalingo auth API returns an error', function () {
+        it('responds with 500 and throws an error', async function () {
+          const scalingoAuth = nock('https://auth.scalingo.com')
+            .post('/v1/tokens/exchange')
+            .reply(StatusCodes.INTERNAL_SERVER_ERROR);
+
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(scalingoAuth.isDone()).to.be.true;
+          expect(res.statusCode).to.equal(500);
+          expect(res.result).to.eql({
+            statusCode: 500,
+            error: 'Internal Server Error',
+            message: 'An internal server error occurred',
+          });
+        });
+      });
+
+      describe('when Scalingo deploy API returns an error', function () {
+        describe('for every deployment', function () {
+          it('responds with 500 and throws an error', async function () {
+            const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+            const scalingoRAExists1 = getAppNock({ reviewAppName: 'pix-front-review-pr2' });
+            const scalingoRAExists2 = getAppNock({ reviewAppName: 'pix-api-review-pr2' });
+            const scalingoRAExists3 = getAppNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
+            const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2', returnCode: 500 });
+            const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2', returnCode: 500 });
+            const scalingoDeploy3 = getManualDeployNock({
+              reviewAppName: 'pix-audit-logger-review-pr2',
+              returnCode: 500,
+            });
+
+            const res = await server.inject({
+              method: 'POST',
+              url: '/github/webhook',
+              headers: {
+                ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+                'x-github-event': 'pull_request',
+              },
+              payload: body,
+            });
+
+            expect(scalingoAuth.isDone()).to.be.true;
+            expect(scalingoRAExists1.isDone()).to.be.true;
+            expect(scalingoRAExists2.isDone()).to.be.true;
+            expect(scalingoRAExists3.isDone()).to.be.true;
+            expect(scalingoDeploy1.isDone()).to.be.true;
+            expect(scalingoDeploy2.isDone()).to.be.true;
+            expect(scalingoDeploy3.isDone()).to.be.true;
+            expect(res.statusCode).to.equal(500);
+            expect(res.result).to.eql({
+              statusCode: 500,
+              error: 'Internal Server Error',
+              message: 'An internal server error occurred',
+            });
+          });
+        });
+
+        it('responds with 200 and list every app deployed', async function () {
+          const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(201);
+          const scalingoRAExists1 = getAppNock({ reviewAppName: 'pix-front-review-pr2' });
+          const scalingoRAExists2 = getAppNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoRAExists3 = getAppNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
+          const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2', returnCode: 500 });
+          const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
+          const scalingoDeploy3 = getManualDeployNock({
+            reviewAppName: 'pix-audit-logger-review-pr2',
+          });
+
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(scalingoAuth.isDone()).to.be.true;
+          expect(scalingoRAExists1.isDone()).to.be.true;
+          expect(scalingoRAExists2.isDone()).to.be.true;
+          expect(scalingoRAExists3.isDone()).to.be.true;
+          expect(scalingoDeploy1.isDone()).to.be.true;
+          expect(scalingoDeploy2.isDone()).to.be.true;
+          expect(scalingoDeploy3.isDone()).to.be.true;
+          expect(res.statusCode).to.equal(200);
+          expect(res.result).to.eql(
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review with pr 2',
+          );
+        });
       });
     });
 

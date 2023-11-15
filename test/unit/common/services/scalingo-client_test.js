@@ -750,4 +750,58 @@ describe('Scalingo client', () => {
       expect(actual.message).to.equal("Aucun autoscaler trouvé pour l'application 'pix-application-recette'");
     });
   });
+
+  describe('#Scalingo.reviewAppExists', () => {
+    let clientAppsFind;
+    let scalingoClient;
+
+    beforeEach(async function () {
+      clientAppsFind = sinon.stub();
+      const clientStub = {
+        clientFromToken: async () => {
+          return {
+            Apps: { find: clientAppsFind },
+          };
+        },
+      };
+      scalingoClient = await ScalingoClient.getInstance('production', clientStub);
+    });
+
+    it('should return true when review app exists', async () => {
+      //given
+      const reviewAppName = 'reviewApp';
+      clientAppsFind.withArgs(reviewAppName).resolves({ name: reviewAppName });
+      //when
+      const exists = await scalingoClient.reviewAppExists(reviewAppName);
+      //then
+      expect(exists).to.be.true;
+    });
+
+    it('should return false when review app does not exist', async () => {
+      //given
+      const reviewAppName = 'reviewApp';
+      clientAppsFind.withArgs(reviewAppName).rejects({ status: 404 });
+      //when
+      const exists = await scalingoClient.reviewAppExists(reviewAppName);
+      //then
+      expect(exists).to.be.false;
+    });
+
+    it('should return throw an error when Scalingo API call fails', async () => {
+      //given
+      const reviewAppName = 'reviewApp';
+      clientAppsFind.withArgs(reviewAppName).rejects({ status: 500, message: 'API unavailable' });
+      //when
+      let error;
+      try {
+        await scalingoClient.reviewAppExists(reviewAppName);
+      } catch (err) {
+        error = err;
+      }
+      //then
+      expect(error.message).to.equal(
+        'Impossible to get info for RA reviewApp. Scalingo API returned 500 : API unavailable',
+      );
+    });
+  });
 });

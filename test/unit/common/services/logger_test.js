@@ -2,130 +2,49 @@ const { expect, sinon } = require('../../../test-helper');
 const logger = require('../../../../common/services/logger');
 
 describe('logger', function () {
-  describe('error', function () {
-    describe('when an message is passed', function () {
-      it('should call injectedLogger error', function () {
-        // given
-        const injectedLogger = { error: sinon.stub() };
+  const injectedLoggerFunction = {
+    error: 'error',
+    info: 'log',
+    warn: 'warn',
+    ok: 'ok',
+  };
 
-        // when
-        logger.error({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger, true);
-        // then
-        expect(injectedLogger.error.calledOnce).to.be.true;
-        expect(injectedLogger.error.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"titi","stack":"stack","level":"error"}',
-        );
+  ['error', 'info', 'warn', 'ok'].forEach((level) => {
+    describe(level, function () {
+      describe('when an message is passed', function () {
+        it(`should call injectedLogger ${level}`, function () {
+          // given
+          let injectedLogger = [];
+          const functionToStub = injectedLoggerFunction[level];
+          injectedLogger[functionToStub] = sinon.stub();
+          const data = { ctx: 'context', meta: 'metadata' };
+
+          // when
+          logger[level]({ event: 'toto', message: 'titi', stack: 'stack', data }, injectedLogger, true);
+          // then
+          expect(injectedLogger[functionToStub].calledOnce).to.be.true;
+          expect(injectedLogger[functionToStub].firstCall.args[0]).to.equal(
+            `{"event":"toto","message":"titi","stack":"stack","level":"${level}","data":{"ctx":"context","meta":"metadata"}}`,
+          );
+        });
       });
-    });
-    describe('when an object is passed', function () {
-      it('should call injectedLogger error with object in message', function () {
-        // given
-        const injectedLogger = { error: sinon.stub() };
+      describe('when an object is passed', function () {
+        it(`should call injectedLogger ${level} with object in message`, function () {
+          // given
+          let injectedLogger = [];
+          const functionToStub = injectedLoggerFunction[level];
+          injectedLogger[functionToStub] = sinon.stub();
+          const data = { ctx: 'context', meta: 'metadata' };
 
-        // when
-        logger.error({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger, true);
+          // when
+          logger[level]({ event: 'toto', message: { foo: 'bar' }, stack: 'stack', data }, injectedLogger, true);
 
-        // then
-        expect(injectedLogger.error.calledOnce).to.be.true;
-        expect(injectedLogger.error.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"error"}',
-        );
-      });
-    });
-  });
-  describe('info', function () {
-    describe('when an message is passed', function () {
-      it('should call injectedLogger log', function () {
-        // given
-        const injectedLogger = { log: sinon.stub() };
-
-        // when
-        logger.info({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger, true);
-
-        // then
-        expect(injectedLogger.log.calledOnce).to.be.true;
-        expect(injectedLogger.log.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"titi","stack":"stack","level":"info"}',
-        );
-      });
-    });
-    describe('when an object is passed', function () {
-      it('should call injectedLogger log with object in message', function () {
-        // given
-        const injectedLogger = { log: sinon.stub() };
-
-        // when
-        logger.info({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger, true);
-
-        // then
-        expect(injectedLogger.log.calledOnce).to.be.true;
-        expect(injectedLogger.log.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"info"}',
-        );
-      });
-    });
-  });
-  describe('warn', function () {
-    describe('when an message is passed', function () {
-      it('should call injectedLogger warn', function () {
-        // given
-        const injectedLogger = { warn: sinon.stub() };
-
-        // when
-        logger.warn({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger, true);
-
-        // then
-        expect(injectedLogger.warn.calledOnce).to.be.true;
-        expect(injectedLogger.warn.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"titi","stack":"stack","level":"warn"}',
-        );
-      });
-    });
-    describe('when an object is passed', function () {
-      it('should call injectedLogger warn with object in message', function () {
-        // given
-        const injectedLogger = { warn: sinon.stub() };
-
-        // when
-        logger.warn({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger, true);
-
-        // then
-        expect(injectedLogger.warn.calledOnce).to.be.true;
-        expect(injectedLogger.warn.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"warn"}',
-        );
-      });
-    });
-  });
-  describe('ok', function () {
-    describe('when an message is passed', function () {
-      it('should call injectedLogger ok', function () {
-        // given
-        const injectedLogger = { ok: sinon.stub() };
-
-        // when
-        logger.ok({ event: 'toto', message: 'titi', stack: 'stack' }, injectedLogger, true);
-
-        // then
-        expect(injectedLogger.ok.calledOnce).to.be.true;
-        expect(injectedLogger.ok.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"titi","stack":"stack","level":"ok"}',
-        );
-      });
-    });
-    describe('when an object is passed', function () {
-      it('should call injectedLogger warn with object in message', function () {
-        // given
-        const injectedLogger = { ok: sinon.stub() };
-
-        // when
-        logger.ok({ event: 'toto', message: { foo: 'bar' }, stack: 'stack' }, injectedLogger, true);
-
-        // then
-        expect(injectedLogger.ok.calledOnce).to.be.true;
-        expect(injectedLogger.ok.firstCall.args[0]).to.equal(
-          '{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"ok"}',
-        );
+          // then
+          expect(injectedLogger[functionToStub].calledOnce).to.be.true;
+          expect(injectedLogger[functionToStub].firstCall.args[0]).to.equal(
+            `{"event":"toto","message":"{\\"foo\\":\\"bar\\"}","stack":"stack","level":"${level}","data":{"ctx":"context","meta":"metadata"}}`,
+          );
+        });
       });
     });
   });

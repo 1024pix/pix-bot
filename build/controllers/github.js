@@ -107,15 +107,41 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
   if (!shouldContinue) {
     return message;
   }
-
+  let deployedRA = [];
+  let client;
   try {
-    const client = await injectedScalingoClient.getInstance('reviewApps');
-    for (const appName of reviewApps) {
-      const reviewAppName = `${appName}-pr${prId}`;
-      await client.deployUsingSCM(reviewAppName, ref);
-    }
+    client = await injectedScalingoClient.getInstance('reviewApps');
   } catch (error) {
-    throw new Error(`Scalingo APIError: ${error.message}`);
+    throw new Error(`Scalingo auth APIError: ${error.message}`);
+  }
+  for (const appName of reviewApps) {
+    const reviewAppName = `${appName}-pr${prId}`;
+    try {
+      if (await client.reviewAppExists(reviewAppName)) {
+        await client.deployUsingSCM(reviewAppName, ref);
+      } else {
+        await client.deployReviewApp(appName, prId);
+        await client.disableAutoDeploy(reviewAppName);
+        await client.deployUsingSCM(reviewAppName, ref);
+      }
+      deployedRA.push(appName);
+    } catch (error) {
+      logger.error({
+        event: 'review-app',
+        stack: error.stack,
+        message: `Deployement for application ${reviewAppName} failed : ${error.message}`,
+        data: {
+          repository,
+          reviewApp: reviewAppName,
+          pr: prId,
+          ref,
+        },
+      });
+    }
+  }
+
+  if (deployedRA.length == 0) {
+    throw new Error(`No RA deployed for repository ${repository} and pr${prId}`);
   }
 
   logger.info({
@@ -123,7 +149,7 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
     message: `PR${prId} deployement triggered on RA for repo ${repository}`,
   });
 
-  return `Triggered deployment of RA on app ${reviewApps.join(', ')} with pr ${prId}`;
+  return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
 async function pushOnDefaultBranchWebhook(request, injectedScalingoClient = ScalingoClient) {
