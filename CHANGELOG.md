@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.90.0 (15/11/2023)
+
+
+### :building_construction: Tech
+- [#331](https://github.com/1024pix/pix-bot/pull/331) [TECH] Vérifier si une RA existe avant de la créer.
+
+### :arrow_up: Montée de version
+- [#330](https://github.com/1024pix/pix-bot/pull/330) [BUMP] Lock file maintenance (dossier racine).
+- [#332](https://github.com/1024pix/pix-bot/pull/332) [BUMP] Update dependency axios to v1.6.0 [SECURITY].
+
 ## v1.89.0 (30/10/2023)
 
 
