@@ -1,5 +1,5 @@
 const axios = require('axios');
-const axiosRetry = require('axios-retry');
+const axiosRetry = require('axios-retry').default;
 const config = require('../../config');
 const logger = require('../../common/services/logger');
 const _ = require('lodash');
