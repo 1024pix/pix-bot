@@ -1,5 +1,13 @@
 # pix-bot Changelog
 
+## v1.91.0 (06/12/2023)
+
+
+### :arrow_up: Montée de version
+- [#336](https://github.com/1024pix/pix-bot/pull/336) [BUMP] Lock file maintenance (dossier racine).
+- [#335](https://github.com/1024pix/pix-bot/pull/335) [BUMP] Update dependency axios-retry to v4 (dossier racine).
+- [#334](https://github.com/1024pix/pix-bot/pull/334) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.90.0 (15/11/2023)
 
 
