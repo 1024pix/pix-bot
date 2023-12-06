@@ -65,4 +65,32 @@ module.exports = {
 
     return 'Slack error notification sent';
   },
+  async restartReviewApp(request) {
+    logger.info({
+      event: 'restart-review-app',
+      message: 'Restart review app request received',
+    });
+
+    logger.info({
+      event: 'restart-review-app',
+      message: JSON.stringify(request.payload),
+    });
+
+    if (request.payload?.type_data?.metric !== 'Requests per Minute') {
+      logger.error({
+        event: 'restart-review-app',
+        message: `Not managed metric ${request.payload?.type_data?.metric}`,
+      });
+      return;
+    }
+
+    const { app_name: appName, app_id: appId } = request.payload;
+
+    logger.info({
+      event: 'restart-review-app',
+      message: `Starting review app ${appName} (id: ${appId})`,
+    });
+
+    return '';
+  },
 };
