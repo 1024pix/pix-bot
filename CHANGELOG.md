@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.92.0 (21/12/2023)
+
+
+### :building_construction: Tech
+- [#342](https://github.com/1024pix/pix-bot/pull/342) [TECH] Add 1d and audit-logger to versioned applications.
+
+### :arrow_up: Montée de version
+- [#341](https://github.com/1024pix/pix-bot/pull/341) [BUMP] Lock file maintenance (dossier racine).
+- [#339](https://github.com/1024pix/pix-bot/pull/339) [BUMP] Lock file maintenance (dossier racine).
+- [#337](https://github.com/1024pix/pix-bot/pull/337) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.0 (dossier racine).
+
 ## v1.91.0 (06/12/2023)
 
 
