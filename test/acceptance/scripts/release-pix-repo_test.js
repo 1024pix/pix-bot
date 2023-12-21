@@ -68,10 +68,12 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function () {
       'v0.2.0',
       'v0.2.0',
       'v0.2.0',
+      'v0.2.0',
+      'v0.2.0',
       'Writing to CHANGELOG.md',
       'Updated CHANGELOG.md',
       /A minor is being released to 0.2.0.$/,
-      ' 9 files changed, 14 insertions(+), 8 deletions(-)',
+      ' 11 files changed, 19 insertions(+), 10 deletions(-)',
       'Created the release commit',
       'Created annotated tag',
       'Pushed release commit to the origin',
@@ -93,6 +95,9 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function () {
 
 ### :rocket: Amélioration
 - [#1](https://github.com/1024pix/pix-bot-publish-test/pull/1) [FEATURE] Ajout d'un index pour Pix App.
+
+### :building_construction: Tech
+- [#4](https://github.com/1024pix/pix-bot-publish-test/pull/4) [TECH] Add 1d/ and audit-logger/ folders.
 `);
   });
 });
