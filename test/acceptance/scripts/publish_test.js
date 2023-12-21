@@ -15,7 +15,7 @@ const scriptName = 'publish.sh';
 // and the cloned one on data/clean_repository.git
 // rm -rf data/clean_repository.git
 // git clone --bare https://github.com/1024pix/pix-bot-publish-test data/clean_repository.git
-// Make sure that empty folders on the bare git repostory have a .gitkeep file
+// Make sure that empty folders on the bare git repository have a .gitkeep file
 // Have a nice day
 describe('Acceptance | Scripts | publish.sh', function () {
   this.timeout(30000);
@@ -73,7 +73,7 @@ describe('Acceptance | Scripts | publish.sh', function () {
       'Updated CHANGELOG.md',
       'Set Git user information',
       /A minor is being released to 0.2.0.$/,
-      ' 9 files changed, 14 insertions(+), 8 deletions(-)',
+      ' 11 files changed, 19 insertions(+), 10 deletions(-)',
       'Created the release commit',
       'Created annotated tag',
       'Pushed release commit to the origin',
@@ -96,6 +96,9 @@ describe('Acceptance | Scripts | publish.sh', function () {
 
 ### :rocket: Amélioration
 - [#1](https://github.com/1024pix/pix-bot-publish-test/pull/1) [FEATURE] Ajout d'un index pour Pix App.
+
+### :building_construction: Tech
+- [#4](https://github.com/1024pix/pix-bot-publish-test/pull/4) [TECH] Add 1d/ and audit-logger/ folders.
 `);
   });
 });
