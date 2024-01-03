@@ -59,4 +59,4 @@ manifest.addInteractivity({
   handler: slackbotController.interactiveEndpoint,
 });
 
-module.exports = manifest;
+export default manifest;

@@ -1,7 +1,7 @@
 const { verifySignatureAndParseBody: verifySlackSignatureAndParseBody } = require('./services/slack/security');
 const { verifyWebhookSignature: verifyGithubSignature } = require('./services/github');
 
-module.exports = {
+const slackConfig = {
   slackConfig: {
     payload: {
       allow: ['application/json', 'application/x-www-form-urlencoded'],
@@ -17,3 +17,5 @@ module.exports = {
     pre: [{ method: verifyGithubSignature }],
   },
 };
+
+export default slackConfig;

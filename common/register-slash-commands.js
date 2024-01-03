@@ -1,4 +1,4 @@
-function registerSlashCommands(deployConfiguration, manifest) {
+export default function registerSlashCommands(deployConfiguration, manifest) {
   deployConfiguration.forEach((configuration) => {
     manifest.registerSlashCommand({
       ...configuration.slashCommand,
@@ -13,7 +13,3 @@ function registerSlashCommands(deployConfiguration, manifest) {
     });
   });
 }
-
-module.exports = {
-  registerSlashCommands,
-};

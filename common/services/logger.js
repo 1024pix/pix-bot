@@ -20,32 +20,25 @@ function serialize({ event, message, job, stack, level, data }) {
   return JSON.stringify(log);
 }
 
-const error = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
+export const error = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
   if (enabled) {
     injectedLogger.error(serialize({ event, message, job, stack, data, level: 'error' }));
   }
 };
 
-const info = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
+export const info = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
   if (enabled) {
     injectedLogger.log(serialize({ event, message, job, stack, data, level: 'info' }));
   }
 };
 
-const warn = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
+export const warn = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
   if (enabled) {
     injectedLogger.warn(serialize({ event, message, job, stack, data, level: 'warn' }));
   }
 };
-const ok = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
+export const ok = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
   if (enabled) {
     injectedLogger.ok(serialize({ event, message, job, stack, data, level: 'ok' }));
   }
-};
-
-module.exports = {
-  error,
-  info,
-  warn,
-  ok,
 };

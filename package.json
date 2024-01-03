@@ -5,7 +5,8 @@
   "engines": {
     "node": "^20.8.1"
   },
-  "main": "index.js",
+  "exports": "./index.js",
+  "type": "module",
   "scripts": {
     "configure": "cp sample.env .env && npm ci",
     "deploy": "npm run deploy:minor",
@@ -43,6 +44,7 @@
     "cron": "^2.1.0",
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
+    "esm": "^3.2.25",
     "lodash": "^4.17.21",
     "node-fetch": "^2.7.0",
     "scalingo": "^0.8.0",
