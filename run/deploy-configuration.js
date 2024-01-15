@@ -16,6 +16,15 @@ module.exports = [
   },
   {
     slashCommand: {
+      command: '/deploy-privatebin',
+      description: 'Déploie privatebin',
+      usage_hint: '/deploy-privatebin',
+    },
+    slackReturnText: 'Commande de déploiement de PrivateBin en production bien reçue.',
+    deployFunction: fromBranch('privatebin-deploy', ['pix-privatebin-production'], 'main'),
+  },
+  {
+    slashCommand: {
       command: '/deploy-pix-apim',
       description: 'Pour déployer les applications Pix APIM depuis la branche main',
       usage_hint: '/deploy-pix-apim',
