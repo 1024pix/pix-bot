@@ -134,6 +134,13 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '/deploy-metabase',
             },
             {
+              command: '/deploy-privatebin',
+              description: 'Déploie privatebin',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-privatebin`,
+              usage_hint: '/deploy-privatebin',
+            },
+            {
               command: '/deploy-pix-apim',
               description: 'Pour déployer les applications Pix APIM depuis la branche main',
               should_escape: false,

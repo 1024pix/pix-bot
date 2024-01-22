@@ -15,6 +15,19 @@ describe('Acceptance | Run | SlashCommand', function () {
       expect(res.result.text).to.equal('Commande de déploiement de Metabase en production bien reçue.');
     });
   });
+  describe('POST /slack/commands/deploy-privatebin', function () {
+    it('responds with 200', async function () {
+      const body = {};
+      const res = await server.inject({
+        method: 'POST',
+        url: '/slack/commands/deploy-privatebin',
+        headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+        payload: body,
+      });
+      expect(res.statusCode).to.equal(200);
+      expect(res.result.text).to.equal('Commande de déploiement de PrivateBin en production bien reçue.');
+    });
+  });
 
   describe('POST /slack/commands/deploy-pix-apim', function () {
     it('responds with 200', async function () {
