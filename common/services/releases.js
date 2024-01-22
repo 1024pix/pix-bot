@@ -56,10 +56,18 @@ module.exports = {
       const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${sanitizedRepoName}.git`;
       const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType, branchName, repositoryURL];
       const newPackageVersion = await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
-      logger.info(
-        'Releasing : Type: ' + releaseType + ' | reponame ' + repoName + ' | Repo URL : ',
-        repositoryURL + ' | Package version : ' + newPackageVersion,
-      );
+      logger.ok({
+        event: 'release',
+        message:
+          'Type: ' +
+          releaseType +
+          ' , reponame ' +
+          repoName +
+          ' , Repo URL : ' +
+          repositoryURL +
+          ' , Package version : ' +
+          newPackageVersion,
+      });
       return newPackageVersion;
     } catch (err) {
       logger.error({ event: 'release', message: err });
