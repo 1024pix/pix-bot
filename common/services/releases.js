@@ -56,6 +56,18 @@ module.exports = {
       const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${sanitizedRepoName}.git`;
       const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType, branchName, repositoryURL];
       const newPackageVersion = await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
+      logger.ok({
+        event: 'release',
+        message:
+          'Type: ' +
+          releaseType +
+          ' , reponame ' +
+          repoName +
+          ' , Repo URL : ' +
+          repositoryURL +
+          ' , Package version : ' +
+          newPackageVersion,
+      });
       return newPackageVersion;
     } catch (err) {
       logger.error({ event: 'release', message: err });
@@ -67,9 +79,14 @@ module.exports = {
     const sanitizedReleaseTag = _sanitizedArgument(releaseTag);
     const sanitizedRepoName = _sanitizedArgument(repoName);
     const sanitizedAppName = _sanitizedArgument(appName);
-    const client = await ScalingoClient.getInstance(environment);
-
-    return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
+    try {
+      const client = await ScalingoClient.getInstance(environment);
+      logger.info('Deploy : ' + sanitizedAppName + ' | Tag ' + sanitizedReleaseTag + ' | Repo  : ', sanitizedRepoName);
+      return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
+    } catch (err) {
+      logger.error({ event: 'deploy', message: err });
+      throw err;
+    }
   },
 
   _runScriptWithArgument,
