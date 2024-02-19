@@ -39,6 +39,7 @@ describe('Acceptance | Build | Scalingo', function () {
         });
       });
     });
+
     describe('when the build has succeeded', function () {
       it('should return OK (200) and log a message', async function () {
         // given

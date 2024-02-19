@@ -98,6 +98,7 @@ describe('Unit | Build | github-test', function () {
           message: 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]',
         });
       });
+
       it('should throw an error', async function () {
         // given
         sinon.stub(logger, 'error');

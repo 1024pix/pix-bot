@@ -532,6 +532,7 @@ describe('Acceptance | Build | Github', function () {
           expect(scalingoDeployFront2.isDone()).to.be.true;
           expect(scalingoDeployApi.isDone()).to.be.true;
         });
+
         describe('when scalingo returns an error during deployment', function () {
           it('responds with 500', async function () {
             // given

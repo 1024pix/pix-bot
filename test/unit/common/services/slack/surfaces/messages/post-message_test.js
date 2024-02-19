@@ -29,6 +29,7 @@ describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message'
         },
       });
     });
+
     it('should log slack API errors', async function () {
       //given
       const messageToSend = 'test message';

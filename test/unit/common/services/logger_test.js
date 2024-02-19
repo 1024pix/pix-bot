@@ -27,6 +27,7 @@ describe('logger', function () {
           );
         });
       });
+
       describe('when an object is passed', function () {
         it(`should call injectedLogger ${level} with object in message`, function () {
           // given
