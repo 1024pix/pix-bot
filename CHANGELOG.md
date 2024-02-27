@@ -1,5 +1,29 @@
 # pix-bot Changelog
 
+## v1.93.0 (27/02/2024)
+
+
+### :building_construction: Tech
+- [#360](https://github.com/1024pix/pix-bot/pull/360) [TECH]  Permettre la création de review app sur pix-epreuves.
+
+### :arrow_up: Montée de version
+- [#357](https://github.com/1024pix/pix-bot/pull/357) [BUMP] Lock file maintenance (dossier racine).
+- [#356](https://github.com/1024pix/pix-bot/pull/356) [BUMP] Lock file maintenance (dossier racine).
+- [#355](https://github.com/1024pix/pix-bot/pull/355) [BUMP] Update dependency husky to v9 (dossier racine).
+- [#354](https://github.com/1024pix/pix-bot/pull/354) [BUMP] Lock file maintenance (dossier racine).
+- [#353](https://github.com/1024pix/pix-bot/pull/353) [BUMP] Lock file maintenance (dossier racine).
+- [#352](https://github.com/1024pix/pix-bot/pull/352) [BUMP] Update dependency node to v20.11.0.
+- [#350](https://github.com/1024pix/pix-bot/pull/350) [BUMP] Update Node.js to v20.11.0.
+- [#349](https://github.com/1024pix/pix-bot/pull/349) [BUMP] Update node.
+- [#348](https://github.com/1024pix/pix-bot/pull/348) [BUMP] Lock file maintenance (dossier racine).
+- [#347](https://github.com/1024pix/pix-bot/pull/347) [BUMP] Lock file maintenance (dossier racine).
+- [#344](https://github.com/1024pix/pix-bot/pull/344) [BUMP] Lock file maintenance (dossier racine).
+- [#343](https://github.com/1024pix/pix-bot/pull/343) [BUMP] Lock file maintenance (dossier racine).
+
+### :coffee: Autre
+- [#351](https://github.com/1024pix/pix-bot/pull/351) PIX-9190 : Enrichir le logger de pix bot.
+- [#340](https://github.com/1024pix/pix-bot/pull/340) Ajouter le déploiement de Privatebin depuis slack.
+
 ## v1.92.0 (21/12/2023)
 
 
