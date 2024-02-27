@@ -12,6 +12,7 @@ const repositoryToScalingoAppsReview = {
   'pix-db-replication': ['pix-datawarehouse-integration'],
   'pix-db-stats': ['pix-db-stats-review'],
   'pix-editor': ['pix-lcms-review'],
+  'pix-epreuves': ['pix-epreuves-review'],
   'pix-site': ['pix-site-review', 'pix-pro-review'],
   'pix-tutos': ['pix-tutos-review'],
   'pix-ui': ['pix-ui-review'],
