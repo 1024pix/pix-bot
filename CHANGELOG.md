@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.94.0 (28/02/2024)
+
+
+### :bug: Correction
+- [#361](https://github.com/1024pix/pix-bot/pull/361) [BUGFIX] Corrige l'utilisation de `logger.info` lors du déploiement d'un repo.
+
 ## v1.93.0 (27/02/2024)
 
 
