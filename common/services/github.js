@@ -177,7 +177,7 @@ async function _getTagCommitUrl({ owner, repo, tagName }) {
   const tags = await _getTags(owner, repo);
   const tag = tags.find((tag) => tag.name === tagName);
   if (!tag) {
-    logger.error(`Could not find the tag ${tagName} on ${owner}/${repo}`);
+    logger.error({ message: `Could not find the tag ${tagName} on ${owner}/${repo}` });
     throw new Error(`Could not find the tag ${tagName} on ${owner}/${repo}`);
   }
   return tag.commit.url;

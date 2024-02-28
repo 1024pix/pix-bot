@@ -14,7 +14,7 @@ class ScalingoClient {
   static async getInstance(environment, injectedClient = scalingo) {
     const { token, apiUrl } = config.scalingo[environment];
     if (!token || !apiUrl) {
-      logger.error(`Scalingo credentials missing for environment ${environment}`);
+      logger.error({ message: `Scalingo credentials missing for environment ${environment}` });
       throw new Error(`Scalingo credentials missing for environment ${environment}`);
     }
     const client = await injectedClient.clientFromToken(token, { apiUrl });
@@ -23,11 +23,11 @@ class ScalingoClient {
 
   async deployFromArchive(pixApp, releaseTag, repository = config.github.repository, options = DEFAULT_OPTS) {
     if (!pixApp) {
-      logger.error('No application to deploy.');
+      logger.error({ message: 'No application to deploy.' });
       throw new Error('No application to deploy.');
     }
     if (!releaseTag) {
-      logger.error('No release tag to deploy.');
+      logger.error({ message: 'No release tag to deploy.' });
       throw new Error('No release tag to deploy.');
     }
 
@@ -54,7 +54,7 @@ class ScalingoClient {
       throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
     }
 
-    logger.info(`Deployment of ${scalingoApp} ${releaseTag} has been requested`);
+    logger.info({ message: `Deployment of ${scalingoApp} ${releaseTag} has been requested` });
     return `Deployment of ${scalingoApp} ${releaseTag} has been requested`;
   }
 
@@ -74,9 +74,9 @@ class ScalingoClient {
       if (err.status === 404) {
         return false;
       }
-      logger.error(
-        `Impossible to get info for RA ${reviewAppName}. Scalingo API returned ${err.status} : ${err.message}`,
-      );
+      logger.error({
+        message: `Impossible to get info for RA ${reviewAppName}. Scalingo API returned ${err.status} : ${err.message}`,
+      });
       throw new Error(
         `Impossible to get info for RA ${reviewAppName}. Scalingo API returned ${err.status} : ${err.message}`,
       );

@@ -81,7 +81,10 @@ module.exports = {
     const sanitizedAppName = _sanitizedArgument(appName);
     try {
       const client = await ScalingoClient.getInstance(environment);
-      logger.info('Deploy : ' + sanitizedAppName + ' | Tag ' + sanitizedReleaseTag + ' | Repo  : ', sanitizedRepoName);
+      logger.info({
+        event: 'deploy',
+        message: `Deploy: ${sanitizedAppName} | Tag: ${sanitizedReleaseTag} | Repo: ${sanitizedRepoName}`,
+      });
       return client.deployFromArchive(sanitizedAppName, sanitizedReleaseTag, sanitizedRepoName);
     } catch (err) {
       logger.error({ event: 'deploy', message: err });
