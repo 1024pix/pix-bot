@@ -37,15 +37,9 @@ const warn = ({ event, message, job, stack, data }, injectedLogger = console, en
     injectedLogger.warn(serialize({ event, message, job, stack, data, level: 'warn' }));
   }
 };
-const ok = ({ event, message, job, stack, data }, injectedLogger = console, enabled = enabledFromConfiguration) => {
-  if (enabled) {
-    injectedLogger.ok(serialize({ event, message, job, stack, data, level: 'ok' }));
-  }
-};
 
 module.exports = {
   error,
   info,
   warn,
-  ok,
 };

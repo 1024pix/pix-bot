@@ -145,7 +145,7 @@ class ScalingoClient {
     try {
       const { id } = await this.client.Apps.create(app);
       await this.client.Apps.update(id, appSettings);
-      logger.ok({ event: 'scalingo', message: `${app.name} created` });
+      logger.info({ event: 'scalingo', message: `${app.name} created` });
       return id;
     } catch (e) {
       logger.error({ event: 'scalingo', message: e });

@@ -6,10 +6,9 @@ describe('logger', function () {
     error: 'error',
     info: 'log',
     warn: 'warn',
-    ok: 'ok',
   };
 
-  ['error', 'info', 'warn', 'ok'].forEach((level) => {
+  ['error', 'info', 'warn'].forEach((level) => {
     describe(level, function () {
       describe('when an message is passed', function () {
         it(`should call injectedLogger ${level}`, function () {
