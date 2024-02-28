@@ -1,15 +1,22 @@
-const chai = require('chai');
+import chai from 'chai';
 const { expect } = chai;
-const sinon = require('sinon');
-const nock = require('nock');
-const crypto = require('crypto');
-const config = require('../config');
+// const sinon = require('sinon');
+import Sinon from 'sinon';
+const {sinon} = Sinon;
+// const nock = require('nock');
+import nock from 'nock';
+// const crypto = require('crypto');
+import { Cipher } from 'crypto';
+const {crypto} = Cipher;
+// const config = require('../config');
+import config from '../config.js';
 
-const { StatusCodes } = require('http-status-codes');
-const _ = require('lodash');
-
-chai.use(require('sinon-chai'));
-chai.use(require('chai-nock'));
+import { StatusCodes } from 'http-status-codes';
+// const _ = require('lodash');
+import values  from 'lodash';
+const {lodashvalues} = values;
+// chai.use(require('sinon-chai'));
+// chai.use(require('chai-nock'));
 
 // eslint-disable-next-line mocha/no-top-level-hooks
 beforeEach(function () {
@@ -33,7 +40,7 @@ function catchErr(promiseFn, ctx) {
   };
 }
 
-function createGithubWebhookSignatureHeader(body) {
+export function createGithubWebhookSignatureHeader(body) {
   const hmac = crypto.createHmac('sha256', config.github.webhookSecret);
   hmac.update(body);
 
@@ -42,7 +49,7 @@ function createGithubWebhookSignatureHeader(body) {
   };
 }
 
-function createSlackWebhookSignatureHeaders(body) {
+export function createSlackWebhookSignatureHeaders(body) {
   const timestamp = Date.now();
   const version = 'v0';
   const hmac = crypto.createHmac('sha256', config.slack.requestSigningSecret);
@@ -54,7 +61,7 @@ function createSlackWebhookSignatureHeaders(body) {
   };
 }
 
-function nockGithubWithNoConfigChanges() {
+export function nockGithubWithNoConfigChanges() {
   const tags = nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/tags')
     .twice()
@@ -102,7 +109,7 @@ function nockGithubWithNoConfigChanges() {
   const nocks = { tags, commit1234, commit456, commits };
 
   const checkAllNocksHaveBeenCalled = () => {
-    _.values(nocks).map((nock) => {
+    lodashvalues(nocks).map((nock) => {
       expect(nock).to.have.been.requested;
     });
   };
@@ -110,7 +117,7 @@ function nockGithubWithNoConfigChanges() {
   return { nocks, checkAllNocksHaveBeenCalled };
 }
 
-function nockGithubWithConfigChanges() {
+export function nockGithubWithConfigChanges() {
   nock('https://api.github.com')
     .get('/repos/github-owner/github-repository/tags')
     .twice()
@@ -159,16 +166,15 @@ function nockGithubWithConfigChanges() {
 function createScalingoTokenNock() {
   nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
 }
-// eslint-disable-next-line mocha/no-exports
-module.exports = {
-  catchErr,
-  expect,
-  nock,
-  sinon,
-  createGithubWebhookSignatureHeader,
-  createScalingoTokenNock,
-  createSlackWebhookSignatureHeaders,
-  nockGithubWithConfigChanges,
-  nockGithubWithNoConfigChanges,
-  StatusCodes,
-};
+// // eslint-disable-next-line mocha/no-exports
+// module.exports = {
+//   catchErr,
+//   expect,
+//   nock,
+//   createGithubWebhookSignatureHeader,
+//   createScalingoTokenNock,
+//   createSlackWebhookSignatureHeaders,
+//   nockGithubWithConfigChanges,
+//   nockGithubWithNoConfigChanges,
+//   StatusCodes,
+// };

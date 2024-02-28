@@ -1,6 +1,6 @@
 const { fromBranch } = require('../common/deployer');
 
-module.exports = [
+const deployConfig = [
   {
     slashCommand: {
       command: '/deploy-metabase',
@@ -51,3 +51,4 @@ module.exports = [
     deployFunction: fromBranch('pix-360', ['pix-360-production'], 'main'),
   },
 ];
+export default deployConfig;

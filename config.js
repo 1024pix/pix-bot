@@ -14,8 +14,7 @@ function _getJSON(value) {
 function isFeatureEnabled(environmentVariable) {
   return environmentVariable === 'true';
 }
-
-module.exports = (function () {
+const config = () => {
   const config = {
     port: _getNumber(process.env.PORT, 3000),
     environment: process.env.NODE_ENV || 'development',
@@ -183,4 +182,5 @@ module.exports = (function () {
   }
 
   return config;
-})();
+}
+export default config;
