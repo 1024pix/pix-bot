@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.94.1 (28/02/2024)
+
+
+### :building_construction: Tech
+- [#362](https://github.com/1024pix/pix-bot/pull/362) [TECH] Utiliser le logger info à la place du logger ok qui n'existe pas.
+
 ## v1.94.0 (28/02/2024)
 
 
