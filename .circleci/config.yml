@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: cimg/node:20.11.0
+      - image: cimg/node:20.11.1
     steps:
       - checkout
       - run: npm ci
