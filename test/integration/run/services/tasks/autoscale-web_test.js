@@ -35,6 +35,7 @@ describe('#task-autoscale-web', function () {
       message: 'pix-api-test has been austocaled with sucess to min: 2 and max: 4',
     });
   });
+
   it('should throw an error on scalingo errors', async function () {
     // given
     const applicationName = 'pix-api-test';

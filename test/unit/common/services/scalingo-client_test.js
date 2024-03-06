@@ -500,6 +500,7 @@ describe('Scalingo client', () => {
       // then
       expect(actual).to.equal(1);
     });
+
     it('should call create with application name', async () => {
       // given
       const createApplicationStub = sinon.stub();
@@ -519,6 +520,7 @@ describe('Scalingo client', () => {
       // then
       expect(createApplicationStub).to.have.been.calledOnceWithExactly({ name: 'pix-application-recette' });
     });
+
     it('should call update with valid options', async () => {
       // given
       const createApplicationStub = sinon.stub();

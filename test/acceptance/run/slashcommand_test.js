@@ -15,6 +15,7 @@ describe('Acceptance | Run | SlashCommand', function () {
       expect(res.result.text).to.equal('Commande de déploiement de Metabase en production bien reçue.');
     });
   });
+
   describe('POST /slack/commands/deploy-privatebin', function () {
     it('responds with 200', async function () {
       const body = {};

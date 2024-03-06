@@ -38,6 +38,7 @@ describe('Unit | Common | Models | ScalingoAppName', function () {
       // then
       expect(resultTooShortAppName, 'Too short app name').to.be.false;
     });
+
     it('should return false if appName is too long', function () {
       // given
       const tooLongAppName = 'pix-application-with-a-long-name-that-does-not-fit-production';
@@ -48,6 +49,7 @@ describe('Unit | Common | Models | ScalingoAppName', function () {
       // then
       expect(resultTooLongAppName, 'Too long app name').to.be.false;
     });
+
     it('should return false if appName end with incorrect suffix', function () {
       // given
       const incorrectSuffixAppName = 'pix-coucou-app-name-mauvaissuffix';
@@ -58,6 +60,7 @@ describe('Unit | Common | Models | ScalingoAppName', function () {
       // then
       expect(resultIncorrectSuffixAppName, 'Incorrect suffix app name').to.be.false;
     });
+
     it('should return true if parameter is a valid appName', function () {
       // given
       const validAppName = 'pix-super-application-recette';

@@ -203,6 +203,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
 
   describe('#createAndDeployPixBotRelease', () => {
     let client;
+
     beforeEach(async function () {
       // given
       client = { deployFromArchive: sinon.spy() };

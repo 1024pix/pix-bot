@@ -18,6 +18,7 @@ describe('#getA11YTip', function () {
       ],
     ],
   };
+
   before(function () {
     sinon.stub(axios, 'get').resolves({ data });
   });
