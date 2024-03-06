@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.95.0 (06/03/2024)
+
+
+### :rocket: Amélioration
+- [#363](https://github.com/1024pix/pix-bot/pull/363) [FEATURE] Ne pas créer de RA quand la PR est en draft (PIX-9921).
+
+### :arrow_up: Montée de version
+- [#358](https://github.com/1024pix/pix-bot/pull/358) [BUMP] Lock file maintenance (dossier racine).
+- [#359](https://github.com/1024pix/pix-bot/pull/359) [BUMP] Update node.
+
 ## v1.94.1 (28/02/2024)
 
 
