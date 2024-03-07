@@ -1,6 +1,6 @@
 {
   "name": "pix-bot",
-  "version": "1.95.0",
+  "version": "1.95.1",
   "description": "Automating development actions",
   "engines": {
     "node": "^20.11.1"

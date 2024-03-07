@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.95.1 (07/03/2024)
+
+
+### :coffee: Autre
+- [#364](https://github.com/1024pix/pix-bot/pull/364) Revert "[FEATURE] Ne pas créer de RA quand la PR est en draft (PIX-9921)".
+
 ## v1.95.0 (06/03/2024)
 
 
