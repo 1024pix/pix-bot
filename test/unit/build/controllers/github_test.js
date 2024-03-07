@@ -425,7 +425,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       payload: {
         number: 3,
         pull_request: {
-          draft: false,
           state: 'open',
           labels: [],
           head: {
@@ -489,27 +488,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
           // then
           expect(response).to.equal('No RA for closed PR');
-        });
-      });
-
-      describe('when the PR is in draft mode', function () {
-        it('should not create a Review App', async function () {
-          // given
-          const injectedScalingoClientStub = sinon.stub();
-          const deployUsingSCMStub = sinon.stub();
-
-          injectedScalingoClientStub.getInstance = sinon.stub().returns({
-            deployUsingSCM: deployUsingSCMStub,
-          });
-
-          sinon.stub(request.payload.pull_request, 'draft').value(true);
-
-          // when
-          const response = await githubController.pullRequestSynchronizeWebhook(request, injectedScalingoClientStub);
-
-          // then
-          expect(deployUsingSCMStub).to.not.have.been.called;
-          expect(response).to.equal('No RA for draft PR');
         });
       });
     });

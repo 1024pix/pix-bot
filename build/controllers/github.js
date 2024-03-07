@@ -210,7 +210,6 @@ function _handleNoRACase(request) {
   const isFork = payload.pull_request.head.repo.fork;
   const labelsList = payload.pull_request.labels;
   const state = payload.pull_request.state;
-  const draft = payload.pull_request.draft;
 
   if (isFork) {
     return { message: 'No RA for a fork', shouldContinue: false };
@@ -223,9 +222,6 @@ function _handleNoRACase(request) {
   }
   if (state !== 'open') {
     return { message: 'No RA for closed PR', shouldContinue: false };
-  }
-  if (draft) {
-    return { message: 'No RA for draft PR', shouldContinue: false };
   }
 
   return { shouldContinue: true };
