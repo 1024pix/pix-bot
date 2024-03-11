@@ -1,8 +1,8 @@
-const { expect } = require('chai');
-const sinon = require('sinon');
-const github = require('../../../../common/services/github');
+import { expect } from 'chai';
+import sinon from 'sinon';
+import github from '../../../../common/services/github';
 
-const {
+import {
   displayPullRequest,
   filterPullRequest,
   generateChangeLogContent,
@@ -10,7 +10,7 @@ const {
   getTagReleaseDate,
   getNewChangeLogLines,
   orderPr,
-} = require('../../../../common/services/changelog');
+} from '../../../../common/services/changelog';
 
 describe('Unit | Common | Services | Changelog', function () {
   describe('#displayPullRequest', function () {

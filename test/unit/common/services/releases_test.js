@@ -1,9 +1,9 @@
-const { describe, it } = require('mocha');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const { expect } = require('chai');
-const ScalingoClient = require('../../../../common/services/scalingo-client');
-const github = require('../../../../common/services/github');
+import { describe, it } from 'mocha';
+import * as sinon from 'sinon';
+import * as proxyquire from 'proxyquire';
+import { expect } from 'chai';
+import * as ScalingoClient from '../../../../common/services/scalingo-client';
+import * as github from '../../../../common/services/github';
 
 describe('releases', function () {
   let exec;

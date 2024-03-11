@@ -14,6 +14,4 @@ function registerSlashCommands(deployConfiguration, manifest) {
   });
 }
 
-module.exports = {
-  registerSlashCommands,
-};
+export { registerSlashCommands };
