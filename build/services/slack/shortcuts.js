@@ -1,8 +1,9 @@
-const axios = require('axios');
-const publishReleaseTypeSelectionModal = require('./surfaces/modals/publish-release/release-type-selection');
-const config = require('../../../config');
+import axios from 'axios';
 
-module.exports = {
+import { config } from '../../../config.js';
+import publishReleaseTypeSelectionModal from './surfaces/modals/publish-release/release-type-selection.js';
+
+const slackShorcuts = {
   openViewPublishReleaseTypeSelectionCallbackId: publishReleaseTypeSelectionModal.callbackId,
   openViewPublishReleaseTypeSelection(payload) {
     const options = {
@@ -12,8 +13,10 @@ module.exports = {
         'content-type': 'application/json',
         authorization: `Bearer ${config.slack.botToken}`,
       },
-      data: publishReleaseTypeSelectionModal(payload.trigger_id),
+      data: publishReleaseTypeSelectionModal.getView(payload.trigger_id),
     };
     return axios(options);
   },
 };
+
+export default slackShorcuts;

@@ -1,14 +1,14 @@
-const github = require('../../common/services/github');
-const { environments, deploy, publish } = require('../../common/services/releases');
-const shortcuts = require('../services/slack/shortcuts');
-const viewSubmissions = require('../services/slack/view-submissions');
-const slackPostMessageService = require('../../common/services/slack/surfaces/messages/post-message');
-const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
-const logger = require('../../common/services/logger');
+import _ from 'lodash';
 
-const _ = require('lodash');
+import github from '../../common/services/github.js';
+import { logger } from '../../common/services/logger.js';
+import releases from '../../common/services/releases.js';
+import sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
+import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
+import shortcuts from '../services/slack/shortcuts.js';
+import viewSubmissions from '../services/slack/view-submissions.js';
 
-module.exports = {
+const slack = {
   async getPullRequests(request) {
     const label = request.pre.payload.text;
     return github.getPullRequests(label);
@@ -47,8 +47,8 @@ module.exports = {
     const payload = request.pre.payload;
     const branchName = payload.text;
 
-    publish('patch', branchName).then(async (latestReleaseTag) => {
-      await deploy(environments.recette, latestReleaseTag);
+    releases.publish('patch', branchName).then(async (latestReleaseTag) => {
+      await releases.deploy(releases.environments.recette, latestReleaseTag);
     });
 
     return {
@@ -100,3 +100,5 @@ module.exports = {
     };
   },
 };
+
+export default slack;

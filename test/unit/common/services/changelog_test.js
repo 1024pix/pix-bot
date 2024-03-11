@@ -1,16 +1,16 @@
-const { expect } = require('chai');
-const sinon = require('sinon');
-const github = require('../../../../common/services/github');
+import { expect } from 'chai';
+import { stub, useFakeTimers } from 'sinon';
 
-const {
+import {
   displayPullRequest,
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,
-  getTagReleaseDate,
   getNewChangeLogLines,
+  getTagReleaseDate,
   orderPr,
-} = require('../../../../common/services/changelog');
+} from '../../../../common/services/changelog.js';
+import github from '../../../../common/services/github.js';
 
 describe('Unit | Common | Services | Changelog', function () {
   describe('#displayPullRequest', function () {
@@ -90,7 +90,7 @@ describe('Unit | Common | Services | Changelog', function () {
   describe('#getHeadOfChangelog', function () {
     it('should return the head of changelog in correct value', function () {
       // given
-      sinon.useFakeTimers();
+      useFakeTimers();
       const headChangelog = '## v2.0.0 (01/01/1970)\n';
       const versionNumber = '2.0.0';
 
@@ -133,15 +133,13 @@ describe('Unit | Common | Services | Changelog', function () {
     const tagName = 'v3.193.1';
 
     beforeEach(function () {
-      sinon
-        .stub(github, 'getLastCommitUrl')
+      stub(github, 'getLastCommitUrl')
         .withArgs({ owner: repoOwner, repo: repoName, tagName })
         .resolves(
           `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`,
         );
 
-      sinon
-        .stub(github, 'getCommitAtURL')
+      stub(github, 'getCommitAtURL')
         .withArgs(
           `https://api.github.com/repos/${repoOwner}/${repoName}/commits/4c3ad3d377c37023e835ad674578cf06fcb4de7a`,
         )

@@ -1,6 +1,6 @@
-const { expect, sinon, StatusCodes, createGithubWebhookSignatureHeader, nock } = require('../../test-helper');
-const server = require('../../../server');
-const config = require('../../../config');
+import { config } from '../../../config.js';
+import server from '../../../server.js';
+import { createGithubWebhookSignatureHeader, expect, nock, sinon, StatusCodes } from '../../test-helper.js';
 
 describe('Acceptance | Build | Github', function () {
   describe('POST /github/webhook', function () {

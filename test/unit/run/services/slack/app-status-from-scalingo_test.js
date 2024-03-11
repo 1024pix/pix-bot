@@ -1,9 +1,9 @@
-const { describe, it } = require('mocha');
-const { expect } = require('chai');
-const sinon = require('sinon');
+import { expect } from 'chai';
+import { describe, it } from 'mocha';
+import * as sinon from 'sinon';
 
-const { getAppStatusFromScalingo } = require('../../../../../run/services/slack/app-status-from-scalingo');
-const ScalingoClient = require('../../../../../common/services/scalingo-client');
+import ScalingoClient from '../../../../../common/services/scalingo-client.js';
+import { getAppStatusFromScalingo } from '../../../../../run/services/slack/app-status-from-scalingo.js';
 
 describe('#getAppStatusFromScalingo', () => {
   it('returns a message when no app is specified in command line', async () => {
@@ -192,7 +192,7 @@ describe('#getAppStatusFromScalingo', () => {
         lastDeployedVersion: 'v1.0.0',
       },
     ]);
-    const scalingoClientSpy = sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves({ getAppInfo });
+    const scalingoClientSpy = sinon.stub(ScalingoClient, 'getInstance').resolves({ getAppInfo });
 
     // when
     const response = await getAppStatusFromScalingo('app');

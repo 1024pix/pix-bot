@@ -1,7 +1,7 @@
-const { postMessage } = require('../../../../../../../common/services/slack/surfaces/messages/post-message');
-const { expect, sinon } = require('../../../../../../test-helper');
-const config = require('../../../../../../../config');
-const logger = require('../../../../../../../common/services/logger');
+import { logger } from '../../../../../../../common/services/logger.js';
+import slackPostMessageService from '../../../../../../../common/services/slack/surfaces/messages/post-message.js';
+import { config } from '../../../../../../../config.js';
+import { expect, sinon } from '../../../../../../test-helper.js';
 
 describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message', function () {
   describe('#postMessage', function () {
@@ -12,7 +12,7 @@ describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message'
       sinon.stub(config.slack, 'botToken').value('faketoken');
       const httpAgent = { post: sinon.stub().resolves({ isSuccessful: true, data: { ok: true } }) };
       //when
-      await postMessage({
+      await slackPostMessageService.postMessage({
         message: messageToSend,
         attachments: {},
         channel: destinationChannel,
@@ -38,8 +38,9 @@ describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message'
       const errorLoggerStub = sinon.stub(logger, 'error');
       const slackErrorResponse = { isSuccessful: true, data: { ok: false, error: 'not_in_channel' } };
       const httpAgent = { post: sinon.stub().resolves(slackErrorResponse) };
+
       //when
-      await postMessage({
+      await slackPostMessageService.postMessage({
         message: messageToSend,
         attachments: {},
         channel: destinationChannel,

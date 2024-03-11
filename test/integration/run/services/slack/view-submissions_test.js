@@ -1,5 +1,5 @@
-const slackViewSubmissions = require('../../../../../run/services/slack/view-submissions');
-const { expect, nock, createScalingoTokenNock } = require('../../../../test-helper');
+import slackViewSubmissions from '../../../../../run/services/slack/view-submissions.js';
+import { createScalingoTokenNock, expect, nock } from '../../../../test-helper.js';
 
 describe('Integration | Run | Services | Slack | Commands', function () {
   describe('#submitCreateAppOnScalingoConfirmation', function () {

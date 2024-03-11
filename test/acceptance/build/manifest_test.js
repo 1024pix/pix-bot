@@ -1,5 +1,6 @@
-const { expect } = require('chai');
-const server = require('../../../server');
+import { expect } from 'chai';
+
+import server from '../../../server.js';
 
 describe('Acceptance | Build | Manifest', function () {
   describe('GET /build/manifest', function () {

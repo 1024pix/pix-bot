@@ -1,7 +1,11 @@
-const { expect } = require('chai');
-const path = require('path');
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+import child_process from 'node:child_process';
+import path from 'node:path';
+import process from 'node:process';
+import util from 'node:util';
+
+import { expect } from 'chai';
+
+const exec = util.promisify(child_process.exec);
 
 async function runScriptWithArgument(scriptFileName, args = [], options = {}) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
@@ -20,7 +24,4 @@ function expectLines(expectedLines, lines) {
   expect(lines).to.have.lengthOf(expectedLines.length);
 }
 
-module.exports = {
-  runScriptWithArgument,
-  expectLines,
-};
+export { expectLines, runScriptWithArgument };

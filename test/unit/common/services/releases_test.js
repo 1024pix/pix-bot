@@ -1,20 +1,16 @@
-const { describe, it } = require('mocha');
-const sinon = require('sinon');
-const proxyquire = require('proxyquire');
-const { expect } = require('chai');
-const ScalingoClient = require('../../../../common/services/scalingo-client');
-const github = require('../../../../common/services/github');
+import { expect } from 'chai';
+import { describe, it } from 'mocha';
+import * as sinon from 'sinon';
 
-describe('releases', function () {
+import github from '../../../../common/services/github.js';
+import releasesService from '../../../../common/services/releases.js';
+import ScalingoClient from '../../../../common/services/scalingo-client.js';
+
+describe('Unit | release', function () {
   let exec;
-  let releasesService;
 
   beforeEach(function () {
     exec = sinon.stub().callsFake(async () => Promise.resolve({ stdout: 'some heavy logs\n3.14.0\n', stderr: '' }));
-    releasesService = proxyquire('../../../../common/services/releases', {
-      child_process: { exec },
-      util: { promisify: (fn) => fn },
-    });
   });
 
   describe('#deployPixRepo', function () {
@@ -100,7 +96,7 @@ describe('releases', function () {
   describe('#publish', function () {
     it('should call the publish script', async function () {
       //when
-      await releasesService.publish('minor');
+      await releasesService.publish('minor', '', exec);
 
       // then
       sinon.assert.calledWith(
@@ -113,7 +109,7 @@ describe('releases', function () {
 
     it('should call the publish script with the branch name', async function () {
       //when
-      await releasesService.publish('minor', 'hotfix');
+      await releasesService.publish('minor', 'hotfix', exec);
 
       // then
       sinon.assert.calledWith(
@@ -128,7 +124,7 @@ describe('releases', function () {
 
     it('should retrieve new package version', async function () {
       //when
-      const newPackageVersion = await releasesService.publish('minor');
+      const newPackageVersion = await releasesService.publish('minor', '', exec);
 
       // then
       expect(newPackageVersion).to.equal('3.14.0');
@@ -143,7 +139,7 @@ describe('releases', function () {
 
     it("should call the release pix script with 'minor'", async function () {
       //when
-      await releasesService.publishPixRepo('pix-site', 'minor');
+      await releasesService.publishPixRepo('pix-site', 'minor', exec);
 
       // then
       sinon.assert.calledWith(
@@ -158,7 +154,7 @@ describe('releases', function () {
 
     it('should retrieve new package version', async function () {
       //when
-      const newPackageVersion = await releasesService.publishPixRepo('pix-site', 'minor');
+      const newPackageVersion = await releasesService.publishPixRepo('pix-site', 'minor', exec);
 
       // then
       expect(newPackageVersion).to.equal('3.14.0');

@@ -1,4 +1,4 @@
-const { Modal, Blocks } = require('slack-block-builder');
+import { Blocks, Modal } from 'slack-block-builder';
 
 const callbackId = 'application-creation-confirmation';
 
@@ -20,15 +20,15 @@ function modal(applicationName, applicationEnvironment, applicationEnvironmentNa
   ]);
 }
 
-module.exports = (applicationName, applicationEnvironment, applicationEnvironmentName, userEmail) => {
+const getView = (applicationName, applicationEnvironment, applicationEnvironmentName, userEmail) => {
   return {
     response_action: 'push',
     view: modal(applicationName, applicationEnvironment, applicationEnvironmentName, userEmail).buildToObject(),
   };
 };
 
-module.exports.sampleView = () => {
+const sampleView = () => {
   return modal('pix-application-name-recette', 'recette', 'Paris - SecNumCloud - Outscale', 'john.doe@pix.fr');
 };
 
-module.exports.callbackId = callbackId;
+export default { callbackId, getView, sampleView };

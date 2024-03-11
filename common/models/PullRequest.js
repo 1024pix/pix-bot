@@ -1,6 +1,6 @@
-const { Tags } = require('./Tags');
+import { Tags } from './Tags.js';
 
-class PullRequest {
+export default class PullRequest {
   constructor({ html_url, number, title }) {
     this.htmlUrl = html_url;
     this.number = number;
@@ -14,5 +14,3 @@ class PullRequest {
     return `- [#${this.number}](${this.htmlUrl}) ${titleWithDot}`;
   }
 }
-
-module.exports = PullRequest;

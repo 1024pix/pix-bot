@@ -1,13 +1,19 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import url from 'node:url';
 
-const { catchErr, expect, sinon } = require('../../../test-helper');
-const githubController = require('../../../../build/controllers/github');
+import * as githubController from '../../../../build/controllers/github.js';
+import { config } from '../../../../config.js';
+import { catchErr, expect, sinon } from '../../../test-helper.js';
 
-const githubService = require('../../../../common/services/github');
-const config = require('../../../../config');
 describe('Unit | Controller | Github', function () {
   describe('#getMessageTemplate', function () {
+    let __dirname;
+
+    before(function () {
+      __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+    });
+
     it('get a specific message per repository', function () {
       const filePath = path.join(
         __dirname,
@@ -61,17 +67,19 @@ describe('Unit | Controller | Github', function () {
     it('should call gitHubService.commentPullRequest', async function () {
       // given
       const data = { repositoryName: 'pix-bot', pullRequestId: 25, scalingoReviewApps: ['pix-bot-review'] };
-      const commentStub = sinon.stub(githubService, 'commentPullRequest');
+      const githubService = {
+        commentPullRequest: sinon.stub(),
+      };
 
       // when
-      await githubController.addMessageToPullRequest(data);
+      await githubController.addMessageToPullRequest(data, { githubService });
 
       // then
       const comment = `Une fois l'application déployée, elle sera accessible à cette adresse https://bot-pr25.review.pix.fr
 Les variables d'environnement seront accessibles sur scalingo https://dashboard.scalingo.com/apps/osc-fr1/pix-bot-review-pr25/environment
 `;
 
-      expect(commentStub).to.have.been.calledOnceWithExactly({
+      expect(githubService.commentPullRequest).to.have.been.calledOnceWithExactly({
         repositoryName: 'pix-bot',
         pullRequestId: 25,
         comment,
@@ -107,7 +115,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
           };
 
-          let injectedPushOnDefaultBranchWebhook = sinon.stub();
+          const injectedPushOnDefaultBranchWebhook = sinon.stub();
 
           // when
           await githubController.processWebhook(request, { injectedPushOnDefaultBranchWebhook });
@@ -129,7 +137,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             // given
             sinon.stub(request, 'payload').value({ action });
 
-            let injectedPullRequestOpenedWebhook = sinon.stub();
+            const injectedPullRequestOpenedWebhook = sinon.stub();
 
             // when
             await githubController.processWebhook(request, { injectedPullRequestOpenedWebhook });
@@ -143,7 +151,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           // given
           sinon.stub(request, 'payload').value({ action: 'synchronize' });
 
-          let injectedPullRequestSynchronizeWebhook = sinon.stub();
+          const injectedPullRequestSynchronizeWebhook = sinon.stub();
 
           // when
           await githubController.processWebhook(request, { injectedPullRequestSynchronizeWebhook });
@@ -347,7 +355,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
     });
 
     describe('when the Review App creation conditions are met', function () {
-      it('should calls scalingo to create and deploy the corresponding applications', async function () {
+      it('should call scalingo to create and deploy the corresponding applications', async function () {
         // given
         const injectedScalingoClientStub = sinon.stub();
         const deployReviewAppStub = sinon.stub().returns({ app_name: 'sample_ra_name' });
@@ -359,12 +367,14 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           deployUsingSCM: deployUsingSCMStub,
         });
         const injectedAddMessageToPullRequestStub = sinon.stub();
+        const githubServiceStub = sinon.stub();
 
         // when
         const response = await githubController.pullRequestOpenedWebhook(
           request,
           injectedScalingoClientStub,
           injectedAddMessageToPullRequestStub,
+          githubServiceStub,
         );
 
         // then
@@ -381,11 +391,14 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         expect(deployUsingSCMStub.thirdCall.calledWith('sample_ra_name', 'my-branch')).to.be.true;
 
         expect(
-          injectedAddMessageToPullRequestStub.calledOnceWithExactly({
-            repositoryName: 'pix',
-            scalingoReviewApps: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
-            pullRequestId: 3,
-          }),
+          injectedAddMessageToPullRequestStub.calledOnceWithExactly(
+            {
+              repositoryName: 'pix',
+              scalingoReviewApps: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
+              pullRequestId: 3,
+            },
+            { githubService: githubServiceStub },
+          ),
         ).to.be.true;
 
         expect(response).to.equal(

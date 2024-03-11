@@ -1,3 +1,5 @@
+import process from 'node:process';
+
 function _getNumber(numberAsString, defaultIntNumber) {
   const number = parseInt(numberAsString, 10);
   return isNaN(number) ? defaultIntNumber : number;
@@ -15,7 +17,7 @@ function isFeatureEnabled(environmentVariable) {
   return environmentVariable === 'true';
 }
 
-module.exports = (function () {
+const configuration = (function () {
   const config = {
     port: _getNumber(process.env.PORT, 3000),
     environment: process.env.NODE_ENV || 'development',
@@ -82,7 +84,7 @@ module.exports = (function () {
     },
 
     slack: {
-      requestSigningSecret: process.env.SLACK_SIGNING_SECRET,
+      requestSigningSecret: process.env.SLACK_SIGNING_SECRET || 'slack-super-signing-secret',
       botToken: process.env.SLACK_BOT_TOKEN,
       webhookUrlForReporting: process.env.SLACK_WEBHOOK_URL_FOR_REPORTING,
     },
@@ -166,8 +168,6 @@ module.exports = (function () {
     config.github.repository = 'github-repository';
     config.github.webhookSecret = 'github-webhook-secret';
 
-    config.slack.requestSigningSecret = 'slack-super-signing-secret';
-
     config.openApi.authorizationToken = 'open-api-token';
 
     config.scalingo.reviewApps.token = 'tk-us-scalingo-token-reviewApps';
@@ -184,3 +184,5 @@ module.exports = (function () {
 
   return config;
 })();
+
+export { configuration as config };

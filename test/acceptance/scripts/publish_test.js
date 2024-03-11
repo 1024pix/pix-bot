@@ -1,14 +1,15 @@
-const { expect } = require('chai');
+import { expect } from 'chai';
+import dayjs from 'dayjs';
+import fs from 'fs-extra';
+import os from 'os';
+import path from 'path';
+import { simpleGit } from 'simple-git';
+import url from 'url';
 
-const path = require('path');
-const fs = require('fs-extra');
-const os = require('os');
-const simpleGit = require('simple-git');
-const dayjs = require('dayjs');
-
-const { runScriptWithArgument, expectLines } = require('./script-helpers');
+import { expectLines, runScriptWithArgument } from './script-helpers.js';
 
 const scriptName = 'publish.sh';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 // You are entering a world of pain
 // To update this test you need to update the github repository https://github.com/1024pix/pix-bot-publish-test

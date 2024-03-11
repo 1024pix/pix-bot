@@ -1,4 +1,4 @@
-class PartialChangeLogGenerator {
+export default class PartialChangeLogGenerator {
   constructor({ headOfChangelogTitle, pullRequestGroups }) {
     this.headOfChangelogTitle = headOfChangelogTitle;
     this.pullRequestGroups = pullRequestGroups;
@@ -18,5 +18,3 @@ class PartialChangeLogGenerator {
     return linesToDisplay.length ? [this.headOfChangelogTitle, ''].concat(linesToDisplay).flat() : [];
   }
 }
-
-module.exports = PartialChangeLogGenerator;

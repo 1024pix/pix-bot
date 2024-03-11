@@ -1,4 +1,4 @@
-const logger = require('./services/logger');
+import { logger } from './services/logger.js';
 
 function handleErrors(request, h) {
   if (request.response.isBoom) {
@@ -11,6 +11,4 @@ function handleErrors(request, h) {
   return h.continue;
 }
 
-module.exports = {
-  handleErrors,
-};
+export { handleErrors };

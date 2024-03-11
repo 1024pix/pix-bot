@@ -1,8 +1,9 @@
-const dayjs = require('dayjs');
-const slackPostMessageService = require('../../common/services/slack/surfaces/messages/post-message');
-const { Message, Section, Context, Attachment } = require('slack-block-builder');
-const config = require('../../config');
-const logger = require('../../common/services/logger');
+import dayjs from 'dayjs';
+import { Attachment, Context, Message, Section } from 'slack-block-builder';
+
+import { logger } from '../../common/services/logger.js';
+import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
+import { config } from '../../config.js';
 
 function getSlackMessageAttachments(payload) {
   const appName = payload.app_name;
@@ -38,7 +39,7 @@ function getSlackMessageAttachments(payload) {
   };
 }
 
-module.exports = {
+const scalingo = {
   async deployEndpoint(request) {
     logger.info({
       event: 'scalingo',
@@ -66,3 +67,5 @@ module.exports = {
     return 'Slack error notification sent';
   },
 };
+
+export default scalingo;

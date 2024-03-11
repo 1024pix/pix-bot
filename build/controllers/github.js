@@ -1,10 +1,11 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'node:fs';
+import path from 'node:path';
+import url from 'node:url';
 
-const ScalingoClient = require('../../common/services/scalingo-client');
-const gitHubService = require('../../common/services/github');
-const logger = require('../../common/services/logger');
-const config = require('../../config');
+import gitHubService from '../../common/services/github.js';
+import { logger } from '../../common/services/logger.js';
+import ScalingoClient from '../../common/services/scalingo-client.js';
+import { config } from '../../config.js';
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
@@ -19,6 +20,8 @@ const repositoryToScalingoAppsReview = {
   pix: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
   pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
 };
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 function getMessageTemplate(repositoryName) {
   const baseDir = path.join(__dirname, '..', 'templates', 'pull-request-messages');
@@ -44,11 +47,11 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
   return message;
 }
 
-const addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingoReviewApps }) => {
+const addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingoReviewApps }, { githubService }) => {
   const messageTemplate = getMessageTemplate(repositoryName);
   const message = getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate);
 
-  await gitHubService.commentPullRequest({
+  await githubService.commentPullRequest({
     repositoryName,
     pullRequestId,
     comment: message,
@@ -59,6 +62,7 @@ async function pullRequestOpenedWebhook(
   request,
   injectedScalingoClient = ScalingoClient,
   injectedAddMessageToPullRequest = addMessageToPullRequest,
+  githubService = gitHubService,
 ) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
@@ -82,11 +86,14 @@ async function pullRequestOpenedWebhook(
       await client.disableAutoDeploy(reviewAppName);
       await client.deployUsingSCM(reviewAppName, ref);
     }
-    await injectedAddMessageToPullRequest({
-      repositoryName: repository,
-      scalingoReviewApps: reviewApps,
-      pullRequestId: prId,
-    });
+    await injectedAddMessageToPullRequest(
+      {
+        repositoryName: repository,
+        scalingoReviewApps: reviewApps,
+        pullRequestId: prId,
+      },
+      { githubService },
+    );
     logger.info({
       event: 'review-app',
       message: `Created RA for repo ${repository} PR ${prId}`,
@@ -108,7 +115,7 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
   if (!shouldContinue) {
     return message;
   }
-  let deployedRA = [];
+  const deployedRA = [];
   let client;
   try {
     client = await injectedScalingoClient.getInstance('reviewApps');
@@ -227,7 +234,7 @@ function _handleNoRACase(request) {
   return { shouldContinue: true };
 }
 
-module.exports = {
+export {
   addMessageToPullRequest,
   getMessage,
   getMessageTemplate,
