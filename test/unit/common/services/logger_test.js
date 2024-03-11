@@ -1,5 +1,5 @@
-const { expect, sinon } = require('../../../test-helper');
-const logger = require('../../../../common/services/logger');
+import { expect, sinon } from '../../../test-helper';
+import * as logger from '../../../../common/services/logger';
 
 describe('logger', function () {
   const injectedLoggerFunction = {

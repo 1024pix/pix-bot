@@ -1,10 +1,10 @@
-const { describe, it } = require('mocha');
-const { sinon } = require('../../../test-helper');
-const axios = require('axios');
-const config = require('../../../../config');
+import { describe, it } from 'mocha';
+import { sinon } from '../../../test-helper';
+import * as axios from 'axios';
+import * as config from '../../../../config';
 
-const ScalingoClient = require('../../../../common/services/scalingo-client');
-const { expect } = require('chai');
+import * as ScalingoClient from '../../../../common/services/scalingo-client';
+import { expect } from 'chai';
 
 describe('Scalingo client', () => {
   beforeEach(function () {

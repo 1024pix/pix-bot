@@ -1,8 +1,8 @@
-const { describe, it } = require('mocha');
-const { expect } = require('chai');
-const axios = require('axios');
-const { catchErr, sinon } = require('../../../../test-helper');
-const {
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import * as axios from 'axios';
+import { catchErr, sinon } from '../../../../test-helper';
+import {
   createAndDeployPixLCMS,
   createAndDeployPixAPIData,
   createAndDeployPixUI,
@@ -13,10 +13,10 @@ const {
   getAndDeployLastVersion,
   createAndDeployDbStats,
   createAndDeployPixTutosRelease,
-} = require('../../../../../run/services/slack/commands');
-const releasesServices = require('../../../../../common/services/releases');
-const githubServices = require('../../../../../common/services/github');
-const ScalingoClient = require('../../../../../common/services/scalingo-client');
+} from '../../../../../run/services/slack/commands';
+import * as releasesServices from '../../../../../common/services/releases';
+import * as githubServices from '../../../../../common/services/github';
+import * as ScalingoClient from '../../../../../common/services/scalingo-client';
 
 describe('Unit | Run | Services | Slack | Commands', () => {
   beforeEach(function () {

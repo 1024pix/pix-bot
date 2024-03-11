@@ -1,9 +1,9 @@
-const { describe, it } = require('mocha');
-const { expect } = require('chai');
-const sinon = require('sinon');
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import * as sinon from 'sinon';
 
-const { getAppStatusFromScalingo } = require('../../../../../run/services/slack/app-status-from-scalingo');
-const ScalingoClient = require('../../../../../common/services/scalingo-client');
+import { getAppStatusFromScalingo } from '../../../../../run/services/slack/app-status-from-scalingo';
+import * as ScalingoClient from '../../../../../common/services/scalingo-client';
 
 describe('#getAppStatusFromScalingo', () => {
   it('returns a message when no app is specified in command line', async () => {

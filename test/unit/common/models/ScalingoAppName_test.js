@@ -1,6 +1,6 @@
-const { expect } = require('../../../test-helper');
+import { expect } from '../../../test-helper';
 
-const { ScalingoAppName } = require('../../../../common/models/ScalingoAppName');
+import { ScalingoAppName } from '../../../../common/models/ScalingoAppName';
 
 /* eslint no-console: off */
 
