@@ -1,4 +1,4 @@
-const { Tags } = require('./Tags');
+import { Tags } from './Tags';
 
 class PullRequestGroup {
   constructor({ tagToGrab, groupTitle }) {
@@ -31,4 +31,4 @@ class PullRequestGroup {
   }
 }
 
-module.exports = PullRequestGroup;
+export { PullRequestGroup };

@@ -1,6 +1,6 @@
-const { describe, it } = require('mocha');
-const { expect } = require('chai');
-const releasesService = require('../../../../common/services/releases');
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
+import * as releasesService from '../../../../common/services/releases';
 
 describe('releases', function () {
   describe('#_runScriptWithArgument', function () {

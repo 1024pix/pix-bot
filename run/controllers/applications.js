@@ -1,8 +1,8 @@
-const cdnServices = require('../services/cdn');
-const config = require('../../config');
-const Boom = require('@hapi/boom');
+import * as cdnServices from '../services/cdn';
+import * as config from '../../config';
+import * as Boom from '@hapi/boom';
 
-module.exports = {
+const applications = {
   async invalidateCdnCache(request) {
     if (request.query.apiKey !== config.openApi.authorizationToken) {
       throw Boom.unauthorized('Token is missing or is incorrect');
@@ -18,3 +18,5 @@ module.exports = {
     }
   },
 };
+
+export { applications };

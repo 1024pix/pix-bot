@@ -1,5 +1,5 @@
-const commands = require('../../../../../run/services/slack/commands');
-const { expect, nock } = require('../../../../test-helper');
+import * as commands from '../../../../../run/services/slack/commands';
+import { expect, nock } from '../../../../test-helper';
 
 describe('Integration | Run | Services | Slack | Commands', function () {
   describe('#deployAirflow', function () {

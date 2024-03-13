@@ -1,11 +1,12 @@
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 
-const { catchErr, expect, sinon } = require('../../../test-helper');
-const githubController = require('../../../../build/controllers/github');
+import { catchErr, expect, sinon } from '../../../test-helper';
+import * as githubController from '../../../../build/controllers/github';
 
-const githubService = require('../../../../common/services/github');
-const config = require('../../../../config');
+import * as githubService from '../../../../common/services/github';
+import * as config from '../../../../config';
+
 describe('Unit | Controller | Github', function () {
   describe('#getMessageTemplate', function () {
     it('get a specific message per repository', function () {

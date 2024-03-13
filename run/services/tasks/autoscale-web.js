@@ -1,5 +1,5 @@
-const logger = require('../../../common/services/logger');
-const ScalingoClient = require('../../../common/services/scalingo-client');
+import * as logger from '../../../common/services/logger';
+import * as ScalingoClient from '../../../common/services/scalingo-client';
 
 async function taskAutoScaleWeb(
   { applicationName, region, autoScalingParameters },
@@ -21,4 +21,4 @@ async function taskAutoScaleWeb(
   }
 }
 
-module.exports = { run: taskAutoScaleWeb };
+export { taskAutoScaleWeb };

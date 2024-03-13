@@ -1,5 +1,5 @@
-const { fromBranch } = require('../../../common/deployer');
-const { expect, nock } = require('../../test-helper');
+import { fromBranch } from '../../../common/deployer';
+import { expect, nock } from '../../test-helper';
 
 describe('Integration | Common | Deployer', function () {
   describe('#fromBranch', function () {

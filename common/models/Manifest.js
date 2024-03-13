@@ -39,6 +39,4 @@ class Manifest {
   }
 }
 
-module.exports = {
-  Manifest,
-};
+export { Manifest };

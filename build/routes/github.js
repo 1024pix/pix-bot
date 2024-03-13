@@ -1,7 +1,7 @@
-const { githubConfig } = require('../../common/config');
-const githubController = require('../../build/controllers/github');
+import { githubConfig } from '../../common/config';
+import * as githubController from '../../build/controllers/github';
 
-module.exports = [
+const github = [
   {
     method: 'POST',
     path: '/github/webhook',
@@ -9,3 +9,5 @@ module.exports = [
     config: githubConfig,
   },
 ];
+
+export { github };

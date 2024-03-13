@@ -1,6 +1,7 @@
-const CronJob = require('cron').CronJob;
+import * as CronJob from 'cron';
+import * as logger from './logger';
+
 const parisTimezone = 'Europe/Paris';
-const logger = require('./logger');
 
 function createCronJob(jobName, jobFunction, jobSchedule) {
   if (!jobSchedule) {
@@ -47,6 +48,4 @@ function createCronJob(jobName, jobFunction, jobSchedule) {
   });
 }
 
-module.exports = {
-  createCronJob,
-};
+export { createCronJob };

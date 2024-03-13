@@ -1,3 +1,5 @@
+import process from 'process';
+
 function _getNumber(numberAsString, defaultIntNumber) {
   const number = parseInt(numberAsString, 10);
   return isNaN(number) ? defaultIntNumber : number;
@@ -15,7 +17,7 @@ function isFeatureEnabled(environmentVariable) {
   return environmentVariable === 'true';
 }
 
-module.exports = (function () {
+const configuration = (function () {
   const config = {
     port: _getNumber(process.env.PORT, 3000),
     environment: process.env.NODE_ENV || 'development',
@@ -181,6 +183,6 @@ module.exports = (function () {
 
     config.prismic.secret = 'prismic-secret';
   }
-
-  return config;
 })();
+
+export { configuration as config };

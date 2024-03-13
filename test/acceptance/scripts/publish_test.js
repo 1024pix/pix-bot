@@ -1,12 +1,12 @@
-const { expect } = require('chai');
+import { expect } from 'chai';
 
-const path = require('path');
-const fs = require('fs-extra');
-const os = require('os');
-const simpleGit = require('simple-git');
-const dayjs = require('dayjs');
+import * as path from 'path';
+import * as fs from 'fs-extra';
+import * as os from 'os';
+import * as simpleGit from 'simple-git';
+import * as dayjs from 'dayjs';
 
-const { runScriptWithArgument, expectLines } = require('./script-helpers');
+import { runScriptWithArgument, expectLines } from './script-helpers';
 
 const scriptName = 'publish.sh';
 

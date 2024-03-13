@@ -1,15 +1,15 @@
-const commands = require('../services/slack/commands');
-const { getAppStatusFromScalingo } = require('../services/slack/app-status-from-scalingo');
-const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
-const shortcuts = require('../services/slack/shortcuts');
-const viewSubmissions = require('../services/slack/view-submissions');
-const logger = require('../../common/services/logger');
+import * as commands from '../services/slack/commands';
+import { getAppStatusFromScalingo } from '../services/slack/app-status-from-scalingo';
+import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message';
+import * as shortcuts from '../services/slack/shortcuts';
+import * as viewSubmissions from '../services/slack/view-submissions';
+import * as logger from '../../common/services/logger';
 
 function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
 }
 
-module.exports = {
+const slack = {
   deployAirflow(request) {
     const payload = request.pre.payload;
     commands.deployAirflow(payload);
@@ -162,3 +162,5 @@ module.exports = {
     }
   },
 };
+
+export { slack };

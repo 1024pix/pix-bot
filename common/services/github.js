@@ -1,11 +1,11 @@
-const { Octokit } = require('@octokit/rest');
-const fetch = require('node-fetch');
-const { zipWith, countBy, entries, noop } = require('lodash');
-const crypto = require('crypto');
-const tsscmp = require('tsscmp');
-const Boom = require('@hapi/boom');
-const settings = require('../../config');
-const logger = require('./logger');
+import { Octokit } from '@octokit/rest';
+import * as fetch from 'node-fetch';
+import { zipWith, countBy, entries, noop } from 'lodash';
+import * as crypto from 'crypto';
+import * as tsscmp from 'tsscmp';
+import * as Boom from '@hapi/boom';
+import * as settings from '../../config';
+import * as logger from './logger';
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -343,106 +343,108 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
-module.exports = {
-  async getPullRequests(label) {
-    const pullRequests = await _getPullReviewsFromGithub(label);
-    const reviewsByPR = await Promise.all(pullRequests.map(({ number }) => _getReviewsFromGithub(number)));
+async function getPullRequests(label) {
+  const pullRequests = await _getPullReviewsFromGithub(label);
+  const reviewsByPR = await Promise.all(pullRequests.map(({ number }) => _getReviewsFromGithub(number)));
 
-    const data = zipWith(pullRequests, reviewsByPR, (pullRequest, reviews) => {
-      return {
-        pullRequest,
-        reviews,
-      };
-    });
+  const data = zipWith(pullRequests, reviewsByPR, (pullRequest, reviews) => {
+    return {
+      pullRequest,
+      reviews,
+    };
+  });
 
-    return _createResponseForSlack(data, label);
-  },
+  return _createResponseForSlack(data, label);
+}
 
-  async getLatestReleaseTag(repoName = settings.github.repository) {
-    return _getLatestReleaseTagName(settings.github.owner, repoName);
-  },
+async function getLatestReleaseTag(repoName = settings.github.repository) {
+  return _getLatestReleaseTagName(settings.github.owner, repoName);
+}
 
-  getLastCommitUrl,
+async function getCommitAtURL(commitUrl) {
+  return _getCommitAtURL(commitUrl);
+}
 
-  async getCommitAtURL(commitUrl) {
-    return _getCommitAtURL(commitUrl);
-  },
+async function getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
+  return _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
+}
 
-  async getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
-    return _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
-  },
+async function getDefaultBranch(repoOwner, repoName) {
+  return _getDefaultBranch(repoOwner, repoName);
+}
 
-  async getDefaultBranch(repoOwner, repoName) {
-    return _getDefaultBranch(repoOwner, repoName);
-  },
+async function isBuildStatusOK({ branchName, tagName }) {
+  const githubCICheckName = 'build-test-and-deploy';
+  const { owner, repository: repo } = settings.github;
+  const commitUrl = await getLastCommitUrl({ branchName, tagName, owner, repo });
+  const commitStatusUrl = commitUrl + '/check-runs';
+  const octokit = _createOctokit();
+  const { data } = await octokit.request(commitStatusUrl);
+  const runs = data.check_runs;
+  const ciRuns = runs.filter((run) => run.name === githubCICheckName);
+  const buildStatusOk = ciRuns.every((run) => run.status === 'completed' && run.conclusion === 'success');
+  return ciRuns.length > 0 && buildStatusOk;
+}
 
-  async isBuildStatusOK({ branchName, tagName }) {
-    const githubCICheckName = 'build-test-and-deploy';
-    const { owner, repository: repo } = settings.github;
-    const commitUrl = await getLastCommitUrl({ branchName, tagName, owner, repo });
-    const commitStatusUrl = commitUrl + '/check-runs';
-    const octokit = _createOctokit();
-    const { data } = await octokit.request(commitStatusUrl);
-    const runs = data.check_runs;
-    const ciRuns = runs.filter((run) => run.name === githubCICheckName);
-    const buildStatusOk = ciRuns.every((run) => run.status === 'completed' && run.conclusion === 'success');
-    return ciRuns.length > 0 && buildStatusOk;
-  },
+async function getChangelogSinceLatestRelease(
+  repoOwner = settings.github.owner,
+  repoName = settings.github.repository,
+) {
+  const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
+  const pullRequests = await _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName);
+  const pullRequestsSinceLatestRelease = pullRequests.filter((PR) => PR.merged_at > latestReleaseDate);
 
-  async getChangelogSinceLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
-    const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
-    const pullRequests = await _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName);
-    const pullRequestsSinceLatestRelease = pullRequests.filter((PR) => PR.merged_at > latestReleaseDate);
+  return pullRequestsSinceLatestRelease.map((PR) => `${PR.title}`);
+}
 
-    return pullRequestsSinceLatestRelease.map((PR) => `${PR.title}`);
-  },
+async function hasConfigFileChangedSinceLatestRelease(
+  repoOwner = settings.github.owner,
+  repoName = settings.github.repository,
+) {
+  const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
+  const now = new Date().toISOString();
+  const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
+  const commitsShaList = commits.map((commit) => commit.sha);
+  const hasConfigFileChanged = commits.length > 0;
+  const latestTag = await _getLatestReleaseTagName(repoOwner, repoName);
 
-  async hasConfigFileChangedSinceLatestRelease(
-    repoOwner = settings.github.owner,
-    repoName = settings.github.repository,
-  ) {
-    const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
-    const now = new Date().toISOString();
-    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
-    const commitsShaList = commits.map((commit) => commit.sha);
-    const hasConfigFileChanged = commits.length > 0;
-    const latestTag = await _getLatestReleaseTagName(repoOwner, repoName);
+  const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
+    repoOwner,
+    repoName,
+    commitsShaList,
+  });
 
-    const pullRequestsForCommitShaDetails = await _getPullRequestsDetailsByCommitShas({
-      repoOwner,
-      repoName,
-      commitsShaList,
-    });
+  return { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails };
+}
 
-    return { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails };
-  },
+async function hasConfigFileChangedInLatestRelease(
+  repoOwner = settings.github.owner,
+  repoName = settings.github.repository,
+) {
+  const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
+  const secondToLastReleaseDate = await _getSecondToLastReleaseDate(repoOwner, repoName);
+  const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(
+    repoOwner,
+    repoName,
+    secondToLastReleaseDate,
+    latestReleaseDate,
+  );
+  return commits.length > 0;
+}
 
-  async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
-    const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
-    const secondToLastReleaseDate = await _getSecondToLastReleaseDate(repoOwner, repoName);
-    const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(
-      repoOwner,
-      repoName,
-      secondToLastReleaseDate,
-      latestReleaseDate,
-    );
-    return commits.length > 0;
-  },
+function verifyWebhookSignature(request) {
+  const { headers, payload } = request;
 
-  verifyWebhookSignature(request) {
-    const { headers, payload } = request;
+  const webhookSecret = settings.github.webhookSecret;
+  const signature = headers['x-hub-signature-256'];
+  const stringBody = payload ? JSON.stringify(payload) : '';
 
-    const webhookSecret = settings.github.webhookSecret;
-    const signature = headers['x-hub-signature-256'];
-    const stringBody = payload ? JSON.stringify(payload) : '';
+  try {
+    _verifyRequestSignature(webhookSecret, stringBody, signature);
+  } catch (error) {
+    return error;
+  }
+  return true;
+}
 
-    try {
-      _verifyRequestSignature(webhookSecret, stringBody, signature);
-    } catch (error) {
-      return error;
-    }
-    return true;
-  },
-
-  commentPullRequest,
-};
+export { getLatestReleaseTag };

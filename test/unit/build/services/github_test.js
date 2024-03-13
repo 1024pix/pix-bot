@@ -1,13 +1,6 @@
-const {
-  expect,
-  nock,
-  createGithubWebhookSignatureHeader,
-  catchErr,
-  sinon,
-  StatusCodes,
-} = require('../../../test-helper');
-const githubService = require('../../../../common/services/github');
-const logger = require('../../../../common/services/logger');
+import { expect, nock, createGithubWebhookSignatureHeader, catchErr, sinon, StatusCodes } from '../../../test-helper';
+import * as githubService from '../../../../common/services/github';
+import * as logger from '../../../../common/services/logger';
 
 describe('Unit | Build | github-test', function () {
   describe('#getPullRequests', function () {

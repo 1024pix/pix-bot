@@ -1,9 +1,11 @@
-const manifestController = require('../controllers/manifest');
+import * as manifestController from '../controllers/manifest';
 
-module.exports = [
+const manifest = [
   {
     method: 'GET',
     path: '/run/manifest',
     handler: manifestController.get,
   },
 ];
+
+export { manifest };

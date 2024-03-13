@@ -19,7 +19,4 @@ class Tags {
   }
 }
 
-module.exports = {
-  Tag,
-  Tags,
-};
+export { Tag, Tags };

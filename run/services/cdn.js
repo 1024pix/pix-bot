@@ -1,8 +1,9 @@
-const axios = require('axios');
-const axiosRetry = require('axios-retry').default;
-const config = require('../../config');
-const logger = require('../../common/services/logger');
-const _ = require('lodash');
+import * as axios from 'axios';
+import * as axiosRetry from 'axios-retry';
+axiosRetry.default;
+import * as config from '../../config';
+import * as logger from '../../common/services/logger';
+import * as _ from 'lodash';
 
 const CDN_URL = 'https://console.baleen.cloud/api';
 
@@ -80,7 +81,4 @@ async function invalidateCdnCache(application) {
   return `Cache CDN invalidé pour l‘application ${application}.`;
 }
 
-module.exports = {
-  invalidateCdnCache,
-  NamespaceNotFoundError,
-};
+export { invalidateCdnCache, NamespaceNotFoundError };

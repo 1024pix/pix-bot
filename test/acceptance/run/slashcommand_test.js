@@ -1,5 +1,5 @@
-const { expect, createSlackWebhookSignatureHeaders, nock } = require('../../test-helper');
-const server = require('../../../server');
+import { expect, createSlackWebhookSignatureHeaders, nock } from '../../test-helper';
+import * as server from '../../../server';
 
 describe('Acceptance | Run | SlashCommand', function () {
   describe('POST /slack/commands/deploy-metabase', function () {

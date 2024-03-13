@@ -1,4 +1,4 @@
-module.exports = (message) => {
+const blockMessage = (message) => {
   return {
     response_type: 'in_channel',
     blocks: [
@@ -12,3 +12,5 @@ module.exports = (message) => {
     ],
   };
 };
+
+export { blockMessage };

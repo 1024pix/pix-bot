@@ -1,15 +1,18 @@
-const chai = require('chai');
+import * as chai from 'chai';
 const { expect } = chai;
-const sinon = require('sinon');
-const nock = require('nock');
-const crypto = require('crypto');
-const config = require('../config');
+import * as sinon from 'sinon';
+import * as nock from 'nock';
+import * as crypto from 'crypto';
+import * as config from '../config';
 
-const { StatusCodes } = require('http-status-codes');
-const _ = require('lodash');
+import { StatusCodes } from 'http-status-codes';
+import * as _ from 'lodash';
 
-chai.use(require('sinon-chai'));
-chai.use(require('chai-nock'));
+import * as sinonChai from 'sinon-chai';
+import * as chaiNock from 'chai-nock';
+
+chai.use(sinonChai);
+chai.use(chaiNock);
 
 // eslint-disable-next-line mocha/no-top-level-hooks
 beforeEach(function () {
@@ -160,7 +163,7 @@ function createScalingoTokenNock() {
   nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
 }
 // eslint-disable-next-line mocha/no-exports
-module.exports = {
+export {
   catchErr,
   expect,
   nock,
