@@ -1,9 +1,9 @@
-const crypto = require('crypto');
-const querystring = require('querystring');
-const tsscmp = require('tsscmp');
-const Boom = require('@hapi/boom');
-const config = require('../../../config');
-const logger = require('../logger');
+import * as crypto from 'crypto';
+import * as querystring from 'querystring';
+import * as tsscmp from 'tsscmp';
+import * as Boom from '@hapi/boom';
+import * as config from '../../../config';
+import * as logger from '../logger';
 
 function verifyRequestSignature(signingSecret, body, signature, requestTimestamp) {
   if (signature === undefined || requestTimestamp === undefined) {
@@ -55,7 +55,7 @@ function parseRequestBody(stringBody, contentType) {
   }
 }
 
-module.exports = {
+const slackSecurity = {
   async verifySignatureAndParseBody(request) {
     const { headers, payload } = request;
 
@@ -74,3 +74,5 @@ module.exports = {
     return parseRequestBody(stringBody, contentType);
   },
 };
+
+export { slackSecurity };

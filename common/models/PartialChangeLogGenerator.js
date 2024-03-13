@@ -19,4 +19,4 @@ class PartialChangeLogGenerator {
   }
 }
 
-module.exports = PartialChangeLogGenerator;
+export { PartialChangeLogGenerator };

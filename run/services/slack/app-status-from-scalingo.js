@@ -1,4 +1,4 @@
-const ScalingoClient = require('../../../common/services/scalingo-client');
+import * as ScalingoClient from '../../../common/services/scalingo-client';
 
 async function getAppStatusFromScalingo(appName) {
   if (!appName) {
@@ -41,4 +41,4 @@ function _getEnvironmentFrom({ appName }) {
   return 'production';
 }
 
-module.exports = { getAppStatusFromScalingo };
+export { getAppStatusFromScalingo };

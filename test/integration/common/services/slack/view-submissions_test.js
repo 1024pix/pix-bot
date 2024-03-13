@@ -1,6 +1,6 @@
-const { expect, sinon } = require('../../../../test-helper');
-const viewSubmissions = require('../../../../../run/services/slack/view-submissions');
-const slackGetUserInfos = require('../../../../../common/services/slack/surfaces/user-infos/get-user-infos');
+import { expect, sinon } from '../../../../test-helper';
+import * as viewSubmissions from '../../../../../run/services/slack/view-submissions';
+import * as slackGetUserInfos from '../../../../../common/services/slack/surfaces/user-infos/get-user-infos';
 
 describe('view-submissions', function () {
   describe('#submitApplicationNameSelection', function () {

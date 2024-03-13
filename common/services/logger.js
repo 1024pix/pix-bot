@@ -38,8 +38,4 @@ const warn = ({ event, message, job, stack, data }, injectedLogger = console, en
   }
 };
 
-module.exports = {
-  error,
-  info,
-  warn,
-};
+export { error, info, warn };

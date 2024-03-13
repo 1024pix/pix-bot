@@ -1,10 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-
-const ScalingoClient = require('../../common/services/scalingo-client');
-const gitHubService = require('../../common/services/github');
-const logger = require('../../common/services/logger');
-const config = require('../../config');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as ScalingoClient from '../../common/services/scalingo-client';
+import * as gitHubService from '../../common/services/github';
+import * as logger from '../../common/services/logger';
+import * as config from '../../config';
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
@@ -227,7 +226,7 @@ function _handleNoRACase(request) {
   return { shouldContinue: true };
 }
 
-module.exports = {
+export {
   addMessageToPullRequest,
   getMessage,
   getMessageTemplate,

@@ -1,9 +1,9 @@
-const openModalReleasePublicationConfirmation = require('./surfaces/modals/publish-release/release-publication-confirmation');
-const { environments, deploy, publish } = require('../../../common/services/releases');
-const githubService = require('../../../common/services/github');
-const slackPostMessageService = require('../../../common/services/slack/surfaces/messages/post-message');
+import * as openModalReleasePublicationConfirmation from './surfaces/modals/publish-release/release-publication-confirmation';
+import { environments, deploy, publish } from '../../../common/services/releases';
+import * as githubService from '../../../common/services/github';
+import * as slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message';
 
-module.exports = {
+const viewSubmissions = {
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
     const { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails } =
@@ -47,3 +47,5 @@ module.exports = {
     };
   },
 };
+
+export { viewSubmissions };

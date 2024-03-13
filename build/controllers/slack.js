@@ -1,14 +1,13 @@
-const github = require('../../common/services/github');
-const { environments, deploy, publish } = require('../../common/services/releases');
-const shortcuts = require('../services/slack/shortcuts');
-const viewSubmissions = require('../services/slack/view-submissions');
-const slackPostMessageService = require('../../common/services/slack/surfaces/messages/post-message');
-const sendSlackBlockMessage = require('../../common/services/slack/surfaces/messages/block-message');
-const logger = require('../../common/services/logger');
+import * as github from '../../common/services/github';
+import { environments, deploy, publish } from '../../common/services/releases';
+import * as shortcuts from '../services/slack/shortcuts';
+import * as viewSubmissions from '../services/slack/view-submissions';
+import * as slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message';
+import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message';
+import * as logger from '../../common/services/logger';
+import * as _ from 'lodash';
 
-const _ = require('lodash');
-
-module.exports = {
+const slack = {
   async getPullRequests(request) {
     const label = request.pre.payload.text;
     return github.getPullRequests(label);
@@ -100,3 +99,5 @@ module.exports = {
     };
   },
 };
+
+export { slack };

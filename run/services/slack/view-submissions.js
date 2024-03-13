@@ -1,14 +1,14 @@
-const openModalReleaseDeploymentConfirmation = require('./surfaces/modals/deploy-release/release-deployment-confirmation');
-const openModalApplicationCreationConfirmation = require('./surfaces/modals/scalingo-apps/application-creation-confirmation');
-const { environments, deploy } = require('../../../common/services/releases');
-const githubService = require('../../../common/services/github');
-const slackPostMessageService = require('../../../common/services/slack/surfaces/messages/post-message');
-const slackGetUserInfos = require('../../../common/services/slack/surfaces/user-infos/get-user-infos');
-const ScalingoClient = require('../../../common/services/scalingo-client');
-const { ScalingoAppName } = require('../../../common/models/ScalingoAppName');
-const config = require('../../../config');
+import * as openModalReleaseDeploymentConfirmation from './surfaces/modals/deploy-release/release-deployment-confirmation';
+import * as openModalApplicationCreationConfirmation from './surfaces/modals/scalingo-apps/application-creation-confirmation';
+import { environments, deploy } from '../../../common/services/releases';
+import * as githubService from '../../../common/services/github';
+import * as slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message';
+import * as slackGetUserInfos from '../../../common/services/slack/surfaces/user-infos/get-user-infos';
+import * as ScalingoClient from '../../../common/services/scalingo-client';
+import { ScalingoAppName } from '../../../common/models/ScalingoAppName';
+import * as config from '../../../config';
 
-module.exports = {
+const viewSubmissions = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
     const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestRelease();
@@ -68,3 +68,5 @@ module.exports = {
     };
   },
 };
+
+export { viewSubmissions };

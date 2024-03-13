@@ -1,6 +1,6 @@
-const { expect, sinon } = require('../../../test-helper');
-const logger = require('../../../../common/services/logger');
-const taskScheluder = require('../../../../run/services/task-scheduler');
+import { expect, sinon } from '../../../test-helper';
+import * as logger from '../../../../common/services/logger';
+import * as taskScheluder from '../../../../run/services/task-scheduler';
 
 describe('Integration | Run | Services | schedule-task', function () {
   let clock;

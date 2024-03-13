@@ -1,9 +1,11 @@
-const applicationController = require('../controllers/applications');
+import * as applicationController from '../controllers/applications';
 
-module.exports = [
+const applications = [
   {
     method: 'POST',
     path: '/applications/{name}/cdn-cache-invalidations',
     handler: applicationController.invalidateCdnCache,
   },
 ];
+
+export { applications };

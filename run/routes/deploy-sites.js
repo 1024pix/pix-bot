@@ -1,9 +1,11 @@
-const deploySitesController = require('../controllers/deploy-sites');
+import * as deploySitesController from '../controllers/deploy-sites';
 
-module.exports = [
+const deploySites = [
   {
     method: 'POST',
     path: '/deploy-sites',
     handler: deploySitesController.deploySites,
   },
 ];
+
+export { deploySites };

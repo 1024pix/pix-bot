@@ -1,9 +1,11 @@
-const scalingoController = require('../../build/controllers/scalingo');
+import scalingoController from '../../build/controllers/scalingo';
 
-module.exports = [
+const scalingo = [
   {
     method: 'POST',
     path: '/build/scalingo/deploy-endpoint',
     handler: scalingoController.deployEndpoint,
   },
 ];
+
+export { scalingo };

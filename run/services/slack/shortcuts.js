@@ -1,10 +1,11 @@
-const axios = require('axios');
-const deployReleaseTagSelectionModal = require('./surfaces/modals/deploy-release/release-tag-selection');
-const createAppOnScalingoModal = require('./surfaces/modals/scalingo-apps/application-creation');
-const config = require('../../../config');
+import * as axios from 'axios';
+import * as deployReleaseTagSelectionModal from './surfaces/modals/deploy-release/release-tag-selection';
+import * as createAppOnScalingoModal from './surfaces/modals/scalingo-apps/application-creation';
+import * as config from '../../../config';
+
 const openViewUrl = 'https://slack.com/api/views.open';
 
-module.exports = {
+const shortcuts = {
   openViewDeployReleaseTagSelectionCallbackId: deployReleaseTagSelectionModal.callbackId,
 
   openViewCreateAppOnScalingoSelectionCallbackId: createAppOnScalingoModal.callbackId,
@@ -35,3 +36,5 @@ module.exports = {
     return axios(options);
   },
 };
+
+export { shortcuts };

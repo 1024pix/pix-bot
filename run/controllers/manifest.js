@@ -1,6 +1,6 @@
-const manifest = require('../manifest');
+import * as manifest from '../manifest';
 
-module.exports = {
+const manifestRequest = {
   async get(request) {
     const protocol = request.headers['x-forwarded-proto'] ? request.headers['x-forwarded-proto'] : 'http';
     const { host } = request.info;
@@ -44,3 +44,5 @@ module.exports = {
     };
   },
 };
+
+export { manifestRequest };

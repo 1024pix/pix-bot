@@ -1,14 +1,15 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const config = require('./config');
-const server = require('./server');
-const { createCronJob } = require('./common/services/cron-job');
-const githubServices = require('./common/services/github');
-const { deploy } = require('./run/services/deploy');
-const ecoModeService = require('./build/services/eco-mode-service');
-const logger = require('./common/services/logger');
-const taskScheluder = require('./run/services/task-scheduler');
-const { tasks } = require('./run/services/tasks');
+import * as config from './config';
+import * as server from './server';
+import { createCronJob } from './common/services/cron-job';
+import * as githubServices from './common/services/github';
+import { deploy } from './run/services/deploy';
+import * as ecoModeService from './build/services/eco-mode-service';
+import * as logger from './common/services/logger';
+import * as taskScheluder from './run/services/task-scheduler';
+import { tasks } from './run/services/tasks';
 
 const init = async () => {
   await ecoModeService.start();

@@ -1,9 +1,10 @@
-const axios = require('axios');
-const _ = require('lodash');
-const settings = require('../../config');
+import * as axios from 'axios';
+import * as _ from 'lodash';
+import * as settings from '../../config';
+import * as logger from '../../common/services/logger';
+
 const URL_SPREADSHEET_API = 'https://sheets.googleapis.com/v4/spreadsheets/';
 const SPREADSHEET_VALUES = 'tips!A1:E500';
-const logger = require('../../common/services/logger');
 
 function getGoogleSheetAPIURL() {
   return `${URL_SPREADSHEET_API}${settings.googleSheet.idA11Y}/values/${SPREADSHEET_VALUES}?key=${settings.googleSheet.key}`;
@@ -69,10 +70,12 @@ function getOneRandomTip(tipsFromGoogleSheet) {
   const randomTip = tipsFromGoogleSheet[Math.floor(Math.random() * tipsFromGoogleSheet.length)];
   return _.zipObject(titles, randomTip);
 }
-module.exports = {
+const a11yTip = {
   async getA11YTip() {
     const tipsFromGoogleSheet = await getDataFromGoogleSheet();
     const tip = getOneRandomTip(tipsFromGoogleSheet);
     return createResponseForSlack(tip);
   },
 };
+
+export { a11yTip };

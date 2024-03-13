@@ -1,6 +1,7 @@
+import * as CronJob from 'cron';
+import * as logger from '../../common/services/logger';
+
 const parisTimezone = 'Europe/Paris';
-const CronJob = require('cron').CronJob;
-const logger = require('../../common/services/logger');
 
 const taskScheluder = function (tasksList) {
   const scheduleTask = ({ schedule, handler }) => {
@@ -26,4 +27,4 @@ const taskScheluder = function (tasksList) {
   });
 };
 
-module.exports = taskScheluder;
+export { taskScheluder };

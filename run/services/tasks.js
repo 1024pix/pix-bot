@@ -1,5 +1,5 @@
-const taskAutoScaleWeb = require('./tasks/autoscale-web');
-const { tasks: config } = require('../../config');
+import * as taskAutoScaleWeb from './tasks/autoscale-web';
+import * as config from '../../config';
 
 const tasks = [
   {
@@ -28,4 +28,4 @@ const tasks = [
   },
 ];
 
-module.exports = { tasks };
+export { tasks };

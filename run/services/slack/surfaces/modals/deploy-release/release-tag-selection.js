@@ -1,4 +1,4 @@
-const { Modal, Blocks, Elements } = require('slack-block-builder');
+import { Modal, Blocks, Elements } from 'slack-block-builder';
 
 const callbackId = 'release-tag-selection';
 
@@ -21,15 +21,15 @@ function modal() {
   ]);
 }
 
-module.exports = (triggerId) => {
+const releaseTagSelection = (triggerId) => {
   return {
     trigger_id: triggerId,
     view: modal().buildToObject(),
   };
 };
 
-module.exports.sampleView = () => {
+const sampleView = () => {
   return modal();
 };
 
-module.exports.callbackId = callbackId;
+export { releaseTagSelection, sampleView, callbackId };

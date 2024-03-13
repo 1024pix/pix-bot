@@ -1,4 +1,4 @@
-const ScalingoClient = require('./services/scalingo-client');
+import * as ScalingoClient from './services/scalingo-client';
 
 function fromBranch(repoName, appNames, branch) {
   return async () => {
@@ -11,4 +11,4 @@ function fromBranch(repoName, appNames, branch) {
   };
 }
 
-module.exports = { fromBranch };
+export { fromBranch };

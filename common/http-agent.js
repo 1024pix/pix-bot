@@ -1,5 +1,5 @@
-const axios = require('axios');
-const logger = require('./services/logger');
+import * as axios from 'axios';
+import * as logger from './services/logger';
 
 class HttpResponse {
   constructor({ code, data, isSuccessful }) {
@@ -46,4 +46,4 @@ const httpAgent = {
   },
 };
 
-module.exports = { httpAgent };
+export { httpAgent };

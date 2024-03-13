@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import * as axios from 'axios';
+import axios from 'axios';
 import { catchErr, sinon } from '../../../../test-helper';
 import {
   createAndDeployPixLCMS,

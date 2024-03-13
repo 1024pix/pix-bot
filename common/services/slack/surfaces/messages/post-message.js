@@ -1,8 +1,8 @@
-const config = require('../../../../../config');
-const { httpAgent } = require('../../../../http-agent');
-const logger = require('../../../logger');
+import * as config from '../../../../../config';
+import { httpAgent } from '../../../../http-agent';
+import * as logger from '../../../logger';
 
-module.exports = {
+const postMessage = {
   async postMessage({ message, attachments, channel = '#tech-releases', injectedHttpAgent = httpAgent }) {
     const url = 'https://slack.com/api/chat.postMessage';
 
@@ -28,3 +28,5 @@ module.exports = {
     }
   },
 };
+
+export { postMessage };

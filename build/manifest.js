@@ -1,6 +1,6 @@
-const { Manifest } = require('../common/models/Manifest');
-const slackbotController = require('./controllers/slack');
-const googleSheet = require('./services/google-sheet');
+import { Manifest } from '../common/models/Manifest';
+import * as slackbotController from './controllers/slack';
+import * as googleSheet from './services/google-sheet';
 
 const manifest = new Manifest('Pix Bot Build');
 
@@ -59,4 +59,4 @@ manifest.addInteractivity({
   handler: slackbotController.interactiveEndpoint,
 });
 
-module.exports = manifest;
+export { manifest };

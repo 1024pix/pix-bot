@@ -1,5 +1,5 @@
-const { Manifest } = require('../common/models/Manifest');
-const slackbotController = require('./controllers/slack');
+import { Manifest } from '../common/models/Manifest';
+import * as slackbotController from './controllers/slack';
 
 const manifest = new Manifest('Pix Bot Run');
 
@@ -140,4 +140,4 @@ manifest.addInteractivity({
   handler: slackbotController.interactiveEndpoint,
 });
 
-module.exports = manifest;
+export { manifest };

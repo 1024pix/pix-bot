@@ -1,4 +1,4 @@
-const { Tags } = require('./Tags');
+import { Tags } from './Tags';
 
 class PullRequest {
   constructor({ html_url, number, title }) {
@@ -15,4 +15,4 @@ class PullRequest {
   }
 }
 
-module.exports = PullRequest;
+export { PullRequest };

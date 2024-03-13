@@ -1,18 +1,21 @@
 // As early as possible in your application, require and configure dotenv.
 // https://www.npmjs.com/package/dotenv#usage
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const path = require('path');
-const Hapi = require('@hapi/hapi');
-const config = require('./config');
-const runDeployConfiguration = require('./run/deploy-configuration');
-const { registerSlashCommands } = require('./common/register-slash-commands');
-const runManifest = require('./run/manifest');
-const buildManifest = require('./build/manifest');
-const { slackConfig } = require('./common/config');
+import * as path from 'path';
+import * as Hapi from '@hapi/hapi';
+import { config } from './config.js';
+import * as runDeployConfiguration from './run/deploy-configuration';
+import { registerSlashCommands } from './common/register-slash-commands';
+import * as runManifest from './run/manifest';
+import * as buildManifest from './build/manifest';
+import { slackConfig } from './common/config';
+import * as preResponseHandler from './common/pre-response-handler';
+import * as fs from 'fs';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const manifests = [runManifest, buildManifest];
-const preResponseHandler = require('./common/pre-response-handler');
-
 const setupErrorHandling = function (server) {
   server.ext('onPreResponse', preResponseHandler.handleErrors);
 };
@@ -25,8 +28,7 @@ setupErrorHandling(server);
 
 ['/build', '/run', '/common'].forEach((subDir) => {
   const routesDir = path.join(__dirname, subDir, '/routes');
-  require('fs')
-    .readdirSync(routesDir)
+  fs.readdirSync(routesDir)
     .filter((file) => path.extname(file) === '.js')
     .forEach((file) => server.route(require(path.join(routesDir, file))));
 });
@@ -43,4 +45,4 @@ manifests.forEach((manifest) => {
   server.route(routes);
 });
 
-module.exports = server;
+export { server };

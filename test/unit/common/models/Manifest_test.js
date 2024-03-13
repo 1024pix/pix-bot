@@ -1,6 +1,6 @@
-const { expect } = require('../../../test-helper');
+import { expect } from '../../../test-helper';
 
-const { Manifest } = require('../../../../common/models/Manifest');
+import { Manifest } from '../../../../common/models/Manifest';
 
 describe('Unit | Common | Models | Manifest', function () {
   describe('#constructor', function () {

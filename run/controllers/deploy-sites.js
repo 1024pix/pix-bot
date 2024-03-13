@@ -1,10 +1,9 @@
-const config = require('../../config');
-const { deploy } = require('../services/deploy');
-const githubServices = require('../../common/services/github');
+import * as config from '../../config';
+import { deploy } from '../services/deploy';
+import * as githubServices from '../../common/services/github';
+import * as Boom from '@hapi/boom';
 
-const Boom = require('@hapi/boom');
-
-module.exports = {
+const deploySites = {
   async deploySites(request) {
     const payload = request.payload;
     if (payload.secret !== config.prismic.secret) {
@@ -17,3 +16,5 @@ module.exports = {
     return `pix.fr and pro.pix.fr deployments ${releaseTag} are in progress. Check deployment status on Scalingo`;
   },
 };
+
+export { deploySites };
