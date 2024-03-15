@@ -6,6 +6,7 @@
     "node": "^20.12.2"
   },
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "configure": "cp sample.env .env && npm ci",
     "deploy": "npm run deploy:minor",

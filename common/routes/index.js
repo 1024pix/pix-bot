@@ -1,4 +1,4 @@
-import * as indexController from '../controllers';
+import indexController from '../controllers';
 
 const routeIndex = [
   {

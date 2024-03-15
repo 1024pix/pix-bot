@@ -1,5 +1,5 @@
-import { Manifest } from '../common/models/Manifest';
-import * as slackbotController from './controllers/slack';
+import { Manifest } from '../common/models/Manifest.js';
+import slackbotController from './controllers/slack.js';
 
 const manifest = new Manifest('Pix Bot Run');
 
@@ -140,4 +140,4 @@ manifest.addInteractivity({
   handler: slackbotController.interactiveEndpoint,
 });
 
-export { manifest };
+export default manifest;

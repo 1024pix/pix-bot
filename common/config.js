@@ -1,5 +1,5 @@
-import { verifySignatureAndParseBody as verifySlackSignatureAndParseBody } from './services/slack/security';
-import { verifyWebhookSignature as verifyGithubSignature } from './services/github';
+import { verifySignatureAndParseBody as verifySlackSignatureAndParseBody } from './services/slack/security.js';
+import github from './services/github.js';
 
 const commonConfig = {
   slackConfig: {
@@ -14,8 +14,8 @@ const commonConfig = {
     payload: {
       allow: ['application/json'],
     },
-    pre: [{ method: verifyGithubSignature }],
+    pre: [{ method: github.verifyGithubSignature }],
   },
 };
 
-export { commonConfig };
+export default commonConfig;

@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import * as releasesService from '../../../../common/services/releases';
+import releasesService from '../../../../common/services/releases';
 
 describe('releases', function () {
   describe('#_runScriptWithArgument', function () {

@@ -3,7 +3,7 @@ import { expect } from '../../../test-helper';
 import * as PullRequestGroup from '../../../../common/models/PullRequestGroup';
 import { Tag } from '../../../../common/models/Tags';
 
-import * as PullRequestGroupFactory from '../../../../common/models/PullRequestGroupFactory';
+import PullRequestGroupFactory from '../../../../common/models/PullRequestGroupFactory';
 
 describe('Unit | Common | Models | PullRequestGroupFactory', function () {
   describe('#build', function () {

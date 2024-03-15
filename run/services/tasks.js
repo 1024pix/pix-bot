@@ -1,5 +1,5 @@
 import * as taskAutoScaleWeb from './tasks/autoscale-web';
-import * as config from '../../config';
+import config from '../../config';
 
 const tasks = [
   {
@@ -28,4 +28,4 @@ const tasks = [
   },
 ];
 
-export { tasks };
+export default tasks;

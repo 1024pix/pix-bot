@@ -2,7 +2,7 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { sinon } from '../../../test-helper';
 import axios from 'axios';
-import * as googleSheet from '../../../../build/services/google-sheet';
+import googleSheet from '../../../../build/services/google-sheet';
 
 describe('#getA11YTip', function () {
   const data = {

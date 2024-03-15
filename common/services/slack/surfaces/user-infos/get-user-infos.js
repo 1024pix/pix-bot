@@ -1,6 +1,6 @@
-import * as axios from 'axios';
-import * as config from '../../../../../config';
-import * as logger from '../../../logger';
+import axios from 'axios';
+import config from '../../../../../config.js';
+import * as logger from '../../../logger.js';
 
 const getUserInfos = {
   async getUserEmail(userId) {
@@ -21,4 +21,4 @@ const getUserInfos = {
   },
 };
 
-export { getUserInfos };
+export default getUserInfos;

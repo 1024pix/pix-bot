@@ -1,6 +1,6 @@
-import { postMessage } from '../../../../../../../common/services/slack/surfaces/messages/post-message';
+import postMessage from '../../../../../../../common/services/slack/surfaces/messages/post-message';
 import { expect, sinon } from '../../../../../../test-helper';
-import * as config from '../../../../../../../config';
+import config from '../../../../../../../config';
 import * as logger from '../../../../../../../common/services/logger';
 
 describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message', function () {

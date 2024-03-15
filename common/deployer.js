@@ -1,4 +1,4 @@
-import * as ScalingoClient from './services/scalingo-client';
+import ScalingoClient from './services/scalingo-client.js';
 
 function fromBranch(repoName, appNames, branch) {
   return async () => {

@@ -1,17 +1,17 @@
-import * as openModalReleaseDeploymentConfirmation from './surfaces/modals/deploy-release/release-deployment-confirmation';
-import * as openModalApplicationCreationConfirmation from './surfaces/modals/scalingo-apps/application-creation-confirmation';
-import { environments, deploy } from '../../../common/services/releases';
-import * as githubService from '../../../common/services/github';
-import * as slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message';
-import * as slackGetUserInfos from '../../../common/services/slack/surfaces/user-infos/get-user-infos';
-import * as ScalingoClient from '../../../common/services/scalingo-client';
-import { ScalingoAppName } from '../../../common/models/ScalingoAppName';
-import * as config from '../../../config';
+import * as openModalReleaseDeploymentConfirmation from './surfaces/modals/deploy-release/release-deployment-confirmation.js';
+import * as openModalApplicationCreationConfirmation from './surfaces/modals/scalingo-apps/application-creation-confirmation.js';
+import releases from '../../../common/services/releases.js';
+import github from '../../../common/services/github.js';
+import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
+import slackGetUserInfos from '../../../common/services/slack/surfaces/user-infos/get-user-infos.js';
+import ScalingoClient from '../../../common/services/scalingo-client.js';
+import { ScalingoAppName } from '../../../common/models/ScalingoAppName.js';
+import config from '../../../config.js';
 
 const viewSubmissions = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-    const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestRelease();
+    const hasConfigFileChanged = await github.hasConfigFileChangedInLatestRelease();
     return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 
@@ -44,11 +44,11 @@ const viewSubmissions = {
 
   submitReleaseDeploymentConfirmation(payload) {
     const releaseTag = payload.view.private_metadata;
-    if (!githubService.isBuildStatusOK({ tagName: releaseTag.trim().toLowerCase() })) {
+    if (!github.isBuildStatusOK({ tagName: releaseTag.trim().toLowerCase() })) {
       const message = 'MEP bloquée. Etat de l‘environnement de recette à vérifier.';
       slackPostMessageService.postMessage({ message });
     } else {
-      deploy(environments.production, releaseTag);
+      releases.deploy(releases.environments.production, releaseTag);
     }
     return {
       response_action: 'clear',
@@ -69,4 +69,4 @@ const viewSubmissions = {
   },
 };
 
-export { viewSubmissions };
+export default viewSubmissions;

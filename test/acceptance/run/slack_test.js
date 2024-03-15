@@ -6,7 +6,7 @@ import {
   nockGithubWithConfigChanges,
   StatusCodes,
 } from '../../test-helper';
-import * as server from '../../../server';
+import server from '../../../server';
 
 describe('Acceptance | Run | Slack', function () {
   describe('POST /run/slack/interactive-endpoint', function () {

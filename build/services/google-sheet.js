@@ -1,7 +1,7 @@
-import * as axios from 'axios';
+import axios from 'axios';
 import * as _ from 'lodash';
-import * as settings from '../../config';
-import * as logger from '../../common/services/logger';
+import settings from '../../config.js';
+import * as logger from '../../common/services/logger.js';
 
 const URL_SPREADSHEET_API = 'https://sheets.googleapis.com/v4/spreadsheets/';
 const SPREADSHEET_VALUES = 'tips!A1:E500';
@@ -78,4 +78,4 @@ const a11yTip = {
   },
 };
 
-export { a11yTip };
+export default a11yTip;

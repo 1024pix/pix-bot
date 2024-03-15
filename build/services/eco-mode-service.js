@@ -2,7 +2,7 @@ import ReviewAppManager from '@1024pix/scalingo-review-app-manager';
 ReviewAppManager.ReviewAppManager;
 
 import config from '../../config';
-import logger from '../../common/services/logger';
+import * as logger from '../../common/services/logger';
 
 const ecoModeService = {
   async start() {
@@ -30,4 +30,4 @@ const ecoModeService = {
   },
 };
 
-export { ecoModeService };
+export default ecoModeService;

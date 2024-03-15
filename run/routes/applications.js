@@ -1,4 +1,4 @@
-import * as applicationController from '../controllers/applications';
+import applicationController from '../controllers/applications';
 
 const applications = [
   {

@@ -1,6 +1,6 @@
-import { Manifest } from '../common/models/Manifest';
-import * as slackbotController from './controllers/slack';
-import * as googleSheet from './services/google-sheet';
+import { Manifest } from '../common/models/Manifest.js';
+import slackbotController from './controllers/slack.js';
+import googleSheet from './services/google-sheet.js';
 
 const manifest = new Manifest('Pix Bot Build');
 
@@ -59,4 +59,4 @@ manifest.addInteractivity({
   handler: slackbotController.interactiveEndpoint,
 });
 
-export { manifest };
+export default manifest;

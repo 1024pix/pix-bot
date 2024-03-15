@@ -1,15 +1,15 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import * as config from './config';
-import * as server from './server';
+import config from './config';
+import server from './server';
 import { createCronJob } from './common/services/cron-job';
-import * as githubServices from './common/services/github';
+import github from './common/services/github';
 import { deploy } from './run/services/deploy';
-import * as ecoModeService from './build/services/eco-mode-service';
+import ecoModeService from './build/services/eco-mode-service';
 import * as logger from './common/services/logger';
 import * as taskScheluder from './run/services/task-scheduler';
-import { tasks } from './run/services/tasks';
+import tasks from './run/services/tasks.js';
 
 const init = async () => {
   await ecoModeService.start();
@@ -18,7 +18,7 @@ const init = async () => {
     'Deploy Pix site',
     async () => {
       const repoName = config.PIX_SITE_REPO_NAME;
-      const releaseTag = await githubServices.getLatestReleaseTag(repoName);
+      const releaseTag = await github.getLatestReleaseTag(repoName);
       deploy(repoName, config.PIX_SITE_APPS, releaseTag);
     },
     config.pixSiteDeploy.schedule,

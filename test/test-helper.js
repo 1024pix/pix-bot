@@ -3,13 +3,13 @@ const { expect } = chai;
 import * as sinon from 'sinon';
 import * as nock from 'nock';
 import * as crypto from 'crypto';
-import * as config from '../config';
+import config from '../config.js';
 
 import { StatusCodes } from 'http-status-codes';
 import * as _ from 'lodash';
 
-import * as sinonChai from 'sinon-chai';
-import * as chaiNock from 'chai-nock';
+import sinonChai from 'sinon-chai';
+import chaiNock from 'chai-nock';
 
 chai.use(sinonChai);
 chai.use(chaiNock);

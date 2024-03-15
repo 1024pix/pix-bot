@@ -32,4 +32,4 @@ class PullRequestGroupFactory {
   }
 }
 
-export { PullRequestGroupFactory };
+export default PullRequestGroupFactory;

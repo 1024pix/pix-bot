@@ -1,4 +1,4 @@
-import * as logger from './services/logger';
+import * as logger from './services/logger.js';
 
 function handleErrors(request, h) {
   if (request.response.isBoom) {

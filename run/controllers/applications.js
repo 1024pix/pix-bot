@@ -1,5 +1,5 @@
 import * as cdnServices from '../services/cdn';
-import * as config from '../../config';
+import config from '../../config';
 import * as Boom from '@hapi/boom';
 
 const applications = {
@@ -19,4 +19,4 @@ const applications = {
   },
 };
 
-export { applications };
+export default applications;

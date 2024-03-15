@@ -5,14 +5,15 @@ dotenv.config();
 
 import * as path from 'path';
 import * as Hapi from '@hapi/hapi';
-import { config } from './config.js';
-import * as runDeployConfiguration from './run/deploy-configuration';
-import { registerSlashCommands } from './common/register-slash-commands';
-import * as runManifest from './run/manifest';
-import * as buildManifest from './build/manifest';
-import { slackConfig } from './common/config';
-import * as preResponseHandler from './common/pre-response-handler';
+import config from './config.js';
+import * as runDeployConfiguration from './run/deploy-configuration.js';
+import { registerSlashCommands } from './common/register-slash-commands.js';
+import * as runManifest from './run/manifest.js';
+import * as buildManifest from './build/manifest.js';
+import slackConfig from './common/config.js';
+import * as preResponseHandler from './common/pre-response-handler.js';
 import * as fs from 'fs';
+import * as url from 'url';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const manifests = [runManifest, buildManifest];
@@ -30,7 +31,7 @@ setupErrorHandling(server);
   const routesDir = path.join(__dirname, subDir, '/routes');
   fs.readdirSync(routesDir)
     .filter((file) => path.extname(file) === '.js')
-    .forEach((file) => server.route(require(path.join(routesDir, file))));
+    .forEach((file) => server.route(await import(path.join(routesDir, file))));
 });
 
 registerSlashCommands(runDeployConfiguration, runManifest);
@@ -45,4 +46,4 @@ manifests.forEach((manifest) => {
   server.route(routes);
 });
 
-export { server };
+export default server;

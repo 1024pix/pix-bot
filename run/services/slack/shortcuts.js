@@ -1,7 +1,7 @@
-import * as axios from 'axios';
-import * as deployReleaseTagSelectionModal from './surfaces/modals/deploy-release/release-tag-selection';
-import * as createAppOnScalingoModal from './surfaces/modals/scalingo-apps/application-creation';
-import * as config from '../../../config';
+import axios from 'axios';
+import * as deployReleaseTagSelectionModal from './surfaces/modals/deploy-release/release-tag-selection.js';
+import * as createAppOnScalingoModal from './surfaces/modals/scalingo-apps/application-creation.js';
+import config from '../../../config.js';
 
 const openViewUrl = 'https://slack.com/api/views.open';
 
@@ -37,4 +37,4 @@ const shortcuts = {
   },
 };
 
-export { shortcuts };
+export default shortcuts;

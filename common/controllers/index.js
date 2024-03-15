@@ -32,4 +32,4 @@ const controllers = {
   },
 };
 
-export { controllers };
+export default controllers;

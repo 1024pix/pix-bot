@@ -1,10 +1,7 @@
 import * as logger from '../../../common/services/logger';
-import * as ScalingoClient from '../../../common/services/scalingo-client';
+import ScalingoClient from '../../../common/services/scalingo-client';
 
-async function taskAutoScaleWeb(
-  { applicationName, region, autoScalingParameters },
-  injectedScalingoClient = ScalingoClient,
-) {
+async function run({ applicationName, region, autoScalingParameters }, injectedScalingoClient = ScalingoClient) {
   logger.info({
     event: 'scalingo-autoscaler',
     message: `Starting autoscaling for ${applicationName} with min: ${autoScalingParameters.min} and max: ${autoScalingParameters.max}`,
@@ -21,4 +18,4 @@ async function taskAutoScaleWeb(
   }
 }
 
-export { taskAutoScaleWeb };
+export { run };
