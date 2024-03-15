@@ -1,32 +1,10 @@
-import { deploy } from '../deploy';
-import {
-  PIX_REPO_NAME,
-  PIX_APPS,
-  PIX_APPS_ENVIRONMENTS,
-  PIX_SITE_REPO_NAME,
-  PIX_SITE_APPS,
-  PIX_BOT_REPO_NAME,
-  PIX_BOT_APPS,
-  PIX_DATAWAREHOUSE_REPO_NAME,
-  PIX_DATAWAREHOUSE_APPS_NAME,
-  PIX_LCMS_REPO_NAME,
-  PIX_LCMS_APPS,
-  PIX_API_DATA_REPO_NAME,
-  PIX_API_DATA_APPS,
-  PIX_UI_REPO_NAME,
-  PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
-  PIX_DB_STATS_REPO_NAME,
-  PIX_DB_STATS_APPS_NAME,
-  PIX_TUTOS_REPO_NAME,
-  PIX_TUTOS_APP_NAME,
-  PIX_AIRFLOW_APP_NAME,
-  PIX_DBT_APPS_NAME,
-} from '../../../config';
-import * as releasesService from '../../../common/services/releases';
-import * as ScalingoClient from '../../../common/services/scalingo-client';
-import * as githubServices from '../../../common/services/github';
-import * as axios from 'axios';
-import * as slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message';
+import { deploy } from '../deploy.js';
+import config from '../../../config.js';
+import releasesService from '../../../common/services/releases.js';
+import ScalingoClient from '../../../common/services/scalingo-client.js';
+import githubServices from '../../../common/services/github.js';
+import axios from 'axios';
+import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 
 function sendResponse(responseUrl, text) {
   axios.post(
@@ -130,7 +108,7 @@ async function _publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv
 }
 
 async function _getAndDeployLastVersion({ appName }) {
-  const lastReleaseTag = await githubServices.getLatestReleaseTag(PIX_REPO_NAME);
+  const lastReleaseTag = await githubServices.getLatestReleaseTag(config.PIX_REPO_NAME);
   const sanitizedAppName = appName.trim().toLowerCase();
 
   const appNameParts = sanitizedAppName.split('-');
@@ -141,7 +119,7 @@ async function _getAndDeployLastVersion({ appName }) {
   }
 
   const shortAppName = appNameParts[0] + '-' + appNameParts[1];
-  await releasesService.deployPixRepo(PIX_REPO_NAME, shortAppName, lastReleaseTag, environment);
+  await releasesService.deployPixRepo(config.PIX_REPO_NAME, shortAppName, lastReleaseTag, environment);
 }
 
 function _isAppFromPixRepo({ appName }) {
@@ -153,7 +131,11 @@ function _isAppFromPixRepo({ appName }) {
 
   const [appNamePrefix, shortAppName, environment] = appName.split('-');
 
-  return appNamePrefix === 'pix' && PIX_APPS.includes(shortAppName) && PIX_APPS_ENVIRONMENTS.includes(environment);
+  return (
+    appNamePrefix === 'pix' &&
+    config.PIX_APPS.includes(shortAppName) &&
+    config.PIX_APPS_ENVIRONMENTS.includes(environment)
+  );
 }
 
 async function deployTagUsingSCM(appNames, tag) {
@@ -167,18 +149,18 @@ async function deployTagUsingSCM(appNames, tag) {
 
 async function deployAirflow(payload) {
   const version = payload.text;
-  await deployTagUsingSCM([PIX_AIRFLOW_APP_NAME], version);
+  await deployTagUsingSCM([config.PIX_AIRFLOW_APP_NAME], version);
 }
 
 async function deployDBT(payload) {
   const version = payload.text;
-  await deployTagUsingSCM(PIX_DBT_APPS_NAME, version);
+  await deployTagUsingSCM(config.PIX_DBT_APPS_NAME, version);
 }
 
 async function createAndDeployPixLCMS(payload) {
   await _publishAndDeployReleaseWithAppsByEnvironment(
-    PIX_LCMS_REPO_NAME,
-    PIX_LCMS_APPS,
+    config.PIX_LCMS_REPO_NAME,
+    config.PIX_LCMS_APPS,
     payload.text,
     payload.response_url,
   );
@@ -186,29 +168,33 @@ async function createAndDeployPixLCMS(payload) {
 
 async function createAndDeployPixAPIData(payload) {
   await _publishAndDeployReleaseWithAppsByEnvironment(
-    PIX_API_DATA_REPO_NAME,
-    PIX_API_DATA_APPS,
+    config.PIX_API_DATA_REPO_NAME,
+    config.PIX_API_DATA_APPS,
     payload.text,
     payload.response_url,
   );
 }
 
 async function createAndDeployPixUI(payload) {
-  await _publishPixUI(PIX_UI_REPO_NAME, payload.text, payload.response_url);
+  await _publishPixUI(config.PIX_UI_REPO_NAME, payload.text, payload.response_url);
 }
 
 async function createAndDeployEmberTestingLibrary(payload) {
-  await _publishAndDeployEmberTestingLibrary(PIX_EMBER_TESTING_LIBRARY_REPO_NAME, payload.text, payload.response_url);
+  await _publishAndDeployEmberTestingLibrary(
+    config.PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
+    payload.text,
+    payload.response_url,
+  );
 }
 
 async function createAndDeployPixSiteRelease(payload) {
-  await _publishAndDeployRelease(PIX_SITE_REPO_NAME, PIX_SITE_APPS, payload.text, payload.response_url);
+  await _publishAndDeployRelease(config.PIX_SITE_REPO_NAME, config.PIX_SITE_APPS, payload.text, payload.response_url);
 }
 
 async function createAndDeployPixDatawarehouse(payload) {
   await _publishAndDeployRelease(
-    PIX_DATAWAREHOUSE_REPO_NAME,
-    PIX_DATAWAREHOUSE_APPS_NAME,
+    config.PIX_DATAWAREHOUSE_REPO_NAME,
+    config.PIX_DATAWAREHOUSE_APPS_NAME,
     payload.text,
     payload.response_url,
   );
@@ -216,8 +202,8 @@ async function createAndDeployPixDatawarehouse(payload) {
 
 async function createAndDeployPixBotRelease(payload) {
   await _publishAndDeployReleaseWithAppsByEnvironment(
-    PIX_BOT_REPO_NAME,
-    PIX_BOT_APPS,
+    config.PIX_BOT_REPO_NAME,
+    config.PIX_BOT_APPS,
     payload.text,
     payload.response_url,
   );
@@ -228,11 +214,21 @@ async function getAndDeployLastVersion({ appName }) {
 }
 
 async function createAndDeployDbStats(payload) {
-  await _publishAndDeployRelease(PIX_DB_STATS_REPO_NAME, PIX_DB_STATS_APPS_NAME, payload.text, payload.response_url);
+  await _publishAndDeployRelease(
+    config.PIX_DB_STATS_REPO_NAME,
+    config.PIX_DB_STATS_APPS_NAME,
+    payload.text,
+    payload.response_url,
+  );
 }
 
 async function createAndDeployPixTutosRelease(payload) {
-  await _publishAndDeployRelease(PIX_TUTOS_REPO_NAME, [PIX_TUTOS_APP_NAME], payload.text, payload.response_url);
+  await _publishAndDeployRelease(
+    config.PIX_TUTOS_REPO_NAME,
+    [config.PIX_TUTOS_APP_NAME],
+    payload.text,
+    payload.response_url,
+  );
 }
 
 export {

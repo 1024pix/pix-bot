@@ -2,8 +2,8 @@ import * as crypto from 'crypto';
 import * as querystring from 'querystring';
 import * as tsscmp from 'tsscmp';
 import * as Boom from '@hapi/boom';
-import * as config from '../../../config';
-import * as logger from '../logger';
+import config from '../../../config.js';
+import * as logger from '../logger.js';
 
 function verifyRequestSignature(signingSecret, body, signature, requestTimestamp) {
   if (signature === undefined || requestTimestamp === undefined) {
@@ -55,24 +55,22 @@ function parseRequestBody(stringBody, contentType) {
   }
 }
 
-const slackSecurity = {
-  async verifySignatureAndParseBody(request) {
-    const { headers, payload } = request;
+async function verifySignatureAndParseBody(request) {
+  const { headers, payload } = request;
 
-    const signingSecret = config.slack.requestSigningSecret;
-    const signature = headers['x-slack-signature'];
-    const requestTimestamp = headers['x-slack-request-timestamp'];
-    const contentType = headers['content-type'];
-    const stringBody = payload ? payload.toString() : '';
+  const signingSecret = config.slack.requestSigningSecret;
+  const signature = headers['x-slack-signature'];
+  const requestTimestamp = headers['x-slack-request-timestamp'];
+  const contentType = headers['content-type'];
+  const stringBody = payload ? payload.toString() : '';
 
-    try {
-      verifyRequestSignature(signingSecret, stringBody, signature, requestTimestamp);
-    } catch (error) {
-      return error;
-    }
+  try {
+    verifyRequestSignature(signingSecret, stringBody, signature, requestTimestamp);
+  } catch (error) {
+    return error;
+  }
 
-    return parseRequestBody(stringBody, contentType);
-  },
-};
+  return parseRequestBody(stringBody, contentType);
+}
 
-export { slackSecurity };
+export { verifySignatureAndParseBody };

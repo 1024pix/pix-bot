@@ -1,9 +1,9 @@
-import * as commands from '../services/slack/commands';
-import { getAppStatusFromScalingo } from '../services/slack/app-status-from-scalingo';
-import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message';
-import * as shortcuts from '../services/slack/shortcuts';
-import * as viewSubmissions from '../services/slack/view-submissions';
-import * as logger from '../../common/services/logger';
+import * as commands from '../services/slack/commands.js';
+import { getAppStatusFromScalingo } from '../services/slack/app-status-from-scalingo.js';
+import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
+import shortcuts from '../services/slack/shortcuts.js';
+import viewSubmissions from '../services/slack/view-submissions.js';
+import * as logger from '../../common/services/logger.js';
 
 function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
@@ -163,4 +163,4 @@ const slack = {
   },
 };
 
-export { slack };
+export default slack;

@@ -14,9 +14,9 @@ import {
   createAndDeployDbStats,
   createAndDeployPixTutosRelease,
 } from '../../../../../run/services/slack/commands';
-import * as releasesServices from '../../../../../common/services/releases';
-import * as githubServices from '../../../../../common/services/github';
-import * as ScalingoClient from '../../../../../common/services/scalingo-client';
+import releasesServices from '../../../../../common/services/releases';
+import githubServices from '../../../../../common/services/github';
+import ScalingoClient from '../../../../../common/services/scalingo-client';
 
 describe('Unit | Run | Services | Slack | Commands', () => {
   beforeEach(function () {

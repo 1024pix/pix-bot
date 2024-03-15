@@ -1,5 +1,5 @@
 import { expect, StatusCodes, nock, sinon } from '../../test-helper';
-import * as server from '../../../server';
+import server from '../../../server';
 import * as logger from '../../../common/services/logger';
 
 describe('Acceptance | Build | Scalingo', function () {

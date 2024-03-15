@@ -2,8 +2,8 @@ import { describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import * as proxyquire from 'proxyquire';
 import { expect } from 'chai';
-import * as ScalingoClient from '../../../../common/services/scalingo-client';
-import * as github from '../../../../common/services/github';
+import ScalingoClient from '../../../../common/services/scalingo-client';
+import github from '../../../../common/services/github';
 
 describe('releases', function () {
   let exec;

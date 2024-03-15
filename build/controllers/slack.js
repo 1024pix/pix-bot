@@ -1,10 +1,10 @@
-import * as github from '../../common/services/github';
-import { environments, deploy, publish } from '../../common/services/releases';
-import * as shortcuts from '../services/slack/shortcuts';
-import * as viewSubmissions from '../services/slack/view-submissions';
-import * as slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message';
-import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message';
-import * as logger from '../../common/services/logger';
+import github from '../../common/services/github.js';
+import releases from '../../common/services/releases.js';
+import shortcuts from '../services/slack/shortcuts.js';
+import viewSubmissions from '../services/slack/view-submissions.js';
+import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
+import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
+import * as logger from '../../common/services/logger.js';
 import * as _ from 'lodash';
 
 const slack = {
@@ -46,8 +46,8 @@ const slack = {
     const payload = request.pre.payload;
     const branchName = payload.text;
 
-    publish('patch', branchName).then(async (latestReleaseTag) => {
-      await deploy(environments.recette, latestReleaseTag);
+    releases.publish('patch', branchName).then(async (latestReleaseTag) => {
+      await releases.deploy(releases.environments.recette, latestReleaseTag);
     });
 
     return {
@@ -100,4 +100,4 @@ const slack = {
   },
 };
 
-export { slack };
+export default slack;

@@ -5,7 +5,7 @@ import { catchErr, expect, sinon } from '../../../test-helper';
 import * as githubController from '../../../../build/controllers/github';
 
 import * as githubService from '../../../../common/services/github';
-import * as config from '../../../../config';
+import config from '../../../../config';
 
 describe('Unit | Controller | Github', function () {
   describe('#getMessageTemplate', function () {

@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ScalingoClient from '../../common/services/scalingo-client';
-import * as gitHubService from '../../common/services/github';
+import ScalingoClient from '../../common/services/scalingo-client';
+import gitHubService from '../../common/services/github';
 import * as logger from '../../common/services/logger';
-import * as config from '../../config';
+import config from '../../config';
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],

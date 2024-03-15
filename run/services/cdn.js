@@ -1,7 +1,7 @@
-import * as axios from 'axios';
+import axios from 'axios';
 import * as axiosRetry from 'axios-retry';
 axiosRetry.default;
-import * as config from '../../config';
+import config from '../../config';
 import * as logger from '../../common/services/logger';
 import * as _ from 'lodash';
 

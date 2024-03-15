@@ -1,7 +1,8 @@
-const { expect, sinon } = require('../../../test-helper');
+import { expect, sinon } from '../../../test-helper';
 
-const taskAutoScaleWeb = require('../../../../run/services/tasks/autoscale-web');
-const { tasks: config } = require('../../../../config');
+import * as taskAutoScaleWeb from '../../../../run/services/tasks/autoscale-web';
+import config from '../../../../config';
+import tasksList from '../../../../run/services/tasks.js';
 
 describe('Integration | Run | Services | Scheduled Tasks', function () {
   describe('#handler', function () {
@@ -22,7 +23,6 @@ describe('Integration | Run | Services | Scheduled Tasks', function () {
       sinon.stub(config, 'autoScaleEnabled').value(true);
       sinon.stub(config, 'scheduleAutoScaleUp').value(schedule);
 
-      const { tasks: tasksList } = require('../../../../run/services/tasks');
       const [morningAutoScaleTask] = tasksList.filter((task) => task.name === 'morningAutoScale');
 
       const runStub = sinon.stub();

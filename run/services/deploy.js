@@ -1,4 +1,4 @@
-import * as releasesService from '../../common/services/releases';
+import releasesService from '../../common/services/releases.js';
 
 async function deploy(repoName, appNamesList, releaseTag) {
   const environment = 'production';

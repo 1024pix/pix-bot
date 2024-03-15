@@ -1,7 +1,7 @@
 import * as dayjs from 'dayjs';
-import * as slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message';
+import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message';
 import { Message, Section, Context, Attachment } from 'slack-block-builder';
-import * as config from '../../config';
+import config from '../../config';
 import * as logger from '../../common/services/logger';
 
 function getSlackMessageAttachments(payload) {
@@ -54,7 +54,7 @@ const scalingo = {
       message: `Failed deployment on the ${request.payload.app_name} app`,
     });
 
-    const { message, attachments } = getS lackMessageAttachments(request.payload);
+    const { message, attachments } = getSlackMessageAttachments(request.payload);
 
     await slackPostMessageService.postMessage({ message, attachments: JSON.stringify(attachments) });
 
@@ -67,4 +67,4 @@ const scalingo = {
   },
 };
 
-export { scalingo };
+export default scalingo;

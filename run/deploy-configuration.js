@@ -1,4 +1,4 @@
-import { fromBranch } from '../common/deployer';
+import { fromBranch } from '../common/deployer.js';
 
 const deployConfiguration = [
   {

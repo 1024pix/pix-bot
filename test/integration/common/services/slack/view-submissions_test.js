@@ -1,5 +1,5 @@
 import { expect, sinon } from '../../../../test-helper';
-import * as viewSubmissions from '../../../../../run/services/slack/view-submissions';
+import viewSubmissions from '../../../../../run/services/slack/view-submissions';
 import * as slackGetUserInfos from '../../../../../common/services/slack/surfaces/user-infos/get-user-infos';
 
 describe('view-submissions', function () {

@@ -1,4 +1,4 @@
-import { githubConfig } from '../../common/config';
+import githubConfig from '../../common/config';
 import * as githubController from '../../build/controllers/github';
 
 const github = [

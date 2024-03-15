@@ -1,6 +1,6 @@
-import * as config from '../../../../../config';
-import { httpAgent } from '../../../../http-agent';
-import * as logger from '../../../logger';
+import config from '../../../../../config.js';
+import { httpAgent } from '../../../../http-agent.js';
+import * as logger from '../../../logger.js';
 
 const postMessage = {
   async postMessage({ message, attachments, channel = '#tech-releases', injectedHttpAgent = httpAgent }) {
@@ -29,4 +29,4 @@ const postMessage = {
   },
 };
 
-export { postMessage };
+export default postMessage;

@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import { catchErr, expect, nock } from '../../../test-helper';
-import * as config from '../../../../config';
+import config from '../../../../config';
 import * as cdn from '../../../../run/services/cdn';
 
 function _stubAccountDetails(namespace) {

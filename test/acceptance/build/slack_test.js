@@ -1,5 +1,5 @@
 import { expect, nock, createSlackWebhookSignatureHeaders, nockGithubWithNoConfigChanges } from '../../test-helper';
-import * as server from '../../../server';
+import server from '../../../server';
 
 describe('Acceptance | Build | Slack', function () {
   describe('POST /build/slack/interactive-endpoint', function () {

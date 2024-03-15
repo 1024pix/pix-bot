@@ -1,4 +1,4 @@
-import * as manifest from '../manifest';
+import manifest from '../manifest';
 
 const manifestRequest = {
   async get(request) {
@@ -45,4 +45,4 @@ const manifestRequest = {
   },
 };
 
-export { manifestRequest };
+export default manifestRequest;

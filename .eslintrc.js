@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   root: true,
   extends: [
@@ -5,9 +7,21 @@ module.exports = {
     'plugin:mocha/recommended',
     'plugin:prettier/recommended',
     'plugin:import/recommended',
+    'plugin:import/recommended',
   ],
   parserOptions: {
-    ecmaVersion: 11,
+    ecmaVersion: 2020,
+    requireConfigFile: false,
+    babelOptions: {
+      parserOpts: {
+        plugins: ['importAssertions'],
+      },
+    },
+  },
+  env: {
+    browser: true,
+    node: true,
+    es6: true,
   },
   rules: {
     'mocha/no-setup-in-describe': 'off',

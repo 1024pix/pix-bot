@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as server from '../../../server';
+import server from '../../../server';
 
 describe('Acceptance | Run | Manifest', function () {
   describe('GET /run/manifest', function () {

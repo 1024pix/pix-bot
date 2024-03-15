@@ -1,9 +1,9 @@
 import { describe, it } from 'mocha';
 import { sinon } from '../../../test-helper';
-import * as axios from 'axios';
-import * as config from '../../../../config';
+import axios from 'axios';
+import config from '../../../../config';
 
-import * as ScalingoClient from '../../../../common/services/scalingo-client';
+import ScalingoClient from '../../../../common/services/scalingo-client';
 import { expect } from 'chai';
 
 describe('Scalingo client', () => {

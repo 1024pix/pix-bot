@@ -1,5 +1,5 @@
 //TODO use EnvVars
-import config from '../../config';
+import config from '../../config.js';
 const alphanumericAndDashOnly = /^([a-zA-Z0-9]+-)+[a-zA-Z0-9]+$/;
 const prefix = config.scalingo.validAppPrefix;
 class ScalingoAppName {

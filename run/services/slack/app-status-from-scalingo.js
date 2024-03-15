@@ -1,4 +1,4 @@
-import * as ScalingoClient from '../../../common/services/scalingo-client';
+import ScalingoClient from '../../../common/services/scalingo-client.js';
 
 async function getAppStatusFromScalingo(appName) {
   if (!appName) {

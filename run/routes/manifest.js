@@ -1,4 +1,4 @@
-import * as manifestController from '../controllers/manifest';
+import manifestController from '../controllers/manifest';
 
 const manifest = [
   {
@@ -8,4 +8,4 @@ const manifest = [
   },
 ];
 
-export { manifest };
+export default manifest;

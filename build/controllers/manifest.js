@@ -1,4 +1,4 @@
-import * as manifest from '../manifest';
+import manifest from '../manifest';
 
 const controllerManifest = {
   async get(request) {
@@ -45,4 +45,4 @@ const controllerManifest = {
   },
 };
 
-export { controllerManifest };
+export default controllerManifest;

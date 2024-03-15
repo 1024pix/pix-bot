@@ -4,7 +4,7 @@
 
 import * as fs from 'fs';
 
-import * as github from '../common/services/github';
+import github from '../common/services/github';
 import {
   getTagReleaseDate,
   filterPullRequest,
