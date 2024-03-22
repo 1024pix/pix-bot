@@ -1,7 +1,7 @@
 import { expect, sinon } from '../../../test-helper';
 
 import * as taskAutoScaleWeb from '../../../../run/services/tasks/autoscale-web';
-import config from '../../../../config';
+import config from '../../../../config.js';
 import tasksList from '../../../../run/services/tasks.js';
 
 describe('Integration | Run | Services | Scheduled Tasks', function () {

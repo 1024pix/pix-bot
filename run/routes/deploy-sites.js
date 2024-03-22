@@ -1,4 +1,4 @@
-import deploySitesController from '../controllers/deploy-sites';
+import deploySitesController from '../controllers/deploy-sites.js';
 
 const deploySites = [
   {

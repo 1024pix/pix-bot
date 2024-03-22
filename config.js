@@ -1,4 +1,4 @@
-import process from 'process';
+import process from 'node:process';
 
 function _getNumber(numberAsString, defaultIntNumber) {
   const number = parseInt(numberAsString, 10);

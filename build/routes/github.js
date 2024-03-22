@@ -1,12 +1,12 @@
-import githubConfig from '../../common/config';
-import * as githubController from '../../build/controllers/github';
+import { commonConfig } from '../../common/config.js';
+import { processWebhook } from '../../build/controllers/github.js';
 
 const github = [
   {
     method: 'POST',
     path: '/github/webhook',
-    handler: githubController.processWebhook,
-    config: githubConfig,
+    handler: processWebhook,
+    config: commonConfig.githubConfig,
   },
 ];
 

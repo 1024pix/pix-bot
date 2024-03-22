@@ -1,5 +1,5 @@
-import * as logger from '../../../common/services/logger';
-import ScalingoClient from '../../../common/services/scalingo-client';
+import * as logger from '../../../common/services/logger.js';
+import ScalingoClient from '../../../common/services/scalingo-client.js';
 
 async function run({ applicationName, region, autoScalingParameters }, injectedScalingoClient = ScalingoClient) {
   logger.info({

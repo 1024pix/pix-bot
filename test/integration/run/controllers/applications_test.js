@@ -2,7 +2,7 @@ import axios from 'axios';
 import { describe, it } from 'mocha';
 import { expect, sinon } from '../../../test-helper';
 import server from '../../../../server';
-import config from '../../../../config';
+import config from '../../../../config.js';
 
 describe('Integration | Run | Applications', () => {
   describe('#invalidateCdnCache', () => {

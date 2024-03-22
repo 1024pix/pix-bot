@@ -1,5 +1,5 @@
-import * as taskAutoScaleWeb from './tasks/autoscale-web';
-import config from '../../config';
+import * as taskAutoScaleWeb from './tasks/autoscale-web.js';
+import config from '../../config.js';
 
 const tasks = [
   {

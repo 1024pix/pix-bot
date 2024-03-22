@@ -1,4 +1,4 @@
-import manifestController from '../controllers/manifest';
+import manifestController from '../controllers/manifest.js';
 
 const manifest = [
   {

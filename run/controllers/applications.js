@@ -1,5 +1,5 @@
-import * as cdnServices from '../services/cdn';
-import config from '../../config';
+import * as cdnServices from '../services/cdn.js';
+import config from '../../config.js';
 import * as Boom from '@hapi/boom';
 
 const applications = {
