@@ -7,12 +7,13 @@ import slackGetUserInfos from '../../../common/services/slack/surfaces/user-info
 import ScalingoClient from '../../../common/services/scalingo-client.js';
 import { ScalingoAppName } from '../../../common/models/ScalingoAppName.js';
 import config from '../../../config.js';
+import {applicationCreationConfirmation} from './surfaces/modals/scalingo-apps/application-creation-confirmation.js';
 
 const viewSubmissions = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
     const hasConfigFileChanged = await github.hasConfigFileChangedInLatestRelease();
-    return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
+    return openModalReleaseDeploymentConfirmation.releaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 
   async submitApplicationNameSelection(payload) {
@@ -30,7 +31,7 @@ const viewSubmissions = {
         },
       };
     }
-    return openModalApplicationCreationConfirmation(
+    return openModalApplicationCreationConfirmation.applicationCreationConfirmation(
       applicationName,
       applicationEnvironment,
       applicationEnvironmentName,
