@@ -1,6 +1,6 @@
-import config from '../../config';
-import { deploy } from '../services/deploy';
-import github from '../../common/services/github';
+import config from '../../config.js';
+import { deploy } from '../services/deploy.js';
+import github from '../../common/services/github.js';
 import * as Boom from '@hapi/boom';
 
 const deploySites = {

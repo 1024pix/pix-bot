@@ -1,8 +1,8 @@
 import ReviewAppManager from '@1024pix/scalingo-review-app-manager';
 ReviewAppManager.ReviewAppManager;
 
-import config from '../../config';
-import * as logger from '../../common/services/logger';
+import config from '../../config.js';
+import * as logger from '../../common/services/logger.js';
 
 const ecoModeService = {
   async start() {

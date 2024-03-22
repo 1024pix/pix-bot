@@ -18,4 +18,4 @@ const commonConfig = {
   },
 };
 
-export default commonConfig;
+export { commonConfig };

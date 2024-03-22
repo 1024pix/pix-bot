@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha';
 import { sinon } from '../../../test-helper';
 import axios from 'axios';
-import config from '../../../../config';
+import config from '../../../../config.js';
 
 import ScalingoClient from '../../../../common/services/scalingo-client';
 import { expect } from 'chai';

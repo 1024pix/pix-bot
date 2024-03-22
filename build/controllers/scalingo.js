@@ -1,7 +1,7 @@
 import * as dayjs from 'dayjs';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message';
 import { Message, Section, Context, Attachment } from 'slack-block-builder';
-import config from '../../config';
+import config from '../../config.js';
 import * as logger from '../../common/services/logger';
 
 function getSlackMessageAttachments(payload) {

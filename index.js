@@ -1,14 +1,14 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import config from './config';
-import server from './server';
-import { createCronJob } from './common/services/cron-job';
-import github from './common/services/github';
-import { deploy } from './run/services/deploy';
-import ecoModeService from './build/services/eco-mode-service';
-import * as logger from './common/services/logger';
-import * as taskScheluder from './run/services/task-scheduler';
+import config from './config.js';
+import server from './server.js';
+import { createCronJob } from './common/services/cron-job.js';
+import github from './common/services/github.js';
+import { deploy } from './run/services/deploy.js';
+import ecoModeService from './build/services/eco-mode-service.js';
+import * as logger from './common/services/logger.js';
+import { taskScheluder } from './run/services/task-scheduler.js';
 import tasks from './run/services/tasks.js';
 
 const init = async () => {

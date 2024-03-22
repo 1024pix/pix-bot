@@ -1,10 +1,10 @@
 import * as dayjs from 'dayjs';
 import { sortBy, indexOf } from 'lodash';
-import github from './github';
+import github from './github.js';
 
-import * as PartialChangeLogGenerator from '../models/PartialChangeLogGenerator';
-import * as PullRequest from '../models/PullRequest';
-import PullRequestGroupFactory from '../models/PullRequestGroupFactory';
+import * as PartialChangeLogGenerator from '../models/PartialChangeLogGenerator.js';
+import * as PullRequest from '../models/PullRequest.js';
+import PullRequestGroupFactory from '../models/PullRequestGroupFactory.js';
 
 const CHANGELOG_HEADER_LINES = 2;
 

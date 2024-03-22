@@ -8,9 +8,9 @@ import * as Hapi from '@hapi/hapi';
 import config from './config.js';
 import * as runDeployConfiguration from './run/deploy-configuration.js';
 import { registerSlashCommands } from './common/register-slash-commands.js';
-import * as runManifest from './run/manifest.js';
-import * as buildManifest from './build/manifest.js';
-import slackConfig from './common/config.js';
+import { manifest as runManifest } from './run/manifest.js';
+import { manifest as buildManifest } from './build/manifest.js';
+import { commonConfig } from './common/config.js';
 import * as preResponseHandler from './common/pre-response-handler.js';
 import * as fs from 'fs';
 import * as url from 'url';
@@ -27,20 +27,27 @@ const server = Hapi.server({
 
 setupErrorHandling(server);
 
-['/build', '/run', '/common'].forEach((subDir) => {
-  const routesDir = path.join(__dirname, subDir, '/routes');
-  fs.readdirSync(routesDir)
-    .filter((file) => path.extname(file) === '.js')
-    .forEach((file) => server.route(await import(path.join(routesDir, file))));
-});
+async function loadRoutes() {
+  for (const subDir of ['/build', '/run', '/common']) {
+    const routesDir = path.join(__dirname, subDir, '/routes');
+    const files = fs.readdirSync(routesDir)
+      .filter((file) => path.extname(file) === '.js');
 
-registerSlashCommands(runDeployConfiguration, runManifest);
+    for (const file of files) {
+      server.route(await import(path.join(routesDir, file)));
+    }
+  }
+}
+
+loadRoutes();
+
+registerSlashCommands(runDeployConfiguration.deployConfiguration, runManifest);
 
 manifests.forEach((manifest) => {
   const routes = manifest.getHapiRoutes().map((route) => {
     return {
       ...route,
-      config: slackConfig,
+      config: commonConfig.slackConfig,
     };
   });
   server.route(routes);
