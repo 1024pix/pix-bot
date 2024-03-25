@@ -2,8 +2,8 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
 
-import { getAppStatusFromScalingo } from '../../../../../run/services/slack/app-status-from-scalingo';
-import ScalingoClient from '../../../../../common/services/scalingo-client';
+import { getAppStatusFromScalingo } from '../../../../../run/services/slack/app-status-from-scalingo.js';
+import ScalingoClient from '../../../../../common/services/scalingo-client.js';
 
 describe('#getAppStatusFromScalingo', () => {
   it('returns a message when no app is specified in command line', async () => {

@@ -1,5 +1,5 @@
-import * as commands from '../../../../../run/services/slack/commands';
-import { expect, nock } from '../../../../test-helper';
+import * as commands from '../../../../../run/services/slack/commands.js';
+import { expect, nock } from '../../../../test-helper.js';
 
 describe('Integration | Run | Services | Slack | Commands', function () {
   describe('#deployAirflow', function () {

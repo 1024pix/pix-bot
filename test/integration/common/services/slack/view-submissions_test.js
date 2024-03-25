@@ -1,6 +1,6 @@
-import { expect, sinon } from '../../../../test-helper';
-import viewSubmissions from '../../../../../run/services/slack/view-submissions';
-import * as slackGetUserInfos from '../../../../../common/services/slack/surfaces/user-infos/get-user-infos';
+import { expect, sinon } from '../../../../test-helper.js';
+import viewSubmissions from '../../../../../run/services/slack/view-submissions.js';
+import * as slackGetUserInfos from '../../../../../common/services/slack/surfaces/user-infos/get-user-infos.js';
 
 describe('view-submissions', function () {
   describe('#submitApplicationNameSelection', function () {

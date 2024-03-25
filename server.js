@@ -14,8 +14,14 @@ import { commonConfig } from './common/config.js';
 import * as preResponseHandler from './common/pre-response-handler.js';
 import * as fs from 'fs';
 import * as url from 'url';
+import githubRoutes from './build/routes/github.js';
+import commonRoutesIndex from './common/routes/index.js';
+import runRoutesManifest from './run/routes/manifest.js';
+import buildRoutesManifest from './build/routes/manifest.js';
+import runRoutesApplication from './run/routes/applications.js';
+import scalingoRoutes from './build/routes/scalingo.js';
+import deploySitesRoutes from './run/routes/deploy-sites.js';
 
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const manifests = [runManifest, buildManifest];
 const setupErrorHandling = function (server) {
   server.ext('onPreResponse', preResponseHandler.handleErrors);
@@ -27,18 +33,13 @@ const server = Hapi.server({
 
 setupErrorHandling(server);
 
-async function loadRoutes() {
-  for (const subDir of ['/build', '/run', '/common']) {
-    const routesDir = path.join(__dirname, subDir, '/routes');
-    const files = fs.readdirSync(routesDir).filter((file) => path.extname(file) === '.js');
-
-    for (const file of files) {
-      server.route(await import(path.join(routesDir, file)));
-    }
-  }
-}
-
-loadRoutes();
+server.route(githubRoutes);
+server.route(commonRoutesIndex);
+server.route(runRoutesManifest);
+server.route(buildRoutesManifest);
+server.route(runRoutesApplication);
+server.route(scalingoRoutes);
+server.route(deploySitesRoutes);
 
 registerSlashCommands(runDeployConfiguration.deployConfiguration, runManifest);
 

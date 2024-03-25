@@ -8,4 +8,4 @@ const applications = [
   },
 ];
 
-export { applications };
+export default applications;

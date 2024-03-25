@@ -13,4 +13,4 @@ const routeIndex = [
   },
 ];
 
-export { routeIndex };
+export default routeIndex;

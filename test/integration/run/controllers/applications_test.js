@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { describe, it } from 'mocha';
-import { expect, sinon } from '../../../test-helper';
-import server from '../../../../server';
+import { expect, sinon } from '../../../test-helper.js';
+import server from '../../../../server.js';
 import config from '../../../../config.js';
 
 describe('Integration | Run | Applications', () => {

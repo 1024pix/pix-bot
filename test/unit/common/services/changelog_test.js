@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { stub, useFakeTimers } from 'sinon';
-import github from '../../../../common/services/github';
+import github from '../../../../common/services/github.js';
 
 import {
   displayPullRequest,

@@ -1,6 +1,6 @@
-import { expect, sinon } from '../../test-helper';
+import { expect, sinon } from '../../test-helper.js';
 import axios from 'axios';
-import { httpAgent } from '../../../common/http-agent';
+import { httpAgent } from '../../../common/http-agent.js';
 
 const { post } = httpAgent;
 

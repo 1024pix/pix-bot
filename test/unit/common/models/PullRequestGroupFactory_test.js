@@ -1,9 +1,9 @@
-import { expect } from '../../../test-helper';
+import { expect } from '../../../test-helper.js';
 
-import * as PullRequestGroup from '../../../../common/models/PullRequestGroup';
-import { Tag } from '../../../../common/models/Tags';
+import * as PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
+import { Tag } from '../../../../common/models/Tags.js';
 
-import PullRequestGroupFactory from '../../../../common/models/PullRequestGroupFactory';
+import PullRequestGroupFactory from '../../../../common/models/PullRequestGroupFactory.js';
 
 describe('Unit | Common | Models | PullRequestGroupFactory', function () {
   describe('#build', function () {

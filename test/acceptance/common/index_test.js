@@ -1,5 +1,5 @@
-import { expect, StatusCodes } from '../../test-helper';
-import server from '../../../server';
+import { expect, StatusCodes } from '../../test-helper.js';
+import server from '../../../server.js';
 import { version } from '../../../package.json';
 
 describe('Acceptance | Common | Index', function () {

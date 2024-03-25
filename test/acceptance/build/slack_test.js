@@ -1,4 +1,4 @@
-import { expect, nock, createSlackWebhookSignatureHeaders, nockGithubWithNoConfigChanges } from '../../test-helper';
+import { expect, nock, createSlackWebhookSignatureHeaders, nockGithubWithNoConfigChanges } from '../../test-helper.js';
 import server from '../../../server';
 
 describe('Acceptance | Build | Slack', function () {

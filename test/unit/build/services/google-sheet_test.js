@@ -1,8 +1,8 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { sinon } from '../../../test-helper';
+import { sinon } from '../../../test-helper.js';
 import axios from 'axios';
-import googleSheet from '../../../../build/services/google-sheet';
+import googleSheet from '../../../../build/services/google-sheet.js';
 
 describe('#getA11YTip', function () {
   const data = {

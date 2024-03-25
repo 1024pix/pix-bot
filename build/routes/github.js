@@ -10,4 +10,4 @@ const github = [
   },
 ];
 
-export { github };
+export default github;

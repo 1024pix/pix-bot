@@ -1,7 +1,7 @@
-import postMessage from '../../../../../../../common/services/slack/surfaces/messages/post-message';
-import { expect, sinon } from '../../../../../../test-helper';
+import postMessage from '../../../../../../../common/services/slack/surfaces/messages/post-message.js';
+import { expect, sinon } from '../../../../../../test-helper.js';
 import config from '../../../../../../../config.js';
-import * as logger from '../../../../../../../common/services/logger';
+import * as logger from '../../../../../../../common/services/logger.js';
 
 describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message', function () {
   describe('#postMessage', function () {
