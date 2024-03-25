@@ -1,17 +1,15 @@
-#! /usr/bin/env node
-
 /* eslint no-console: off */
 
 import * as fs from 'fs';
 
-import github from '../common/services/github';
 import {
-  getTagReleaseDate,
   filterPullRequest,
-  getNewChangeLogLines,
-  getHeadOfChangelog,
   generateChangeLogContent,
-} from '../common/services/changelog';
+  getHeadOfChangelog,
+  getNewChangeLogLines,
+  getTagReleaseDate,
+} from '../common/services/changelog.js';
+import github from '../common/services/github.js';
 
 const CHANGELOG_FILE = 'CHANGELOG.md';
 
@@ -29,46 +27,41 @@ async function main() {
   const branchName = process.argv[5];
   const lastTagNameOnBranch = process.argv[6];
 
-  try {
-    let pullRequests;
-    if (lastTagNameOnBranch === 'v0.0.0') {
-      pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
-    } else {
-      try {
-        pullRequests = await pullRequestSinceLastRelease(repoOwner, repoName, lastTagNameOnBranch, branchName);
-      } catch (e) {
-        console.error(
-          "Error while fetching the tag and pull-requests. If it's your first release, ensure that the version set is 0.0.0.",
-        );
-        throw e;
-      }
-    }
-
-    const newChangeLogLines = getNewChangeLogLines({
-      headOfChangelogTitle: getHeadOfChangelog(tagVersion),
-      pullRequests,
-    });
-
-    let currentChangeLog = '';
-
+  let pullRequests;
+  if (lastTagNameOnBranch === 'v0.0.0') {
+    pullRequests = await github.getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName);
+  } else {
     try {
-      currentChangeLog = fs.readFileSync(CHANGELOG_FILE, 'utf-8').split('\n');
-    } catch (error) {
-      console.log('Changelog file does not exist. It will be created.');
-      currentChangeLog = [`# ${repoName} Changelog\n`, '\n'];
+      pullRequests = await pullRequestSinceLastRelease(repoOwner, repoName, lastTagNameOnBranch, branchName);
+    } catch (e) {
+      console.error(
+        "Error while fetching the tag and pull-requests. If it's your first release, ensure that the version set is 0.0.0.",
+      );
+      throw e;
     }
-
-    const changeLogContent = generateChangeLogContent({
-      currentChangelogContent: currentChangeLog,
-      changes: newChangeLogLines,
-    });
-
-    console.log(`Writing to ${CHANGELOG_FILE}`);
-    fs.writeFileSync(CHANGELOG_FILE, changeLogContent.join('\n'));
-  } catch (e) {
-    console.log(e);
-    process.exit(1);
   }
+
+  const newChangeLogLines = getNewChangeLogLines({
+    headOfChangelogTitle: getHeadOfChangelog(tagVersion),
+    pullRequests,
+  });
+
+  let currentChangeLog = '';
+
+  try {
+    currentChangeLog = fs.readFileSync(CHANGELOG_FILE, 'utf-8').split('\n');
+  } catch (error) {
+    console.log('Changelog file does not exist. It will be created.');
+    currentChangeLog = [`# ${repoName} Changelog\n`, '\n'];
+  }
+
+  const changeLogContent = generateChangeLogContent({
+    currentChangelogContent: currentChangeLog,
+    changes: newChangeLogLines,
+  });
+
+  console.log(`Writing to ${CHANGELOG_FILE}`);
+  fs.writeFileSync(CHANGELOG_FILE, changeLogContent.join('\n'));
 }
 
 main();

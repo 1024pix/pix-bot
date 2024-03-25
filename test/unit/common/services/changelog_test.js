@@ -1,16 +1,16 @@
 import { expect } from 'chai';
 import { stub, useFakeTimers } from 'sinon';
-import github from '../../../../common/services/github.js';
 
 import {
   displayPullRequest,
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,
-  getTagReleaseDate,
   getNewChangeLogLines,
+  getTagReleaseDate,
   orderPr,
-} from '../../../../common/services/changelog';
+} from '../../../../common/services/changelog.js';
+import github from '../../../../common/services/github.js';
 
 describe('Unit | Common | Services | Changelog', function () {
   describe('#displayPullRequest', function () {

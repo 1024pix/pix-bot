@@ -1,9 +1,8 @@
-import { expect } from '../../../test-helper.js';
-
-import { Tag } from '../../../../common/models/Tags.js';
+import * as PartialChangeLogGenerator from '../../../../common/models/PartialChangeLogGenerator.js';
 import * as PullRequest from '../../../../common/models/PullRequest.js';
 import * as PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
-import * as PartialChangeLogGenerator from '../../../../common/models/PartialChangeLogGenerator.js';
+import { Tag } from '../../../../common/models/Tags.js';
+import { expect } from '../../../test-helper.js';
 
 describe('Unit | Common | Models | PartialChangeLogGenerator', function () {
   describe('#constructor', function () {

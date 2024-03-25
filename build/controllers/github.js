@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import ScalingoClient from '../../common/services/scalingo-client.js';
+
 import gitHubService from '../../common/services/github.js';
 import * as logger from '../../common/services/logger.js';
+import ScalingoClient from '../../common/services/scalingo-client.js';
 import config from '../../config.js';
 
 const repositoryToScalingoAppsReview = {
@@ -18,6 +19,8 @@ const repositoryToScalingoAppsReview = {
   pix: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
   pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
 };
+
+const __dirname = path.resolve(path.dirname(''));
 
 function getMessageTemplate(repositoryName) {
   const baseDir = path.join(__dirname, '..', 'templates', 'pull-request-messages');
@@ -107,7 +110,7 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
   if (!shouldContinue) {
     return message;
   }
-  let deployedRA = [];
+  const deployedRA = [];
   let client;
   try {
     client = await injectedScalingoClient.getInstance('reviewApps');

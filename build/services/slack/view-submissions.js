@@ -1,7 +1,7 @@
-import * as openModalReleasePublicationConfirmation from './surfaces/modals/publish-release/release-publication-confirmation.js';
-import releases from '../../../common/services/releases.js';
 import github from '../../../common/services/github.js';
+import releases from '../../../common/services/releases.js';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
+import * as openModalReleasePublicationConfirmation from './surfaces/modals/publish-release/release-publication-confirmation.js';
 
 const viewSubmissions = {
   async submitReleaseTypeSelection(payload) {

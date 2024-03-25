@@ -1,12 +1,12 @@
-import * as openModalReleaseDeploymentConfirmation from './surfaces/modals/deploy-release/release-deployment-confirmation.js';
-import * as openModalApplicationCreationConfirmation from './surfaces/modals/scalingo-apps/application-creation-confirmation.js';
-import releases from '../../../common/services/releases.js';
+import { ScalingoAppName } from '../../../common/models/ScalingoAppName.js';
 import github from '../../../common/services/github.js';
+import releases from '../../../common/services/releases.js';
+import ScalingoClient from '../../../common/services/scalingo-client.js';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 import slackGetUserInfos from '../../../common/services/slack/surfaces/user-infos/get-user-infos.js';
-import ScalingoClient from '../../../common/services/scalingo-client.js';
-import { ScalingoAppName } from '../../../common/models/ScalingoAppName.js';
 import config from '../../../config.js';
+import * as openModalReleaseDeploymentConfirmation from './surfaces/modals/deploy-release/release-deployment-confirmation.js';
+import * as openModalApplicationCreationConfirmation from './surfaces/modals/scalingo-apps/application-creation-confirmation.js';
 
 const viewSubmissions = {
   async submitReleaseTagSelection(payload) {

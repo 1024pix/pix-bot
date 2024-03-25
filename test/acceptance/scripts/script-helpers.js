@@ -1,7 +1,7 @@
 import { expect } from 'chai';
+import * as child_process from 'child_process';
 import * as path from 'path';
 import * as util from 'util';
-import * as child_process from 'child_process';
 
 const exec = util.promisify(child_process.exec);
 
@@ -22,4 +22,4 @@ function expectLines(expectedLines, lines) {
   expect(lines).to.have.lengthOf(expectedLines.length);
 }
 
-export { runScriptWithArgument, expectLines };
+export { expectLines, runScriptWithArgument };

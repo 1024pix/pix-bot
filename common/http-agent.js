@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import * as logger from './services/logger.js';
 
 class HttpResponse {

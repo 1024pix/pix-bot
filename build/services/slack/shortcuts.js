@@ -1,6 +1,7 @@
 import axios from 'axios';
-import * as publishReleaseTypeSelectionModal from './surfaces/modals/publish-release/release-type-selection.js';
+
 import conf from '../../../config.js';
+import * as publishReleaseTypeSelectionModal from './surfaces/modals/publish-release/release-type-selection.js';
 
 const slackShorcuts = {
   openViewPublishReleaseTypeSelectionCallbackId: publishReleaseTypeSelectionModal.callbackId,

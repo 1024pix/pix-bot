@@ -1,6 +1,6 @@
-import { expect, sinon, StatusCodes, createGithubWebhookSignatureHeader, nock } from '../../test-helper.js';
-import server from '../../../server.js';
 import config from '../../../config.js';
+import server from '../../../server.js';
+import { createGithubWebhookSignatureHeader, expect, nock, sinon, StatusCodes } from '../../test-helper.js';
 
 describe('Acceptance | Build | Github', function () {
   describe('POST /github/webhook', function () {

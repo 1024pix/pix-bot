@@ -1,11 +1,12 @@
 import pkg from 'lodash';
 const { zipWith, countBy, entries, noop } = pkg;
 
-import { Octokit } from '@octokit/rest';
-import * as fetch from 'node-fetch';
-import * as crypto from 'crypto';
-import * as tsscmp from 'tsscmp';
 import * as Boom from '@hapi/boom';
+import { Octokit } from '@octokit/rest';
+import * as crypto from 'crypto';
+import * as fetch from 'node-fetch';
+import * as tsscmp from 'tsscmp';
+
 import settings from '../../config.js';
 import * as logger from './logger.js';
 
@@ -307,7 +308,7 @@ async function _getPullRequestsFromCommitShaFromGithub({ repoOwner, repoName, co
 }
 
 async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commitsShaList }) {
-  let pullRequests = [];
+  const pullRequests = [];
 
   await Promise.all(
     commitsShaList.map(async (commitSha) => {

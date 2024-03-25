@@ -1,8 +1,7 @@
-import { expect, sinon } from '../../../test-helper.js';
-
-import * as taskAutoScaleWeb from '../../../../run/services/tasks/autoscale-web.js';
 import config from '../../../../config.js';
 import tasksList from '../../../../run/services/tasks.js';
+import * as taskAutoScaleWeb from '../../../../run/services/tasks/autoscale-web.js';
+import { expect, sinon } from '../../../test-helper.js';
 
 describe('Integration | Run | Services | Scheduled Tasks', function () {
   describe('#handler', function () {

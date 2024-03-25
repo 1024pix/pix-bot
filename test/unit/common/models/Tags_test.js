@@ -1,6 +1,5 @@
-import { expect } from '../../../test-helper.js';
-
 import { Tag, Tags } from '../../../../common/models/Tags.js';
+import { expect } from '../../../test-helper.js';
 
 describe('Unit | Common | Models | Tags', function () {
   describe('#getTagByTitle', function () {

@@ -1,7 +1,6 @@
-import { expect, sinon } from '../../test-helper.js';
-
-import { registerSlashCommands } from '../../../common/register-slash-commands.js';
 import { Manifest } from '../../../common/models/Manifest.js';
+import { registerSlashCommands } from '../../../common/register-slash-commands.js';
+import { expect, sinon } from '../../test-helper.js';
 
 describe('Unit | Common | register-slack-commands', function () {
   describe('#registerSlashCommand', function () {

@@ -1,6 +1,6 @@
-import { expect, StatusCodes, nock, sinon } from '../../test-helper.js';
-import server from '../../../server.js';
 import * as logger from '../../../common/services/logger.js';
+import server from '../../../server.js';
+import { expect, nock, sinon, StatusCodes } from '../../test-helper.js';
 
 describe('Acceptance | Build | Scalingo', function () {
   describe('POST build/scalingo/deploy-endpoint', function () {

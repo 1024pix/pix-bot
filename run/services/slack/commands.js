@@ -1,10 +1,11 @@
-import { deploy } from '../deploy.js';
-import config from '../../../config.js';
+import axios from 'axios';
+
+import githubServices from '../../../common/services/github.js';
 import releasesService from '../../../common/services/releases.js';
 import ScalingoClient from '../../../common/services/scalingo-client.js';
-import githubServices from '../../../common/services/github.js';
-import axios from 'axios';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
+import config from '../../../config.js';
+import { deploy } from '../deploy.js';
 
 function sendResponse(responseUrl, text) {
   axios.post(
@@ -232,16 +233,16 @@ async function createAndDeployPixTutosRelease(payload) {
 }
 
 export {
+  createAndDeployDbStats,
+  createAndDeployEmberTestingLibrary,
+  createAndDeployPixAPIData,
+  createAndDeployPixBotRelease,
+  createAndDeployPixDatawarehouse,
+  createAndDeployPixLCMS,
+  createAndDeployPixSiteRelease,
+  createAndDeployPixTutosRelease,
+  createAndDeployPixUI,
   deployAirflow,
   deployDBT,
-  createAndDeployPixLCMS,
-  createAndDeployPixAPIData,
-  createAndDeployPixUI,
-  createAndDeployEmberTestingLibrary,
-  createAndDeployPixSiteRelease,
-  createAndDeployPixDatawarehouse,
-  createAndDeployPixBotRelease,
   getAndDeployLastVersion,
-  createAndDeployDbStats,
-  createAndDeployPixTutosRelease,
 };

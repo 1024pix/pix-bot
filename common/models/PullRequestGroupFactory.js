@@ -1,5 +1,5 @@
-import { Tag } from './Tags.js';
 import * as PullRequestGroup from './PullRequestGroup.js';
+import { Tag } from './Tags.js';
 
 class PullRequestGroupFactory {
   static build() {

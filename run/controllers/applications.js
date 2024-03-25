@@ -1,6 +1,7 @@
-import * as cdnServices from '../services/cdn.js';
-import config from '../../config.js';
 import * as Boom from '@hapi/boom';
+
+import config from '../../config.js';
+import * as cdnServices from '../services/cdn.js';
 
 const applications = {
   async invalidateCdnCache(request) {

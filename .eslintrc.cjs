@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = {
-  root: true,
   extends: [
-    'eslint:recommended',
+    '@1024pix',
     'plugin:mocha/recommended',
     'plugin:prettier/recommended',
-    'plugin:import/recommended',
+    'plugin:chai-expect/recommended',
+    'plugin:n/recommended',
     'plugin:import/recommended',
   ],
   parserOptions: {
@@ -17,6 +17,10 @@ module.exports = {
         plugins: ['importAssertions'],
       },
     },
+  },
+  parser: '@babel/eslint-parser',
+  globals: {
+    include: true,
   },
   env: {
     browser: true,
@@ -31,5 +35,22 @@ module.exports = {
     'mocha/no-hooks-for-single-case': 'off',
     'mocha/no-top-level-hooks': 'error',
     'no-console': 'error',
+    'n/no-unpublished-import': [
+      'error',
+      {
+        allowModules: [
+          'chai',
+          'chai-nock',
+          'sinon',
+          'sinon-chai',
+          'mocha',
+          'proxyquire',
+          'nock',
+          'fs-extra',
+          'simple-git',
+          'http-status-codes',
+        ],
+      },
+    ],
   },
 };

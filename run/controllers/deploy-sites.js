@@ -1,7 +1,8 @@
+import * as Boom from '@hapi/boom';
+
+import github from '../../common/services/github.js';
 import config from '../../config.js';
 import { deploy } from '../services/deploy.js';
-import github from '../../common/services/github.js';
-import * as Boom from '@hapi/boom';
 
 const deploySites = {
   async deploySites(request) {

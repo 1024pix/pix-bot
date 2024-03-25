@@ -1,4 +1,4 @@
-import { Modal, Blocks, Elements, Bits } from 'slack-block-builder';
+import { Bits, Blocks, Elements, Modal } from 'slack-block-builder';
 
 const regions = [
   { id: 'production', name: 'Paris - SecNumCloud - Outscale' },
@@ -42,4 +42,4 @@ const sampleView = () => {
   return modal(regions);
 };
 
-export { applicationCreation, sampleView, callbackId };
+export { applicationCreation, callbackId, sampleView };

@@ -1,4 +1,4 @@
-import { Modal, Blocks } from 'slack-block-builder';
+import { Blocks, Modal } from 'slack-block-builder';
 
 const callbackId = 'application-creation-confirmation';
 
@@ -36,4 +36,4 @@ const sampleView = () => {
   return modal('pix-application-name-recette', 'recette', 'Paris - SecNumCloud - Outscale', 'john.doe@pix.fr');
 };
 
-export { applicationCreationConfirmation, sampleView, callbackId };
+export { applicationCreationConfirmation, callbackId, sampleView };

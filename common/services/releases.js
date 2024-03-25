@@ -1,12 +1,12 @@
-import { promisify } from 'util';
 import * as child_process from 'child_process';
+import { promisify } from 'util';
 
 const exec = promisify(child_process.exec);
 
 import config from '../../config.js';
 import github from './github.js';
-import ScalingoClient from './scalingo-client.js';
 import * as logger from './logger.js';
+import ScalingoClient from './scalingo-client.js';
 
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 

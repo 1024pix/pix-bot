@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { describe, it } from 'mocha';
-import { expect, sinon } from '../../../test-helper.js';
-import server from '../../../../server.js';
+
 import config from '../../../../config.js';
+import server from '../../../../server.js';
+import { expect, sinon } from '../../../test-helper.js';
 
 describe('Integration | Run | Applications', () => {
   describe('#invalidateCdnCache', () => {

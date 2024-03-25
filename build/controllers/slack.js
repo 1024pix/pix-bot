@@ -1,11 +1,12 @@
+import * as _ from 'lodash';
+
 import github from '../../common/services/github.js';
+import * as logger from '../../common/services/logger.js';
 import releases from '../../common/services/releases.js';
+import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
+import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
 import shortcuts from '../services/slack/shortcuts.js';
 import viewSubmissions from '../services/slack/view-submissions.js';
-import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
-import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
-import * as logger from '../../common/services/logger.js';
-import * as _ from 'lodash';
 
 const slack = {
   async getPullRequests(request) {

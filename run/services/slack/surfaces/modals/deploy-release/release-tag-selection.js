@@ -1,4 +1,4 @@
-import { Modal, Blocks, Elements } from 'slack-block-builder';
+import { Blocks, Elements, Modal } from 'slack-block-builder';
 
 const callbackId = 'release-tag-selection';
 
@@ -32,4 +32,4 @@ const sampleView = () => {
   return modal();
 };
 
-export { releaseTagSelection, sampleView, callbackId };
+export { callbackId, releaseTagSelection, sampleView };
