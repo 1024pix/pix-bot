@@ -1,7 +1,7 @@
-const { expect, sinon } = require('../../../test-helper');
+import { expect, sinon } from '../../../test-helper.js';
 
-const { Tag, Tags } = require('../../../../common/models/Tags');
-const PullRequest = require('../../../../common/models/PullRequest');
+import { Tag, Tags } from '../../../../common/models/Tags.js';
+import * as PullRequest from '../../../../common/models/PullRequest.js';
 
 describe('Unit | Common | Models | PullRequest', function () {
   describe('#constructor', function () {

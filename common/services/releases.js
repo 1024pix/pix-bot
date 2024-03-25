@@ -1,14 +1,16 @@
-const util = require('util');
-const exec = util.promisify(require('child_process').exec);
+import { promisify } from 'util';
+import * as child_process from 'child_process';
 
-const config = require('../../config');
-const github = require('./github');
-const ScalingoClient = require('./scalingo-client');
-const logger = require('./logger');
+const exec = promisify(child_process.exec);
+
+import config from '../../config.js';
+import github from './github.js';
+import ScalingoClient from './scalingo-client.js';
+import * as logger from './logger.js';
 
 const RELEASE_PIX_SCRIPT = 'release-pix-repo.sh';
 
-module.exports = {
+const release = {
   environments: {
     recette: 'recette',
     production: 'production',
@@ -83,8 +85,6 @@ module.exports = {
       throw err;
     }
   },
-
-  _runScriptWithArgument,
 };
 
 async function _runScriptWithArgument(scriptFileName, ...args) {
@@ -99,3 +99,5 @@ async function _runScriptWithArgument(scriptFileName, ...args) {
 function _sanitizedArgument(param) {
   return param ? param.trim().toLowerCase() : null;
 }
+
+export default release;

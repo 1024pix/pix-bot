@@ -1,6 +1,6 @@
-const taskAutoscaleWeb = require('../../../../../run/services/tasks/autoscale-web');
-const logger = require('../../../../../common/services/logger');
-const { expect, sinon, catchErr } = require('../../../../test-helper');
+import * as taskAutoscaleWeb from '../../../../../run/services/tasks/autoscale-web.js';
+import * as logger from '../../../../../common/services/logger.js';
+import { expect, sinon, catchErr } from '../../../../test-helper.js';
 
 describe('#task-autoscale-web', function () {
   it('should call autoscale on web container for specified application', async function () {

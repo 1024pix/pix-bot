@@ -1,13 +1,13 @@
-const openModalReleasePublicationConfirmation = require('./surfaces/modals/publish-release/release-publication-confirmation');
-const { environments, deploy, publish } = require('../../../common/services/releases');
-const githubService = require('../../../common/services/github');
-const slackPostMessageService = require('../../../common/services/slack/surfaces/messages/post-message');
+import * as openModalReleasePublicationConfirmation from './surfaces/modals/publish-release/release-publication-confirmation.js';
+import releases from '../../../common/services/releases.js';
+import github from '../../../common/services/github.js';
+import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 
-module.exports = {
+const viewSubmissions = {
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
     const { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails } =
-      await githubService.hasConfigFileChangedSinceLatestRelease();
+      await github.hasConfigFileChangedSinceLatestRelease();
 
     if (hasConfigFileChanged) {
       let pRsAndTeamLabelsMessageList = 'Les Pr et équipes concernées sont : ';
@@ -37,13 +37,15 @@ module.exports = {
     const releaseType = payload.view.private_metadata;
 
     async function _publishAndDeploy({ releaseType, environment }) {
-      const latestReleaseTag = await publish(releaseType);
-      return deploy(environment, latestReleaseTag);
+      const latestReleaseTag = await releases.publish(releaseType);
+      return releases.deploy(environment, latestReleaseTag);
     }
 
-    _publishAndDeploy({ releaseType, environment: environments.recette });
+    _publishAndDeploy({ releaseType, environment: releases.environments.recette });
     return {
       response_action: 'clear',
     };
   },
 };
+
+export default viewSubmissions;

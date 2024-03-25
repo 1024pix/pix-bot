@@ -1,11 +1,13 @@
-const { Octokit } = require('@octokit/rest');
-const fetch = require('node-fetch');
-const { zipWith, countBy, entries, noop } = require('lodash');
-const crypto = require('crypto');
-const tsscmp = require('tsscmp');
-const Boom = require('@hapi/boom');
-const settings = require('../../config');
-const logger = require('./logger');
+import pkg from 'lodash';
+const { zipWith, countBy, entries, noop } = pkg;
+
+import { Octokit } from '@octokit/rest';
+import * as fetch from 'node-fetch';
+import * as crypto from 'crypto';
+import * as tsscmp from 'tsscmp';
+import * as Boom from '@hapi/boom';
+import settings from '../../config.js';
+import * as logger from './logger.js';
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -293,17 +295,6 @@ function _buildOctokitSearchQueryString(params = []) {
   return params.map((p) => `${Object.keys(p)}:${Object.values(p)}`).join('+');
 }
 
-const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) => {
-  const owner = settings.github.owner;
-  const octokit = _createOctokit();
-  await octokit.issues.createComment({
-    owner,
-    repo: repositoryName,
-    issue_number: pullRequestId,
-    body: comment,
-  });
-};
-
 async function _getPullRequestsFromCommitShaFromGithub({ repoOwner, repoName, commitSha }) {
   const { repos } = _createOctokit();
   const { data } = await repos.listPullRequestsAssociatedWithCommit({
@@ -343,7 +334,7 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
-module.exports = {
+const github = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
     const reviewsByPR = await Promise.all(pullRequests.map(({ number }) => _getReviewsFromGithub(number)));
@@ -361,8 +352,6 @@ module.exports = {
   async getLatestReleaseTag(repoName = settings.github.repository) {
     return _getLatestReleaseTagName(settings.github.owner, repoName);
   },
-
-  getLastCommitUrl,
 
   async getCommitAtURL(commitUrl) {
     return _getCommitAtURL(commitUrl);
@@ -443,6 +432,6 @@ module.exports = {
     }
     return true;
   },
-
-  commentPullRequest,
 };
+
+export default github;

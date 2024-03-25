@@ -1,5 +1,5 @@
-const { Tag } = require('./Tags');
-const PullRequestGroup = require('./PullRequestGroup');
+import { Tag } from './Tags.js';
+import * as PullRequestGroup from './PullRequestGroup.js';
 
 class PullRequestGroupFactory {
   static build() {
@@ -32,4 +32,4 @@ class PullRequestGroupFactory {
   }
 }
 
-module.exports = PullRequestGroupFactory;
+export default PullRequestGroupFactory;

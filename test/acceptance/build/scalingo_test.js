@@ -1,6 +1,6 @@
-const { expect, StatusCodes, nock, sinon } = require('../../test-helper');
-const server = require('../../../server');
-const logger = require('../../../common/services/logger');
+import { expect, StatusCodes, nock, sinon } from '../../test-helper.js';
+import server from '../../../server.js';
+import * as logger from '../../../common/services/logger.js';
 
 describe('Acceptance | Build | Scalingo', function () {
   describe('POST build/scalingo/deploy-endpoint', function () {

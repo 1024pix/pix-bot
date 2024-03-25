@@ -1,7 +1,7 @@
-const { postMessage } = require('../../../../../../../common/services/slack/surfaces/messages/post-message');
-const { expect, sinon } = require('../../../../../../test-helper');
-const config = require('../../../../../../../config');
-const logger = require('../../../../../../../common/services/logger');
+import postMessage from '../../../../../../../common/services/slack/surfaces/messages/post-message.js';
+import { expect, sinon } from '../../../../../../test-helper.js';
+import config from '../../../../../../../config.js';
+import * as logger from '../../../../../../../common/services/logger.js';
 
 describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message', function () {
   describe('#postMessage', function () {

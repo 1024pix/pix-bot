@@ -1,9 +1,9 @@
-const { expect } = require('../../../test-helper');
+import { expect } from '../../../test-helper.js';
 
-const { Tag } = require('../../../../common/models/Tags');
-const PullRequest = require('../../../../common/models/PullRequest');
-const PullRequestGroup = require('../../../../common/models/PullRequestGroup');
-const PartialChangeLogGenerator = require('../../../../common/models/PartialChangeLogGenerator');
+import { Tag } from '../../../../common/models/Tags.js';
+import * as PullRequest from '../../../../common/models/PullRequest.js';
+import * as PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
+import * as PartialChangeLogGenerator from '../../../../common/models/PartialChangeLogGenerator.js';
 
 describe('Unit | Common | Models | PartialChangeLogGenerator', function () {
   describe('#constructor', function () {

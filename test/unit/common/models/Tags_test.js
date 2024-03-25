@@ -1,6 +1,6 @@
-const { expect } = require('../../../test-helper');
+import { expect } from '../../../test-helper.js';
 
-const { Tag, Tags } = require('../../../../common/models/Tags');
+import { Tag, Tags } from '../../../../common/models/Tags.js';
 
 describe('Unit | Common | Models | Tags', function () {
   describe('#getTagByTitle', function () {

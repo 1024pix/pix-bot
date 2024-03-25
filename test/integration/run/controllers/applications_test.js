@@ -1,8 +1,8 @@
-const axios = require('axios');
-const { describe, it } = require('mocha');
-const { expect, sinon } = require('../../../test-helper');
-const server = require('../../../../server');
-const config = require('../../../../config');
+import axios from 'axios';
+import { describe, it } from 'mocha';
+import { expect, sinon } from '../../../test-helper.js';
+import server from '../../../../server.js';
+import config from '../../../../config.js';
 
 describe('Integration | Run | Applications', () => {
   describe('#invalidateCdnCache', () => {

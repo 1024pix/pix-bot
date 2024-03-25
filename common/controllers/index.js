@@ -1,24 +1,12 @@
-const { name, version, description } = require('../../package.json');
-const {
-  sampleView: releaseTypeSelection,
-} = require('../../build/services/slack/surfaces/modals/publish-release/release-type-selection');
-const {
-  sampleView: releaseTagSelection,
-} = require('../../run/services/slack/surfaces/modals/deploy-release/release-tag-selection');
-const {
-  sampleView: createAppOnScalingoSelection,
-} = require('../../run/services/slack/surfaces/modals/scalingo-apps/application-creation');
-const {
-  sampleView: releaseDeploymentConfirmation,
-} = require('../../run/services/slack/surfaces/modals/deploy-release/release-deployment-confirmation');
-const {
-  sampleView: releasePublicationConfirmation,
-} = require('../../build/services/slack/surfaces/modals/publish-release/release-publication-confirmation');
-const {
-  sampleView: submitApplicationNameSelection,
-} = require('../../run/services/slack/surfaces/modals/scalingo-apps/application-creation-confirmation');
+import { name, version, description } from '../../package.json';
+import { sampleView as releaseTypeSelection } from '../../build/services/slack/surfaces/modals/publish-release/release-type-selection.js';
+import { sampleView as releaseTagSelection } from '../../run/services/slack/surfaces/modals/deploy-release/release-tag-selection.js';
+import { sampleView as createAppOnScalingoSelection } from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation.js';
+import { sampleView as releaseDeploymentConfirmation } from '../../run/services/slack/surfaces/modals/deploy-release/release-deployment-confirmation.js';
+import { sampleView as releasePublicationConfirmation } from '../../build/services/slack/surfaces/modals/publish-release/release-publication-confirmation.js';
+import { sampleView as submitApplicationNameSelection } from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation-confirmation.js';
 
-module.exports = {
+const controllers = {
   getApiInfo() {
     return {
       name,
@@ -43,3 +31,5 @@ module.exports = {
       .join('<br>');
   },
 };
+
+export default controllers;

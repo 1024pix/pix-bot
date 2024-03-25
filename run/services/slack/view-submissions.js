@@ -1,18 +1,18 @@
-const openModalReleaseDeploymentConfirmation = require('./surfaces/modals/deploy-release/release-deployment-confirmation');
-const openModalApplicationCreationConfirmation = require('./surfaces/modals/scalingo-apps/application-creation-confirmation');
-const { environments, deploy } = require('../../../common/services/releases');
-const githubService = require('../../../common/services/github');
-const slackPostMessageService = require('../../../common/services/slack/surfaces/messages/post-message');
-const slackGetUserInfos = require('../../../common/services/slack/surfaces/user-infos/get-user-infos');
-const ScalingoClient = require('../../../common/services/scalingo-client');
-const { ScalingoAppName } = require('../../../common/models/ScalingoAppName');
-const config = require('../../../config');
+import * as openModalReleaseDeploymentConfirmation from './surfaces/modals/deploy-release/release-deployment-confirmation.js';
+import * as openModalApplicationCreationConfirmation from './surfaces/modals/scalingo-apps/application-creation-confirmation.js';
+import releases from '../../../common/services/releases.js';
+import github from '../../../common/services/github.js';
+import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
+import slackGetUserInfos from '../../../common/services/slack/surfaces/user-infos/get-user-infos.js';
+import ScalingoClient from '../../../common/services/scalingo-client.js';
+import { ScalingoAppName } from '../../../common/models/ScalingoAppName.js';
+import config from '../../../config.js';
 
-module.exports = {
+const viewSubmissions = {
   async submitReleaseTagSelection(payload) {
     const releaseTag = payload.view.state.values['deploy-release-tag']['release-tag-value'].value;
-    const hasConfigFileChanged = await githubService.hasConfigFileChangedInLatestRelease();
-    return openModalReleaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
+    const hasConfigFileChanged = await github.hasConfigFileChangedInLatestRelease();
+    return openModalReleaseDeploymentConfirmation.releaseDeploymentConfirmation(releaseTag, hasConfigFileChanged);
   },
 
   async submitApplicationNameSelection(payload) {
@@ -30,7 +30,7 @@ module.exports = {
         },
       };
     }
-    return openModalApplicationCreationConfirmation(
+    return openModalApplicationCreationConfirmation.applicationCreationConfirmation(
       applicationName,
       applicationEnvironment,
       applicationEnvironmentName,
@@ -44,11 +44,11 @@ module.exports = {
 
   submitReleaseDeploymentConfirmation(payload) {
     const releaseTag = payload.view.private_metadata;
-    if (!githubService.isBuildStatusOK({ tagName: releaseTag.trim().toLowerCase() })) {
+    if (!github.isBuildStatusOK({ tagName: releaseTag.trim().toLowerCase() })) {
       const message = 'MEP bloquée. Etat de l‘environnement de recette à vérifier.';
       slackPostMessageService.postMessage({ message });
     } else {
-      deploy(environments.production, releaseTag);
+      releases.deploy(releases.environments.production, releaseTag);
     }
     return {
       response_action: 'clear',
@@ -68,3 +68,5 @@ module.exports = {
     };
   },
 };
+
+export default viewSubmissions;

@@ -1,13 +1,13 @@
-const {
+import {
   expect,
   nock,
   createGithubWebhookSignatureHeader,
   catchErr,
   sinon,
   StatusCodes,
-} = require('../../../test-helper');
-const githubService = require('../../../../common/services/github');
-const logger = require('../../../../common/services/logger');
+} from '../../../test-helper.js';
+import github from '../../../../common/services/github.js';
+import * as logger from '../../../../common/services/logger.js';
 
 describe('Unit | Build | github-test', function () {
   describe('#getPullRequests', function () {
@@ -50,7 +50,7 @@ describe('Unit | Build | github-test', function () {
       };
 
       // when
-      const response = await githubService.getPullRequests('team-certif');
+      const response = await github.getPullRequests('team-certif');
 
       // then
       expect(response).to.deep.equal(expectedResponse);
@@ -71,7 +71,7 @@ describe('Unit | Build | github-test', function () {
         .reply(200, []);
 
       // when
-      await githubService.getPullRequests('cross-team');
+      await github.getPullRequests('cross-team');
 
       // then
       expect(scopePr.isDone());
@@ -89,7 +89,7 @@ describe('Unit | Build | github-test', function () {
           .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
 
         // when
-        await catchErr(githubService.getPullRequests)('cross-team');
+        await catchErr(github.getPullRequests)('cross-team');
 
         // then
         expect(loggerErrorStub.calledOnce).to.be.true;
@@ -109,7 +109,7 @@ describe('Unit | Build | github-test', function () {
           .reply(StatusCodes.FORBIDDEN, 'API rate limit exceeded for user ID 1. [rate reset in 8m48s]');
 
         // when
-        const error = await catchErr(githubService.getPullRequests)('cross-team');
+        const error = await catchErr(github.getPullRequests)('cross-team');
 
         // then
         expect(error.message).to.deep.equal('Cannot retrieve PR from Github');
@@ -125,7 +125,7 @@ describe('Unit | Build | github-test', function () {
         .reply(200, [{ name: 'v2.171.0' }, { name: 'v2.170.0' }]);
 
       // when
-      const response = await githubService.getLatestReleaseTag();
+      const response = await github.getLatestReleaseTag();
 
       // then
       expect(response).to.equal('v2.171.0');
@@ -138,7 +138,7 @@ describe('Unit | Build | github-test', function () {
         .reply(200, [{ name: 'v2.171.0' }, { name: 'v2.170.0' }]);
 
       // when
-      const response = await githubService.getLatestReleaseTag('given-repository');
+      const response = await github.getLatestReleaseTag('given-repository');
 
       // then
       expect(response).to.equal('v2.171.0');
@@ -183,7 +183,7 @@ describe('Unit | Build | github-test', function () {
         ]);
 
       // when
-      const response = await githubService.getChangelogSinceLatestRelease(repoOwner, repoName);
+      const response = await github.getChangelogSinceLatestRelease(repoOwner, repoName);
 
       // then
       expect(response).to.deep.equal(['PR Protéines', 'PR Légumes']);
@@ -202,10 +202,7 @@ describe('Unit | Build | github-test', function () {
         .reply(200, pullRequests);
 
       // when
-      const response = await githubService.getMergedPullRequestsSortedByDescendingDate(
-        'github-owner',
-        'github-repository',
-      );
+      const response = await github.getMergedPullRequestsSortedByDescendingDate('github-owner', 'github-repository');
 
       // then
       expect(response).to.deep.equal(pullRequests);
@@ -221,7 +218,7 @@ describe('Unit | Build | github-test', function () {
         .reply(200, pullRequests);
 
       // when
-      const response = await githubService.getMergedPullRequestsSortedByDescendingDate(
+      const response = await github.getMergedPullRequestsSortedByDescendingDate(
         'github-owner',
         'github-repository',
         'toto',
@@ -240,7 +237,7 @@ describe('Unit | Build | github-test', function () {
       });
 
       // when
-      const response = await githubService.getCommitAtURL('https://commit-url.github.com');
+      const response = await github.getCommitAtURL('https://commit-url.github.com');
 
       // then
       expect(response).to.deep.equal('some data');
@@ -265,7 +262,7 @@ describe('Unit | Build | github-test', function () {
         });
 
       // when
-      const response = await githubService.isBuildStatusOK({ branchName });
+      const response = await github.isBuildStatusOK({ branchName });
 
       // then
       expect(response).to.equal(true);
@@ -297,7 +294,7 @@ describe('Unit | Build | github-test', function () {
         });
 
       // when
-      const response = await githubService.isBuildStatusOK({ tagName });
+      const response = await github.isBuildStatusOK({ tagName });
 
       // then
       expect(response).to.equal(true);
@@ -361,7 +358,7 @@ describe('Unit | Build | github-test', function () {
           .reply(200, pullRequestsForCommitShaDetails);
 
         // when
-        const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+        const response = await github.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
 
         // then
         expect(response).to.be.deep.equal({
@@ -415,7 +412,7 @@ describe('Unit | Build | github-test', function () {
           .reply(200, pullRequestsForCommitShaDetails);
 
         // when
-        const response = await githubService.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
+        const response = await github.hasConfigFileChangedSinceLatestRelease(repoOwner, repoName);
 
         // then
         expect(response).to.be.deep.equal({
@@ -462,7 +459,7 @@ describe('Unit | Build | github-test', function () {
           .reply(200, { commit: { committer: { date: secondToLastReleaseDate } } });
 
         // when
-        const response = await githubService.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
+        const response = await github.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
         // then
         expect(response).to.be.true;
       });
@@ -493,7 +490,7 @@ describe('Unit | Build | github-test', function () {
           .reply(200, { commit: { committer: { date: secondToLastReleaseDate } } });
 
         // when
-        const response = await githubService.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
+        const response = await github.hasConfigFileChangedInLatestRelease(repoOwner, repoName);
         // then
         expect(response).to.be.false;
       });
@@ -507,7 +504,7 @@ describe('Unit | Build | github-test', function () {
         headers: createGithubWebhookSignatureHeader(JSON.stringify(body)),
         payload: body,
       };
-      expect(githubService.verifyWebhookSignature(request)).to.be.true;
+      expect(github.verifyWebhookSignature(request)).to.be.true;
     });
 
     it('return error when the signature dont match', function () {
@@ -517,7 +514,7 @@ describe('Unit | Build | github-test', function () {
         payload: body,
       };
 
-      expect(githubService.verifyWebhookSignature(request).output.payload.message).to.eql(
+      expect(github.verifyWebhookSignature(request).output.payload.message).to.eql(
         'Github signature verification failed. Signature mismatch.',
       );
     });
@@ -529,7 +526,7 @@ describe('Unit | Build | github-test', function () {
         payload: body,
       };
 
-      expect(githubService.verifyWebhookSignature(request).output.payload.message).to.eql('Github signature is empty.');
+      expect(github.verifyWebhookSignature(request).output.payload.message).to.eql('Github signature is empty.');
     });
   });
 
@@ -546,7 +543,7 @@ describe('Unit | Build | github-test', function () {
         const comment = '# Test \n **awesome comment**';
 
         // when
-        await githubService.commentPullRequest({ repositoryName, pullRequestId, comment });
+        await github.commentPullRequest({ repositoryName, pullRequestId, comment });
 
         // then
         expect(commentNock.isDone()).to.be.true;

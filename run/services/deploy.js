@@ -1,4 +1,4 @@
-const releasesService = require('../../common/services/releases');
+import releasesService from '../../common/services/releases.js';
 
 async function deploy(repoName, appNamesList, releaseTag) {
   const environment = 'production';
@@ -8,6 +8,4 @@ async function deploy(repoName, appNamesList, releaseTag) {
   return releaseTag;
 }
 
-module.exports = {
-  deploy,
-};
+export { deploy };

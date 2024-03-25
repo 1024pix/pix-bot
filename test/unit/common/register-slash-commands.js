@@ -1,7 +1,7 @@
-const { expect, sinon } = require('../../test-helper');
+import { expect, sinon } from '../../test-helper.js';
 
-const { registerSlashCommands } = require('../../../common/register-slash-commands');
-const { Manifest } = require('../../../common/models/Manifest');
+import { registerSlashCommands } from '../../../common/register-slash-commands.js';
+import { Manifest } from '../../../common/models/Manifest.js';
 
 describe('Unit | Common | register-slack-commands', function () {
   describe('#registerSlashCommand', function () {

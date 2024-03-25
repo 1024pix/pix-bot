@@ -1,6 +1,6 @@
-const { expect, StatusCodes } = require('../../test-helper');
-const server = require('../../../server');
-const { version } = require('../../../package.json');
+import { expect, StatusCodes } from '../../test-helper.js';
+import server from '../../../server.js';
+import { version } from '../../../package.json';
 
 describe('Acceptance | Common | Index', function () {
   describe('on every route', function () {

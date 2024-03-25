@@ -1,8 +1,7 @@
-const { describe, it } = require('mocha');
-const { catchErr, expect, nock } = require('../../../test-helper');
-const config = require('../../../../config');
-
-const cdn = require('../../../../run/services/cdn');
+import { describe, it } from 'mocha';
+import { catchErr, expect, nock } from '../../../test-helper.js';
+import config from '../../../../config.js';
+import * as cdn from '../../../../run/services/cdn.js';
 
 function _stubAccountDetails(namespace) {
   return nock('https://console.baleen.cloud/api', {

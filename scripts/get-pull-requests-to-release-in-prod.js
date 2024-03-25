@@ -2,16 +2,16 @@
 
 /* eslint no-console: off */
 
-const fs = require('fs');
+import * as fs from 'fs';
 
-const github = require('../common/services/github');
-const {
+import github from '../common/services/github';
+import {
   getTagReleaseDate,
   filterPullRequest,
   getNewChangeLogLines,
   getHeadOfChangelog,
   generateChangeLogContent,
-} = require('../common/services/changelog');
+} from '../common/services/changelog';
 
 const CHANGELOG_FILE = 'CHANGELOG.md';
 

@@ -1,5 +1,5 @@
-const { expect, sinon } = require('../../../test-helper');
-const logger = require('../../../../common/services/logger');
+import { expect, sinon } from '../../../test-helper.js';
+import { error, info, warn } from '../../../../common/services/logger.js';
 
 describe('logger', function () {
   const injectedLoggerFunction = {
@@ -8,7 +8,7 @@ describe('logger', function () {
     warn: 'warn',
   };
 
-  ['error', 'info', 'warn'].forEach((level) => {
+  [error, info, warn].forEach((level) => {
     describe(level, function () {
       describe('when an message is passed', function () {
         it(`should call injectedLogger ${level}`, function () {
@@ -19,7 +19,7 @@ describe('logger', function () {
           const data = { ctx: 'context', meta: 'metadata' };
 
           // when
-          logger[level]({ event: 'toto', message: 'titi', stack: 'stack', data }, injectedLogger, true);
+          level({ event: 'toto', message: 'titi', stack: 'stack', data }, injectedLogger, true);
           // then
           expect(injectedLogger[functionToStub].calledOnce).to.be.true;
           expect(injectedLogger[functionToStub].firstCall.args[0]).to.equal(
@@ -37,7 +37,7 @@ describe('logger', function () {
           const data = { ctx: 'context', meta: 'metadata' };
 
           // when
-          logger[level]({ event: 'toto', message: { foo: 'bar' }, stack: 'stack', data }, injectedLogger, true);
+          level({ event: 'toto', message: { foo: 'bar' }, stack: 'stack', data }, injectedLogger, true);
 
           // then
           expect(injectedLogger[functionToStub].calledOnce).to.be.true;

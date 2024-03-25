@@ -1,14 +1,15 @@
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-const config = require('./config');
-const server = require('./server');
-const { createCronJob } = require('./common/services/cron-job');
-const githubServices = require('./common/services/github');
-const { deploy } = require('./run/services/deploy');
-const ecoModeService = require('./build/services/eco-mode-service');
-const logger = require('./common/services/logger');
-const taskScheluder = require('./run/services/task-scheduler');
-const { tasks } = require('./run/services/tasks');
+import config from './config.js';
+import server from './server.js';
+import { createCronJob } from './common/services/cron-job.js';
+import github from './common/services/github.js';
+import { deploy } from './run/services/deploy.js';
+import ecoModeService from './build/services/eco-mode-service.js';
+import * as logger from './common/services/logger.js';
+import { taskScheluder } from './run/services/task-scheduler.js';
+import tasks from './run/services/tasks.js';
 
 const init = async () => {
   await ecoModeService.start();
@@ -17,7 +18,7 @@ const init = async () => {
     'Deploy Pix site',
     async () => {
       const repoName = config.PIX_SITE_REPO_NAME;
-      const releaseTag = await githubServices.getLatestReleaseTag(repoName);
+      const releaseTag = await github.getLatestReleaseTag(repoName);
       deploy(repoName, config.PIX_SITE_APPS, releaseTag);
     },
     config.pixSiteDeploy.schedule,

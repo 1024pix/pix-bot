@@ -1,10 +1,10 @@
-const dayjs = require('dayjs');
-const { sortBy, indexOf } = require('lodash');
-const github = require('./github');
+import * as dayjs from 'dayjs';
+import { sortBy, indexOf } from 'lodash';
+import github from './github.js';
 
-const PartialChangeLogGenerator = require('../models/PartialChangeLogGenerator');
-const PullRequest = require('../models/PullRequest');
-const PullRequestGroupFactory = require('../models/PullRequestGroupFactory');
+import * as PartialChangeLogGenerator from '../models/PartialChangeLogGenerator.js';
+import * as PullRequest from '../models/PullRequest.js';
+import PullRequestGroupFactory from '../models/PullRequestGroupFactory.js';
 
 const CHANGELOG_HEADER_LINES = 2;
 
@@ -59,7 +59,7 @@ function getNewChangeLogLines({ headOfChangelogTitle, pullRequests }) {
   return partialChangeLogGenerator.getLinesToDisplay();
 }
 
-module.exports = {
+export {
   displayPullRequest,
   filterPullRequest,
   generateChangeLogContent,

@@ -1,6 +1,6 @@
-const indexController = require('../controllers');
+import indexController from '../controllers/index.js';
 
-module.exports = [
+const routeIndex = [
   {
     method: 'GET',
     path: '/',
@@ -12,3 +12,5 @@ module.exports = [
     handler: indexController.getSlackViews,
   },
 ];
+
+export default routeIndex;

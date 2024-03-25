@@ -1,4 +1,4 @@
-const { Modal, Blocks } = require('slack-block-builder');
+import { Modal, Blocks } from 'slack-block-builder';
 
 const callbackId = 'release-deployment-confirmation';
 
@@ -23,15 +23,15 @@ function modal(releaseTag, hasConfigFileChanged) {
   ]);
 }
 
-module.exports = (releaseTag, hasConfigFileChanged) => {
+const releaseDeploymentConfirmation = (releaseTag, hasConfigFileChanged) => {
   return {
     response_action: 'push',
     view: modal(releaseTag, hasConfigFileChanged).buildToObject(),
   };
 };
 
-module.exports.sampleView = () => {
+const sampleView = () => {
   return modal('v6.6.6', true);
 };
 
-module.exports.callbackId = callbackId;
+export { releaseDeploymentConfirmation, sampleView, callbackId };
