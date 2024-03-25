@@ -1,4 +1,4 @@
-import { Tags } from './Tags';
+import { Tags } from './Tags.js';
 
 class PullRequestGroup {
   constructor({ tagToGrab, groupTitle }) {

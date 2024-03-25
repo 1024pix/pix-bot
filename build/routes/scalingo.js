@@ -1,4 +1,4 @@
-import scalingoController from '../../build/controllers/scalingo';
+import scalingoController from '../../build/controllers/scalingo.js';
 
 const scalingo = [
   {
