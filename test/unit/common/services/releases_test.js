@@ -1,9 +1,10 @@
-import { describe, it } from 'mocha';
-import * as sinon from 'sinon';
-import * as proxyquire from 'proxyquire';
 import { expect } from 'chai';
-import ScalingoClient from '../../../../common/services/scalingo-client.js';
+import { describe, it } from 'mocha';
+import * as proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+
 import github from '../../../../common/services/github.js';
+import ScalingoClient from '../../../../common/services/scalingo-client.js';
 
 describe('releases', function () {
   let exec;

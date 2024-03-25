@@ -3,24 +3,22 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import * as path from 'path';
 import * as Hapi from '@hapi/hapi';
-import config from './config.js';
-import * as runDeployConfiguration from './run/deploy-configuration.js';
-import { registerSlashCommands } from './common/register-slash-commands.js';
-import runManifest from './run/manifest.js';
+
 import buildManifest from './build/manifest.js';
+import githubRoutes from './build/routes/github.js';
+import buildRoutesManifest from './build/routes/manifest.js';
+import scalingoRoutes from './build/routes/scalingo.js';
 import { commonConfig } from './common/config.js';
 import * as preResponseHandler from './common/pre-response-handler.js';
-import * as fs from 'fs';
-import * as url from 'url';
-import githubRoutes from './build/routes/github.js';
+import { registerSlashCommands } from './common/register-slash-commands.js';
 import commonRoutesIndex from './common/routes/index.js';
-import runRoutesManifest from './run/routes/manifest.js';
-import buildRoutesManifest from './build/routes/manifest.js';
+import config from './config.js';
+import * as runDeployConfiguration from './run/deploy-configuration.js';
+import runManifest from './run/manifest.js';
 import runRoutesApplication from './run/routes/applications.js';
-import scalingoRoutes from './build/routes/scalingo.js';
 import deploySitesRoutes from './run/routes/deploy-sites.js';
+import runRoutesManifest from './run/routes/manifest.js';
 
 const manifests = [runManifest, buildManifest];
 const setupErrorHandling = function (server) {

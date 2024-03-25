@@ -1,7 +1,8 @@
 import axios from 'axios';
+
+import config from '../../../config.js';
 import * as deployReleaseTagSelectionModal from './surfaces/modals/deploy-release/release-tag-selection.js';
 import * as createAppOnScalingoModal from './surfaces/modals/scalingo-apps/application-creation.js';
-import config from '../../../config.js';
 
 const openViewUrl = 'https://slack.com/api/views.open';
 

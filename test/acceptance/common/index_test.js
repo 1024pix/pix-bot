@@ -1,6 +1,6 @@
-import { expect, StatusCodes } from '../../test-helper.js';
-import server from '../../../server.js';
 import { version } from '../../../package.json';
+import server from '../../../server.js';
+import { expect, StatusCodes } from '../../test-helper.js';
 
 describe('Acceptance | Common | Index', function () {
   describe('on every route', function () {

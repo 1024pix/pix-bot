@@ -1,6 +1,5 @@
-import { expect } from '../../../test-helper.js';
-
 import { Manifest } from '../../../../common/models/Manifest.js';
+import { expect } from '../../../test-helper.js';
 
 describe('Unit | Common | Models | Manifest', function () {
   describe('#constructor', function () {

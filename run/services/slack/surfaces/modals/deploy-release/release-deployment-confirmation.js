@@ -1,4 +1,4 @@
-import { Modal, Blocks } from 'slack-block-builder';
+import { Blocks, Modal } from 'slack-block-builder';
 
 const callbackId = 'release-deployment-confirmation';
 
@@ -34,4 +34,4 @@ const sampleView = () => {
   return modal('v6.6.6', true);
 };
 
-export { releaseDeploymentConfirmation, sampleView, callbackId };
+export { callbackId, releaseDeploymentConfirmation, sampleView };

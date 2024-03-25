@@ -1,4 +1,4 @@
-import { Modal, Blocks, Elements, Bits } from 'slack-block-builder';
+import { Bits, Blocks, Elements, Modal } from 'slack-block-builder';
 
 const callbackId = 'release-type-selection';
 
@@ -56,4 +56,4 @@ const sampleView = () => {
   return modal();
 };
 
-export { releaseTypeSelection, sampleView, callbackId };
+export { callbackId, releaseTypeSelection, sampleView };

@@ -1,7 +1,8 @@
 import { describe, it } from 'mocha';
-import { catchErr, expect, nock } from '../../../test-helper.js';
+
 import config from '../../../../config.js';
 import * as cdn from '../../../../run/services/cdn.js';
+import { catchErr, expect, nock } from '../../../test-helper.js';
 
 function _stubAccountDetails(namespace) {
   return nock('https://console.baleen.cloud/api', {
@@ -109,7 +110,7 @@ describe('Integration | CDN', () => {
           const namespace = 'Pix_Namespace';
           const namespaceKey = 'namespace-key1';
           let called = 0;
-          let expectedCallCount = 1 + config.baleen.CDNInvalidationRetryCount;
+          const expectedCallCount = 1 + config.baleen.CDNInvalidationRetryCount;
 
           _stubAccountDetails(namespace);
 
@@ -150,7 +151,7 @@ describe('Integration | CDN', () => {
           const namespace = 'Pix_Namespace';
           const namespaceKey = 'namespace-key1';
           let called = 0;
-          let expectedCallCount = 1;
+          const expectedCallCount = 1;
 
           _stubAccountDetails(namespace);
 

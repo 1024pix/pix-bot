@@ -1,15 +1,14 @@
 import * as chai from 'chai';
 const { expect } = chai;
-import * as sinon from 'sinon';
-import * as nock from 'nock';
+import chaiNock from 'chai-nock';
 import * as crypto from 'crypto';
-import config from '../config.js';
-
 import { StatusCodes } from 'http-status-codes';
 import * as _ from 'lodash';
-
+import * as nock from 'nock';
+import * as sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import chaiNock from 'chai-nock';
+
+import config from '../config.js';
 
 chai.use(sinonChai);
 chai.use(chaiNock);
@@ -165,13 +164,13 @@ function createScalingoTokenNock() {
 // eslint-disable-next-line mocha/no-exports
 export {
   catchErr,
-  expect,
-  nock,
-  sinon,
   createGithubWebhookSignatureHeader,
   createScalingoTokenNock,
   createSlackWebhookSignatureHeaders,
+  expect,
+  nock,
   nockGithubWithConfigChanges,
   nockGithubWithNoConfigChanges,
+  sinon,
   StatusCodes,
 };

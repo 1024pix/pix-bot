@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { catchErr, expect, sinon } from '../../../test-helper.js';
 import * as githubController from '../../../../build/controllers/github.js';
-
 import * as githubService from '../../../../common/services/github.js';
 import config from '../../../../config.js';
+import { catchErr, expect, sinon } from '../../../test-helper.js';
+
+const __dirname = path.resolve(path.dirname(''));
 
 describe('Unit | Controller | Github', function () {
   describe('#getMessageTemplate', function () {
@@ -108,7 +109,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
           };
 
-          let injectedPushOnDefaultBranchWebhook = sinon.stub();
+          const injectedPushOnDefaultBranchWebhook = sinon.stub();
 
           // when
           await githubController.processWebhook(request, { injectedPushOnDefaultBranchWebhook });
@@ -130,7 +131,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             // given
             sinon.stub(request, 'payload').value({ action });
 
-            let injectedPullRequestOpenedWebhook = sinon.stub();
+            const injectedPullRequestOpenedWebhook = sinon.stub();
 
             // when
             await githubController.processWebhook(request, { injectedPullRequestOpenedWebhook });
@@ -144,7 +145,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           // given
           sinon.stub(request, 'payload').value({ action: 'synchronize' });
 
-          let injectedPullRequestSynchronizeWebhook = sinon.stub();
+          const injectedPullRequestSynchronizeWebhook = sinon.stub();
 
           // when
           await githubController.processWebhook(request, { injectedPullRequestSynchronizeWebhook });

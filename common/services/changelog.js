@@ -1,10 +1,10 @@
 import * as dayjs from 'dayjs';
-import { sortBy, indexOf } from 'lodash';
-import github from './github.js';
+import { indexOf, sortBy } from 'lodash';
 
 import * as PartialChangeLogGenerator from '../models/PartialChangeLogGenerator.js';
 import * as PullRequest from '../models/PullRequest.js';
 import PullRequestGroupFactory from '../models/PullRequestGroupFactory.js';
+import github from './github.js';
 
 const CHANGELOG_HEADER_LINES = 2;
 
@@ -64,7 +64,7 @@ export {
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,
-  getTagReleaseDate,
   getNewChangeLogLines,
+  getTagReleaseDate,
   orderPr,
 };

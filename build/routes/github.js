@@ -1,5 +1,5 @@
-import { commonConfig } from '../../common/config.js';
 import { processWebhook } from '../../build/controllers/github.js';
+import { commonConfig } from '../../common/config.js';
 
 const github = [
   {

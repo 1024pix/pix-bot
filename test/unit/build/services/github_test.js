@@ -1,13 +1,13 @@
+import github from '../../../../common/services/github.js';
+import * as logger from '../../../../common/services/logger.js';
 import {
+  catchErr,
+  createGithubWebhookSignatureHeader,
   expect,
   nock,
-  createGithubWebhookSignatureHeader,
-  catchErr,
   sinon,
   StatusCodes,
 } from '../../../test-helper.js';
-import github from '../../../../common/services/github.js';
-import * as logger from '../../../../common/services/logger.js';
 
 describe('Unit | Build | github-test', function () {
   describe('#getPullRequests', function () {
@@ -58,15 +58,14 @@ describe('Unit | Build | github-test', function () {
 
     it('should call the Github API with the label', async function () {
       // given
-      let scopePr, scopeReview;
       const items = [{ html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [{ name: 'cross-team' }] }];
-      scopePr = nock('https://api.github.com')
+      const scopePr = nock('https://api.github.com')
         .get(
           '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Across-team&sort=updated&order=desc',
         )
         .reply(200, { items });
 
-      scopeReview = nock('https://api.github.com')
+      const scopeReview = nock('https://api.github.com')
         .get('/repos/github-owner/github-repository/pulls/0/reviews')
         .reply(200, []);
 
@@ -74,8 +73,8 @@ describe('Unit | Build | github-test', function () {
       await github.getPullRequests('cross-team');
 
       // then
-      expect(scopePr.isDone());
-      expect(scopeReview.isDone());
+      expect(scopePr.isDone()).to.be.true;
+      expect(scopeReview.isDone()).to.be.true;
     });
 
     describe('when Github API rate-limit is exceeded', function () {

@@ -1,5 +1,5 @@
-import { verifySignatureAndParseBody as verifySlackSignatureAndParseBody } from './services/slack/security.js';
 import github from './services/github.js';
+import { verifySignatureAndParseBody as verifySlackSignatureAndParseBody } from './services/slack/security.js';
 
 const commonConfig = {
   slackConfig: {

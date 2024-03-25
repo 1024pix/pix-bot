@@ -1,8 +1,9 @@
 import * as dayjs from 'dayjs';
-import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
-import { Message, Section, Context, Attachment } from 'slack-block-builder';
-import config from '../../config.js';
+import { Attachment, Context, Message, Section } from 'slack-block-builder';
+
 import * as logger from '../../common/services/logger.js';
+import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
+import config from '../../config.js';
 
 function getSlackMessageAttachments(payload) {
   const appName = payload.app_name;

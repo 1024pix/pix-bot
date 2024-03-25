@@ -1,9 +1,7 @@
-import { expect } from '../../../test-helper.js';
-
 import * as PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
-import { Tag } from '../../../../common/models/Tags.js';
-
 import PullRequestGroupFactory from '../../../../common/models/PullRequestGroupFactory.js';
+import { Tag } from '../../../../common/models/Tags.js';
+import { expect } from '../../../test-helper.js';
 
 describe('Unit | Common | Models | PullRequestGroupFactory', function () {
   describe('#build', function () {

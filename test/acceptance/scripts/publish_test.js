@@ -1,14 +1,14 @@
 import { expect } from 'chai';
-
-import * as path from 'path';
+import * as dayjs from 'dayjs';
 import * as fs from 'fs-extra';
 import * as os from 'os';
+import * as path from 'path';
 import * as simpleGit from 'simple-git';
-import * as dayjs from 'dayjs';
 
-import { runScriptWithArgument, expectLines } from './script-helpers.js';
+import { expectLines, runScriptWithArgument } from './script-helpers.js';
 
 const scriptName = 'publish.sh';
+const __dirname = path.resolve(path.dirname(''));
 
 // You are entering a world of pain
 // To update this test you need to update the github repository https://github.com/1024pix/pix-bot-publish-test

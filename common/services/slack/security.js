@@ -1,7 +1,8 @@
+import * as Boom from '@hapi/boom';
 import * as crypto from 'crypto';
 import * as querystring from 'querystring';
 import * as tsscmp from 'tsscmp';
-import * as Boom from '@hapi/boom';
+
 import config from '../../../config.js';
 import * as logger from '../logger.js';
 
