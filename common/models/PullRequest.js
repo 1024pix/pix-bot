@@ -1,4 +1,4 @@
-import { Tags } from './Tags';
+import { Tags } from './Tags.js';
 
 class PullRequest {
   constructor({ html_url, number, title }) {

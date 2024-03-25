@@ -7,7 +7,6 @@ import slackGetUserInfos from '../../../common/services/slack/surfaces/user-info
 import ScalingoClient from '../../../common/services/scalingo-client.js';
 import { ScalingoAppName } from '../../../common/models/ScalingoAppName.js';
 import config from '../../../config.js';
-import {applicationCreationConfirmation} from './surfaces/modals/scalingo-apps/application-creation-confirmation.js';
 
 const viewSubmissions = {
   async submitReleaseTagSelection(payload) {

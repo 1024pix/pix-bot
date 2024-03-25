@@ -1,10 +1,10 @@
 import { name, version, description } from '../../package.json';
-import { sampleView as releaseTypeSelection } from '../../build/services/slack/surfaces/modals/publish-release/release-type-selection';
-import { sampleView as releaseTagSelection } from '../../run/services/slack/surfaces/modals/deploy-release/release-tag-selection';
-import { sampleView as createAppOnScalingoSelection } from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation';
-import { sampleView as releaseDeploymentConfirmation } from '../../run/services/slack/surfaces/modals/deploy-release/release-deployment-confirmation';
-import { sampleView as releasePublicationConfirmation } from '../../build/services/slack/surfaces/modals/publish-release/release-publication-confirmation';
-import { sampleView as submitApplicationNameSelection } from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation-confirmation';
+import { sampleView as releaseTypeSelection } from '../../build/services/slack/surfaces/modals/publish-release/release-type-selection.js';
+import { sampleView as releaseTagSelection } from '../../run/services/slack/surfaces/modals/deploy-release/release-tag-selection.js';
+import { sampleView as createAppOnScalingoSelection } from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation.js';
+import { sampleView as releaseDeploymentConfirmation } from '../../run/services/slack/surfaces/modals/deploy-release/release-deployment-confirmation.js';
+import { sampleView as releasePublicationConfirmation } from '../../build/services/slack/surfaces/modals/publish-release/release-publication-confirmation.js';
+import { sampleView as submitApplicationNameSelection } from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation-confirmation.js';
 
 const controllers = {
   getApiInfo() {
