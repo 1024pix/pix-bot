@@ -1,6 +1,13 @@
-import { expect, nock, createGithubWebhookSignatureHeader, catchErr, sinon, StatusCodes } from '../../../test-helper';
-import github from '../../../../common/services/github';
-import * as logger from '../../../../common/services/logger';
+import {
+  expect,
+  nock,
+  createGithubWebhookSignatureHeader,
+  catchErr,
+  sinon,
+  StatusCodes,
+} from '../../../test-helper.js';
+import github from '../../../../common/services/github.js';
+import * as logger from '../../../../common/services/logger.js';
 
 describe('Unit | Build | github-test', function () {
   describe('#getPullRequests', function () {

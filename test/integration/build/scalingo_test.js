@@ -1,6 +1,6 @@
-import { expect, sinon } from '../../test-helper';
-import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message';
-import server from '../../../server';
+import { expect, sinon } from '../../test-helper.js';
+import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
+import server from '../../../server.js';
 import { describe } from 'mocha';
 
 describe('Integration | Build | Scalingo', function () {

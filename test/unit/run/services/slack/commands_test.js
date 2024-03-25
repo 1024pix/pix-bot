@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import axios from 'axios';
-import { catchErr, sinon } from '../../../../test-helper';
+import { catchErr, sinon } from '../../../../test-helper.js';
 import {
   createAndDeployPixLCMS,
   createAndDeployPixAPIData,
@@ -13,10 +13,10 @@ import {
   getAndDeployLastVersion,
   createAndDeployDbStats,
   createAndDeployPixTutosRelease,
-} from '../../../../../run/services/slack/commands';
-import releasesServices from '../../../../../common/services/releases';
-import githubServices from '../../../../../common/services/github';
-import ScalingoClient from '../../../../../common/services/scalingo-client';
+} from '../../../../../run/services/slack/commands.js';
+import releasesServices from '../../../../../common/services/releases.js';
+import githubServices from '../../../../../common/services/github.js';
+import ScalingoClient from '../../../../../common/services/scalingo-client.js';
 
 describe('Unit | Run | Services | Slack | Commands', () => {
   beforeEach(function () {

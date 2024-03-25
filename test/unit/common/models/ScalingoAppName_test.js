@@ -1,6 +1,6 @@
-import { expect } from '../../../test-helper';
+import { expect } from '../../../test-helper.js';
 
-import { ScalingoAppName } from '../../../../common/models/ScalingoAppName';
+import { ScalingoAppName } from '../../../../common/models/ScalingoAppName.js';
 
 /* eslint no-console: off */
 

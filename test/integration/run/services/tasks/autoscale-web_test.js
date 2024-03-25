@@ -1,6 +1,6 @@
-import * as taskAutoscaleWeb from '../../../../../run/services/tasks/autoscale-web';
-import * as logger from '../../../../../common/services/logger';
-import { expect, sinon, catchErr } from '../../../../test-helper';
+import * as taskAutoscaleWeb from '../../../../../run/services/tasks/autoscale-web.js';
+import * as logger from '../../../../../common/services/logger.js';
+import { expect, sinon, catchErr } from '../../../../test-helper.js';
 
 describe('#task-autoscale-web', function () {
   it('should call autoscale on web container for specified application', async function () {

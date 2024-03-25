@@ -8,4 +8,4 @@ const deploySites = [
   },
 ];
 
-export { deploySites };
+export default deploySites;

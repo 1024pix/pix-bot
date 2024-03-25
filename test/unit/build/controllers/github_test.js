@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { catchErr, expect, sinon } from '../../../test-helper';
-import * as githubController from '../../../../build/controllers/github';
+import { catchErr, expect, sinon } from '../../../test-helper.js';
+import * as githubController from '../../../../build/controllers/github.js';
 
-import * as githubService from '../../../../common/services/github';
+import * as githubService from '../../../../common/services/github.js';
 import config from '../../../../config.js';
 
 describe('Unit | Controller | Github', function () {

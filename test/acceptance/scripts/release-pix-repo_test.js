@@ -5,7 +5,7 @@ import * as os from 'os';
 import * as simpleGit from 'simple-git';
 import * as dayjs from 'dayjs';
 
-import { runScriptWithArgument, expectLines } from './script-helpers';
+import { runScriptWithArgument, expectLines } from './script-helpers.js';
 
 const scriptName = 'release-pix-repo.sh';
 

@@ -1,7 +1,7 @@
-import { expect, sinon } from '../../../test-helper';
+import { expect, sinon } from '../../../test-helper.js';
 
-import { Tag, Tags } from '../../../../common/models/Tags';
-import * as PullRequest from '../../../../common/models/PullRequest';
+import { Tag, Tags } from '../../../../common/models/Tags.js';
+import * as PullRequest from '../../../../common/models/PullRequest.js';
 
 describe('Unit | Common | Models | PullRequest', function () {
   describe('#constructor', function () {

@@ -1,5 +1,5 @@
-import { fromBranch } from '../../../common/deployer';
-import { expect, nock } from '../../test-helper';
+import { fromBranch } from '../../../common/deployer.js';
+import { expect, nock } from '../../test-helper.js';
 
 describe('Integration | Common | Deployer', function () {
   describe('#fromBranch', function () {

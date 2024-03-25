@@ -1,6 +1,6 @@
-import { expect, sinon } from '../../../test-helper';
-import * as logger from '../../../../common/services/logger';
-import * as taskScheluder from '../../../../run/services/task-scheduler';
+import { expect, sinon } from '../../../test-helper.js';
+import * as logger from '../../../../common/services/logger.js';
+import * as taskScheluder from '../../../../run/services/task-scheduler.js';
 
 describe('Integration | Run | Services | schedule-task', function () {
   let clock;

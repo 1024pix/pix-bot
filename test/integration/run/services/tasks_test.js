@@ -1,6 +1,6 @@
-import { expect, sinon } from '../../../test-helper';
+import { expect, sinon } from '../../../test-helper.js';
 
-import * as taskAutoScaleWeb from '../../../../run/services/tasks/autoscale-web';
+import * as taskAutoScaleWeb from '../../../../run/services/tasks/autoscale-web.js';
 import config from '../../../../config.js';
 import tasksList from '../../../../run/services/tasks.js';
 

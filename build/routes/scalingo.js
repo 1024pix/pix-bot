@@ -8,4 +8,4 @@ const scalingo = [
   },
 ];
 
-export { scalingo };
+export default scalingo;

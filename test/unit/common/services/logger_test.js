@@ -1,5 +1,5 @@
-import { expect, sinon } from '../../../test-helper';
-import { error, info, warn } from '../../../../common/services/logger';
+import { expect, sinon } from '../../../test-helper.js';
+import { error, info, warn } from '../../../../common/services/logger.js';
 
 describe('logger', function () {
   const injectedLoggerFunction = {
