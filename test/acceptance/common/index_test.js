@@ -1,4 +1,6 @@
-import { version } from '../../../package.json';
+import pkg from '../../../package.json' assert { type: 'json' };
+const { version } = pkg;
+
 import server from '../../../server.js';
 import { expect, StatusCodes } from '../../test-helper.js';
 
