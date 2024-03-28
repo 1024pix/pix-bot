@@ -1,6 +1,6 @@
 import { Tags } from './Tags.js';
 
-class PullRequestGroup {
+export default class PullRequestGroup {
   constructor({ tagToGrab, groupTitle }) {
     if (!Tags.isValidTag(tagToGrab)) {
       throw new TypeError('A valid Tag must be used');
@@ -30,5 +30,3 @@ class PullRequestGroup {
       : [];
   }
 }
-
-export { PullRequestGroup };

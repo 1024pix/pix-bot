@@ -1,4 +1,4 @@
-import * as PullRequest from '../../../../common/models/PullRequest.js';
+import PullRequest from '../../../../common/models/PullRequest.js';
 import { Tag, Tags } from '../../../../common/models/Tags.js';
 import { expect, sinon } from '../../../test-helper.js';
 

@@ -1,4 +1,4 @@
-import * as PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
+import PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
 import PullRequestGroupFactory from '../../../../common/models/PullRequestGroupFactory.js';
 import { Tag } from '../../../../common/models/Tags.js';
 import { expect } from '../../../test-helper.js';

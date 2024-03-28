@@ -1,8 +1,8 @@
 import * as dayjs from 'dayjs';
-import { indexOf, sortBy } from 'lodash';
+import * as _ from 'lodash';
 
-import * as PartialChangeLogGenerator from '../models/PartialChangeLogGenerator.js';
-import * as PullRequest from '../models/PullRequest.js';
+import PartialChangeLogGenerator from '../models/PartialChangeLogGenerator.js';
+import PullRequest from '../models/PullRequest.js';
 import PullRequestGroupFactory from '../models/PullRequestGroupFactory.js';
 import github from './github.js';
 
@@ -21,9 +21,9 @@ function displayPullRequest(pr) {
 
 function orderPr(listPR) {
   const typeOrder = ['BREAKING', 'FEATURE', 'BUGFIX', 'TECH', 'BUMP'];
-  return sortBy(listPR, (pr) => {
+  return _.sortBy(listPR, (pr) => {
     const typeOfPR = pr.title.substring(1, pr.title.indexOf(']'));
-    const typeIndex = indexOf(typeOrder, typeOfPR);
+    const typeIndex = _.indexOf(typeOrder, typeOfPR);
     return typeIndex < 0 ? Number.MAX_VALUE : typeIndex;
   });
 }

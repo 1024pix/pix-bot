@@ -4,8 +4,8 @@ import chaiNock from 'chai-nock';
 import * as crypto from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 import * as _ from 'lodash';
-import * as nock from 'nock';
-import * as sinon from 'sinon';
+import nock from 'nock';
+import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import config from '../config.js';

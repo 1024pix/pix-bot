@@ -1,6 +1,6 @@
-import * as PartialChangeLogGenerator from '../../../../common/models/PartialChangeLogGenerator.js';
-import * as PullRequest from '../../../../common/models/PullRequest.js';
-import * as PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
+import PartialChangeLogGenerator from '../../../../common/models/PartialChangeLogGenerator.js';
+import PullRequest from '../../../../common/models/PullRequest.js';
+import PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
 import { Tag } from '../../../../common/models/Tags.js';
 import { expect } from '../../../test-helper.js';
 

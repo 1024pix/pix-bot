@@ -1,4 +1,4 @@
-import * as PullRequestGroup from './PullRequestGroup.js';
+import PullRequestGroup from './PullRequestGroup.js';
 import { Tag } from './Tags.js';
 
 class PullRequestGroupFactory {

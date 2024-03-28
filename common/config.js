@@ -14,7 +14,7 @@ const commonConfig = {
     payload: {
       allow: ['application/json'],
     },
-    pre: [{ method: github.verifyGithubSignature }],
+    pre: [{ method: github.verifyWebhookSignature }],
   },
 };
 
