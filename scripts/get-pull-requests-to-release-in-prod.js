@@ -50,7 +50,7 @@ async function main() {
 
   try {
     currentChangeLog = fs.readFileSync(CHANGELOG_FILE, 'utf-8').split('\n');
-  } catch (error) {
+  } catch (_) {
     console.log('Changelog file does not exist. It will be created.');
     currentChangeLog = [`# ${repoName} Changelog\n`, '\n'];
   }

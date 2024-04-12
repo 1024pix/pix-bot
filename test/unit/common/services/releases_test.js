@@ -30,7 +30,7 @@ describe('Unit | release', function () {
   });
 
   describe('#deploy', function () {
-    it('should return application deployment status', async () => {
+    it('should return application deployment status', async function () {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
@@ -42,7 +42,7 @@ describe('Unit | release', function () {
       expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK']);
     });
 
-    it('should ask scalingo to deploy applications', async () => {
+    it('should ask scalingo to deploy applications', async function () {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
@@ -63,7 +63,7 @@ describe('Unit | release', function () {
       ]);
     });
 
-    it('should sanitize release tag', async () => {
+    it('should sanitize release tag', async function () {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();
@@ -77,7 +77,7 @@ describe('Unit | release', function () {
       expect(scalingoClient.deployFromArchive.firstCall.args[1]).to.equal('v1.0.0');
     });
 
-    it('should throw an error when an application deployment fails', async () => {
+    it('should throw an error when an application deployment fails', async function () {
       // given
       const scalingoClient = new ScalingoClient(null, 'production');
       scalingoClient.deployFromArchive = sinon.stub();

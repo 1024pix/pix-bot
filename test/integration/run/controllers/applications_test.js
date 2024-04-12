@@ -5,9 +5,9 @@ import { config } from '../../../../config.js';
 import server from '../../../../server.js';
 import { expect, sinon } from '../../../test-helper.js';
 
-describe('Integration | Run | Applications', () => {
-  describe('#invalidateCdnCache', () => {
-    it('should throw unauthorized error when api key provide are bad', async () => {
+describe('Integration | Run | Applications', function () {
+  describe('#invalidateCdnCache', function () {
+    it('should throw unauthorized error when api key provide are bad', async function () {
       // given
       const badApiKey = 'bad-api-key';
 
@@ -21,8 +21,8 @@ describe('Integration | Run | Applications', () => {
       expect(response.statusCode).to.equal(401);
     });
 
-    describe('Success case', () => {
-      it('should return a HTTP response with status code 200', async () => {
+    describe('Success case', function () {
+      it('should return a HTTP response with status code 200', async function () {
         // given
         const apiKey = config.openApi.authorizationToken;
         const namespace = 'Pix_Namespace';
@@ -40,9 +40,9 @@ describe('Integration | Run | Applications', () => {
       });
     });
 
-    describe('Fail case', () => {
+    describe('Fail case', function () {
       context('When application not have equivalent in namespace', function () {
-        it('should return a HTTP response with status code 400', async () => {
+        it('should return a HTTP response with status code 400', async function () {
           // given
           const apiKey = config.openApi.authorizationToken;
           const application = 'Not-existing-application';

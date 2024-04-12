@@ -10,7 +10,7 @@ describe('Integration | Build | Scalingo', function () {
   });
 
   describe('POST /build/scalingo/deploy-endpoint', function () {
-    describe('when scalingo build status is "build-error" ', () => {
+    describe('when scalingo build status is "build-error" ', function () {
       it('should send slack message and return 200', async function () {
         // Given
         const body = {
@@ -86,7 +86,7 @@ describe('Integration | Build | Scalingo', function () {
       });
     });
 
-    describe('when scalingo build status is not "build-error" ', () => {
+    describe('when scalingo build status is not "build-error" ', function () {
       it('should not send slack message and return 200', async function () {
         // Given
         const body = {

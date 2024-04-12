@@ -6,7 +6,7 @@ import ScalingoClient from '../../../../common/services/scalingo-client.js';
 import { config } from '../../../../config.js';
 import { sinon } from '../../../test-helper.js';
 
-describe('Scalingo client', () => {
+describe('Scalingo client', function () {
   beforeEach(function () {
     config.github.token = 'github-personal-access-token';
   });
@@ -15,11 +15,11 @@ describe('Scalingo client', () => {
     config.github.token = null;
   });
 
-  describe('#ScalingoClient.getInstance', () => {
-    it('should return the Scalingo client instance for recette', async () => {
+  describe('#ScalingoClient.getInstance', function () {
+    it('should return the Scalingo client instance for recette', async function () {
       // given
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return sinon.stub();
         },
       };
@@ -31,10 +31,10 @@ describe('Scalingo client', () => {
       expect(scalingoClient.client).to.exist;
     });
 
-    it('should return the Scalingo client instance for production', async () => {
+    it('should return the Scalingo client instance for production', async function () {
       // given
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return sinon.stub();
         },
       };
@@ -46,7 +46,7 @@ describe('Scalingo client', () => {
       expect(scalingoClient.client).to.exist;
     });
 
-    it('should throw an error when no token is provided', async () => {
+    it('should throw an error when no token is provided', async function () {
       // given
       sinon.stub(config.scalingo, 'integration').value({
         token: undefined,
@@ -61,10 +61,10 @@ describe('Scalingo client', () => {
       }
     });
 
-    it('should throw an error when scalingo authentication failed', async () => {
+    it('should throw an error when scalingo authentication failed', async function () {
       // given
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           throw new Error('Invalid credentials');
         },
       };
@@ -81,14 +81,14 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#ScalingoClient.deployFromArchive', () => {
+  describe('#ScalingoClient.deployFromArchive', function () {
     let createDeploymentStub;
     let scalingoClient;
 
     beforeEach(async function () {
       createDeploymentStub = sinon.stub();
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Deployments: { create: createDeploymentStub } };
         },
       };
@@ -96,7 +96,7 @@ describe('Scalingo client', () => {
       scalingoClient = await ScalingoClient.getInstance('production', clientStub);
     });
 
-    it('should not deploy without app given', async () => {
+    it('should not deploy without app given', async function () {
       try {
         await scalingoClient.deployFromArchive(null, 'v1.0');
         expect.fail('Should throw an error when no application given');
@@ -105,7 +105,7 @@ describe('Scalingo client', () => {
       }
     });
 
-    it('should not deploy without a release tag given', async () => {
+    it('should not deploy without a release tag given', async function () {
       try {
         await scalingoClient.deployFromArchive('pix-app', null);
         expect.fail('Should throw an error when no release tag given');
@@ -114,7 +114,7 @@ describe('Scalingo client', () => {
       }
     });
 
-    it('should deploy an application for a given tag', async () => {
+    it('should deploy an application for a given tag', async function () {
       // given
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0');
@@ -127,7 +127,7 @@ describe('Scalingo client', () => {
       expect(result).to.be.equal('pix-app-production v1.0 has been deployed');
     });
 
-    it('should deploy an application without the environment suffix', async () => {
+    it('should deploy an application without the environment suffix', async function () {
       // given
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', undefined, { withEnvSuffix: false });
@@ -135,7 +135,7 @@ describe('Scalingo client', () => {
       expect(result).to.be.equal('pix-app v1.0 has been deployed');
     });
 
-    it('should deploy an application for a given repository', async () => {
+    it('should deploy an application for a given repository', async function () {
       // given
       // when
       const result = await scalingoClient.deployFromArchive('pix-app', 'v1.0', 'given-repository');
@@ -147,7 +147,7 @@ describe('Scalingo client', () => {
       expect(result).to.be.equal('pix-app-production v1.0 has been deployed');
     });
 
-    it('should fail when application does not exists', async () => {
+    it('should fail when application does not exists', async function () {
       // given
       sinon.stub(console, 'error');
       createDeploymentStub.rejects(new Error());
@@ -161,14 +161,14 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#ScalingoClient.deployUsingSCM', () => {
+  describe('#ScalingoClient.deployUsingSCM', function () {
     let manualDeployStub;
     let scalingoClient;
 
     beforeEach(async function () {
       manualDeployStub = sinon.stub();
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { SCMRepoLinks: { manualDeploy: manualDeployStub } };
         },
       };
@@ -176,12 +176,12 @@ describe('Scalingo client', () => {
       scalingoClient = await ScalingoClient.getInstance('production', clientStub);
     });
 
-    it('should deploy an application for a given tag', async () => {
+    it('should deploy an application for a given tag', async function () {
       await scalingoClient.deployUsingSCM('pix-app-production', 'v1.0');
       expect(manualDeployStub).to.have.been.calledOnceWithExactly('pix-app-production', 'v1.0');
     });
 
-    it('should fail when application does not exists', async () => {
+    it('should fail when application does not exists', async function () {
       // given
       sinon.stub(console, 'error');
       manualDeployStub.rejects(new Error());
@@ -195,7 +195,7 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#Scalingo.getAppInfo', () => {
+  describe('#Scalingo.getAppInfo', function () {
     let clientAppsFind;
     let clientDeploymentsFind;
     let scalingoClient;
@@ -208,7 +208,7 @@ describe('Scalingo client', () => {
       axiosGet = sinon.stub(axios, 'get');
 
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return {
             Apps: { find: clientAppsFind },
             Deployments: { find: clientDeploymentsFind },
@@ -219,7 +219,7 @@ describe('Scalingo client', () => {
       scalingoClient = await ScalingoClient.getInstance('production', clientStub);
     });
 
-    it('should return app info', async () => {
+    it('should return app info', async function () {
       // given
       clientAppsFind.withArgs('pix-app-production').resolves({
         id: '5e6660f0623d3a000f479124',
@@ -239,7 +239,7 @@ describe('Scalingo client', () => {
       expect(appInfos[0].url).to.equal('https://app.pix.fr');
     });
 
-    it('should return last deployment info', async () => {
+    it('should return last deployment info', async function () {
       // given
       clientAppsFind.withArgs('pix-app-production').resolves({
         last_deployment_id: 'deployment-id-1',
@@ -261,7 +261,7 @@ describe('Scalingo client', () => {
       expect(appInfos[0].lastDeployedVersion).to.equal('v1.1.1');
     });
 
-    it('should return application status when UP', async () => {
+    it('should return application status when UP', async function () {
       // given
       clientAppsFind.withArgs('pix-app-production').resolves({
         url: 'https://app.pix.fr',
@@ -278,7 +278,7 @@ describe('Scalingo client', () => {
       expect(appInfos[0].isUp).to.equal(true);
     });
 
-    it('should return application status when DOWN', async () => {
+    it('should return application status when DOWN', async function () {
       // given
       clientAppsFind.withArgs('pix-app-production').resolves({
         url: 'https://app.pix.fr',
@@ -295,7 +295,7 @@ describe('Scalingo client', () => {
       expect(appInfos[0].isUp).to.equal(false);
     });
 
-    it('should return production info by default with short name', async () => {
+    it('should return production info by default with short name', async function () {
       // given
       clientAppsFind.withArgs('pix-app-production').resolves({
         id: '5e6660f0623d3a000f479124',
@@ -315,7 +315,7 @@ describe('Scalingo client', () => {
       expect(appInfos[0].url).to.equal('https://app.pix.fr');
     });
 
-    it('should return correct app with full name', async () => {
+    it('should return correct app with full name', async function () {
       // given
       clientAppsFind.withArgs('pix-app-recette').resolves({
         id: '5e6660f0623d3a000f479124',
@@ -334,7 +334,7 @@ describe('Scalingo client', () => {
       expect(appInfos[0].url).to.equal('https://app.recette.pix.fr');
     });
 
-    it('should suffix api url with /api', async () => {
+    it('should suffix api url with /api', async function () {
       // given
       clientAppsFind.withArgs('pix-api-production').resolves({
         url: 'https://api.pix.fr',
@@ -352,7 +352,7 @@ describe('Scalingo client', () => {
       expect(axiosSpy.called).to.equal(true);
     });
 
-    it('should return all production app info', async () => {
+    it('should return all production app info', async function () {
       // given
       clientAppsFind.withArgs('pix-api-production').resolves({
         url: 'https://api.pix.fr',
@@ -402,7 +402,7 @@ describe('Scalingo client', () => {
       expect(certifPing.called).to.equal(true);
     });
 
-    it('should throw an error if app does not exist', async () => {
+    it('should throw an error if app does not exist', async function () {
       // given
       clientAppsFind.withArgs('pix-toto-production').rejects({ status: 404 });
 
@@ -416,14 +416,14 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#Scalingo.deployReviewApp', () => {
+  describe('#Scalingo.deployReviewApp', function () {
     let manualReviewApp;
     let scalingoClient;
 
     beforeEach(async function () {
       manualReviewApp = sinon.stub();
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return {
             SCMRepoLinks: {
               manualReviewApp,
@@ -435,7 +435,7 @@ describe('Scalingo client', () => {
       scalingoClient = await ScalingoClient.getInstance('reviewApps', clientStub);
     });
 
-    it('should call manualReviewApp', async () => {
+    it('should call manualReviewApp', async function () {
       // given
       manualReviewApp.withArgs('pix-app-review', 1).resolves();
 
@@ -447,14 +447,14 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#Scalingo.disableAutoDeploy', () => {
+  describe('#Scalingo.disableAutoDeploy', function () {
     let update;
     let scalingoClient;
 
     beforeEach(async function () {
       update = sinon.stub();
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return {
             SCMRepoLinks: {
               update,
@@ -466,7 +466,7 @@ describe('Scalingo client', () => {
       scalingoClient = await ScalingoClient.getInstance('reviewApps', clientStub);
     });
 
-    it('should call update', async () => {
+    it('should call update', async function () {
       // given
       update.withArgs('pix-app-review').resolves();
 
@@ -478,8 +478,8 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#Scalingo.createApplication', () => {
-    it('should return application identifier', async () => {
+  describe('#Scalingo.createApplication', function () {
+    it('should return application identifier', async function () {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
@@ -487,7 +487,7 @@ describe('Scalingo client', () => {
       updateApplicationStub.resolves();
 
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
         },
       };
@@ -501,14 +501,14 @@ describe('Scalingo client', () => {
       expect(actual).to.equal(1);
     });
 
-    it('should call create with application name', async () => {
+    it('should call create with application name', async function () {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
       createApplicationStub.resolves({ id: 1 });
       updateApplicationStub.resolves();
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
         },
       };
@@ -521,14 +521,14 @@ describe('Scalingo client', () => {
       expect(createApplicationStub).to.have.been.calledOnceWithExactly({ name: 'pix-application-recette' });
     });
 
-    it('should call update with valid options', async () => {
+    it('should call update with valid options', async function () {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
       createApplicationStub.resolves({ id: 1 });
       updateApplicationStub.resolves();
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
         },
       };
@@ -541,7 +541,7 @@ describe('Scalingo client', () => {
       expect(updateApplicationStub).to.have.been.calledOnceWithExactly(1, { force_https: true, router_logs: true });
     });
 
-    it('should throw when scalingo client throw an error', async () => {
+    it('should throw when scalingo client throw an error', async function () {
       // given
       const createApplicationStub = sinon.stub();
       const updateApplicationStub = sinon.stub();
@@ -550,7 +550,7 @@ describe('Scalingo client', () => {
         name: 'foo',
       });
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Apps: { create: createApplicationStub, update: updateApplicationStub } };
         },
       };
@@ -569,8 +569,8 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#Scalingo.updateAutoscaler', () => {
-    it('should update web autoscaler for one application', async () => {
+  describe('#Scalingo.updateAutoscaler', function () {
+    it('should update web autoscaler for one application', async function () {
       // given
       const forAutoscalerStub = sinon.stub();
       const updateAutoscalerStub = sinon.stub();
@@ -589,7 +589,7 @@ describe('Scalingo client', () => {
       updateAutoscalerStub.resolves();
 
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
         },
       };
@@ -610,7 +610,7 @@ describe('Scalingo client', () => {
         .be.true;
     });
 
-    it('should throw when web autoscaler not found', async () => {
+    it('should throw when web autoscaler not found', async function () {
       // given
       const forAutoscalerStub = sinon.stub();
       const updateAutoscalerStub = sinon.stub();
@@ -625,7 +625,7 @@ describe('Scalingo client', () => {
       updateAutoscalerStub.resolves();
 
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
         },
       };
@@ -650,7 +650,7 @@ describe('Scalingo client', () => {
       expect(updateAutoscalerStub.called).to.be.false;
     });
 
-    it('should throw when autoscaler not found', async () => {
+    it('should throw when autoscaler not found', async function () {
       // given
       const forAutoscalerStub = sinon.stub();
       const updateAutoscalerStub = sinon.stub();
@@ -660,7 +660,7 @@ describe('Scalingo client', () => {
       updateAutoscalerStub.resolves();
 
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
         },
       };
@@ -684,7 +684,7 @@ describe('Scalingo client', () => {
       expect(actual.message).to.equal("Aucun autoscaler trouvé pour l'application 'pix-application-recette'");
     });
 
-    it('should throw when autoscaler api return undefined', async () => {
+    it('should throw when autoscaler api return undefined', async function () {
       // given
       const forAutoscalerStub = sinon.stub();
       const updateAutoscalerStub = sinon.stub();
@@ -694,7 +694,7 @@ describe('Scalingo client', () => {
       updateAutoscalerStub.resolves();
 
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
         },
       };
@@ -718,7 +718,7 @@ describe('Scalingo client', () => {
       expect(actual.message).to.equal("Aucun autoscaler trouvé pour l'application 'pix-application-recette'");
     });
 
-    it('should throw when autoscaler api return null', async () => {
+    it('should throw when autoscaler api return null', async function () {
       // given
       const forAutoscalerStub = sinon.stub();
       const updateAutoscalerStub = sinon.stub();
@@ -728,7 +728,7 @@ describe('Scalingo client', () => {
       updateAutoscalerStub.resolves();
 
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return { Autoscalers: { for: forAutoscalerStub, update: updateAutoscalerStub } };
         },
       };
@@ -753,14 +753,14 @@ describe('Scalingo client', () => {
     });
   });
 
-  describe('#Scalingo.reviewAppExists', () => {
+  describe('#Scalingo.reviewAppExists', function () {
     let clientAppsFind;
     let scalingoClient;
 
     beforeEach(async function () {
       clientAppsFind = sinon.stub();
       const clientStub = {
-        clientFromToken: async () => {
+        clientFromToken: async function () {
           return {
             Apps: { find: clientAppsFind },
           };
@@ -769,7 +769,7 @@ describe('Scalingo client', () => {
       scalingoClient = await ScalingoClient.getInstance('production', clientStub);
     });
 
-    it('should return true when review app exists', async () => {
+    it('should return true when review app exists', async function () {
       //given
       const reviewAppName = 'reviewApp';
       clientAppsFind.withArgs(reviewAppName).resolves({ name: reviewAppName });
@@ -779,7 +779,7 @@ describe('Scalingo client', () => {
       expect(exists).to.be.true;
     });
 
-    it('should return false when review app does not exist', async () => {
+    it('should return false when review app does not exist', async function () {
       //given
       const reviewAppName = 'reviewApp';
       clientAppsFind.withArgs(reviewAppName).rejects({ status: 404 });
@@ -789,7 +789,7 @@ describe('Scalingo client', () => {
       expect(exists).to.be.false;
     });
 
-    it('should return throw an error when Scalingo API call fails', async () => {
+    it('should return throw an error when Scalingo API call fails', async function () {
       //given
       const reviewAppName = 'reviewApp';
       clientAppsFind.withArgs(reviewAppName).rejects({ status: 500, message: 'API unavailable' });
