@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 
 import github from '../../common/services/github.js';
-import * as logger from '../../common/services/logger.js';
+import { logger } from '../../common/services/logger.js';
 import releases from '../../common/services/releases.js';
 import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';

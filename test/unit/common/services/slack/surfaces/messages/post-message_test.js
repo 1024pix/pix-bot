@@ -1,4 +1,4 @@
-import * as logger from '../../../../../../../common/services/logger.js';
+import { logger } from '../../../../../../../common/services/logger.js';
 import postMessage from '../../../../../../../common/services/slack/surfaces/messages/post-message.js';
 import config from '../../../../../../../config.js';
 import { expect, sinon } from '../../../../../../test-helper.js';
@@ -38,6 +38,7 @@ describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message'
       const errorLoggerStub = sinon.stub(logger, 'error');
       const slackErrorResponse = { isSuccessful: true, data: { ok: false, error: 'not_in_channel' } };
       const httpAgent = { post: sinon.stub().resolves(slackErrorResponse) };
+
       //when
       await postMessage({
         message: messageToSend,

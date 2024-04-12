@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import gitHubService from '../../common/services/github.js';
-import * as logger from '../../common/services/logger.js';
+import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import config from '../../config.js';
 

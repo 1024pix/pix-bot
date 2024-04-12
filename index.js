@@ -4,7 +4,7 @@ dotenv.config();
 import ecoModeService from './build/services/eco-mode-service.js';
 import { createCronJob } from './common/services/cron-job.js';
 import github from './common/services/github.js';
-import * as logger from './common/services/logger.js';
+import { logger } from './common/services/logger.js';
 import config from './config.js';
 import { deploy } from './run/services/deploy.js';
 import { taskScheluder } from './run/services/task-scheduler.js';

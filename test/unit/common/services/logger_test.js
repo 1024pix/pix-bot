@@ -1,4 +1,4 @@
-import { error, info, warn } from '../../../../common/services/logger.js';
+import { logger } from '../../../../common/services/logger.js';
 import { expect, sinon } from '../../../test-helper.js';
 
 describe('logger', function () {
@@ -8,7 +8,7 @@ describe('logger', function () {
     warn: 'warn',
   };
 
-  [error, info, warn].forEach((level) => {
+  [logger.error, logger.info, logger.warn].forEach((level) => {
     describe(`${level}`, function () {
       describe('when an message is passed', function () {
         it(`should call injectedLogger ${level}`, function () {

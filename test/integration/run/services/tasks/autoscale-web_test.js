@@ -1,4 +1,4 @@
-import * as logger from '../../../../../common/services/logger.js';
+import { logger } from '../../../../../common/services/logger.js';
 import * as taskAutoscaleWeb from '../../../../../run/services/tasks/autoscale-web.js';
 import { catchErr, expect, sinon } from '../../../../test-helper.js';
 

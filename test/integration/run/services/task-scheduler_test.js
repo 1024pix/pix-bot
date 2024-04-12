@@ -1,4 +1,4 @@
-import * as logger from '../../../../common/services/logger.js';
+import { logger } from '../../../../common/services/logger.js';
 import * as taskScheluder from '../../../../run/services/task-scheduler.js';
 import { expect, sinon } from '../../../test-helper.js';
 

@@ -1,5 +1,5 @@
 import github from '../../../../common/services/github.js';
-import * as logger from '../../../../common/services/logger.js';
+import { logger } from '../../../../common/services/logger.js';
 import {
   catchErr,
   createGithubWebhookSignatureHeader,

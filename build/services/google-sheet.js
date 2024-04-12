@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as _ from 'lodash';
 
-import * as logger from '../../common/services/logger.js';
+import { logger } from '../../common/services/logger.js';
 import settings from '../../config.js';
 
 const URL_SPREADSHEET_API = 'https://sheets.googleapis.com/v4/spreadsheets/';

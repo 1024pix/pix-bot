@@ -1,6 +1,6 @@
 import config from '../../../../../config.js';
 import { httpAgent } from '../../../../http-agent.js';
-import * as logger from '../../../logger.js';
+import { logger } from '../../../logger.js';
 
 async function postMessage({ message, attachments, channel = '#tech-releases', injectedHttpAgent = httpAgent }) {
   const url = 'https://slack.com/api/chat.postMessage';

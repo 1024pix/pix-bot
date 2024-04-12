@@ -1,4 +1,4 @@
-import * as logger from '../../common/services/logger.js';
+import { logger } from '../../common/services/logger.js';
 import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
 import { getAppStatusFromScalingo } from '../services/slack/app-status-from-scalingo.js';
 import * as commands from '../services/slack/commands.js';

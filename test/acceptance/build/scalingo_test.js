@@ -1,4 +1,4 @@
-import * as logger from '../../../common/services/logger.js';
+import { logger } from '../../../common/services/logger.js';
 import server from '../../../server.js';
 import { expect, nock, sinon, StatusCodes } from '../../test-helper.js';
 

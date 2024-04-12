@@ -1,7 +1,7 @@
 import ReviewAppManager from '@1024pix/scalingo-review-app-manager';
 ReviewAppManager.ReviewAppManager;
 
-import * as logger from '../../common/services/logger.js';
+import { logger } from '../../common/services/logger.js';
 import config from '../../config.js';
 
 const ecoModeService = {

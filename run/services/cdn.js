@@ -3,7 +3,7 @@ import * as axiosRetry from 'axios-retry';
 axiosRetry.default;
 import * as _ from 'lodash';
 
-import * as logger from '../../common/services/logger.js';
+import { logger } from '../../common/services/logger.js';
 import config from '../../config.js';
 
 const CDN_URL = 'https://console.baleen.cloud/api';

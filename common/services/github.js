@@ -8,7 +8,7 @@ import * as fetch from 'node-fetch';
 import * as tsscmp from 'tsscmp';
 
 import settings from '../../config.js';
-import * as logger from './logger.js';
+import { logger } from './logger.js';
 
 const color = {
   'team-evaluation': '#FDEEC1',

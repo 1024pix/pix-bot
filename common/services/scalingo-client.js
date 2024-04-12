@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as scalingo from 'scalingo';
 
 import config from '../../config.js';
-import * as logger from './logger.js';
+import { logger } from './logger.js';
 
 const DEFAULT_OPTS = { withEnvSuffix: true };
 

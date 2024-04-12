@@ -4,7 +4,7 @@ import * as querystring from 'querystring';
 import * as tsscmp from 'tsscmp';
 
 import config from '../../../config.js';
-import * as logger from '../logger.js';
+import { logger } from '../logger.js';
 
 function verifyRequestSignature(signingSecret, body, signature, requestTimestamp) {
   if (signature === undefined || requestTimestamp === undefined) {
