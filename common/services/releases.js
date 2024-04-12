@@ -1,8 +1,6 @@
 import * as child_process from 'child_process';
 import { promisify } from 'util';
 
-const exec = promisify(child_process.exec);
-
 import config from '../../config.js';
 import github from './github.js';
 import { logger } from './logger.js';
@@ -16,7 +14,7 @@ const release = {
     production: 'production',
   },
 
-  async publish(releaseType, branchName) {
+  async publish(releaseType, branchName, exec = promisify(child_process.exec)) {
     const scriptFileName = 'publish.sh';
     try {
       const sanitizedReleaseType = _sanitizedArgument(releaseType);
@@ -24,6 +22,7 @@ const release = {
       const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${config.github.repository}.git`;
       const newPackageVersion = await _runScriptWithArgument(
         scriptFileName,
+        exec,
         sanitizedReleaseType,
         repositoryURL,
         sanitizedBranchName,
@@ -50,14 +49,14 @@ const release = {
     return results;
   },
 
-  async publishPixRepo(repoName, releaseType) {
+  async publishPixRepo(repoName, releaseType, exec = promisify(child_process.exec)) {
     try {
       const sanitizedReleaseType = _sanitizedArgument(releaseType);
       const sanitizedRepoName = _sanitizedArgument(repoName);
       const branchName = await github.getDefaultBranch(config.github.owner, sanitizedRepoName);
       const repositoryURL = `https://${config.github.token}@github.com/${config.github.owner}/${sanitizedRepoName}.git`;
       const args = [config.github.owner, sanitizedRepoName, sanitizedReleaseType, branchName, repositoryURL];
-      const newPackageVersion = await _runScriptWithArgument(RELEASE_PIX_SCRIPT, ...args);
+      const newPackageVersion = await _runScriptWithArgument(RELEASE_PIX_SCRIPT, exec, ...args);
       logger.info({
         event: 'release',
         message: `Type: ${releaseType} | Reponame : ${repoName} | Repo URL : ${repositoryURL} | Package version : ${newPackageVersion}`,
@@ -87,7 +86,7 @@ const release = {
   },
 };
 
-async function _runScriptWithArgument(scriptFileName, ...args) {
+async function _runScriptWithArgument(scriptFileName, exec, ...args) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
   const { stdout, stderr } = await exec(`${scriptsDirectory}/${scriptFileName} ${args.join(' ')}`);
   logger.error({ event: 'release', message: `stdout: ${stdout}` });
@@ -100,4 +99,4 @@ function _sanitizedArgument(param) {
   return param ? param.trim().toLowerCase() : null;
 }
 
-export default release;
+export { release };

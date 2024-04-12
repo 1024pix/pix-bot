@@ -1,5 +1,5 @@
 import github from '../../../common/services/github.js';
-import releases from '../../../common/services/releases.js';
+import { release } from '../../../common/services/releases.js';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 import * as openModalReleasePublicationConfirmation from './surfaces/modals/publish-release/release-publication-confirmation.js';
 
@@ -37,11 +37,11 @@ const viewSubmissions = {
     const releaseType = payload.view.private_metadata;
 
     async function _publishAndDeploy({ releaseType, environment }) {
-      const latestReleaseTag = await releases.publish(releaseType);
-      return releases.deploy(environment, latestReleaseTag);
+      const latestReleaseTag = await release.publish(releaseType);
+      return release.deploy(environment, latestReleaseTag);
     }
 
-    _publishAndDeploy({ releaseType, environment: releases.environments.recette });
+    _publishAndDeploy({ releaseType, environment: release.environments.recette });
     return {
       response_action: 'clear',
     };

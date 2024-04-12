@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import githubServices from '../../../common/services/github.js';
-import releasesService from '../../../common/services/releases.js';
+import { release } from '../../../common/services/releases.js';
 import ScalingoClient from '../../../common/services/scalingo-client.js';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 import config from '../../../config.js';
@@ -44,7 +44,7 @@ async function _publishPixUI(repoName, releaseType, responseUrl) {
     releaseType = 'minor';
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
-  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
+  const releaseTagAfterRelease = await release.publishPixRepo(repoName, releaseType);
 
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
@@ -60,7 +60,7 @@ async function _publishAndDeployEmberTestingLibrary(repoName, releaseType, respo
     releaseType = 'minor';
   }
   const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
-  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
+  const releaseTagAfterRelease = await release.publishPixRepo(repoName, releaseType);
 
   if (releaseTagBeforeRelease === releaseTagAfterRelease) {
     sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
@@ -76,7 +76,7 @@ async function _publishAndDeployRelease(repoName, appNamesList = [], releaseType
     if (_isReleaseTypeInvalid(releaseType)) {
       releaseType = 'minor';
     }
-    const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
+    const releaseTagAfterRelease = await release.publishPixRepo(repoName, releaseType);
     await deploy(repoName, appNamesList, releaseTagAfterRelease);
 
     sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, appNamesList.join(', ')));
@@ -90,7 +90,7 @@ async function _publishAndDeployReleaseWithAppsByEnvironment(repoName, appsByEnv
     releaseType = 'minor';
   }
 
-  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
+  const releaseTagAfterRelease = await release.publishPixRepo(repoName, releaseType);
 
   await Promise.all(
     Object.keys(appsByEnv).map(async (scalingoEnv) => {
@@ -120,7 +120,7 @@ async function _getAndDeployLastVersion({ appName }) {
   }
 
   const shortAppName = appNameParts[0] + '-' + appNameParts[1];
-  await releasesService.deployPixRepo(config.PIX_REPO_NAME, shortAppName, lastReleaseTag, environment);
+  await release.deployPixRepo(config.PIX_REPO_NAME, shortAppName, lastReleaseTag, environment);
 }
 
 function _isAppFromPixRepo({ appName }) {

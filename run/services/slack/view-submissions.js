@@ -1,6 +1,6 @@
 import { ScalingoAppName } from '../../../common/models/ScalingoAppName.js';
 import github from '../../../common/services/github.js';
-import releases from '../../../common/services/releases.js';
+import { release } from '../../../common/services/releases.js';
 import ScalingoClient from '../../../common/services/scalingo-client.js';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 import slackGetUserInfos from '../../../common/services/slack/surfaces/user-infos/get-user-infos.js';

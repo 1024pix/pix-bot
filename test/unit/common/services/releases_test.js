@@ -1,21 +1,16 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import proxyquire from 'proxyquire';
 import * as sinon from 'sinon';
 
+import { release } from '../../../../common/services/releases.js';
 import github from '../../../../common/services/github.js';
 import ScalingoClient from '../../../../common/services/scalingo-client.js';
 
-describe('releases', function () {
+describe('Unit | release', function () {
   let exec;
-  let releasesService;
 
   beforeEach(function () {
     exec = sinon.stub().callsFake(async () => Promise.resolve({ stdout: 'some heavy logs\n3.14.0\n', stderr: '' }));
-    releasesService = proxyquire('../../../../common/services/releases', {
-      child_process: { exec },
-      util: { promisify: (fn) => fn },
-    });
   });
 
   describe('#deployPixRepo', function () {
@@ -27,7 +22,7 @@ describe('releases', function () {
       sinon.stub(ScalingoClient, 'getInstance').withArgs('production').resolves(scalingoClient);
 
       // when
-      const response = await releasesService.deployPixRepo('Pix-Site', 'app-name', 'V1.0.0 ', 'production');
+      const response = await release.deployPixRepo('Pix-Site', 'app-name', 'V1.0.0 ', 'production');
 
       // then
       expect(response).to.equal('OK');
@@ -42,7 +37,7 @@ describe('releases', function () {
       scalingoClient.deployFromArchive.resolves('OK');
       sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
       // when
-      const response = await releasesService.deploy('production', 'v1.0');
+      const response = await release.deploy('production', 'v1.0');
       // then
       expect(response).to.deep.equal(['OK', 'OK', 'OK', 'OK', 'OK', 'OK', 'OK']);
     });
@@ -54,7 +49,7 @@ describe('releases', function () {
       scalingoClient.deployFromArchive.resolves('OK');
       sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
       // when
-      await releasesService.deploy('production', 'v1.0 ');
+      await release.deploy('production', 'v1.0 ');
       // then
       expect(scalingoClient.deployFromArchive.callCount).to.equal(7);
       expect(scalingoClient.deployFromArchive.args).to.deep.equal([
@@ -76,7 +71,7 @@ describe('releases', function () {
       sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
       const tag = ' V1.0.0 ';
       // when
-      await releasesService.deploy('production', tag);
+      await release.deploy('production', tag);
       // then
       expect(scalingoClient.deployFromArchive.callCount).to.equal(7);
       expect(scalingoClient.deployFromArchive.firstCall.args[1]).to.equal('v1.0.0');
@@ -90,7 +85,7 @@ describe('releases', function () {
       sinon.stub(ScalingoClient, 'getInstance').resolves(scalingoClient);
       // when
       try {
-        await releasesService.deploy('production', 'v1.0');
+        await release.deploy('production', 'v1.0');
         expect.fail('Should throw an error when an application deployment fails');
       } catch (e) {
         expect(e.message).to.equal('KO');
@@ -101,7 +96,7 @@ describe('releases', function () {
   describe('#publish', function () {
     it('should call the publish script', async function () {
       //when
-      await releasesService.publish('minor');
+      await release.publish('minor', '', exec);
 
       // then
       sinon.assert.calledWith(
@@ -114,7 +109,7 @@ describe('releases', function () {
 
     it('should call the publish script with the branch name', async function () {
       //when
-      await releasesService.publish('minor', 'hotfix');
+      await release.publish('minor', 'hotfix', exec);
 
       // then
       sinon.assert.calledWith(
@@ -129,7 +124,7 @@ describe('releases', function () {
 
     it('should retrieve new package version', async function () {
       //when
-      const newPackageVersion = await releasesService.publish('minor');
+      const newPackageVersion = await release.publish('minor', '', exec);
 
       // then
       expect(newPackageVersion).to.equal('3.14.0');
@@ -144,7 +139,7 @@ describe('releases', function () {
 
     it("should call the release pix script with 'minor'", async function () {
       //when
-      await releasesService.publishPixRepo('pix-site', 'minor');
+      await release.publishPixRepo('pix-site', 'minor', exec);
 
       // then
       sinon.assert.calledWith(
@@ -159,7 +154,7 @@ describe('releases', function () {
 
     it('should retrieve new package version', async function () {
       //when
-      const newPackageVersion = await releasesService.publishPixRepo('pix-site', 'minor');
+      const newPackageVersion = await release.publishPixRepo('pix-site', 'minor', exec);
 
       // then
       expect(newPackageVersion).to.equal('3.14.0');

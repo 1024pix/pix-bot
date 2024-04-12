@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 
 import github from '../../common/services/github.js';
 import { logger } from '../../common/services/logger.js';
-import releases from '../../common/services/releases.js';
+import { release } from '../../common/services/releases.js';
 import * as sendSlackBlockMessage from '../../common/services/slack/surfaces/messages/block-message.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
 import shortcuts from '../services/slack/shortcuts.js';
@@ -47,8 +47,8 @@ const slack = {
     const payload = request.pre.payload;
     const branchName = payload.text;
 
-    releases.publish('patch', branchName).then(async (latestReleaseTag) => {
-      await releases.deploy(releases.environments.recette, latestReleaseTag);
+    release.publish('patch', branchName).then(async (latestReleaseTag) => {
+      await release.deploy(release.environments.recette, latestReleaseTag);
     });
 
     return {
