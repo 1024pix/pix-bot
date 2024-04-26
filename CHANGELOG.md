@@ -1,5 +1,26 @@
 # pix-bot Changelog
 
+## v1.96.0 (26/04/2024)
+
+
+### :rocket: Amélioration
+- [#380](https://github.com/1024pix/pix-bot/pull/380) [FEATURE] Mise à jour du message du bot pour pix-epreuves.
+
+### :arrow_up: Montée de version
+- [#379](https://github.com/1024pix/pix-bot/pull/379) [BUMP] Lock file maintenance (dossier racine).
+- [#378](https://github.com/1024pix/pix-bot/pull/378) [BUMP] Update dependency node to v20.12.2.
+- [#377](https://github.com/1024pix/pix-bot/pull/377) [BUMP] Lock file maintenance (dossier racine).
+- [#375](https://github.com/1024pix/pix-bot/pull/375) [BUMP] Update Node.js to v20.12.2.
+- [#374](https://github.com/1024pix/pix-bot/pull/374) [BUMP] Update dependency node to v20.12.1.
+- [#373](https://github.com/1024pix/pix-bot/pull/373) [BUMP] Lock file maintenance (dossier racine).
+- [#372](https://github.com/1024pix/pix-bot/pull/372) [BUMP] Update Node.js to v20.12.1.
+- [#371](https://github.com/1024pix/pix-bot/pull/371) [BUMP] Update dependency node to v20.12.0.
+- [#370](https://github.com/1024pix/pix-bot/pull/370) [BUMP] Lock file maintenance (dossier racine).
+- [#369](https://github.com/1024pix/pix-bot/pull/369) [BUMP] Update Node.js to v20.12.0.
+- [#368](https://github.com/1024pix/pix-bot/pull/368) [BUMP] Lock file maintenance (dossier racine).
+- [#367](https://github.com/1024pix/pix-bot/pull/367) [BUMP] Lock file maintenance (dossier racine).
+- [#365](https://github.com/1024pix/pix-bot/pull/365) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.95.1 (07/03/2024)
 
 
