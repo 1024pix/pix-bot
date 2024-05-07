@@ -107,7 +107,21 @@ function _getEmojis(pullRequests) {
 }
 
 function _getReviewsLabel(reviews) {
-  const countByState = countBy(reviews, 'state');
+  const approvedReviews = reviews.filter((review) => review.state === 'APPROVED');
+  const dismissedReviews = reviews.filter((review) => review.state === 'DISMISSED');
+  const clearedReviews = reviews.filter((review) => {
+    if (review.state === 'CHANGES_REQUESTED') {
+      const hasBeenApproved =
+        approvedReviews.find((approvedReview) => approvedReview.user.id === review.user.id) !== undefined;
+      const hasBeenDismissed =
+        dismissedReviews.find((dismissedReview) => dismissedReview.user.id === review.user.id) !== undefined;
+      return !(hasBeenApproved || hasBeenDismissed);
+    }
+
+    return true;
+  });
+
+  const countByState = countBy(clearedReviews, 'state');
   return entries(countByState)
     .map(([label, times]) => {
       switch (label) {
@@ -316,7 +330,7 @@ async function _getPullRequestsFromCommitShaFromGithub({ repoOwner, repoName, co
 }
 
 async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commitsShaList }) {
-  let pullRequests = [];
+  const pullRequests = [];
 
   await Promise.all(
     commitsShaList.map(async (commitSha) => {

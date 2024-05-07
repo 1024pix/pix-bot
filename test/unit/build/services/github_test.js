@@ -56,6 +56,57 @@ describe('Unit | Build | github-test', function () {
       expect(response).to.deep.equal(expectedResponse);
     });
 
+    it('should not add ❌ if CHANGES_REQUESTED has been DISMISSED or APPROVED', async function () {
+      // given
+      const items = [
+        { html_url: 'http://test1.fr', number: 0, title: 'PR1', labels: [{ name: 'team certif' }] },
+        {
+          html_url: 'http://test2.fr',
+          number: 1,
+          title: 'PR2',
+          labels: [{ name: ':construction: toto' }, { name: ':idea: team certif' }],
+        },
+      ];
+
+      nock('https://api.github.com')
+        .get(
+          '/search/issues?q=is%3Apr+is%3Aopen+archived%3Afalse+draft%3Afalse+user%3Agithub-owner+label%3Ateam-certif&sort=updated&order=desc',
+        )
+        .reply(200, { items });
+
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/pulls/0/reviews')
+        .reply(200, [
+          { state: 'CHANGES_REQUESTED', user: { id: 123 } },
+          { state: 'APPROVED', user: { id: 123 } },
+        ]);
+      nock('https://api.github.com')
+        .get('/repos/github-owner/github-repository/pulls/1/reviews')
+        .reply(200, [
+          { state: 'CHANGES_REQUESTED', user: { id: 123 } },
+          { state: 'DISMISSED', user: { id: 123 } },
+        ]);
+
+      const expectedResponse = {
+        response_type: 'in_channel',
+        text: 'PRs à review pour team-certif',
+        attachments: [
+          { color: '#B7CEF5', pretext: '', fields: [{ value: '✅x1 | <http://test1.fr|PR1>', short: false }] },
+          {
+            color: '#B7CEF5',
+            pretext: '',
+            fields: [{ value: ':construction: :idea: | <http://test2.fr|PR2>', short: false }],
+          },
+        ],
+      };
+
+      // when
+      const response = await githubService.getPullRequests('team-certif');
+
+      // then
+      expect(response).to.deep.equal(expectedResponse);
+    });
+
     it('should call the Github API with the label', async function () {
       // given
       let scopePr, scopeReview;
