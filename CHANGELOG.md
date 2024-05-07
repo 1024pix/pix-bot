@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.97.0 (07/05/2024)
+
+
+### :building_construction: Tech
+- [#384](https://github.com/1024pix/pix-bot/pull/384) [TECH] Renomme 1d en Junior.
+
+### :arrow_up: Montée de version
+- [#383](https://github.com/1024pix/pix-bot/pull/383) [BUMP] Lock file maintenance (dossier racine).
+- [#381](https://github.com/1024pix/pix-bot/pull/381) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.96.0 (26/04/2024)
 
 
