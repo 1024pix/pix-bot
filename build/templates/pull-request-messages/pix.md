@@ -5,7 +5,7 @@ Une fois les applications déployées, elles seront accessibles via les liens su
   * [Orga (.org)](https://orga-pr{{pullRequestId}}.review.pix.org)
   * [Certif (.fr)](https://certif-pr{{pullRequestId}}.review.pix.fr)
   * [Certif (.org)](https://certif-pr{{pullRequestId}}.review.pix.org)
-  * [1D](https://1d-pr{{pullRequestId}}.review.pix.fr)
+  * [Junior](https://junior-pr{{pullRequestId}}.review.pix.fr)
   * [Admin](https://admin-pr{{pullRequestId}}.review.pix.fr)
   * [API](https://api-pr{{pullRequestId}}.review.pix.fr/api/)
   * [Audit Logger](https://pix-audit-logger-review-pr{{pullRequestId}}.osc-fr1.scalingo.io/api/)
