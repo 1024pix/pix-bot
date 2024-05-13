@@ -54,7 +54,7 @@ function update_all_pix_modules_version() {
   update_pix_module_version "orga/"
   update_pix_module_version "high-level-tests/load-testing/"
   update_pix_module_version "high-level-tests/e2e/"
-  update_pix_module_version "1d/"
+  update_pix_module_version "junior/"
   update_pix_module_version "audit-logger/"
 
   npm version "${NEW_VERSION_TYPE}" --git-tag-version=false >>/dev/null
@@ -75,8 +75,9 @@ function create_a_release_commit() {
           admin/package*.json \
           high-level-tests/load-testing/package*.json \
           high-level-tests/e2e/package*.json \
-          1d/package*.json \
-          audit-logger/package*.json
+          audit-logger/package*.json \
+          junior/package*.json
+
   git commit --message "[RELEASE] A ${NEW_VERSION_TYPE} is being released to ${NEW_PACKAGE_VERSION}."
 
   echo "Created the release commit"
