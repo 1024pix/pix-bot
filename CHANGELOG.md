@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.98.0 (13/05/2024)
+
+
+### :rocket: Amélioration
+- [#388](https://github.com/1024pix/pix-bot/pull/388) [FEATURE] Adapte la publication et le déploiement au renommage de Pix 1d en Pix Junior.
+
+### :arrow_up: Montée de version
+- [#387](https://github.com/1024pix/pix-bot/pull/387) [BUMP] Lock file maintenance (dossier racine).
+- [#386](https://github.com/1024pix/pix-bot/pull/386) [BUMP] Update Node.js to v20.13.1.
+
 ## v1.97.0 (07/05/2024)
 
 
