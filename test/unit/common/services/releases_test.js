@@ -62,7 +62,7 @@ describe('releases', function () {
         ['pix-admin', 'v1.0'],
         ['pix-orga', 'v1.0'],
         ['pix-api', 'v1.0'],
-        ['pix-1d', 'v1.0'],
+        ['pix-junior', 'v1.0'],
         ['pix-audit-logger', 'v1.0'],
       ]);
     });
