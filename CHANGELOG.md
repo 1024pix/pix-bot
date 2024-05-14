@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.98.1 (14/05/2024)
+
+
+### :arrow_up: Montée de version
+- [#389](https://github.com/1024pix/pix-bot/pull/389) [BUMP] Update dependency node to v20.13.0.
+
+### :coffee: Autre
+- [#385](https://github.com/1024pix/pix-bot/pull/385) [BUGIFX] Ne pas afficher les `CHANGES_REQUESTED` si ils ont été traités.
+
 ## v1.98.0 (13/05/2024)
 
 
