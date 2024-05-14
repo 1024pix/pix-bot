@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.98.2 (14/05/2024)
+
+
+### :bug: Correction
+- [#390](https://github.com/1024pix/pix-bot/pull/390) [BUGFIX] Gère le renommage de l'application pix-1d-integration.
+
 ## v1.98.1 (14/05/2024)
 
 
