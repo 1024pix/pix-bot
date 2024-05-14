@@ -72,7 +72,7 @@ module.exports = (function () {
           'pix-certif-integration',
           'pix-orga-integration',
           'pix-admin-integration',
-          'pix-1d-integration',
+          'pix-junior-integration',
         ],
       },
     },
