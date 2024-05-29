@@ -1,5 +1,19 @@
 # pix-bot Changelog
 
+## v1.98.3 (29/05/2024)
+
+
+### :building_construction: Tech
+- [#392](https://github.com/1024pix/pix-bot/pull/392) [TECH] Migrer le code en ESM.
+
+### :arrow_up: Montée de version
+- [#397](https://github.com/1024pix/pix-bot/pull/397) [BUMP] Update dependency eslint-plugin-n to v17 (dossier racine).
+- [#396](https://github.com/1024pix/pix-bot/pull/396) [BUMP] Update dependency @1024pix/eslint-config to ^1.3.1 (dossier racine).
+- [#395](https://github.com/1024pix/pix-bot/pull/395) [BUMP] Lock file maintenance (dossier racine).
+- [#394](https://github.com/1024pix/pix-bot/pull/394) [BUMP] Update dependency sinon to v18 (dossier racine).
+- [#393](https://github.com/1024pix/pix-bot/pull/393) [BUMP] Lock file maintenance (dossier racine).
+- [#391](https://github.com/1024pix/pix-bot/pull/391) [BUMP] Update dependency node to v20.13.1.
+
 ## v1.98.2 (14/05/2024)
 
 
