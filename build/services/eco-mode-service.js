@@ -1,8 +1,9 @@
-const ReviewAppManager = require('@1024pix/scalingo-review-app-manager').ReviewAppManager;
-const config = require('../../config');
-const logger = require('../../common/services/logger');
+import { ReviewAppManager } from '@1024pix/scalingo-review-app-manager';
 
-module.exports = {
+import { logger } from '../../common/services/logger.js';
+import { config } from '../../config.js';
+
+const ecoModeService = {
   async start() {
     const scalingoToken = config.scalingo.reviewApps.token;
     const scalingoApiUrl = config.scalingo.reviewApps.apiUrl;
@@ -27,3 +28,5 @@ module.exports = {
     await reviewAppManager.startEcoMode();
   },
 };
+
+export default ecoModeService;

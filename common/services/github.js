@@ -1,11 +1,13 @@
-const { Octokit } = require('@octokit/rest');
-const fetch = require('node-fetch');
-const { zipWith, countBy, entries, noop } = require('lodash');
-const crypto = require('crypto');
-const tsscmp = require('tsscmp');
-const Boom = require('@hapi/boom');
-const settings = require('../../config');
-const logger = require('./logger');
+import crypto from 'node:crypto';
+
+import Boom from '@hapi/boom';
+import { Octokit } from '@octokit/rest';
+import _ from 'lodash';
+import fetch from 'node-fetch';
+import tsscmp from 'tsscmp';
+
+import { config } from '../../config.js';
+import { logger } from './logger.js';
 
 const color = {
   'team-evaluation': '#FDEEC1',
@@ -41,14 +43,14 @@ function _logRequest(message) {
 
 function _createOctokit() {
   const authCredentials = {};
-  if (settings.github.token) {
-    authCredentials.auth = settings.github.token;
+  if (config.github.token) {
+    authCredentials.auth = config.github.token;
   }
   const octokit = new Octokit({
     ...authCredentials,
     request: { fetch },
     log: {
-      debug: noop,
+      debug: _.noop,
       info: _logRequest,
       // eslint-disable-next-line no-console
       warn: console.warn,
@@ -68,7 +70,7 @@ function _createOctokit() {
 }
 
 async function _getPullReviewsFromGithub(label) {
-  const owner = settings.github.owner;
+  const owner = config.github.owner;
 
   label = label.replace(/ /g, '%20');
   const octokit = _createOctokit();
@@ -87,8 +89,8 @@ async function _getPullReviewsFromGithub(label) {
 }
 
 async function _getReviewsFromGithub(pull_number) {
-  const owner = settings.github.owner;
-  const repo = settings.github.repository;
+  const owner = config.github.owner;
+  const repo = config.github.repository;
   const octokit = _createOctokit();
   const { data } = await octokit.pulls.listReviews({
     owner,
@@ -121,8 +123,8 @@ function _getReviewsLabel(reviews) {
     return true;
   });
 
-  const countByState = countBy(clearedReviews, 'state');
-  return entries(countByState)
+  const countByState = _.countBy(clearedReviews, 'state');
+  return _.entries(countByState)
     .map(([label, times]) => {
       switch (label) {
         case 'COMMENTED':
@@ -308,7 +310,7 @@ function _buildOctokitSearchQueryString(params = []) {
 }
 
 const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) => {
-  const owner = settings.github.owner;
+  const owner = config.github.owner;
   const octokit = _createOctokit();
   await octokit.issues.createComment({
     owner,
@@ -357,12 +359,12 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
-module.exports = {
+const github = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
     const reviewsByPR = await Promise.all(pullRequests.map(({ number }) => _getReviewsFromGithub(number)));
 
-    const data = zipWith(pullRequests, reviewsByPR, (pullRequest, reviews) => {
+    const data = _.zipWith(pullRequests, reviewsByPR, (pullRequest, reviews) => {
       return {
         pullRequest,
         reviews,
@@ -372,8 +374,8 @@ module.exports = {
     return _createResponseForSlack(data, label);
   },
 
-  async getLatestReleaseTag(repoName = settings.github.repository) {
-    return _getLatestReleaseTagName(settings.github.owner, repoName);
+  async getLatestReleaseTag(repoName = config.github.repository) {
+    return _getLatestReleaseTagName(config.github.owner, repoName);
   },
 
   getLastCommitUrl,
@@ -392,7 +394,7 @@ module.exports = {
 
   async isBuildStatusOK({ branchName, tagName }) {
     const githubCICheckName = 'build-test-and-deploy';
-    const { owner, repository: repo } = settings.github;
+    const { owner, repository: repo } = config.github;
     const commitUrl = await getLastCommitUrl({ branchName, tagName, owner, repo });
     const commitStatusUrl = commitUrl + '/check-runs';
     const octokit = _createOctokit();
@@ -403,7 +405,7 @@ module.exports = {
     return ciRuns.length > 0 && buildStatusOk;
   },
 
-  async getChangelogSinceLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
+  async getChangelogSinceLatestRelease(repoOwner = config.github.owner, repoName = config.github.repository) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const pullRequests = await _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName);
     const pullRequestsSinceLatestRelease = pullRequests.filter((PR) => PR.merged_at > latestReleaseDate);
@@ -411,10 +413,7 @@ module.exports = {
     return pullRequestsSinceLatestRelease.map((PR) => `${PR.title}`);
   },
 
-  async hasConfigFileChangedSinceLatestRelease(
-    repoOwner = settings.github.owner,
-    repoName = settings.github.repository,
-  ) {
+  async hasConfigFileChangedSinceLatestRelease(repoOwner = config.github.owner, repoName = config.github.repository) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const now = new Date().toISOString();
     const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, latestReleaseDate, now);
@@ -431,7 +430,7 @@ module.exports = {
     return { hasConfigFileChanged, latestTag, pullRequestsForCommitShaDetails };
   },
 
-  async hasConfigFileChangedInLatestRelease(repoOwner = settings.github.owner, repoName = settings.github.repository) {
+  async hasConfigFileChangedInLatestRelease(repoOwner = config.github.owner, repoName = config.github.repository) {
     const latestReleaseDate = await _getLatestReleaseDate(repoOwner, repoName);
     const secondToLastReleaseDate = await _getSecondToLastReleaseDate(repoOwner, repoName);
     const commits = await _getCommitsWhereConfigFileHasChangedBetweenDate(
@@ -446,7 +445,7 @@ module.exports = {
   verifyWebhookSignature(request) {
     const { headers, payload } = request;
 
-    const webhookSecret = settings.github.webhookSecret;
+    const webhookSecret = config.github.webhookSecret;
     const signature = headers['x-hub-signature-256'];
     const stringBody = payload ? JSON.stringify(payload) : '';
 
@@ -460,3 +459,5 @@ module.exports = {
 
   commentPullRequest,
 };
+
+export default github;

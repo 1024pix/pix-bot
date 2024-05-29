@@ -1,5 +1,5 @@
-const { expect, sinon } = require('../../../test-helper');
-const logger = require('../../../../common/services/logger');
+import { logger } from '../../../../common/services/logger.js';
+import { expect, sinon } from '../../../test-helper.js';
 
 describe('logger', function () {
   const injectedLoggerFunction = {
@@ -13,7 +13,7 @@ describe('logger', function () {
       describe('when an message is passed', function () {
         it(`should call injectedLogger ${level}`, function () {
           // given
-          let injectedLogger = [];
+          const injectedLogger = {};
           const functionToStub = injectedLoggerFunction[level];
           injectedLogger[functionToStub] = sinon.stub();
           const data = { ctx: 'context', meta: 'metadata' };
@@ -31,7 +31,7 @@ describe('logger', function () {
       describe('when an object is passed', function () {
         it(`should call injectedLogger ${level} with object in message`, function () {
           // given
-          let injectedLogger = [];
+          const injectedLogger = {};
           const functionToStub = injectedLoggerFunction[level];
           injectedLogger[functionToStub] = sinon.stub();
           const data = { ctx: 'context', meta: 'metadata' };

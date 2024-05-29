@@ -1,12 +1,12 @@
-const {
+import server from '../../../server.js';
+import {
+  createSlackWebhookSignatureHeaders,
   expect,
   nock,
-  createSlackWebhookSignatureHeaders,
-  nockGithubWithNoConfigChanges,
   nockGithubWithConfigChanges,
+  nockGithubWithNoConfigChanges,
   StatusCodes,
-} = require('../../test-helper');
-const server = require('../../../server');
+} from '../../test-helper.js';
 
 describe('Acceptance | Run | Slack', function () {
   describe('POST /run/slack/interactive-endpoint', function () {

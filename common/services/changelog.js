@@ -1,10 +1,10 @@
-const dayjs = require('dayjs');
-const { sortBy, indexOf } = require('lodash');
-const github = require('./github');
+import dayjs from 'dayjs';
+import _ from 'lodash';
 
-const PartialChangeLogGenerator = require('../models/PartialChangeLogGenerator');
-const PullRequest = require('../models/PullRequest');
-const PullRequestGroupFactory = require('../models/PullRequestGroupFactory');
+import PartialChangeLogGenerator from '../models/PartialChangeLogGenerator.js';
+import PullRequest from '../models/PullRequest.js';
+import PullRequestGroupFactory from '../models/PullRequestGroupFactory.js';
+import github from './github.js';
 
 const CHANGELOG_HEADER_LINES = 2;
 
@@ -21,9 +21,9 @@ function displayPullRequest(pr) {
 
 function orderPr(listPR) {
   const typeOrder = ['BREAKING', 'FEATURE', 'BUGFIX', 'TECH', 'BUMP'];
-  return sortBy(listPR, (pr) => {
+  return _.sortBy(listPR, (pr) => {
     const typeOfPR = pr.title.substring(1, pr.title.indexOf(']'));
-    const typeIndex = indexOf(typeOrder, typeOfPR);
+    const typeIndex = _.indexOf(typeOrder, typeOfPR);
     return typeIndex < 0 ? Number.MAX_VALUE : typeIndex;
   });
 }
@@ -59,12 +59,12 @@ function getNewChangeLogLines({ headOfChangelogTitle, pullRequests }) {
   return partialChangeLogGenerator.getLinesToDisplay();
 }
 
-module.exports = {
+export {
   displayPullRequest,
   filterPullRequest,
   generateChangeLogContent,
   getHeadOfChangelog,
-  getTagReleaseDate,
   getNewChangeLogLines,
+  getTagReleaseDate,
   orderPr,
 };

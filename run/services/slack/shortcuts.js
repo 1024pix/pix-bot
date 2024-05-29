@@ -1,10 +1,12 @@
-const axios = require('axios');
-const deployReleaseTagSelectionModal = require('./surfaces/modals/deploy-release/release-tag-selection');
-const createAppOnScalingoModal = require('./surfaces/modals/scalingo-apps/application-creation');
-const config = require('../../../config');
+import axios from 'axios';
+
+import { config } from '../../../config.js';
+import deployReleaseTagSelectionModal from './surfaces/modals/deploy-release/release-tag-selection.js';
+import createAppOnScalingoModal from './surfaces/modals/scalingo-apps/application-creation.js';
+
 const openViewUrl = 'https://slack.com/api/views.open';
 
-module.exports = {
+const shortcuts = {
   openViewDeployReleaseTagSelectionCallbackId: deployReleaseTagSelectionModal.callbackId,
 
   openViewCreateAppOnScalingoSelectionCallbackId: createAppOnScalingoModal.callbackId,
@@ -17,7 +19,7 @@ module.exports = {
         'content-type': 'application/json',
         authorization: `Bearer ${config.slack.botToken}`,
       },
-      data: deployReleaseTagSelectionModal(payload.trigger_id),
+      data: deployReleaseTagSelectionModal.getView(payload.trigger_id),
     };
     return axios(options);
   },
@@ -30,8 +32,10 @@ module.exports = {
         'content-type': 'application/json',
         authorization: `Bearer ${config.slack.botToken}`,
       },
-      data: createAppOnScalingoModal(payload.trigger_id),
+      data: createAppOnScalingoModal.getView(payload.trigger_id),
     };
     return axios(options);
   },
 };
+
+export default shortcuts;

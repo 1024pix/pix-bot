@@ -1,9 +1,7 @@
-const { expect } = require('../../../test-helper');
-
-const PullRequest = require('../../../../common/models/PullRequest');
-const { Tag } = require('../../../../common/models/Tags');
-
-const PullRequestGroup = require('../../../../common/models/PullRequestGroup');
+import PullRequest from '../../../../common/models/PullRequest.js';
+import PullRequestGroup from '../../../../common/models/PullRequestGroup.js';
+import { Tag } from '../../../../common/models/Tags.js';
+import { expect } from '../../../test-helper.js';
 
 describe('Unit | Common | Models | PullRequestGroup', function () {
   describe('#constructor', function () {

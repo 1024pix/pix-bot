@@ -1,6 +1,6 @@
-const { expect, sinon } = require('../../../test-helper');
-const logger = require('../../../../common/services/logger');
-const taskScheluder = require('../../../../run/services/task-scheduler');
+import { logger } from '../../../../common/services/logger.js';
+import { taskScheduler } from '../../../../run/services/task-scheduler.js';
+import { expect, sinon } from '../../../test-helper.js';
 
 describe('Integration | Run | Services | schedule-task', function () {
   let clock;
@@ -31,7 +31,7 @@ describe('Integration | Run | Services | schedule-task', function () {
       ];
 
       // when
-      taskScheluder(testTasks);
+      taskScheduler(testTasks);
 
       // then
       expect(runStub).to.not.have.been.called;
@@ -70,7 +70,7 @@ describe('Integration | Run | Services | schedule-task', function () {
       ];
 
       // when
-      taskScheluder(testTasks);
+      taskScheduler(testTasks);
       // then
       expect(runStub).to.not.have.been.called;
 

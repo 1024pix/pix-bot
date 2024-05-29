@@ -1,8 +1,9 @@
-const axios = require('axios');
-const config = require('../../../../../config');
-const logger = require('../../../logger');
+import axios from 'axios';
 
-module.exports = {
+import { config } from '../../../../../config.js';
+import { logger } from '../../../logger.js';
+
+const getUserInfos = {
   async getUserEmail(userId) {
     const options = {
       method: 'GET',
@@ -20,3 +21,5 @@ module.exports = {
     return response.data.user.profile.email;
   },
 };
+
+export default getUserInfos;

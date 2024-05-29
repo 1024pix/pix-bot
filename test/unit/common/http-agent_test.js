@@ -1,6 +1,7 @@
-const { expect, sinon } = require('../../test-helper');
-const axios = require('axios');
-const { httpAgent } = require('../../../common/http-agent');
+import axios from 'axios';
+
+import { httpAgent } from '../../../common/http-agent.js';
+import { expect, sinon } from '../../test-helper.js';
 
 const { post } = httpAgent;
 

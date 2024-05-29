@@ -1,7 +1,8 @@
-const axios = require('axios');
-const scalingo = require('scalingo');
-const config = require('../../config');
-const logger = require('./logger');
+import axios from 'axios';
+import * as scalingo from 'scalingo';
+
+import { config } from '../../config.js';
+import { logger } from './logger.js';
 
 const DEFAULT_OPTS = { withEnvSuffix: true };
 
@@ -185,4 +186,4 @@ async function _isUrlReachable(url) {
   }
 }
 
-module.exports = ScalingoClient;
+export default ScalingoClient;

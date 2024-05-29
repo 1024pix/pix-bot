@@ -1,4 +1,5 @@
-const { Modal, Blocks, Elements, Bits } = require('slack-block-builder');
+import { Bits, Blocks, Elements, Modal } from 'slack-block-builder';
+
 const regions = [
   { id: 'production', name: 'Paris - SecNumCloud - Outscale' },
   { id: 'recette', name: 'Paris - Outscale' },
@@ -30,15 +31,15 @@ function modal() {
   ]);
 }
 
-module.exports = (triggerId) => {
+const getView = (triggerId) => {
   return {
     trigger_id: triggerId,
     view: modal(regions).buildToObject(),
   };
 };
 
-module.exports.sampleView = () => {
+const sampleView = () => {
   return modal(regions);
 };
 
-module.exports.callbackId = callbackId;
+export default { callbackId, getView, sampleView };
