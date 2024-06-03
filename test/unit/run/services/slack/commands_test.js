@@ -19,7 +19,7 @@ import {
 } from '../../../../../run/services/slack/commands.js';
 import { catchErr, sinon } from '../../../../test-helper.js';
 
-describe('Unit | Run | Services | Slack | Commands', () => {
+describe('Unit | Run | Services | Slack | Commands', function () {
   beforeEach(function () {
     // given
     sinon.stub(axios, 'post');
@@ -28,8 +28,8 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     sinon.stub(githubServices, 'getLatestReleaseTag').resolves('v1.0.0');
   });
 
-  describe('#createAndDeployPixSiteRelease', () => {
-    describe('when releaseType is set to minor', () => {
+  describe('#createAndDeployPixSiteRelease', function () {
+    describe('when releaseType is set to minor', function () {
       beforeEach(async function () {
         // given
         const payload = { text: 'minor', response_url: 'http://example.net/callback' };
@@ -37,26 +37,26 @@ describe('Unit | Run | Services | Slack | Commands', () => {
         await createAndDeployPixSiteRelease(payload);
       });
 
-      it('should publish a new release', () => {
+      it('should publish a new release', function () {
         // then
         sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-site', 'minor');
       });
 
-      it('should deploy the release for pix-site and pix-pro', () => {
+      it('should deploy the release for pix-site and pix-pro', function () {
         // then
         sinon.assert.calledWith(releasesService.deployPixRepo, 'pix-site', 'pix-site', 'v1.0.0');
         sinon.assert.calledWith(releasesService.deployPixRepo, 'pix-site', 'pix-pro', 'v1.0.0');
       });
 
-      it('should inform the user of the progress', () => {
+      it('should inform the user of the progress', function () {
         sinon.assert.calledWith(axios.post, 'http://example.net/callback', {
           text: "Le script de déploiement de la release 'v1.0.0' pour pix-site, pix-pro en production s'est déroulé avec succès. En attente de l'installation des applications sur Scalingo…",
         });
       });
     });
 
-    describe('when releaseType is not set to a valid value', () => {
-      it('should publish a new minor release', async () => {
+    describe('when releaseType is not set to a valid value', function () {
+      it('should publish a new minor release', async function () {
         // given
         const payload = { text: '' };
         // when
@@ -66,8 +66,8 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       });
     });
 
-    describe('when something fails', () => {
-      it('should inform the user', async () => {
+    describe('when something fails', function () {
+      it('should inform the user', async function () {
         // given
         const payload = { response_url: 'http://example.net/callback' };
         releasesService.publishPixRepo.rejects();
@@ -81,8 +81,8 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     });
   });
 
-  describe('#createAndDeployPixUI', () => {
-    it('should publish a new release', async () => {
+  describe('#createAndDeployPixUI', function () {
+    it('should publish a new release', async function () {
       // given
       const payload = { text: 'minor' };
 
@@ -93,7 +93,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-ui', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', async () => {
+    it('should retrieve the last release tag from GitHub', async function () {
       // given
       const payload = { text: 'minor' };
 
@@ -104,7 +104,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledOnceWithExactly(githubServices.getLatestReleaseTag, 'pix-ui');
     });
 
-    it('should create a minor version if no version is given', async () => {
+    it('should create a minor version if no version is given', async function () {
       // given
       const payload = { text: '' };
 
@@ -116,8 +116,8 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     });
   });
 
-  describe('#createAndDeployEmberTestingLibrary', () => {
-    it('should publish a new release', async () => {
+  describe('#createAndDeployEmberTestingLibrary', function () {
+    it('should publish a new release', async function () {
       // given
       const payload = { text: 'minor' };
 
@@ -128,7 +128,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesService.publishPixRepo, 'ember-testing-library', 'minor');
     });
 
-    it('should retrieve the last release tag from GitHub', async () => {
+    it('should retrieve the last release tag from GitHub', async function () {
       // given
       const payload = { text: 'minor' };
 
@@ -139,7 +139,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(githubServices.getLatestReleaseTag, 'ember-testing-library');
     });
 
-    it('should create a minor version if no version is given', async () => {
+    it('should create a minor version if no version is given', async function () {
       // given
       const payload = { text: '' };
 
@@ -151,7 +151,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     });
   });
 
-  describe('#createAndDeployPixLCMS', () => {
+  describe('#createAndDeployPixLCMS', function () {
     let client;
 
     beforeEach(async function () {
@@ -163,23 +163,23 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       await createAndDeployPixLCMS(payload);
     });
 
-    it('should publish a new release', () => {
+    it('should publish a new release', function () {
       // then
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-editor', 'minor');
     });
 
-    it('should deploy the release on production', () => {
+    it('should deploy the release on production', function () {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-production', 'v1.0.0');
     });
 
-    it('should deploy the release on minimal', () => {
+    it('should deploy the release on minimal', function () {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-minimal-production', 'v1.0.0');
     });
   });
 
-  describe('#createAndDeployPixAPIData', () => {
+  describe('#createAndDeployPixAPIData', function () {
     let client;
 
     beforeEach(async function () {
@@ -191,18 +191,18 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       await createAndDeployPixAPIData(payload);
     });
 
-    it('should publish a new release', () => {
+    it('should publish a new release', function () {
       // then
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-api-data', 'minor');
     });
 
-    it('should deploy the release on production', () => {
+    it('should deploy the release on production', function () {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-api-data-production', 'v1.0.0');
     });
   });
 
-  describe('#createAndDeployPixBotRelease', () => {
+  describe('#createAndDeployPixBotRelease', function () {
     let client;
 
     beforeEach(async function () {
@@ -214,23 +214,23 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       await createAndDeployPixBotRelease(payload);
     });
 
-    it('should publish a new release', () => {
+    it('should publish a new release', function () {
       // then
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-bot', 'minor');
     });
 
-    it('should deploy the release for pix-bot-build', () => {
+    it('should deploy the release for pix-bot-build', function () {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build-production', 'v1.0.0');
     });
 
-    it('should deploy the release for pix-bot-run', () => {
+    it('should deploy the release for pix-bot-run', function () {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-run-production', 'v1.0.0');
     });
   });
 
-  describe('#createAndDeployPixDatawarehouse', () => {
+  describe('#createAndDeployPixDatawarehouse', function () {
     beforeEach(async function () {
       // given
       const payload = { text: 'minor' };
@@ -238,19 +238,19 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       await createAndDeployPixDatawarehouse(payload);
     });
 
-    it('should publish a new release', () => {
+    it('should publish a new release', function () {
       // then
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-db-replication', 'minor');
     });
 
-    it('should deploy the release', () => {
+    it('should deploy the release', function () {
       // then
       sinon.assert.calledWith(releasesService.deployPixRepo);
     });
   });
 
-  describe('#getAndDeployLastVersion', () => {
-    it('should redeploy last version of an app', async () => {
+  describe('#getAndDeployLastVersion', function () {
+    it('should redeploy last version of an app', async function () {
       // given
       const appName = 'pix-admin-integration';
 
@@ -261,7 +261,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       sinon.assert.calledWith(releasesService.deployPixRepo, 'pix', 'pix-admin', 'v1.0.0', 'integration');
     });
 
-    it('should throw an error if appName is incorrect', async () => {
+    it('should throw an error if appName is incorrect', async function () {
       // given
       const appName = 'pix-admin';
 
@@ -272,7 +272,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       expect(response).to.be.instanceOf(Error);
     });
 
-    it('should throw an error if appName is not from pix repo', async () => {
+    it('should throw an error if appName is not from pix repo', async function () {
       // given
       const appName = 'pix-site-production';
 
@@ -284,7 +284,7 @@ describe('Unit | Run | Services | Slack | Commands', () => {
     });
   });
 
-  describe('#createAndDeployDbStats', () => {
+  describe('#createAndDeployDbStats', function () {
     beforeEach(async function () {
       // given
       const payload = { text: 'minor' };
@@ -292,18 +292,18 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       await createAndDeployDbStats(payload);
     });
 
-    it('should publish a new release', () => {
+    it('should publish a new release', function () {
       // then
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-db-stats', 'minor');
     });
 
-    it('should deploy the release', () => {
+    it('should deploy the release', function () {
       // then
       sinon.assert.calledWith(releasesService.deployPixRepo);
     });
   });
 
-  describe('#createAndDeployPixTutosRelease', () => {
+  describe('#createAndDeployPixTutosRelease', function () {
     beforeEach(async function () {
       // given
       const payload = { text: 'minor' };
@@ -311,12 +311,12 @@ describe('Unit | Run | Services | Slack | Commands', () => {
       await createAndDeployPixTutosRelease(payload);
     });
 
-    it('should publish a new release', () => {
+    it('should publish a new release', function () {
       // then
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-tutos', 'minor');
     });
 
-    it('should deploy the release', () => {
+    it('should deploy the release', function () {
       // then
       sinon.assert.calledWith(releasesService.deployPixRepo);
     });

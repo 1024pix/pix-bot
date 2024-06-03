@@ -5,8 +5,8 @@ import * as sinon from 'sinon';
 import ScalingoClient from '../../../../../common/services/scalingo-client.js';
 import { getAppStatusFromScalingo } from '../../../../../run/services/slack/app-status-from-scalingo.js';
 
-describe('#getAppStatusFromScalingo', () => {
-  it('returns a message when no app is specified in command line', async () => {
+describe('#getAppStatusFromScalingo', function () {
+  it('returns a message when no app is specified in command line', async function () {
     // when
     const response = await getAppStatusFromScalingo();
 
@@ -14,7 +14,7 @@ describe('#getAppStatusFromScalingo', () => {
     expect(response.text).equals("Un nom d'application est attendu en paramètre (ex: pix-app-production)");
   });
 
-  it('returns a production app status for slack', async () => {
+  it('returns a production app status for slack', async function () {
     // given
     const getAppInfo = sinon.stub().resolves([
       {
@@ -46,7 +46,7 @@ describe('#getAppStatusFromScalingo', () => {
     });
   });
 
-  it('returns a recette app status for slack', async () => {
+  it('returns a recette app status for slack', async function () {
     // given
     const getAppInfo = sinon.stub().resolves([
       {
@@ -67,7 +67,7 @@ describe('#getAppStatusFromScalingo', () => {
     expect(response.blocks).is.not.empty;
   });
 
-  it('returns an integration app status for slack', async () => {
+  it('returns an integration app status for slack', async function () {
     // given
     const getAppInfo = sinon.stub().resolves([
       {
@@ -100,7 +100,7 @@ describe('#getAppStatusFromScalingo', () => {
     });
   });
 
-  it('returns status for all production apps for slack', async () => {
+  it('returns status for all production apps for slack', async function () {
     // given
     const getAppInfo = sinon.stub().resolves([
       {
@@ -147,7 +147,7 @@ describe('#getAppStatusFromScalingo', () => {
     });
   });
 
-  it('returns a different status message when app is down', async () => {
+  it('returns a different status message when app is down', async function () {
     // given
     const getAppInfo = sinon.stub().resolves([
       {
@@ -168,7 +168,7 @@ describe('#getAppStatusFromScalingo', () => {
     expect(response.blocks[0].text.text).equals('*pix-app-recette* 🛑 - v1.0.0\n2021-03-24T08:37:18.611Z');
   });
 
-  it('returns an error response if an error occured', async () => {
+  it('returns an error response if an error occured', async function () {
     // given
     const getAppInfo = sinon.stub().rejects(Error('message erreur'));
     sinon.stub(ScalingoClient, 'getInstance').withArgs('recette').resolves({ getAppInfo });
@@ -180,7 +180,7 @@ describe('#getAppStatusFromScalingo', () => {
     expect(response.text).equals('Une erreur est survenue : "message erreur"');
   });
 
-  it('returns a production app status when the appName is not the full app name', async () => {
+  it('returns a production app status when the appName is not the full app name', async function () {
     // given
     const getAppInfo = sinon.stub().resolves([
       {

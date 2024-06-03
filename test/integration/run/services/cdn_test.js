@@ -32,7 +32,7 @@ function _stubInvalidationCachePost(namespaceKey) {
     .reply(200);
 }
 
-describe('Integration | CDN', () => {
+describe('Integration | CDN', function () {
   let defaultRetryCount, defaultRetryDelay;
 
   before(function () {
@@ -47,8 +47,8 @@ describe('Integration | CDN', () => {
     config.baleen.CDNInvalidationRetryDelay = defaultRetryDelay;
   });
 
-  describe('#invalidateCdnCache', () => {
-    it('should call Baleen cache invalidation API', async () => {
+  describe('#invalidateCdnCache', function () {
+    it('should call Baleen cache invalidation API', async function () {
       // given
       const applicationName = 'Pix_Test';
       const namespace = 'Pix_Namespace';
@@ -66,7 +66,7 @@ describe('Integration | CDN', () => {
       expect(result).to.equal(`Cache CDN invalidé pour l‘application ${applicationName}.`);
     });
 
-    it('should use namespace-key of application to create cookie', async () => {
+    it('should use namespace-key of application to create cookie', async function () {
       // given
       const applicationName = 'Pix_Test';
       const namespace = 'Pix_Namespace';
@@ -84,7 +84,7 @@ describe('Integration | CDN', () => {
 
     context('when cache invalidation fails', function () {
       context('when namespace does not exist', function () {
-        it('should throw an NamespaceNotFoundError error ', async () => {
+        it('should throw an NamespaceNotFoundError error ', async function () {
           // given
           const applicationName = 'Not_existing_application';
 
@@ -104,7 +104,7 @@ describe('Integration | CDN', () => {
       });
 
       context('when API returns an error', function () {
-        it('should retry request 3 times on 500', async () => {
+        it('should retry request 3 times on 500', async function () {
           // given
           const applicationName = 'Pix_Test';
           const namespace = 'Pix_Namespace';
@@ -123,7 +123,7 @@ describe('Integration | CDN', () => {
           })
             .post('/cache/invalidations', { patterns: ['.'] })
             .times(4)
-            .reply(500, () => {
+            .reply(500, function () {
               called++;
               return {
                 type: 'https://www.jhipster.tech/problem/problem-with-message',
@@ -145,7 +145,7 @@ describe('Integration | CDN', () => {
           expect(called).equal(expectedCallCount);
         });
 
-        it('should not retry request on status code different than 500', async () => {
+        it('should not retry request on status code different than 500', async function () {
           // given
           const applicationName = 'Pix_Test';
           const namespace = 'Pix_Namespace';
@@ -163,7 +163,7 @@ describe('Integration | CDN', () => {
             },
           })
             .post('/cache/invalidations', { patterns: ['.'] })
-            .reply(400, () => {
+            .reply(400, function () {
               called++;
               return {
                 type: 'https://www.jhipster.tech/problem/problem-with-message',
@@ -185,7 +185,7 @@ describe('Integration | CDN', () => {
           expect(called).equal(expectedCallCount);
         });
 
-        it('should throw an error with statusCode and message', async () => {
+        it('should throw an error with statusCode and message', async function () {
           // given
           const applicationName = 'Pix_Test';
           const namespace = 'Pix_Namespace';

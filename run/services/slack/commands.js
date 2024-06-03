@@ -80,7 +80,7 @@ async function _publishAndDeployRelease(repoName, appNamesList = [], releaseType
     await deploy(repoName, appNamesList, releaseTagAfterRelease);
 
     sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, appNamesList.join(', ')));
-  } catch (e) {
+  } catch (_) {
     sendResponse(responseUrl, getErrorAppMessage(appNamesList.join(', ')));
   }
 }

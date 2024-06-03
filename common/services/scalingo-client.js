@@ -181,7 +181,7 @@ async function _isUrlReachable(url) {
       timeout: 2500,
     });
     return true;
-  } catch (e) {
+  } catch (_) {
     return false;
   }
 }
