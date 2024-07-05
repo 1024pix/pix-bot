@@ -1,5 +1,24 @@
 # pix-bot Changelog
 
+## v1.99.0 (05/07/2024)
+
+
+### :rocket: Amélioration
+- [#409](https://github.com/1024pix/pix-bot/pull/409) [FEATURE] Activer les RA pour pix-api-data.
+
+### :arrow_up: Montée de version
+- [#408](https://github.com/1024pix/pix-bot/pull/408) [BUMP] Lock file maintenance (dossier racine).
+- [#407](https://github.com/1024pix/pix-bot/pull/407) [BUMP] Update dependency @octokit/rest to v21 (dossier racine).
+- [#405](https://github.com/1024pix/pix-bot/pull/405) [BUMP] Lock file maintenance (dossier racine).
+- [#404](https://github.com/1024pix/pix-bot/pull/404) [BUMP] Lock file maintenance (dossier racine).
+- [#403](https://github.com/1024pix/pix-bot/pull/403) [BUMP] Lock file maintenance (dossier racine).
+- [#402](https://github.com/1024pix/pix-bot/pull/402) [BUMP] Lock file maintenance (dossier racine).
+- [#401](https://github.com/1024pix/pix-bot/pull/401) [BUMP] Update dependency node to v20.14.0.
+- [#376](https://github.com/1024pix/pix-bot/pull/376) [BUMP] Update dependency eslint to v9.
+- [#400](https://github.com/1024pix/pix-bot/pull/400) [BUMP] Update dependency @1024pix/eslint-config to ^1.3.2 (dossier racine).
+- [#399](https://github.com/1024pix/pix-bot/pull/399) [BUMP] Lock file maintenance (dossier racine).
+- [#398](https://github.com/1024pix/pix-bot/pull/398) [BUMP] Update Node.js to v20.14.0.
+
 ## v1.98.3 (29/05/2024)
 
 
