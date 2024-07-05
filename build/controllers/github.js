@@ -8,6 +8,7 @@ import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 
 const repositoryToScalingoAppsReview = {
+  'pix-api-data': ['pix-api-data-integration'],
   'pix-bot': ['pix-bot-review'],
   'pix-data': ['pix-airflow-review'],
   'pix-db-replication': ['pix-datawarehouse-integration'],
