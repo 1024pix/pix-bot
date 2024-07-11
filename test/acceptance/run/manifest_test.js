@@ -155,6 +155,13 @@ describe('Acceptance | Run | Manifest', function () {
               url: `http://${hostname}/slack/commands/deploy-pix-360`,
               usage_hint: '/deploy-pix-360',
             },
+            {
+              command: '/deploy-pix-api-data',
+              description: 'Pour déployer pix api data depuis la branche main',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-pix-api-data`,
+              usage_hint: '/deploy-pix-api-data',
+            },
           ],
         },
         oauth_config: {
