@@ -64,13 +64,6 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
             },
             {
-              command: '/deploy-pix-api-data',
-              url: `http://${hostname}/slack/commands/create-and-deploy-pix-api-data-release`,
-              description: 'Crée une release de pix-api-data et la déploie en production (https://api-data.pix.fr)',
-              usage_hint: '[patch, minor, major]',
-              should_escape: false,
-            },
-            {
               command: '/deploy-pix-datawarehouse',
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-datawarehouse-release`,
               description:

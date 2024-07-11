@@ -136,7 +136,6 @@ const configuration = (function () {
       production: ['pix-lcms-production'],
       recette: ['pix-lcms-minimal-production'],
     },
-    PIX_API_DATA_REPO_NAME: 'pix-api-data',
     PIX_API_DATA_APPS: {
       production: ['pix-api-data-production'],
     },
