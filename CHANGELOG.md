@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.100.0 (12/07/2024)
+
+
+### :rocket: Amélioration
+- [#412](https://github.com/1024pix/pix-bot/pull/412) [FEATURE] Faire en sorte d'uniquement déployer Pix Api Data.
+
+### :arrow_up: Montée de version
+- [#410](https://github.com/1024pix/pix-bot/pull/410) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.99.0 (05/07/2024)
 
 
