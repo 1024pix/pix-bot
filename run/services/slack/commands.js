@@ -167,15 +167,6 @@ async function createAndDeployPixLCMS(payload) {
   );
 }
 
-async function createAndDeployPixAPIData(payload) {
-  await _publishAndDeployReleaseWithAppsByEnvironment(
-    config.PIX_API_DATA_REPO_NAME,
-    config.PIX_API_DATA_APPS,
-    payload.text,
-    payload.response_url,
-  );
-}
-
 async function createAndDeployPixUI(payload) {
   await _publishPixUI(config.PIX_UI_REPO_NAME, payload.text, payload.response_url);
 }
@@ -235,7 +226,6 @@ async function createAndDeployPixTutosRelease(payload) {
 export {
   createAndDeployDbStats,
   createAndDeployEmberTestingLibrary,
-  createAndDeployPixAPIData,
   createAndDeployPixBotRelease,
   createAndDeployPixDatawarehouse,
   createAndDeployPixLCMS,

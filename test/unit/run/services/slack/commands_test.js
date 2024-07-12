@@ -8,7 +8,6 @@ import ScalingoClient from '../../../../../common/services/scalingo-client.js';
 import {
   createAndDeployDbStats,
   createAndDeployEmberTestingLibrary,
-  createAndDeployPixAPIData,
   createAndDeployPixBotRelease,
   createAndDeployPixDatawarehouse,
   createAndDeployPixLCMS,
@@ -176,29 +175,6 @@ describe('Unit | Run | Services | Slack | Commands', function () {
     it('should deploy the release on minimal', function () {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-minimal-production', 'v1.0.0');
-    });
-  });
-
-  describe('#createAndDeployPixAPIData', function () {
-    let client;
-
-    beforeEach(async function () {
-      // given
-      client = { deployFromArchive: sinon.spy() };
-      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
-      const payload = { text: 'minor' };
-      // when
-      await createAndDeployPixAPIData(payload);
-    });
-
-    it('should publish a new release', function () {
-      // then
-      sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-api-data', 'minor');
-    });
-
-    it('should deploy the release on production', function () {
-      // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-api-data-production', 'v1.0.0');
     });
   });
 

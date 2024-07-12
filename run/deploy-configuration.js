@@ -50,6 +50,15 @@ const deployConfiguration = [
     slackReturnText: 'Commande de déploiement de Pix 360 en production bien reçue.',
     deployFunction: fromBranch('pix-360', ['pix-360-production'], 'main'),
   },
+  {
+    slashCommand: {
+      command: '/deploy-pix-api-data',
+      description: 'Pour déployer pix api data depuis la branche main',
+      usage_hint: '/deploy-pix-api-data',
+    },
+    slackReturnText: 'Commande de déploiement de Pix Api Data en production bien reçue.',
+    deployFunction: fromBranch('pix-api-data', ['pix-api-data-production'], 'dev'),
+  },
 ];
 
 export { deployConfiguration };

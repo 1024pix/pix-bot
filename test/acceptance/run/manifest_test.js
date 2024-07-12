@@ -64,13 +64,6 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
             },
             {
-              command: '/deploy-pix-api-data',
-              url: `http://${hostname}/slack/commands/create-and-deploy-pix-api-data-release`,
-              description: 'Crée une release de pix-api-data et la déploie en production (https://api-data.pix.fr)',
-              usage_hint: '[patch, minor, major]',
-              should_escape: false,
-            },
-            {
               command: '/deploy-pix-datawarehouse',
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-datawarehouse-release`,
               description:
@@ -161,6 +154,13 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
               url: `http://${hostname}/slack/commands/deploy-pix-360`,
               usage_hint: '/deploy-pix-360',
+            },
+            {
+              command: '/deploy-pix-api-data',
+              description: 'Pour déployer pix api data depuis la branche main',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/deploy-pix-api-data`,
+              usage_hint: '/deploy-pix-api-data',
             },
           ],
         },
