@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.101.0 (25/07/2024)
+
+
+### :rocket: Amélioration
+- [#416](https://github.com/1024pix/pix-bot/pull/416) [FEATURE] Activer les RA pour pix-api-data-pix.
+
+### :arrow_up: Montée de version
+- [#415](https://github.com/1024pix/pix-bot/pull/415) [BUMP] Lock file maintenance (dossier racine).
+- [#414](https://github.com/1024pix/pix-bot/pull/414) [BUMP] Lock file maintenance (dossier racine).
+- [#413](https://github.com/1024pix/pix-bot/pull/413) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.100.0 (12/07/2024)
 
 
