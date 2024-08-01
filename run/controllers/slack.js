@@ -28,6 +28,15 @@ const slack = {
     };
   },
 
+  deployPixDataApiPix(request) {
+    const payload = request.pre.payload;
+    commands.deployPixDataApiPix(payload);
+
+    return {
+      text: _getDeployStartedMessage(payload.text, 'PIX data api pix'),
+    };
+  },
+
   createAndDeployPixSiteRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixSiteRelease(payload);
