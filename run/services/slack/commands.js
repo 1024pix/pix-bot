@@ -223,6 +223,11 @@ async function createAndDeployPixTutosRelease(payload) {
   );
 }
 
+async function deployPixDataApiPix(payload) {
+  const version = payload.text;
+  await deployTagUsingSCM(config.PIX_DATA_API_PIX_APPS_NAME, version);
+}
+
 export {
   createAndDeployDbStats,
   createAndDeployEmberTestingLibrary,
@@ -234,5 +239,6 @@ export {
   createAndDeployPixUI,
   deployAirflow,
   deployDBT,
+  deployPixDataApiPix,
   getAndDeployLastVersion,
 };

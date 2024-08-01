@@ -51,4 +51,27 @@ describe('Integration | Run | Services | Slack | Commands', function () {
       expect(nockCallB.isDone()).to.be.true;
     });
   });
+
+  describe('#deployPixDataApiPix', function () {
+    it('should call Scalingo API to deploy a specified tag', async function () {
+      const scalingoTokenNock = nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
+      const pixDataApiPixVersion = 'v0.0.1';
+      const deploymentPayload = {
+        branch: pixDataApiPixVersion,
+      };
+
+      const commandPayload = {
+        text: pixDataApiPixVersion,
+      };
+
+      const nockCall = nock('https://scalingo.production')
+        .post(`/v1/apps/pix-data-api-pix-production/scm_repo_link/manual_deploy`, deploymentPayload)
+        .reply(200, {});
+
+      await commands.deployPixDataApiPix(commandPayload);
+
+      expect(scalingoTokenNock.isDone()).to.be.true;
+      expect(nockCall.isDone()).to.be.true;
+    });
+  });
 });

@@ -131,4 +131,13 @@ manifest.addInteractivity({
   handler: slackbotController.interactiveEndpoint,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-pix-data-api-pix',
+  path: '/slack/commands/deploy-pix-data-api-pix',
+  description: 'Déploie la version précisée de pix-data-api-pix en production',
+  usage_hint: '/deploy-pix-data-api-pix $version',
+  should_escape: false,
+  handler: slackbotController.deployPixDataApiPix,
+});
+
 export default manifest;

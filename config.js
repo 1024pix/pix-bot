@@ -154,6 +154,7 @@ const configuration = (function () {
     PIX_TUTOS_APP_NAME: 'pix-tutos',
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
     PIX_DBT_APPS_NAME: ['pix-dbt-production', 'pix-dbt-external-production'],
+    PIX_DATA_API_PIX_APPS_NAME: ['pix-data-api-pix-production'],
   };
 
   if (process.env.NODE_ENV === 'test') {
