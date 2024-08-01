@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.102.0 (01/08/2024)
+
+
+### :rocket: Amélioration
+- [#418](https://github.com/1024pix/pix-bot/pull/418) [FEATURE] Ajout d'une commande slack pour déploiement de pix-data-api-pix (PIX-13714).
+
+### :arrow_up: Montée de version
+- [#417](https://github.com/1024pix/pix-bot/pull/417) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.101.0 (25/07/2024)
 
 
