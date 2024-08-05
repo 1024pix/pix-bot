@@ -45,7 +45,7 @@
     "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.7.0",
+    "node-fetch": "^3.0.0",
     "scalingo": "^0.8.0",
     "slack-block-builder": "^2.7.2",
     "tsscmp": "^1.0.6"
