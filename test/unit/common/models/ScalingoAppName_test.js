@@ -11,7 +11,6 @@ describe('Unit | Common | Models | ScalingoAppName', function () {
 
       // when
       const resultInvalidAppName = ScalingoAppName.isApplicationNameValid(invalidAppName);
-      console.log(resultInvalidAppName);
       // then
       expect(resultInvalidAppName, 'Invalid app name').to.be.false;
     });
