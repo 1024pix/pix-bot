@@ -1,5 +1,20 @@
 # pix-bot Changelog
 
+## v1.103.0 (20/08/2024)
+
+
+### :rocket: Amélioration
+- [#430](https://github.com/1024pix/pix-bot/pull/430) [FEATURE] Permettre le déploiement dès la création d'une release (PIX-13870).
+
+### :arrow_up: Montée de version
+- [#431](https://github.com/1024pix/pix-bot/pull/431) [BUMP] Update dependency axios to v1.7.4 [SECURITY].
+- [#429](https://github.com/1024pix/pix-bot/pull/429) [BUMP] Lock file maintenance.
+- [#406](https://github.com/1024pix/pix-bot/pull/406) [BUMP] Update Node.js to ^20.16.0.
+- [#425](https://github.com/1024pix/pix-bot/pull/425) [BUMP] Update dependency node-fetch to v3.
+- [#422](https://github.com/1024pix/pix-bot/pull/422) [BUMP] Update dependency node to v20.16.0.
+- [#421](https://github.com/1024pix/pix-bot/pull/421) [BUMP] Update Node.js to v20.16.0.
+- [#420](https://github.com/1024pix/pix-bot/pull/420) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.102.0 (01/08/2024)
 
 
