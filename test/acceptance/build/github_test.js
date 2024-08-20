@@ -675,6 +675,79 @@ describe('Acceptance | Build | Github', function () {
       });
     });
 
+    describe('on release event', function () {
+      context('when the repository is not configured', function () {
+        it('responds with 200', async function () {
+          // given
+          sinon.stub(config, 'repoAppNames').value({});
+          const tag = 'v0.1.0';
+          const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+
+          const body = {
+            action: 'released',
+            release: {
+              tag_name: tag,
+            },
+            repository: {
+              organization: '1024pix',
+              name: 'pix-test',
+            },
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'release',
+            },
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(StatusCodes.OK);
+          expect(res.result).to.equal('No Scalingo app configured for this repository');
+          expect(scalingoAuth.isDone()).to.be.false;
+        });
+      });
+
+      context('when the repository is configured', function () {
+        it('responds with 200, deploy the repo on Scalingo', async function () {
+          // given
+          sinon.stub(config, 'repoAppNames').value({
+            'pix-test': ['pix-test-app-production'],
+          });
+
+          const tag = 'v0.1.0';
+          const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+          const scalingoDeploy = nock('https://scalingo.production')
+            .post(`/v1/apps/pix-test-app-production/scm_repo_link/manual_deploy`, { branch: tag })
+            .reply(200, {});
+
+          const body = {
+            action: 'released',
+            release: {
+              tag_name: tag,
+            },
+            repository: {
+              organization: '1024pix',
+              name: 'pix-test',
+            },
+          };
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'release',
+            },
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(StatusCodes.OK);
+          expect(res.result).to.deep.equal(['Deployment of pix-test-app-production v0.1.0 has been requested']);
+          expect(scalingoAuth.isDone()).to.be.true;
+          expect(scalingoDeploy.isDone()).to.be.true;
+        });
+      });
+    });
+
     it('responds with 200 and do nothing for other event', async function () {
       body = {};
       const res = await server.inject({
