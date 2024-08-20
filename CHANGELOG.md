@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.103.1 (20/08/2024)
+
+
+### :arrow_up: Montée de version
+- [#432](https://github.com/1024pix/pix-bot/pull/432) [BUMP] Update dependency chai to v5 (dossier racine).
+
 ## v1.103.0 (20/08/2024)
 
 
