@@ -156,7 +156,7 @@ const configuration = (function () {
     PIX_DBT_APPS_NAME: ['pix-dbt-production', 'pix-dbt-external-production'],
     PIX_DATA_API_PIX_APPS_NAME: ['pix-data-api-pix-production'],
 
-    repoAppNames: _getJSON(process.env.REPO_APP_NAMES_MAPPING),
+    repoAppNames: _getJSON(process.env.REPO_APP_NAMES_MAPPING) || {},
   };
 
   if (process.env.NODE_ENV === 'test') {
