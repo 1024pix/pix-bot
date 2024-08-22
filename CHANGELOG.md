@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.103.2 (22/08/2024)
+
+
+### :bug: Correction
+- [#433](https://github.com/1024pix/pix-bot/pull/433) [BUGFIX] Eviter les 500 sur l'appel /github/webhook. .
+
 ## v1.103.1 (20/08/2024)
 
 
