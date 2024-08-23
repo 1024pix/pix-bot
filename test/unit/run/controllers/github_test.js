@@ -75,13 +75,13 @@ describe('Unit | Run | Controller | Github', function () {
             },
           },
         };
-        const deployUsingSCMStub = sinon.stub();
+        const deployFromArchive = sinon.stub();
         const injectedConfigurationRepoAppMapping = {
           'pix-repo-test': ['pix-app-name-production', 'pix-app-name-2-production'],
         };
         const injectedScalingoClientStub = {
           getInstance: () => ({
-            deployUsingSCM: deployUsingSCMStub,
+            deployFromArchive,
           }),
         };
 
@@ -89,8 +89,12 @@ describe('Unit | Run | Controller | Github', function () {
         await githubController.releaseWebhook(request, injectedConfigurationRepoAppMapping, injectedScalingoClientStub);
 
         // then
-        expect(deployUsingSCMStub.firstCall).to.be.calledWith('pix-app-name-production', 'v0.1.0');
-        expect(deployUsingSCMStub.secondCall).to.be.calledWith('pix-app-name-2-production', 'v0.1.0');
+        expect(deployFromArchive.firstCall).to.be.calledWith('pix-app-name-production', 'v0.1.0', 'pix-repo-test', {
+          withEnvSuffix: false,
+        });
+        expect(deployFromArchive.secondCall).to.be.calledWith('pix-app-name-2-production', 'v0.1.0', 'pix-repo-test', {
+          withEnvSuffix: false,
+        });
       });
     });
 
