@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.103.3 (23/08/2024)
+
+
+### :building_construction: Tech
+- [#434](https://github.com/1024pix/pix-bot/pull/434) [TECH] Déplacer le webhook GitHub release dans la partie `run` (PIX-13870).
+
 ## v1.103.2 (22/08/2024)
 
 
