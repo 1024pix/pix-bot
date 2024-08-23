@@ -14,21 +14,22 @@ async function processWebhook(request, { injectedReleaseWebhook = releaseWebhook
 }
 
 async function releaseWebhook(request, repoAppMapping = config.repoAppNames, injectedScalingoClient = ScalingoClient) {
-  const appNames = repoAppMapping[request.payload.repository.name];
+  const repository = request.payload.repository.name;
+  const appNames = repoAppMapping[repository];
   const tag = request.payload.release.tag_name;
 
   if (!appNames) {
     return 'No Scalingo app configured for this repository';
   }
 
-  return deployTagUsingSCM(appNames, tag, injectedScalingoClient);
+  return deployFromArchive(appNames, tag, repository, injectedScalingoClient);
 }
 
-async function deployTagUsingSCM(appNames, tag, scalingoClient) {
+async function deployFromArchive(appNames, tag, repository, scalingoClient) {
   const client = await scalingoClient.getInstance('production');
   return Promise.all(
     appNames.map((appName) => {
-      return client.deployUsingSCM(appName, tag);
+      return client.deployFromArchive(appName, tag, repository, { withEnvSuffix: false });
     }),
   );
 }

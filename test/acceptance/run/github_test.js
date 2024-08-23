@@ -48,8 +48,14 @@ describe('Acceptance | Run | Github', function () {
 
           const tag = 'v0.1.0';
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+          const scalingoDeploymentPayload = {
+            deployment: {
+              git_ref: tag,
+              source_url: 'https://undefined@github.com/github-owner/pix-test/archive/v0.1.0.tar.gz',
+            },
+          };
           const scalingoDeploy = nock('https://scalingo.production')
-            .post(`/v1/apps/pix-test-app-production/scm_repo_link/manual_deploy`, { branch: tag })
+            .post(`/v1/apps/pix-test-app-production/deployments`, scalingoDeploymentPayload)
             .reply(200, {});
 
           const body = {
@@ -72,7 +78,7 @@ describe('Acceptance | Run | Github', function () {
             payload: body,
           });
           expect(res.statusCode).to.equal(StatusCodes.OK);
-          expect(res.result).to.deep.equal(['Deployment of pix-test-app-production v0.1.0 has been requested']);
+          expect(res.result).to.deep.equal(['pix-test-app-production v0.1.0 has been deployed']);
           expect(scalingoAuth.isDone()).to.be.true;
           expect(scalingoDeploy.isDone()).to.be.true;
         });
