@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.104.0 (23/08/2024)
+
+
+### :rocket: Amélioration
+- [#435](https://github.com/1024pix/pix-bot/pull/435) [FEATURE] Déployer les apps grâce au webhook GitHub sans que le repository soit lié dans Scalingo.
+
 ## v1.103.3 (23/08/2024)
 
 
