@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.104.1 (19/09/2024)
+
+
+### :arrow_up: Montée de version
+- [#441](https://github.com/1024pix/pix-bot/pull/441) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.1 (dossier racine).
+- [#440](https://github.com/1024pix/pix-bot/pull/440) [BUMP] Lock file maintenance.
+- [#439](https://github.com/1024pix/pix-bot/pull/439) [BUMP] Lock file maintenance.
+- [#438](https://github.com/1024pix/pix-bot/pull/438) [BUMP] Lock file maintenance.
+- [#436](https://github.com/1024pix/pix-bot/pull/436) [BUMP] Lock file maintenance.
+
 ## v1.104.0 (23/08/2024)
 
 
