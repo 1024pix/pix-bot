@@ -88,7 +88,7 @@ describe('Acceptance | Build | Github', function () {
           });
           expect(res.statusCode).to.equal(StatusCodes.OK);
           expect(res.result).to.eql(
-            'Created RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
           );
           expect(scalingoAuth.isDone()).to.be.true;
           expect(scalingoDeploy1.isDone()).to.be.true;
@@ -338,6 +338,8 @@ describe('Acceptance | Build | Github', function () {
           const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2' });
           const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
           const scalingoDeploy3 = getManualDeployNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+
+          nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(StatusCodes.OK);
 
           const res = await server.inject({
             method: 'POST',
