@@ -358,16 +358,19 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       it('should call scalingo to create and deploy the corresponding applications', async function () {
         // given
         const scalingoClientStub = sinon.stub();
-        const deployReviewAppStub = sinon.stub().returns({ app_name: 'sample_ra_name' });
+        const deployReviewAppStub = sinon.stub();
         const disableAutoDeployStub = sinon.stub();
         const deployUsingSCMStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub();
         scalingoClientStub.getInstance = sinon.stub().returns({
           deployReviewApp: deployReviewAppStub,
           disableAutoDeploy: disableAutoDeployStub,
           deployUsingSCM: deployUsingSCMStub,
+          reviewAppExists: reviewAppExistsStub,
         });
         const addMessageToPullRequestStub = sinon.stub();
         const githubServiceStub = sinon.stub();
+        reviewAppExistsStub.resolves(false);
 
         // when
         const response = await githubController.pullRequestOpenedWebhook(
@@ -379,16 +382,16 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         // then
         expect(deployReviewAppStub.firstCall.calledWith('pix-api-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.firstCall.calledWith('sample_ra_name')).to.be.true;
-        expect(deployUsingSCMStub.firstCall.calledWith('sample_ra_name', 'my-branch')).to.be.true;
+        expect(disableAutoDeployStub.firstCall.calledWith('pix-api-review-pr3')).to.be.true;
+        expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
 
         expect(deployReviewAppStub.secondCall.calledWith('pix-audit-logger-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.secondCall.calledWith('sample_ra_name')).to.be.true;
-        expect(deployUsingSCMStub.secondCall.calledWith('sample_ra_name', 'my-branch')).to.be.true;
+        expect(disableAutoDeployStub.secondCall.calledWith('pix-audit-logger-review-pr3')).to.be.true;
+        expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
 
         expect(deployReviewAppStub.thirdCall.calledWith('pix-front-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.thirdCall.calledWith('sample_ra_name')).to.be.true;
-        expect(deployUsingSCMStub.thirdCall.calledWith('sample_ra_name', 'my-branch')).to.be.true;
+        expect(disableAutoDeployStub.thirdCall.calledWith('pix-front-review-pr3')).to.be.true;
+        expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
 
         expect(
           addMessageToPullRequestStub.calledOnceWithExactly(
@@ -428,7 +431,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         // then
         expect(result).to.be.instanceOf(Error);
-        expect(result.message).to.equal('Scalingo APIError: Deployment error');
+        expect(result.message).to.equal('No RA deployed for repository pix and pr3');
       });
     });
   });
