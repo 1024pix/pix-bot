@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
 
-import gitHubService from '../../common/services/github.js';
+import commonGithubService from '../../common/services/github.js';
 import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
@@ -49,7 +49,7 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
   return message;
 }
 
-const addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingoReviewApps }, { githubService }) => {
+const _addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingoReviewApps }, { githubService }) => {
   const messageTemplate = getMessageTemplate(repositoryName);
   const message = getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate);
 
@@ -60,11 +60,11 @@ const addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingo
   });
 };
 
-async function pullRequestOpenedWebhook(
+async function _pullRequestOpenedWebhook(
   request,
-  injectedScalingoClient = ScalingoClient,
-  injectedAddMessageToPullRequest = addMessageToPullRequest,
-  githubService = gitHubService,
+  scalingoClient = ScalingoClient,
+  addMessageToPullRequest = _addMessageToPullRequest,
+  githubService = commonGithubService,
 ) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
@@ -78,7 +78,7 @@ async function pullRequestOpenedWebhook(
   }
 
   try {
-    const client = await injectedScalingoClient.getInstance('reviewApps');
+    const client = await scalingoClient.getInstance('reviewApps');
     logger.info({
       event: 'review-app',
       message: `Creating RA for repo ${repository} PR ${prId}`,
@@ -88,7 +88,7 @@ async function pullRequestOpenedWebhook(
       await client.disableAutoDeploy(reviewAppName);
       await client.deployUsingSCM(reviewAppName, ref);
     }
-    await injectedAddMessageToPullRequest(
+    await addMessageToPullRequest(
       {
         repositoryName: repository,
         scalingoReviewApps: reviewApps,
@@ -106,7 +106,7 @@ async function pullRequestOpenedWebhook(
   }
 }
 
-async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = ScalingoClient) {
+async function _pullRequestSynchronizeWebhook(request, scalingoClient = ScalingoClient) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
   const ref = payload.pull_request.head.ref;
@@ -120,7 +120,7 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
   const deployedRA = [];
   let client;
   try {
-    client = await injectedScalingoClient.getInstance('reviewApps');
+    client = await scalingoClient.getInstance('reviewApps');
   } catch (error) {
     throw new Error(`Scalingo auth APIError: ${error.message}`);
   }
@@ -162,7 +162,7 @@ async function pullRequestSynchronizeWebhook(request, injectedScalingoClient = S
   return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
-async function pushOnDefaultBranchWebhook(request, injectedScalingoClient = ScalingoClient) {
+async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoClient) {
   const branchName = request.payload.ref.split('/').slice(-1)[0];
   if (request.payload.repository.default_branch != branchName) {
     return `Ignoring push event on branch ${branchName} as it is not the default branch`;
@@ -174,7 +174,7 @@ async function pushOnDefaultBranchWebhook(request, injectedScalingoClient = Scal
     return `Ignoring push event on repository ${repositoryName} as it is not configured`;
   }
   const scalingoApps = config.scalingo.repositoryToScalingoIntegration[repositoryName];
-  const client = await injectedScalingoClient.getInstance('integration');
+  const client = await scalingoClient.getInstance('integration');
   for (const applicationName of scalingoApps) {
     try {
       await client.deployFromArchive(applicationName, branchName, repositoryName, { withEnvSuffix: false });
@@ -189,22 +189,22 @@ async function pushOnDefaultBranchWebhook(request, injectedScalingoClient = Scal
 async function processWebhook(
   request,
   {
-    injectedPushOnDefaultBranchWebhook = pushOnDefaultBranchWebhook,
-    injectedPullRequestOpenedWebhook = pullRequestOpenedWebhook,
-    injectedPullRequestSynchronizeWebhook = pullRequestSynchronizeWebhook,
+    pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
+    pullRequestOpenedWebhook = _pullRequestOpenedWebhook,
+    pullRequestSynchronizeWebhook = _pullRequestSynchronizeWebhook,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
   if (eventName === 'push') {
-    return injectedPushOnDefaultBranchWebhook(request);
+    return pushOnDefaultBranchWebhook(request);
   } else if (eventName === 'pull_request') {
     switch (request.payload.action) {
       case 'opened':
-        return injectedPullRequestOpenedWebhook(request);
+        return pullRequestOpenedWebhook(request);
       case 'reopened':
-        return injectedPullRequestOpenedWebhook(request);
+        return pullRequestOpenedWebhook(request);
       case 'synchronize':
-        return injectedPullRequestSynchronizeWebhook(request);
+        return pullRequestSynchronizeWebhook(request);
     }
     return `Ignoring ${request.payload.action} action`;
   } else {
@@ -237,11 +237,11 @@ function _handleNoRACase(request) {
 }
 
 export {
-  addMessageToPullRequest,
+  _addMessageToPullRequest as addMessageToPullRequest,
   getMessage,
   getMessageTemplate,
   processWebhook,
-  pullRequestOpenedWebhook,
-  pullRequestSynchronizeWebhook,
-  pushOnDefaultBranchWebhook,
+  _pullRequestOpenedWebhook as pullRequestOpenedWebhook,
+  _pullRequestSynchronizeWebhook as pullRequestSynchronizeWebhook,
+  _pushOnDefaultBranchWebhook as pushOnDefaultBranchWebhook,
 };
