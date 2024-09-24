@@ -88,7 +88,7 @@ describe('Acceptance | Build | Github', function () {
           });
           expect(res.statusCode).to.equal(StatusCodes.OK);
           expect(res.result).to.eql(
-            'Created RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
           );
           expect(scalingoAuth.isDone()).to.be.true;
           expect(scalingoDeploy1.isDone()).to.be.true;

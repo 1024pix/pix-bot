@@ -133,31 +133,31 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           payload: { action: 'nothing' },
         };
         ['opened', 'reopened'].forEach((action) => {
-          it(`should call pullRequestOpenedWebhook() method on ${action} action`, async function () {
+          it(`should call handleRA() method on ${action} action`, async function () {
             // given
             sinon.stub(request, 'payload').value({ action });
 
-            const pullRequestOpenedWebhook = sinon.stub();
+            const handleRA = sinon.stub();
 
             // when
-            await githubController.processWebhook(request, { pullRequestOpenedWebhook });
+            await githubController.processWebhook(request, { handleRA });
 
             // then
-            expect(pullRequestOpenedWebhook.calledOnceWithExactly(request)).to.be.true;
+            expect(handleRA.calledOnceWithExactly(request)).to.be.true;
           });
         });
 
-        it('should call pullRequestSynchronizeWebhook() method on synchronize action', async function () {
+        it('should call handleRA() method on synchronize action', async function () {
           // given
           sinon.stub(request, 'payload').value({ action: 'synchronize' });
 
-          const pullRequestSynchronizeWebhook = sinon.stub();
+          const handleRA = sinon.stub();
 
           // when
-          await githubController.processWebhook(request, { pullRequestSynchronizeWebhook });
+          await githubController.processWebhook(request, { handleRA });
 
           // then
-          expect(pullRequestSynchronizeWebhook.calledOnceWithExactly(request)).to.be.true;
+          expect(handleRA.calledOnceWithExactly(request)).to.be.true;
         });
 
         it('should ignore the action', async function () {
@@ -282,7 +282,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
     });
   });
 
-  describe('#pullRequestOpenedWebhook', function () {
+  describe('#handleRA', function () {
     const request = {
       payload: {
         number: 3,
@@ -307,7 +307,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           sinon.stub(request.payload.pull_request.head.repo, 'fork').value(true);
 
           // when
-          const response = await githubController.pullRequestOpenedWebhook(request);
+          const response = await githubController.handleRA(request);
 
           // then
           expect(response).to.equal('No RA for a fork');
@@ -320,7 +320,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           sinon.stub(request.payload.pull_request.head.repo, 'name').value('no-ra-app-repo-name');
 
           // when
-          const response = await githubController.pullRequestOpenedWebhook(request);
+          const response = await githubController.handleRA(request);
 
           // then
           expect(response).to.equal('No RA configured for this repository');
@@ -333,7 +333,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'no-review-app' }]);
 
           // when
-          const response = await githubController.pullRequestOpenedWebhook(request);
+          const response = await githubController.handleRA(request);
 
           // then
           expect(response).to.equal('RA disabled for this PR');
@@ -346,161 +346,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           sinon.stub(request.payload.pull_request, 'state').value('closed');
 
           // when
-          const response = await githubController.pullRequestOpenedWebhook(request);
-
-          // then
-          expect(response).to.equal('No RA for closed PR');
-        });
-      });
-    });
-
-    describe('when the Review App creation conditions are met', function () {
-      it('should call scalingo to create and deploy the corresponding applications', async function () {
-        // given
-        const scalingoClientStub = sinon.stub();
-        const deployReviewAppStub = sinon.stub();
-        const disableAutoDeployStub = sinon.stub();
-        const deployUsingSCMStub = sinon.stub();
-        const reviewAppExistsStub = sinon.stub();
-        scalingoClientStub.getInstance = sinon.stub().returns({
-          deployReviewApp: deployReviewAppStub,
-          disableAutoDeploy: disableAutoDeployStub,
-          deployUsingSCM: deployUsingSCMStub,
-          reviewAppExists: reviewAppExistsStub,
-        });
-        const addMessageToPullRequestStub = sinon.stub();
-        const githubServiceStub = sinon.stub();
-        reviewAppExistsStub.resolves(false);
-
-        // when
-        const response = await githubController.pullRequestOpenedWebhook(
-          request,
-          scalingoClientStub,
-          addMessageToPullRequestStub,
-          githubServiceStub,
-        );
-
-        // then
-        expect(deployReviewAppStub.firstCall.calledWith('pix-api-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.firstCall.calledWith('pix-api-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
-
-        expect(deployReviewAppStub.secondCall.calledWith('pix-audit-logger-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.secondCall.calledWith('pix-audit-logger-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
-
-        expect(deployReviewAppStub.thirdCall.calledWith('pix-front-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.thirdCall.calledWith('pix-front-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
-
-        expect(
-          addMessageToPullRequestStub.calledOnceWithExactly(
-            {
-              repositoryName: 'pix',
-              scalingoReviewApps: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
-              pullRequestId: 3,
-            },
-            { githubService: githubServiceStub },
-          ),
-        ).to.be.true;
-
-        expect(response).to.equal(
-          'Created RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 3',
-        );
-      });
-
-      it('throws an error on scalingo deployment fails', async function () {
-        // given
-        const scalingoClientStub = sinon.stub();
-        const deployReviewAppStub = sinon.stub().rejects(new Error('Deployment error'));
-        const disableAutoDeployStub = sinon.stub();
-        const deployUsingSCMStub = sinon.stub();
-        scalingoClientStub.getInstance = sinon.stub().returns({
-          deployReviewApp: deployReviewAppStub,
-          disableAutoDeploy: disableAutoDeployStub,
-          deployUsingSCM: deployUsingSCMStub,
-        });
-        const addMessageToPullRequestStub = sinon.stub();
-
-        // when
-        const result = await catchErr(githubController.pullRequestOpenedWebhook)(
-          request,
-          scalingoClientStub,
-          addMessageToPullRequestStub,
-        );
-
-        // then
-        expect(result).to.be.instanceOf(Error);
-        expect(result.message).to.equal('No RA deployed for repository pix and pr3');
-      });
-    });
-  });
-
-  describe('#pullRequestSynchronizeWebhook', function () {
-    const request = {
-      payload: {
-        number: 3,
-        pull_request: {
-          state: 'open',
-          labels: [],
-          head: {
-            ref: 'my-branch',
-            repo: {
-              name: 'pix',
-              fork: false,
-            },
-          },
-        },
-      },
-    };
-
-    describe('when the Review App creation conditions are not met', function () {
-      describe('when the project is a fork', function () {
-        it('should not create a Review App', async function () {
-          // given
-          sinon.stub(request.payload.pull_request.head.repo, 'fork').value(true);
-
-          // when
-          const response = await githubController.pullRequestSynchronizeWebhook(request);
-
-          // then
-          expect(response).to.equal('No RA for a fork');
-        });
-      });
-
-      describe('when there is no RA configured for this repository', function () {
-        it('should not create a Review App', async function () {
-          // given
-          sinon.stub(request.payload.pull_request.head.repo, 'name').value('no-ra-app-repo-name');
-
-          // when
-          const response = await githubController.pullRequestSynchronizeWebhook(request);
-
-          // then
-          expect(response).to.equal('No RA configured for this repository');
-        });
-      });
-
-      describe('when there is a no-review-app label on the PR', function () {
-        it('should not create a Review App', async function () {
-          // given
-          sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'no-review-app' }]);
-
-          // when
-          const response = await githubController.pullRequestSynchronizeWebhook(request);
-
-          // then
-          expect(response).to.equal('RA disabled for this PR');
-        });
-      });
-
-      describe('when the PR is not opened', function () {
-        it('should not create a Review App', async function () {
-          // given
-          sinon.stub(request.payload.pull_request, 'state').value('closed');
-
-          // when
-          const response = await githubController.pullRequestSynchronizeWebhook(request);
+          const response = await githubController.handleRA(request);
 
           // then
           expect(response).to.equal('No RA for closed PR');
@@ -513,22 +359,40 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         // given
         const scalingoClientStub = sinon.stub();
         const deployUsingSCMStub = sinon.stub();
-        const reviewAppExistsStub = sinon.stub().resolves(true);
+        const deployReviewAppStub = sinon.stub();
+        const disableAutoDeployStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub().resolves(false);
 
         scalingoClientStub.getInstance = sinon.stub().returns({
           deployUsingSCM: deployUsingSCMStub,
+          deployReviewApp: deployReviewAppStub,
+          disableAutoDeploy: disableAutoDeployStub,
           reviewAppExists: reviewAppExistsStub,
         });
 
+        const addMessageToPullRequestStub = sinon.stub();
+        const githubServiceStub = sinon.stub();
+
         // when
-        const response = await githubController.pullRequestSynchronizeWebhook(request, scalingoClientStub);
+        await githubController.handleRA(request, scalingoClientStub, addMessageToPullRequestStub, githubServiceStub);
 
         // then
-        expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
+
+        expect(deployReviewAppStub.secondCall.calledWith('pix-audit-logger-review', 3)).to.be.true;
+        expect(disableAutoDeployStub.secondCall.calledWith('pix-audit-logger-review-pr3')).to.be.true;
         expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
+
+        expect(deployReviewAppStub.thirdCall.calledWith('pix-front-review', 3)).to.be.true;
+        expect(disableAutoDeployStub.thirdCall.calledWith('pix-front-review-pr3')).to.be.true;
         expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
-        expect(response).to.equal(
-          'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 3',
+
+        expect(addMessageToPullRequestStub).to.have.been.calledOnceWithExactly(
+          {
+            repositoryName: 'pix',
+            scalingoReviewApps: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
+            pullRequestId: 3,
+          },
+          { githubService: githubServiceStub },
         );
       });
 
@@ -543,7 +407,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         });
 
         // when
-        const result = await catchErr(githubController.pullRequestSynchronizeWebhook)(request, scalingoClientStub);
+        const result = await catchErr(githubController.handleRA)(request, scalingoClientStub);
 
         // then
         expect(result).to.be.instanceOf(Error);
@@ -569,11 +433,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
 
           // when
-          const response = await githubController.pullRequestSynchronizeWebhook(
-            request,
-            scalingoClientStub,
-            githubServiceStub,
-          );
+          const response = await githubController.handleRA(request, scalingoClientStub, githubServiceStub);
 
           // then
           expect(deployReviewAppStub.calledOnceWithExactly('pix-api-review', 3)).to.be.true;
@@ -581,6 +441,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
           expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
           expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+
           expect(response).to.equal(
             'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 3',
           );

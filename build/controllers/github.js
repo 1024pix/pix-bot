@@ -60,42 +60,7 @@ const _addMessageToPullRequest = async ({ repositoryName, pullRequestId, scaling
   });
 };
 
-async function _pullRequestOpenedWebhook(
-  request,
-  scalingoClient = ScalingoClient,
-  addMessageToPullRequest = _addMessageToPullRequest,
-  githubService = commonGithubService,
-) {
-  const payload = request.payload;
-  const prId = payload.number;
-  const ref = payload.pull_request.head.ref;
-  const repository = payload.pull_request.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repository];
-
-  const { shouldContinue, message } = _handleNoRACase(request);
-  if (!shouldContinue) {
-    return message;
-  }
-
-  const deployedRA = await deployPullRequest(
-    scalingoClient,
-    reviewApps,
-    prId,
-    ref,
-    repository,
-    addMessageToPullRequest,
-    githubService,
-  );
-
-  logger.info({
-    event: 'review-app',
-    message: `Created RA for repo ${repository} PR ${prId}`,
-  });
-
-  return `Created RA on app ${deployedRA.join(', ')} with pr ${prId}`;
-}
-
-async function _pullRequestSynchronizeWebhook(
+async function _handleRA(
   request,
   scalingoClient = ScalingoClient,
   addMessageToPullRequest = _addMessageToPullRequest,
@@ -181,6 +146,11 @@ async function deployPullRequest(
       },
       { githubService },
     );
+
+    logger.info({
+      event: 'review-app',
+      message: `Created RA for repo ${repository} PR ${prId}`,
+    });
   }
   logger.info({
     event: 'review-app',
@@ -215,23 +185,14 @@ async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoCli
 
 async function processWebhook(
   request,
-  {
-    pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
-    pullRequestOpenedWebhook = _pullRequestOpenedWebhook,
-    pullRequestSynchronizeWebhook = _pullRequestSynchronizeWebhook,
-  } = {},
+  { pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook, handleRA = _handleRA } = {},
 ) {
   const eventName = request.headers['x-github-event'];
   if (eventName === 'push') {
     return pushOnDefaultBranchWebhook(request);
   } else if (eventName === 'pull_request') {
-    switch (request.payload.action) {
-      case 'opened':
-        return pullRequestOpenedWebhook(request);
-      case 'reopened':
-        return pullRequestOpenedWebhook(request);
-      case 'synchronize':
-        return pullRequestSynchronizeWebhook(request);
+    if (['opened', 'reopened', 'synchronize'].includes(request.payload.action)) {
+      return handleRA(request);
     }
     return `Ignoring ${request.payload.action} action`;
   } else {
@@ -267,8 +228,7 @@ export {
   _addMessageToPullRequest as addMessageToPullRequest,
   getMessage,
   getMessageTemplate,
+  _handleRA as handleRA,
   processWebhook,
-  _pullRequestOpenedWebhook as pullRequestOpenedWebhook,
-  _pullRequestSynchronizeWebhook as pullRequestSynchronizeWebhook,
   _pushOnDefaultBranchWebhook as pushOnDefaultBranchWebhook,
 };
