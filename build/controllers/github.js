@@ -60,7 +60,6 @@ const _addMessageToPullRequest = async ({ repositoryName, pullRequestId, scaling
   });
 };
 
-
 async function _pullRequestOpenedWebhook(
   request,
   scalingoClient = ScalingoClient,
@@ -78,16 +77,16 @@ async function _pullRequestOpenedWebhook(
     return message;
   }
 
-  const deployedRA = await deployPullRequest(scalingoClient, reviewApps, prId, ref, repository);
-
-  await addMessageToPullRequest(
-    {
-      repositoryName: repository,
-      scalingoReviewApps: reviewApps,
-      pullRequestId: prId,
-    },
-    { githubService },
+  const deployedRA = await deployPullRequest(
+    scalingoClient,
+    reviewApps,
+    prId,
+    ref,
+    repository,
+    addMessageToPullRequest,
+    githubService,
   );
+
   logger.info({
     event: 'review-app',
     message: `Created RA for repo ${repository} PR ${prId}`,
@@ -96,7 +95,12 @@ async function _pullRequestOpenedWebhook(
   return `Created RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
-async function _pullRequestSynchronizeWebhook(request, scalingoClient = ScalingoClient) {
+async function _pullRequestSynchronizeWebhook(
+  request,
+  scalingoClient = ScalingoClient,
+  addMessageToPullRequest = _addMessageToPullRequest,
+  githubService = commonGithubService,
+) {
   const payload = request.payload;
   const prId = payload.number;
   const ref = payload.pull_request.head.ref;
@@ -108,12 +112,28 @@ async function _pullRequestSynchronizeWebhook(request, scalingoClient = Scalingo
     return message;
   }
 
-  const deployedRA = await deployPullRequest(scalingoClient, reviewApps, prId, ref, repository);
+  const deployedRA = await deployPullRequest(
+    scalingoClient,
+    reviewApps,
+    prId,
+    ref,
+    repository,
+    addMessageToPullRequest,
+    githubService,
+  );
 
   return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
-async function deployPullRequest(scalingoClient, reviewApps, prId, ref, repository) {
+async function deployPullRequest(
+  scalingoClient,
+  reviewApps,
+  prId,
+  ref,
+  repository,
+  addMessageToPullRequest,
+  githubService,
+) {
   const deployedRA = [];
   let client;
   try {
@@ -124,14 +144,15 @@ async function deployPullRequest(scalingoClient, reviewApps, prId, ref, reposito
   for (const appName of reviewApps) {
     const reviewAppName = `${appName}-pr${prId}`;
     try {
-      if (await client.reviewAppExists(reviewAppName)) {
+      const reviewAppExists = await client.reviewAppExists(reviewAppName);
+      if (reviewAppExists) {
         await client.deployUsingSCM(reviewAppName, ref);
       } else {
         await client.deployReviewApp(appName, prId);
         await client.disableAutoDeploy(reviewAppName);
         await client.deployUsingSCM(reviewAppName, ref);
       }
-      deployedRA.push(appName);
+      deployedRA.push({ name: appName, isCreated: !reviewAppExists });
     } catch (error) {
       logger.error({
         event: 'review-app',
@@ -147,15 +168,25 @@ async function deployPullRequest(scalingoClient, reviewApps, prId, ref, reposito
     }
   }
 
-  if (deployedRA.length == 0) {
+  if (deployedRA.length === 0) {
     throw new Error(`No RA deployed for repository ${repository} and pr${prId}`);
   }
 
+  if (deployedRA.some(({ isCreated }) => isCreated)) {
+    await addMessageToPullRequest(
+      {
+        repositoryName: repository,
+        scalingoReviewApps: reviewApps,
+        pullRequestId: prId,
+      },
+      { githubService },
+    );
+  }
   logger.info({
     event: 'review-app',
     message: `PR${prId} deployement triggered on RA for repo ${repository}`,
   });
-  return deployedRA;
+  return deployedRA.map(({ name }) => name);
 }
 
 async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoClient) {

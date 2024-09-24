@@ -559,6 +559,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(false);
           const deployReviewAppStub = sinon.stub();
           const disableAutoDeployStub = sinon.stub();
+          const githubServiceStub = sinon.stub();
 
           scalingoClientStub.getInstance = sinon.stub().returns({
             deployUsingSCM: deployUsingSCMStub,
@@ -568,7 +569,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
 
           // when
-          const response = await githubController.pullRequestSynchronizeWebhook(request, scalingoClientStub);
+          const response = await githubController.pullRequestSynchronizeWebhook(
+            request,
+            scalingoClientStub,
+            githubServiceStub,
+          );
 
           // then
           expect(deployReviewAppStub.calledOnceWithExactly('pix-api-review', 3)).to.be.true;

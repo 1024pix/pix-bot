@@ -339,6 +339,8 @@ describe('Acceptance | Build | Github', function () {
           const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
           const scalingoDeploy3 = getManualDeployNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
 
+          nock('https://api.github.com').post('/repos/github-owner/pix/issues/2/comments').reply(StatusCodes.OK);
+
           const res = await server.inject({
             method: 'POST',
             url: '/github/webhook',
