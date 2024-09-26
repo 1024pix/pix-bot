@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v1.104.2 (26/09/2024)
+
+
+### :building_construction: Tech
+- [#444](https://github.com/1024pix/pix-bot/pull/444) [TECH] Refactorer le controller GitHub.
+
+### :arrow_up: Montée de version
+- [#437](https://github.com/1024pix/pix-bot/pull/437) [BUMP] Update node.
+- [#443](https://github.com/1024pix/pix-bot/pull/443) [BUMP] Lock file maintenance.
+
 ## v1.104.1 (19/09/2024)
 
 
