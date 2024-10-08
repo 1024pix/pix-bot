@@ -185,7 +185,7 @@ async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoCli
 
 async function processWebhook(
   request,
-  { pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook, handleRA = _handleRA } = {},
+  { pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook, handleRA = _handleRA, pullRequestRepository } = {},
 ) {
   const eventName = request.headers['x-github-event'];
   if (eventName === 'push') {
@@ -193,6 +193,12 @@ async function processWebhook(
   } else if (eventName === 'pull_request') {
     if (['opened', 'reopened', 'synchronize'].includes(request.payload.action)) {
       return handleRA(request);
+    }
+    if (request.payload.action === 'labeled' && request.payload.label === ':rocket: Ready to Merge') {
+      await pullRequestRepository.save({
+        number: request.payload.number,
+        repositoryName: request.payload.repository.name,
+      });
     }
     return `Ignoring ${request.payload.action} action`;
   } else {
