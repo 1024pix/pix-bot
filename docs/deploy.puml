@@ -6,10 +6,12 @@ participant pix_bot
 participant Scalingo
 participant application
 participant GitHub
-PO -> Slack : shortcut "Mise en production"
+PO -> Slack : shortcut "Mise en production" \n (/deploy-last-version)
 Slack -> api.slack.com : ?
-api.slack.com -> pix_bot : POST /slack/interactive-endpoint \ntype=release-deployment-confirmation
-pix_bot -> Scalingo: POST /apps/<APPLICATION_NAME>/deployments \n { source_url : 'https://github.com/1024pix/pix/archive/<VERSION_NUMBER>.tar.gz' }
+api.slack.com -> pix_bot : POST /slack/commands/deploy-last-version \n pre.payload.text=<APPLICATION_NAME>
+pix_bot -> GitHub : GET https://github.com/<OWNER>/<PIX_REPO_NAME>/tags
+GitHub -> pix_bot : [{<VERSION_NUMBER>}, <VERSION_NUMBER-1>]
+pix_bot -> Scalingo: POST /apps/<APPLICATION_NAME>/deployments \n { source_url : 'https://github.com/<OWNER>/<PIX_REPO_NAME>/archive/<VERSION_NUMBER>.tar.gz' }
 Scalingo -> GitHub: GET source_url
 GitHub -> Scalingo : <VERSION_NUMBER>.tar.gz
 Scalingo -> application: build + deployment
