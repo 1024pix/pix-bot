@@ -32,7 +32,7 @@
     "preinstall": "npx check-engine",
     "postdeploy": "DEBUG=knex:* npm run db:migrate",
     "start": "node index.js",
-    "test": "NODE_ENV=test mocha --recursive --exit --reporter=${MOCHA_REPORTER:-dot} test"
+    "test": "NODE_ENV=test npm run db:prepare && mocha --recursive --exit --reporter=${MOCHA_REPORTER:-dot} test"
   },
   "repository": {
     "type": "git",
