@@ -132,7 +132,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           },
           payload: { action: 'nothing' },
         };
-        ['opened', 'reopened'].forEach((action) => {
+        ['opened', 'reopened', 'synchronize'].forEach((action) => {
           it(`should call handleRA() method on ${action} action`, async function () {
             // given
             sinon.stub(request, 'payload').value({ action });
