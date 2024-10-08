@@ -25,7 +25,7 @@ const ecoModeService = {
       timeZone,
       ignoredReviewApps,
     });
-    await reviewAppManager.startEcoMode();
+    reviewAppManager.startEcoMode();
   },
 };
 
