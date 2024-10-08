@@ -204,6 +204,9 @@ async function processWebhook(
   } else {
     return `Ignoring ${eventName} event`;
   }
+
+  // TODO: check commits fail => j'enlève du tableau
+  // TODO: pull request merged => j'enlève du tableau
 }
 
 function _handleNoRACase(request) {
