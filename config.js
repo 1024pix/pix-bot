@@ -96,6 +96,11 @@ const configuration = (function () {
       owner: process.env.GITHUB_OWNER,
       repository: process.env.GITHUB_REPOSITORY,
       webhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
+
+      automerge: {
+        workflowId: process.env.GITHUB_AUTOMERGE_WORKFLOW_ID,
+        repositoryName: process.env.GITHUB_AUTOMERGE_REPO_NAME,
+      },
     },
 
     googleSheet: {
@@ -180,6 +185,8 @@ const configuration = (function () {
     config.github.owner = 'github-owner';
     config.github.repository = 'github-repository';
     config.github.webhookSecret = 'github-webhook-secret';
+    config.github.automerge.workflowId = 'github-auto-merge-workflow-id';
+    config.github.automerge.repositoryName = 'github-auto-merge-repo-name';
 
     config.openApi.authorizationToken = 'open-api-token';
 
