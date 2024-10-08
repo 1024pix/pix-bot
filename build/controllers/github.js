@@ -246,6 +246,7 @@ async function processWebhook(
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
+    pullRequestRepository,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
@@ -265,6 +266,12 @@ async function processWebhook(
       } else {
         return 'no-review-app label is not set for this PR';
       }
+    }
+    if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
+      await pullRequestRepository.save({
+        number: request.payload.number,
+        repositoryName: request.payload.repository.name,
+      });
     }
     return `Ignoring ${request.payload.action} action`;
   } else {

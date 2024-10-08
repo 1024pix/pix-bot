@@ -147,17 +147,29 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
         });
 
-        it('should call handleRA() method on synchronize action', async function () {
-          // given
-          sinon.stub(request, 'payload').value({ action: 'synchronize' });
+        describe('when action is `labeled`', function () {
+          describe('when label is Ready-to-merge', function () {
+            it('should call pullRequestRepository.save() method', async function () {
+              // given
+              sinon.stub(request, 'payload').value({
+                action: 'labeled',
+                number: 123,
+                label: { name: ':rocket: Ready to Merge' },
+                repository: { name: 'pix-sample-repo' },
+              });
 
-          const handleRA = sinon.stub();
+              const pullRequestRepository = { save: sinon.stub() };
 
-          // when
-          await githubController.processWebhook(request, { handleRA });
+              // when
+              await githubController.processWebhook(request, { pullRequestRepository });
 
-          // then
-          expect(handleRA.calledOnceWithExactly(request)).to.be.true;
+              // then
+              expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
+                number: 123,
+                repositoryName: 'pix-sample-repo',
+              });
+            });
+          });
         });
 
         it('should call handleCloseRA() method on closed action', async function () {
