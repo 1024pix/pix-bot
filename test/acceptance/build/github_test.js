@@ -38,6 +38,12 @@ describe('Acceptance | Build | Github', function () {
         .reply(returnCode);
     }
 
+    function deleteReviewAppNock({ reviewAppName, returnCode = StatusCodes.NO_CONTENT }) {
+      nock('https://scalingo.reviewApps')
+        .delete(`/v1/apps/${reviewAppName}?current_name=${reviewAppName}`)
+        .reply(returnCode);
+    }
+
     let body;
 
     ['opened', 'reopened'].forEach((action) => {
@@ -468,6 +474,49 @@ describe('Acceptance | Build | Github', function () {
             'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review with pr 2',
           );
         });
+      });
+    });
+
+    describe('on closed event', function () {
+      it('it should delete existing review apps', async function () {
+        // given
+        nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+        getAppNock({ reviewAppName: 'pix-api-review-pr123', returnCode: StatusCodes.OK });
+        getAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+        getAppNock({ reviewAppName: 'pix-front-review-pr123', returnCode: StatusCodes.OK });
+        deleteReviewAppNock({ reviewAppName: 'pix-api-review-pr123' });
+        deleteReviewAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+        deleteReviewAppNock({ reviewAppName: 'pix-front-review-pr123' });
+
+        body = {
+          action: 'closed',
+          number: 123,
+          pull_request: {
+            state: 'closed',
+            head: {
+              ref: 'my-branch',
+              repo: {
+                name: 'pix',
+                fork: false,
+              },
+            },
+          },
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+
+        expect(response.payload).to.equal(
+          'Closed RA for PR 123 : pix-api-review-pr123, pix-audit-logger-review-pr123 (already closed), pix-front-review-pr123.',
+        );
       });
     });
 

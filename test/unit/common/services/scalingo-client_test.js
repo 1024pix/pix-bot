@@ -4,7 +4,7 @@ import { describe, it } from 'mocha';
 
 import ScalingoClient from '../../../../common/services/scalingo-client.js';
 import { config } from '../../../../config.js';
-import { sinon } from '../../../test-helper.js';
+import { catchErr, sinon } from '../../../test-helper.js';
 
 describe('Scalingo client', function () {
   beforeEach(function () {
@@ -804,6 +804,48 @@ describe('Scalingo client', function () {
       expect(error.message).to.equal(
         'Impossible to get info for RA reviewApp. Scalingo API returned 500 : API unavailable',
       );
+    });
+  });
+
+  describe('#Scalingo.deleteReviewApp', function () {
+    let clientAppsDestroy;
+    let client;
+
+    beforeEach(async function () {
+      clientAppsDestroy = sinon.stub();
+      const clientStub = {
+        clientFromToken: async function () {
+          return {
+            Apps: { destroy: clientAppsDestroy },
+          };
+        },
+      };
+      client = await ScalingoClient.getInstance('reviewApps', clientStub);
+    });
+
+    describe('When it is not a review app', function () {
+      it('should throw an error', async function () {
+        // given
+        const appName = 'pix-api-production';
+
+        // when
+        const result = await catchErr(client.deleteReviewApp)(appName);
+
+        // then
+        expect(result).to.be.instanceOf(Error);
+        expect(result.message).to.equal('Cannot call deleteReviewApp for a non review app.');
+      });
+    });
+
+    it('should delete the review app', async function () {
+      // given
+      const appName = 'pix-api-review-pr1';
+
+      // when
+      await client.deleteReviewApp(appName);
+
+      // then
+      expect(clientAppsDestroy).to.have.been.calledWithExactly(appName, appName);
     });
   });
 });
