@@ -464,22 +464,47 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
   });
 
   describe('#handleCloseRA', function () {
-    const request = {
-      payload: {
-        number: 3,
-        pull_request: {
-          state: 'closed',
-          labels: [],
-          head: {
-            ref: 'my-branch',
-            repo: {
-              name: 'pix',
-              fork: false,
+    let request;
+
+    beforeEach(function () {
+      request = {
+        payload: {
+          number: 3,
+          pull_request: {
+            state: 'closed',
+            labels: [],
+            head: {
+              ref: 'my-branch',
+              repo: {
+                name: 'pix',
+                fork: false,
+              },
             },
           },
         },
-      },
-    };
+      };
+    });
+
+    describe('when the review app is not managed by Pix Bot', function () {
+      it('should not try to close the review app', async function () {
+        // given
+        const scalingoClientStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub();
+        const deleteReviewAppStub = sinon.stub();
+
+        scalingoClientStub.getInstance = sinon.stub().returns({
+          reviewAppExists: reviewAppExistsStub,
+          deleteReviewApp: deleteReviewAppStub,
+        });
+
+        request.payload.pull_request.head.repo.name = 'unmanaged_repo';
+
+        // when
+        const response = await githubController.handleCloseRA(request, scalingoClientStub);
+
+        expect(response).to.equal('unmanaged_repo is not managed by Pix Bot.');
+      });
+    });
 
     describe('when a Review App is already closed', function () {
       it('should inform that this Review App is already closed', async function () {

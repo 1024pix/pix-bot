@@ -95,6 +95,11 @@ async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
   const prId = payload.number;
   const repository = payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
+
+  if (!reviewApps) {
+    return `${repository} is not managed by Pix Bot.`;
+  }
+
   let client;
   const closedRA = [];
 
