@@ -90,6 +90,10 @@ async function _handleRA(
   return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
+async function _handleCloseRA() {
+  throw new Error('Not implemented yet !');
+}
+
 async function deployPullRequest(
   scalingoClient,
   reviewApps,
@@ -185,7 +189,7 @@ async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoCli
 
 async function processWebhook(
   request,
-  { pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook, handleRA = _handleRA } = {},
+  { pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook, handleRA = _handleRA, handleCloseRA = _handleCloseRA } = {},
 ) {
   const eventName = request.headers['x-github-event'];
   if (eventName === 'push') {
@@ -193,6 +197,9 @@ async function processWebhook(
   } else if (eventName === 'pull_request') {
     if (['opened', 'reopened', 'synchronize'].includes(request.payload.action)) {
       return handleRA(request);
+    }
+    if (request.payload.action === 'closed') {
+      return handleCloseRA(request);
     }
     return `Ignoring ${request.payload.action} action`;
   } else {

@@ -160,6 +160,19 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           expect(handleRA.calledOnceWithExactly(request)).to.be.true;
         });
 
+        it('should call handleCloseRA() method on closed action', async function () {
+          // given
+          sinon.stub(request, 'payload').value({ action: 'closed' });
+
+          const handleCloseRA = sinon.stub();
+
+          // when
+          await githubController.processWebhook(request, { handleCloseRA });
+
+          // then
+          expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
+        });
+
         it('should ignore the action', async function () {
           // given
           sinon.stub(request, 'payload').value({ action: 'unhandled-action' });
