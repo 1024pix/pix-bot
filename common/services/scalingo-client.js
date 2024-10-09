@@ -168,6 +168,18 @@ class ScalingoClient {
       throw new Error(`Aucun autoscaler web trouvé pour l'application '${appname}'`);
     }
   }
+
+  async deleteReviewApp(appName) {
+    if (!appName.includes('review')) {
+      throw new Error('Cannot call deleteReviewApp for a non review app.');
+    }
+
+    try {
+      await this.client.Apps.destroy(appName, appName);
+    } catch (err) {
+      logger.error(err);
+    }
+  }
 }
 
 async function _isUrlReachable(url) {
