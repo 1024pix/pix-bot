@@ -90,8 +90,48 @@ async function _handleRA(
   return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
-async function _handleCloseRA() {
-  throw new Error('Not implemented yet !');
+async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
+  const payload = request.payload;
+  const prId = payload.number;
+  const repository = payload.pull_request.head.repo.name;
+  const reviewApps = repositoryToScalingoAppsReview[repository];
+  let client;
+  const closedRA = [];
+
+  try {
+    client = await scalingoClient.getInstance('reviewApps');
+  } catch (error) {
+    throw new Error(`Scalingo auth APIError: ${error.message}`);
+  }
+
+  for (const appName of reviewApps) {
+    const reviewAppName = `${appName}-pr${prId}`;
+    try {
+      const reviewAppExists = await client.reviewAppExists(reviewAppName);
+      if (reviewAppExists) {
+        await client.deleteReviewApp(reviewAppName);
+        closedRA.push({ name: appName, isClosed: true, isAlreadyClosed: false });
+      } else {
+        closedRA.push({ name: appName, isClosed: false, isAlreadyClosed: true });
+      }
+    } catch (error) {
+      logger.error({
+        event: 'review-app',
+        stack: error.stack,
+        message: `Deletion of application ${reviewAppName} failed : ${error.message}`,
+        data: {
+          repository,
+          reviewApp: reviewAppName,
+          pr: prId,
+        },
+      });
+    }
+  }
+  const result = closedRA.map((ra) =>
+    ra.isAlreadyClosed ? `${ra.name}-pr${prId} (already closed)` : `${ra.name}-pr${prId}`,
+  );
+
+  return `Closed RA for PR ${prId} : ${result.join(', ')}.`;
 }
 
 async function deployPullRequest(
@@ -189,7 +229,11 @@ async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoCli
 
 async function processWebhook(
   request,
-  { pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook, handleRA = _handleRA, handleCloseRA = _handleCloseRA } = {},
+  {
+    pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
+    handleRA = _handleRA,
+    handleCloseRA = _handleCloseRA,
+  } = {},
 ) {
   const eventName = request.headers['x-github-event'];
   if (eventName === 'push') {
@@ -238,4 +282,5 @@ export {
   _handleRA as handleRA,
   processWebhook,
   _pushOnDefaultBranchWebhook as pushOnDefaultBranchWebhook,
+  _handleCloseRA as handleCloseRA,
 };

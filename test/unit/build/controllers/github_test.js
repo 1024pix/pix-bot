@@ -462,4 +462,75 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       });
     });
   });
+
+  describe('#handleCloseRA', function () {
+    const request = {
+      payload: {
+        number: 3,
+        pull_request: {
+          state: 'closed',
+          labels: [],
+          head: {
+            ref: 'my-branch',
+            repo: {
+              name: 'pix',
+              fork: false,
+            },
+          },
+        },
+      },
+    };
+
+    describe('when a Review App is already closed', function () {
+      it('should inform that this Review App is already closed', async function () {
+        // given
+        const scalingoClientStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub();
+        const deleteReviewAppStub = sinon.stub();
+
+        scalingoClientStub.getInstance = sinon.stub().returns({
+          reviewAppExists: reviewAppExistsStub,
+          deleteReviewApp: deleteReviewAppStub,
+        });
+
+        reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
+
+        // when
+        const response = await githubController.handleCloseRA(request, scalingoClientStub);
+
+        // then
+        expect(response).to.equal(
+          'Closed RA for PR 3 : pix-api-review-pr3, pix-audit-logger-review-pr3 (already closed), pix-front-review-pr3.',
+        );
+      });
+    });
+
+    describe('when a Review App exists', function () {
+      it('should close this Review App', async function () {
+        // given
+        const scalingoClientStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub();
+        const deleteReviewAppStub = sinon.stub();
+
+        scalingoClientStub.getInstance = sinon.stub().returns({
+          reviewAppExists: reviewAppExistsStub,
+          deleteReviewApp: deleteReviewAppStub,
+        });
+
+        reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
+
+        // when
+        await githubController.handleCloseRA(request, scalingoClientStub);
+
+        // then
+        expect(deleteReviewAppStub.calledWith('pix-api-review-pr3')).to.be.true;
+        expect(deleteReviewAppStub.calledWith('pix-audit-logger-review-pr3')).to.be.false;
+        expect(deleteReviewAppStub.calledWith('pix-front-review-pr3')).to.be.true;
+      });
+    });
+  });
 });
