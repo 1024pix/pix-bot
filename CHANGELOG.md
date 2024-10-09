@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.104.4 (09/10/2024)
+
+
+### :bug: Correction
+- [#450](https://github.com/1024pix/pix-bot/pull/450) [BUGFIX] Corriger la suppression des RA pour les repo non gérés par Pix Bot (PIX-14712).
+
 ## v1.104.3 (09/10/2024)
 
 
