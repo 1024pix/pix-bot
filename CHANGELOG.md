@@ -1,5 +1,19 @@
 # pix-bot Changelog
 
+## v1.104.3 (09/10/2024)
+
+
+### :rocket: Amélioration
+- [#449](https://github.com/1024pix/pix-bot/pull/449) [FEATURE] Clôturer les review apps depuis Pix Bot (PIX-14712).
+
+### :arrow_up: Montée de version
+- [#448](https://github.com/1024pix/pix-bot/pull/448) [BUMP] Update Node.js to v20.18.0.
+- [#446](https://github.com/1024pix/pix-bot/pull/446) [BUMP] Lock file maintenance.
+- [#445](https://github.com/1024pix/pix-bot/pull/445) [BUMP] Lock file maintenance.
+
+### :coffee: Autre
+- [#382](https://github.com/1024pix/pix-bot/pull/382) [DOCUMENTATION] Mise à jour du schéma de déploiement.
+
 ## v1.104.2 (26/09/2024)
 
 
