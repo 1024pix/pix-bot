@@ -24,6 +24,10 @@ const repositoryToScalingoAppsReview = {
   pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
 };
 
+const repositoryToScalingoOnDemandAppsReview = {
+  pix: ['pix-front-review'],
+};
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 function getMessageTemplate(repositoryName) {
@@ -142,6 +146,52 @@ async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
   return `Closed RA for PR ${prId} : ${result.join(', ')}.`;
 }
 
+async function _handleIssueComment(request, scalingoClient = ScalingoClient, githubService = commonGithubService) {
+  const payload = request.payload;
+  const repo = payload.repository.name;
+  const owner = payload.repository.owner.login;
+  const reviewApps = repositoryToScalingoOnDemandAppsReview[repo];
+  const pull_number = payload.issue.number;
+
+  if (!reviewApps) {
+    return `${repo} is not managed by Pix Bot nor on-demand review app.`;
+  }
+  let client;
+
+  try {
+    client = await scalingoClient.getInstance('reviewApps');
+  } catch (error) {
+    throw new Error(`Scalingo auth APIError: ${error.message}`);
+  }
+
+  const reviewAppName = `${reviewApps[0]}-pr${pull_number}`;
+
+  const reviewAppExists = await client.reviewAppExists(reviewAppName);
+  if (!reviewAppExists) {
+    return `Review app ${reviewAppName} does not exist.`;
+  }
+
+  const selectedApps = Array.from(payload.comment.body.matchAll(/^- \[[xX]\].+<!-- ([\w-]+) -->$/gm), ([, app]) => app);
+
+  if (selectedApps.length > 0) {
+    await client.bulkUpdateEnvVar(reviewAppName, {
+      CI_FRONT_TASKS: selectedApps.map((app) => `ci:${app}`).join(' '),
+      BUILD_FRONT_TASKS: selectedApps.map((app) => `build:${app}`).join(' '),
+    });
+  } else {
+    await client.bulkUpdateEnvVar(reviewAppName, {
+      CI_FRONT_TASKS: 'ci:none',
+      BUILD_FRONT_TASKS: 'build:none',
+    });
+  }
+
+  const branchName = await githubService.getPullRequestBranchName({ repo, owner, pull_number });
+
+  await client.deployUsingSCM(reviewAppName, branchName);
+
+  return 'ok';
+}
+
 async function deployPullRequest(
   scalingoClient,
   reviewApps,
@@ -245,6 +295,7 @@ async function processWebhook(
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
+    handleIssueComment = _handleIssueComment,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
@@ -258,6 +309,8 @@ async function processWebhook(
       return handleCloseRA(request);
     }
     return `Ignoring ${request.payload.action} action`;
+  } else if (eventName === 'issue_comment' && request.payload.action === 'edited') {
+    return handleIssueComment(request);
   } else {
     return `Ignoring ${eventName} event`;
   }
