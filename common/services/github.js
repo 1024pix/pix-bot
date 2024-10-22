@@ -526,6 +526,12 @@ const github = {
     const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
     return data.labels.some((ghLabel) => ghLabel.name === label);
   },
+
+  async getPullRequestBranchName({ owner, repo, pull_number }) {
+    const { pulls } = _createOctokit();
+    const pull = await pulls.get({ owner, repo, pull_number });
+    return pull.data.head.ref;
+  },
 };
 
 export default github;
