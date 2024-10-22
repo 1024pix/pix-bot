@@ -39,8 +39,16 @@ describe('Acceptance | Build | Github', function () {
     }
 
     function deleteReviewAppNock({ reviewAppName, returnCode = StatusCodes.NO_CONTENT }) {
-      nock('https://scalingo.reviewApps')
+      return nock('https://scalingo.reviewApps')
         .delete(`/v1/apps/${reviewAppName}?current_name=${reviewAppName}`)
+        .reply(returnCode);
+    }
+
+    function bulkUpdateEnvVarNock({ reviewAppName, variables = {}, returnCode = StatusCodes.OK }) {
+      return nock('https://scalingo.reviewApps')
+        .put(`/v1/apps/${reviewAppName}/variables`, {
+          variables: Object.entries(variables).map(([name, value]) => ({ name, value })),
+        })
         .reply(returnCode);
     }
 
@@ -722,6 +730,76 @@ describe('Acceptance | Build | Github', function () {
           expect(res.result).to.equal(
             'Ignoring push event on repository not-configured-repository as it is not configured',
           );
+        });
+      });
+    });
+
+    describe('on issue_comment event', function () {
+      describe('when user has checked some apps', function () {
+        it('should deploy the corresponding review apps', async function () {
+          const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+
+          const scalingoManualDeploy = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2' });
+          const scalingoBulkUpdateEnvVar = bulkUpdateEnvVarNock({
+            reviewAppName: 'pix-front-review-pr2',
+            variables: {
+              BUILD_MONPIX: 'true',
+              BUILD_CERTIF: 'true',
+              BUILD_ADMIN: 'false',
+              BUILD_JUNIOR: 'false',
+              BUILD_ORGA: 'false',
+            },
+          });
+
+          body = {
+            action: 'edited',
+            comment: {
+              body: `Une fois les applications déployées, elles seront accessibles via les liens suivants :
+- [API](https://api-pr2.review.pix.fr/api/)
+- [Audit Logger](https://pix-audit-logger-review-pr2.osc-fr1.scalingo.io/api/)
+- [X] [App (.fr)](https://app-pr2.review.pix.fr) / [App (.org)](https://app-pr2.review.pix.org) <!-- mon-pix -->
+- [ ] [Orga (.fr)](https://orga-pr2.review.pix.fr) / [Orga (.org)](https://orga-pr2.review.pix.org) <!-- orga -->
+- [X] [Certif (.fr)](https://certif-pr2.review.pix.fr) / [Certif (.org)](https://certif-pr2.review.pix.org) <!-- certif -->
+- [ ] [Junior](https://junior-pr2.review.pix.fr) <!-- junior -->
+- [ ] [Admin](https://admin-pr2.review.pix.fr) <!-- admin -->
+
+Les variables d'environnement seront accessibles via les liens suivants :
+  * [scalingo front](https://dashboard.scalingo.com/apps/osc-fr1/pix-front-review-pr2/environment)
+  * [scalingo api](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-review-pr2/environment)
+  * [scalingo audit-logger](https://dashboard.scalingo.com/apps/osc-fr1/pix-audit-logger-review-pr2/environment)
+`,
+              user: {
+                login: 'pix-bot-github',
+              },
+            },
+            issue: {
+              number: 2,
+            },
+            repository: {
+              name: 'pix',
+              full_name: '1024pix/pix',
+              owner: {
+                name: '1024pix',
+                login: '1024pix',
+              },
+              fork: false,
+              organization: '1024pix',
+            },
+          };
+
+          const res = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'issue_comment',
+            },
+            payload: body,
+          });
+          expect(res.statusCode).to.equal(StatusCodes.OK);
+          expect(scalingoAuth.isDone()).to.be.true;
+          expect(scalingoBulkUpdateEnvVar.isDone()).to.be.true;
+          expect(scalingoManualDeploy.isDone()).to.be.true;
         });
       });
     });

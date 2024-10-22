@@ -1,9 +1,9 @@
 Une fois les applications déployées, elles seront accessibles via les liens suivants :
 - [API](https://api-pr{{pullRequestId}}.review.pix.fr/api/)
 - [Audit Logger](https://pix-audit-logger-review-pr{{pullRequestId}}.osc-fr1.scalingo.io/api/)
-- [ ] [App (.fr)](https://app-pr{{pullRequestId}}.review.pix.fr) / [App (.org)](https://app-pr{{pullRequestId}}.review.pix.org) <!-- mon-pix -->
+- [X] [App (.fr)](https://app-pr{{pullRequestId}}.review.pix.fr) / [App (.org)](https://app-pr{{pullRequestId}}.review.pix.org) <!-- mon-pix -->
 - [ ] [Orga (.fr)](https://orga-pr{{pullRequestId}}.review.pix.fr) / [Orga (.org)](https://orga-pr{{pullRequestId}}.review.pix.org) <!-- orga -->
-- [ ] [Certif (.fr)](https://certif-pr{{pullRequestId}}.review.pix.fr) / [Certif (.org)](https://certif-pr{{pullRequestId}}.review.pix.org) <!-- certif -->
+- [X] [Certif (.fr)](https://certif-pr{{pullRequestId}}.review.pix.fr) / [Certif (.org)](https://certif-pr{{pullRequestId}}.review.pix.org) <!-- certif -->
 - [ ] [Junior](https://junior-pr{{pullRequestId}}.review.pix.fr) <!-- junior -->
 - [ ] [Admin](https://admin-pr{{pullRequestId}}.review.pix.fr) <!-- admin -->
 

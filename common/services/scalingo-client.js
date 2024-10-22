@@ -180,6 +180,13 @@ class ScalingoClient {
       logger.error(err);
     }
   }
+
+  async bulkUpdateEnvVar(appName, variables) {
+    await this.client.Environment.bulkUpdate(
+      appName,
+      Object.entries(variables).map(([name, value]) => ({ name, value })),
+    );
+  }
 }
 
 async function _isUrlReachable(url) {

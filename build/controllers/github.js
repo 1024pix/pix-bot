@@ -23,6 +23,10 @@ const repositoryToScalingoAppsReview = {
   pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
 };
 
+const repositoryToScalingoOnDemandAppsReview = {
+  pix: ['pix-front-review'],
+};
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 function getMessageTemplate(repositoryName) {
@@ -139,6 +143,38 @@ async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
   return `Closed RA for PR ${prId} : ${result.join(', ')}.`;
 }
 
+async function _handleIssueComment(request, scalingoClient = ScalingoClient) {
+  const payload = request.payload;
+  const repository = payload.repository.name;
+  const reviewApps = repositoryToScalingoOnDemandAppsReview[repository];
+  const prNumber = payload.issue.number;
+
+  if (!reviewApps) {
+    return `${repository} is not managed by Pix Bot nor on-demand review app.`;
+  }
+  let client;
+
+  try {
+    client = await scalingoClient.getInstance('reviewApps');
+  } catch (error) {
+    throw new Error(`Scalingo auth APIError: ${error.message}`);
+  }
+
+  const reviewAppName = `${reviewApps[0]}-pr${prNumber}`;
+
+  await client.bulkUpdateEnvVar(reviewAppName, {
+    BUILD_MONPIX: 'true',
+    BUILD_CERTIF: 'true',
+    BUILD_ADMIN: 'false',
+    BUILD_JUNIOR: 'false',
+    BUILD_ORGA: 'false',
+  });
+
+  await client.deployUsingSCM(reviewAppName, 'my-branch');
+
+  return 'ok';
+}
+
 async function deployPullRequest(
   scalingoClient,
   reviewApps,
@@ -238,6 +274,7 @@ async function processWebhook(
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
+    handleIssueComment = _handleIssueComment,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
@@ -251,6 +288,8 @@ async function processWebhook(
       return handleCloseRA(request);
     }
     return `Ignoring ${request.payload.action} action`;
+  } else if (eventName === 'issue_comment') {
+    return handleIssueComment(request);
   } else {
     return `Ignoring ${eventName} event`;
   }
