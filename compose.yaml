@@ -1,6 +1,6 @@
 services:
   postgres-pix-bot:
-    image: postgres:15.8-alpine
+    image: postgres:16.3-alpine
     container_name: pix-bot-postgres
     ports:
       - '${PIX_BOT_PORT_API:-5477}:5432'
