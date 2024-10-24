@@ -1,0 +1,11 @@
+services:
+  postgres-pix-bot:
+    image: postgres:15.8-alpine
+    container_name: pix-bot-postgres
+    ports:
+      - '${PIX_BOT_PORT_API:-5477}:5432'
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: pix_bot
+    env_file:
+      - .env
