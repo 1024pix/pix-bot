@@ -359,6 +359,28 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
+async function addRADeploymentCheck({ repository, prNumber, status }) {
+  const checkName = 'check-ra-deployment';
+  const owner = '1024pix';
+  const octokit = _createOctokit();
+
+  let response = await octokit.pulls.get({ owner: '1024pix', repo: repository, pull_number: prNumber });
+  const sha = response.data.head.sha;
+
+  response = await octokit.repos.createCommitStatus({
+    owner,
+    context: checkName,
+    repo: repository,
+    sha,
+    state: status,
+  });
+
+  const startedAt = response.data.started_at;
+  logger.info(`Check ${checkName} added for PR ${prNumber} in ${repository} with status ${status}`);
+
+  return startedAt;
+}
+
 const github = {
   async getPullRequests(label) {
     const pullRequests = await _getPullReviewsFromGithub(label);
@@ -456,8 +478,8 @@ const github = {
     }
     return true;
   },
-
   commentPullRequest,
+  addRADeploymentCheck,
 };
 
 export default github;

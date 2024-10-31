@@ -603,4 +603,37 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#addRADeploymentCheck', function () {
+    describe('when everything is OK', function () {
+      it('should create the check run', async function () {
+        // given
+        const repository = 'my-repository';
+        const sha = 'my-sha';
+        const prNumber = 1234;
+        const startedAt = new Date();
+
+        const getPullRequestNock = nock('https://api.github.com')
+          .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
+          .reply(200, { head: { sha } });
+
+        const body = {
+          context: 'check-ra-deployment',
+          state: 'pending',
+        };
+
+        const createCheckNock = nock('https://api.github.com')
+          .post(`/repos/1024pix/${repository}/statuses/${sha}`, body)
+          .reply(201, { started_at: startedAt });
+
+        // when
+        const result = await githubService.addRADeploymentCheck({ repository, prNumber, status: 'pending' });
+
+        // then
+        expect(result).to.equal(startedAt.toISOString());
+        expect(getPullRequestNock.isDone()).to.be.true;
+        expect(createCheckNock.isDone()).to.be.true;
+      });
+    });
+  });
 });

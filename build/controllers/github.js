@@ -186,6 +186,8 @@ async function deployPullRequest(
     throw new Error(`No RA deployed for repository ${repository} and pr${prId}`);
   }
 
+  await githubService.addRADeploymentCheck({ repository, prNumber: prId, status: 'pending' });
+
   if (deployedRA.some(({ isCreated }) => isCreated)) {
     await addMessageToPullRequest(
       {

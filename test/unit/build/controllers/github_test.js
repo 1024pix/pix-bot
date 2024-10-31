@@ -384,7 +384,9 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         });
 
         const addMessageToPullRequestStub = sinon.stub();
-        const githubServiceStub = sinon.stub();
+        const githubServiceStub = {
+          addRADeploymentCheck: sinon.stub(),
+        };
 
         // when
         await githubController.handleRA(request, scalingoClientStub, addMessageToPullRequestStub, githubServiceStub);
@@ -407,6 +409,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           },
           { githubService: githubServiceStub },
         );
+        expect(githubServiceStub.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+          repository: 'pix',
+          prNumber: 3,
+          status: 'pending',
+        });
       });
 
       it('throws an error on scalingo deployment fails', async function () {
@@ -436,7 +443,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(false);
           const deployReviewAppStub = sinon.stub();
           const disableAutoDeployStub = sinon.stub();
-          const githubServiceStub = sinon.stub();
+          const addMessageToPullRequestStub = sinon.stub();
+          const githubServiceStub = {
+            addRADeploymentCheck: sinon.stub(),
+          };
 
           scalingoClientStub.getInstance = sinon.stub().returns({
             deployUsingSCM: deployUsingSCMStub,
@@ -446,7 +456,12 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
 
           // when
-          const response = await githubController.handleRA(request, scalingoClientStub, githubServiceStub);
+          const response = await githubController.handleRA(
+            request,
+            scalingoClientStub,
+            addMessageToPullRequestStub,
+            githubServiceStub,
+          );
 
           // then
           expect(deployReviewAppStub.calledOnceWithExactly('pix-api-review', 3)).to.be.true;
