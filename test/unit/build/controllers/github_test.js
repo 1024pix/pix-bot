@@ -447,6 +447,9 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           const githubServiceStub = {
             addRADeploymentCheck: sinon.stub(),
           };
+          const reviewAppRepositoryStub = {
+            create: sinon.stub(),
+          };
 
           scalingoClientStub.getInstance = sinon.stub().returns({
             deployUsingSCM: deployUsingSCMStub,
@@ -461,11 +464,20 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             scalingoClientStub,
             addMessageToPullRequestStub,
             githubServiceStub,
+            reviewAppRepositoryStub,
           );
 
           // then
           expect(deployReviewAppStub.calledOnceWithExactly('pix-api-review', 3)).to.be.true;
           expect(disableAutoDeployStub.calledOnceWithExactly('pix-api-review-pr3')).to.be.true;
+          expect(
+            reviewAppRepositoryStub.create.calledWith({
+              name: 'pix-api-review-pr3',
+              repository: 'pix',
+              prNumber: 3,
+              parentApp: 'pix-api-review',
+            }),
+          ).to.be.true;
           expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
           expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
           expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;

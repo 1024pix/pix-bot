@@ -6,6 +6,7 @@ import commonGithubService from '../../common/services/github.js';
 import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
+import * as reviewAppRepo from '../repository/review-app-repository.js';
 
 const repositoryToScalingoAppsReview = {
   'pix-api-data': ['pix-api-data-integration'],
@@ -65,6 +66,7 @@ async function _handleRA(
   scalingoClient = ScalingoClient,
   addMessageToPullRequest = _addMessageToPullRequest,
   githubService = commonGithubService,
+  reviewAppRepository = reviewAppRepo,
 ) {
   const payload = request.payload;
   const prId = payload.number;
@@ -85,6 +87,7 @@ async function _handleRA(
     repository,
     addMessageToPullRequest,
     githubService,
+    reviewAppRepository,
   );
 
   return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
@@ -147,6 +150,7 @@ async function deployPullRequest(
   repository,
   addMessageToPullRequest,
   githubService,
+  reviewAppRepository,
 ) {
   const deployedRA = [];
   let client;
@@ -165,6 +169,7 @@ async function deployPullRequest(
         await client.deployReviewApp(appName, prId);
         await client.disableAutoDeploy(reviewAppName);
         await client.deployUsingSCM(reviewAppName, ref);
+        await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
       }
       deployedRA.push({ name: appName, isCreated: !reviewAppExists });
     } catch (error) {
