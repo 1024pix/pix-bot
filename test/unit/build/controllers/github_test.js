@@ -172,6 +172,31 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
         });
 
+        describe('when action is `unlabeled`', function () {
+          describe('when label is Ready-to-merge', function () {
+            it('should call pullRequestRepository.remove() method', async function () {
+              // given
+              sinon.stub(request, 'payload').value({
+                action: 'unlabeled',
+                number: 123,
+                label: { name: ':rocket: Ready to Merge' },
+                repository: { name: 'pix-sample-repo' },
+              });
+
+              const pullRequestRepository = { remove: sinon.stub() };
+
+              // when
+              await githubController.processWebhook(request, { pullRequestRepository });
+
+              // then
+              expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+                number: 123,
+                repositoryName: 'pix-sample-repo',
+              });
+            });
+          });
+        });
+
         it('should call handleCloseRA() method on closed action', async function () {
           // given
           sinon.stub(request, 'payload').value({ action: 'closed' });

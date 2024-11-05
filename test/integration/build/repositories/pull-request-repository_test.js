@@ -95,4 +95,27 @@ describe('PullRequestRepository', function () {
       expect(results).to.have.been.lengthOf(1);
     });
   });
+
+  describe('#remove', function () {
+    it('should remove only given pull request', async function () {
+      await knex('pull_requests').insert({ number: 123, repositoryName: 'pix-sample-repo', isMerging: false });
+      await knex('pull_requests').insert({ number: 1234, repositoryName: 'pix-sample-repo', isMerging: false });
+
+      await pullRequestRepository.remove({ number: 1234, repositoryName: 'pix-sample-repo' });
+
+      const results = await knex('pull_requests');
+      expect(results).to.have.been.lengthOf(1);
+      expect(results[0].number).to.equal(123);
+    });
+
+    it('should do nothing when pull request not exists', async function () {
+      await knex('pull_requests').insert({ number: 123, repositoryName: 'pix-sample-repo', isMerging: false });
+
+      await pullRequestRepository.remove({ number: 1234, repositoryName: 'pix-sample-repo' });
+
+      const results = await knex('pull_requests');
+      expect(results).to.have.been.lengthOf(1);
+      expect(results[0].number).to.equal(123);
+    });
+  });
 });

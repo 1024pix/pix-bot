@@ -273,6 +273,12 @@ async function processWebhook(
         repositoryName: request.payload.repository.name,
       });
     }
+    if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
+      await pullRequestRepository.remove({
+        number: request.payload.number,
+        repositoryName: request.payload.repository.name,
+      });
+    }
     return `Ignoring ${request.payload.action} action`;
   } else {
     return `Ignoring ${eventName} event`;

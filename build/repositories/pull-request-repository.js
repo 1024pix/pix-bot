@@ -20,4 +20,8 @@ async function update({ number, repositoryName, isMerging }) {
   await knex('pull_requests').where({ number, repositoryName }).update({ isMerging });
 }
 
-export { save, isAtLeastOneMergeInProgress, getOldest, update };
+async function remove({ number, repositoryName }) {
+  await knex('pull_requests').where({ number, repositoryName }).delete();
+}
+
+export { save, isAtLeastOneMergeInProgress, getOldest, update, remove };
