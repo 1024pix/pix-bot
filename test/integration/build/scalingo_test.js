@@ -2,13 +2,13 @@ import { describe } from 'mocha';
 
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 import server from '../../../server.js';
-import { expect, sinon } from '../../test-helper.js';
+import { expect, nock, sinon } from '../../test-helper.js';
+
+import * as reviewAppRepository from '../../../build/repository/review-app-repository.js';
+import { knex } from '../../../db/knex-database-connection.js';
+import { logger } from '../../../common/services/logger.js';
 
 describe('Integration | Build | Scalingo', function () {
-  beforeEach(function () {
-    sinon.stub(console, 'log');
-  });
-
   describe('POST /build/scalingo/deploy-endpoint', function () {
     describe('when scalingo build status is "build-error" ', function () {
       it('should send slack message and return 200', async function () {
@@ -114,6 +114,321 @@ describe('Integration | Build | Scalingo', function () {
         // Then
         expect(slackPostMessageService.postMessage).not.to.have.been.called;
         expect(res.statusCode).to.equal(200);
+      });
+    });
+  });
+
+  describe('POST /build/scalingo/review-app-deploy-endpoint', function () {
+    afterEach(async function () {
+      await knex('review-apps').truncate();
+    });
+
+    describe('when the event received is not a deployment', function () {
+      it('should not mark the review app as deployed', async function () {
+        // given
+        const appName = 'pix-api-review-pr123';
+        await reviewAppRepository.create({
+          name: appName,
+          repository: 'pix',
+          prNumber: 123,
+          parentApp: 'pix-api-review',
+        });
+        const errorLoggerStub = sinon.stub(logger, 'error');
+
+        const payload = {
+          type_data: {
+            status: 'success',
+            deployment_type: 'deployment',
+          },
+          app_name: appName,
+          type: 'other-type',
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/build/scalingo/review-app-deploy-endpoint',
+          payload,
+        });
+
+        // then
+        expect(response.statusCode).to.equal(200);
+        expect(errorLoggerStub.calledWith({ event: 'review-app-deploy', message: `The event type is not deployment.` }))
+          .to.be.true;
+        const reviewApp = await knex('review-apps').where({ name: appName }).first();
+        expect(reviewApp.isDeployed).to.be.false;
+      });
+    });
+
+    describe('when the deployement_type is not deployment', function () {
+      it('should not mark the review app as deployed', async function () {
+        // given
+        const appName = 'pix-api-review-pr123';
+        await reviewAppRepository.create({
+          name: appName,
+          repository: 'pix',
+          prNumber: 123,
+          parentApp: 'pix-api-review',
+        });
+        const errorLoggerStub = sinon.stub(logger, 'error');
+
+        const payload = {
+          type_data: {
+            status: 'success',
+            deployment_type: 'other-type',
+          },
+          app_name: appName,
+          type: 'deployment',
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/build/scalingo/review-app-deploy-endpoint',
+          payload,
+        });
+
+        // then
+        expect(response.statusCode).to.equal(200);
+        expect(errorLoggerStub.calledWith({ event: 'review-app-deploy', message: `The event type is not deployment.` }))
+          .to.be.true;
+        const reviewApp = await knex('review-apps').where({ name: appName }).first();
+        expect(reviewApp.isDeployed).to.be.false;
+      });
+    });
+
+    describe('when the status of the deployment event is not managed', function () {
+      it('should not mark the review app as deployed', async function () {
+        // given
+        const appName = 'pix-api-review-pr123';
+        await reviewAppRepository.create({
+          name: appName,
+          repository: 'pix',
+          prNumber: 123,
+          parentApp: 'pix-api-review',
+        });
+        const warnLoggerStub = sinon.stub(logger, 'warn');
+
+        const payload = {
+          type_data: {
+            status: 'building',
+            deployment_type: 'deployment',
+          },
+          app_name: appName,
+          type: 'deployment',
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/build/scalingo/review-app-deploy-endpoint',
+          payload,
+        });
+
+        // then
+        expect(response.statusCode).to.equal(200);
+        expect(
+          warnLoggerStub.calledWith({
+            event: 'review-app-deploy',
+            message: `The status "building" is not managed by this hook.`,
+          }),
+        ).to.be.true;
+        const reviewApp = await knex('review-apps').where({ name: appName }).first();
+        expect(reviewApp.isDeployed).to.be.false;
+      });
+    });
+
+    describe('when the event received is not for a review app', function () {
+      it('should not mark the review app as deployed', async function () {
+        // given
+        const appName = 'pix-api-review-pr123';
+        await reviewAppRepository.create({
+          name: appName,
+          repository: 'pix',
+          prNumber: 123,
+          parentApp: 'pix-api-review',
+        });
+        const errorLoggerStub = sinon.stub(logger, 'error');
+
+        const payload = {
+          type_data: {
+            status: 'success',
+            deployment_type: 'deployment',
+          },
+          app_name: 'pix-api-production',
+          type: 'deployment',
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/build/scalingo/review-app-deploy-endpoint',
+          payload,
+        });
+
+        // then
+        expect(response.statusCode).to.equal(200);
+        expect(
+          errorLoggerStub.calledWith({
+            event: 'review-app-deploy',
+            message: `The application pix-api-production is not linked to a pull request.`,
+          }),
+        ).to.be.true;
+        const reviewApp = await knex('review-apps').where({ name: appName }).first();
+        expect(reviewApp.isDeployed).to.be.false;
+      });
+    });
+
+    describe('when the deployment status is success', function () {
+      it('should mark the review app as deployed', async function () {
+        // given
+        const appName = 'pix-api-review-pr123';
+        await reviewAppRepository.create({
+          name: appName,
+          repository: 'pix',
+          prNumber: 123,
+          parentApp: 'pix-api-review',
+        });
+        await reviewAppRepository.create({
+          name: 'pix-front-review-pr123',
+          repository: 'pix',
+          prNumber: 123,
+          parentApp: 'pix-api-review',
+        });
+        const payload = {
+          type_data: {
+            status: 'success',
+            deployment_type: 'deployment',
+          },
+          app_name: appName,
+          type: 'deployment',
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/build/scalingo/review-app-deploy-endpoint',
+          payload,
+        });
+
+        // then
+        expect(response.statusCode).to.equal(200);
+        const reviewApp = await knex('review-apps').where({ name: appName }).first();
+        expect(reviewApp.isDeployed).to.be.true;
+      });
+
+      describe('when all the review apps are deployed', function () {
+        it('should update the commit status check state', async function () {
+          // given
+          const appName = 'pix-api-review-pr123';
+          const repository = 'pix';
+          const prNumber = 123;
+          await reviewAppRepository.create({ name: appName, repository, prNumber, parentApp: 'pix-api-review' });
+          await reviewAppRepository.create({
+            name: 'pix-front-review-pr123',
+            repository,
+            prNumber,
+            parentApp: 'pix-api-review',
+          });
+          await reviewAppRepository.markAsDeployed({ name: 'pix-front-review-pr123' });
+          await reviewAppRepository.create({
+            name: 'pix-audit-logger-review-pr123',
+            repository,
+            prNumber,
+            parentApp: 'pix-api-review',
+          });
+          await reviewAppRepository.markAsDeployed({ name: 'pix-audit-logger-review-pr123' });
+
+          const sha = 'a-commit-sha';
+
+          const getPullRequestNock = nock('https://api.github.com')
+            .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
+            .reply(201, { head: { sha } });
+
+          const addRADeploymentCheckNock = nock('https://api.github.com')
+            .post(`/repos/1024pix/${repository}/statuses/${sha}`, {
+              context: 'check-ra-deployment',
+              state: 'success',
+            })
+            .reply(201, { started_at: new Date() });
+
+          const payload = {
+            type_data: {
+              status: 'success',
+              deployment_type: 'deployment',
+            },
+            app_name: appName,
+            type: 'deployment',
+          };
+
+          // when
+          const response = await server.inject({
+            method: 'POST',
+            url: '/build/scalingo/review-app-deploy-endpoint',
+            payload,
+          });
+
+          // then
+          expect(response.statusCode).to.equal(200);
+          expect(getPullRequestNock.isDone()).to.be.true;
+          expect(addRADeploymentCheckNock.isDone()).to.be.true;
+        });
+      });
+    });
+
+    describe('when the deployment status is error', function () {
+      it('should mark the review app as not deployed and set the check as failure', async function () {
+        // given
+        const appName = 'pix-api-review-pr123';
+        const repository = 'pix';
+        const prNumber = 123;
+        await reviewAppRepository.create({
+          name: appName,
+          repository,
+          prNumber,
+          parentApp: 'pix-api-review',
+        });
+        await reviewAppRepository.create({
+          name: 'pix-front-review-pr123',
+          repository,
+          prNumber,
+          parentApp: 'pix-api-review',
+        });
+
+        const sha = 'a-commit-sha';
+        const getPullRequestNock = nock('https://api.github.com')
+          .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
+          .reply(201, { head: { sha } });
+
+        const addRADeploymentCheckNock = nock('https://api.github.com')
+          .post(`/repos/1024pix/${repository}/statuses/${sha}`, {
+            context: 'check-ra-deployment',
+            state: 'failure',
+          })
+          .reply(201, { started_at: new Date() });
+
+        const payload = {
+          type_data: {
+            status: 'build-error',
+            deployment_type: 'deployment',
+          },
+          app_name: appName,
+          type: 'deployment',
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/build/scalingo/review-app-deploy-endpoint',
+          payload,
+        });
+
+        // then
+        expect(response.statusCode).to.equal(200);
+        const reviewApp = await knex('review-apps').where({ name: appName }).first();
+        expect(reviewApp.isDeployed).to.be.false;
+        expect(getPullRequestNock.isDone()).to.be.true;
+        expect(addRADeploymentCheckNock.isDone()).to.be.true;
       });
     });
   });

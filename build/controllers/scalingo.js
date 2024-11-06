@@ -4,6 +4,8 @@ import { Attachment, Context, Message, Section } from 'slack-block-builder';
 import { logger } from '../../common/services/logger.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
 import { config } from '../../config.js';
+import * as reviewAppRepository from '../repository/review-app-repository.js';
+import githubService from '../../common/services/github.js';
 
 function getSlackMessageAttachments(payload) {
   const appName = payload.app_name;
@@ -65,6 +67,51 @@ const scalingo = {
     });
 
     return 'Slack error notification sent';
+  },
+
+  async reviewAppDeployEndpoint(request, h) {
+    const event = 'review-app-deploy';
+    const appName = request.payload.app_name;
+    const type = request.payload.type;
+    const { status, deployment_type: deploymentType } = request.payload.type_data;
+
+    logger.info({
+      event,
+      message: `Scalingo deployment request received for application ${appName}.`,
+    });
+
+    if (type !== 'deployment' || deploymentType !== 'deployment') {
+      logger.error({ event, message: `The event type is not deployment.` });
+      return h.response().code(200);
+    }
+
+    if (status !== 'success' && !status.includes('error')) {
+      logger.warn({ event, message: `The status "${status}" is not managed by this hook.` });
+      return h.response().code(200);
+    }
+
+    if (!appName.includes('review-pr')) {
+      logger.error({ event, message: `The application ${appName} is not linked to a pull request.` });
+      return h.response().code(200);
+    }
+
+    if (status.includes('error')) {
+      const { repository, prNumber } = await reviewAppRepository.markAsFailed({ name: appName });
+      logger.info({ event, message: `Application ${appName} marked as failed.` });
+
+      await githubService.addRADeploymentCheck({ repository, prNumber, status: 'failure' });
+      return h.response().code(200);
+    }
+
+    const { repository, prNumber } = await reviewAppRepository.markAsDeployed({ name: appName });
+    logger.info({ event, message: `Application ${appName} marked as deployed.` });
+
+    const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
+    if (areAllDeployed) {
+      await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
+    }
+
+    return h.response().code(200);
   },
 };
 
