@@ -4,6 +4,10 @@ import * as reviewAppRepository from '../../../../build/repository/review-app-re
 import { knex } from '../../../../db/knex-database-connection.js';
 
 describe('Integration | Build | Repository | Review App', function () {
+  afterEach(async function () {
+    await knex('review-apps').truncate();
+  });
+
   describe('create', function () {
     it('should insert a review app', async function () {
       // given

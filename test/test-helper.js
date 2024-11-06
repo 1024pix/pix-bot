@@ -21,7 +21,6 @@ beforeEach(function () {
 
 // eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(async function () {
-  await knex('review-apps').truncate();
   sinon.restore();
   nock.cleanAll();
 });

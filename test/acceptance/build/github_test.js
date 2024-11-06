@@ -1,8 +1,13 @@
 import { config } from '../../../config.js';
 import server from '../../../server.js';
 import { createGithubWebhookSignatureHeader, expect, nock, sinon, StatusCodes } from '../../test-helper.js';
+import { knex } from '../../../db/knex-database-connection.js';
 
 describe('Acceptance | Build | Github', function () {
+  afterEach(async function () {
+    await knex('review-apps').truncate();
+  });
+
   describe('POST /github/webhook', function () {
     function getAppNock({ reviewAppName, returnCode = StatusCodes.OK }) {
       let body = undefined;
