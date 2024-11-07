@@ -78,4 +78,35 @@ describe('Integration | Build | Repository | Review App', function () {
       });
     });
   });
+
+  describe('markAsFailed', function () {
+    it('should set isDeployed to false and return repository and prNumber', async function () {
+      // given
+      const name = 'pix-api-review-pr123';
+      const repository = 'pix';
+      const prNumber = 123;
+      const parentApp = 'pix-api-review';
+
+      await reviewAppRepository.create({ name, repository, prNumber, parentApp });
+      await reviewAppRepository.markAsDeployed({ name });
+
+      // when
+      const result = await reviewAppRepository.markAsFailed({ name });
+
+      const updatedReviewApp = await knex('review-apps').where({ name }).first();
+      expect(updatedReviewApp.isDeployed).to.be.false;
+      expect(result.repository).to.equal(repository);
+      expect(result.prNumber).to.equal(prNumber);
+    });
+
+    describe('when review app does not exist', function () {
+      it('should throw an Error', async function () {
+        // when
+        const name = 'does-not-exist';
+        const error = await catchErr(reviewAppRepository.markAsFailed)({ name });
+
+        expect(error.message).to.equal(`${name} doesn't exist.`);
+      });
+    });
+  });
 });

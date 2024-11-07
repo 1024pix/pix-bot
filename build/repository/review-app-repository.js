@@ -14,3 +14,14 @@ export const markAsDeployed = async function ({ name }) {
   }
   return result[0];
 };
+
+export const markAsFailed = async function ({ name }) {
+  const result = await knex('review-apps')
+    .update({ isDeployed: false })
+    .where({ name })
+    .returning(['repository', 'prNumber']);
+  if (result.length === 0) {
+    throw new Error(`${name} doesn't exist.`);
+  }
+  return result[0];
+};
