@@ -6,7 +6,7 @@ import { PgClient } from './PgClient.js';
 
 dotenv.config();
 
-const dbUrl = env.NODE_ENV === 'test' ? env.TEST_DATABASE_API_URL : env.DATABASE_API_URL;
+const dbUrl = env.NODE_ENV === 'test' ? env.TEST_DATABASE_URL : env.DATABASE_URL;
 
 const url = new URL(dbUrl);
 

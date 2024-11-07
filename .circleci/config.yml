@@ -18,7 +18,7 @@ jobs:
           name: Test
           command: npm run test
           environment:
-            TEST_DATABASE_API_URL: postgres://circleci@pg-pix-bot:5432/circleci
+            TEST_DATABASE_URL: postgres://circleci@pg-pix-bot:5432/circleci
             MOCHA_FILE: /home/circleci/test-results/test-results.[hash].xml
             MOCHA_REPORTER: mocha-junit-reporter
             when: always
