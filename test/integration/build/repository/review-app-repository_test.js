@@ -109,4 +109,69 @@ describe('Integration | Build | Repository | Review App', function () {
       });
     });
   });
+
+  describe('areAllDeployed', function () {
+    it('should return true when all applications are deployed', async function () {
+      // given
+      const repository = 'pix';
+      const prNumber = 123;
+
+      await reviewAppRepository.create({
+        name: 'other-repo-review-pr1',
+        repository: 'other-repo',
+        prNumber: 1,
+        parentApp: 'other-repo-review',
+      });
+      await reviewAppRepository.create({
+        name: 'pix-api-review-pr123',
+        repository,
+        prNumber,
+        parentApp: 'pix-api-review',
+      });
+      await reviewAppRepository.markAsDeployed({ name: 'pix-api-review-pr123' });
+      await reviewAppRepository.create({
+        name: 'pix-front-review-pr123',
+        repository,
+        prNumber,
+        parentApp: 'pix-front-review',
+      });
+      await reviewAppRepository.markAsDeployed({ name: 'pix-front-review-pr123' });
+
+      // when
+      const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
+
+      expect(areAllDeployed).to.be.true;
+    });
+
+    it('should return false when not all applications are deployed', async function () {
+      // given
+      const repository = 'pix';
+      const prNumber = 123;
+
+      await reviewAppRepository.create({
+        name: 'other-repo-review-pr1',
+        repository: 'other-repo',
+        prNumber: 1,
+        parentApp: 'other-repo-review',
+      });
+      await reviewAppRepository.create({
+        name: 'pix-api-review-pr123',
+        repository,
+        prNumber,
+        parentApp: 'pix-api-review',
+      });
+      await reviewAppRepository.markAsDeployed({ name: 'pix-api-review-pr123' });
+      await reviewAppRepository.create({
+        name: 'pix-front-review-pr123',
+        repository,
+        prNumber,
+        parentApp: 'pix-front-review',
+      });
+
+      // when
+      const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
+
+      expect(areAllDeployed).to.be.false;
+    });
+  });
 });

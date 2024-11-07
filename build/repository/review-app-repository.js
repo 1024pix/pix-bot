@@ -25,3 +25,8 @@ export const markAsFailed = async function ({ name }) {
   }
   return result[0];
 };
+
+export const areAllDeployed = async function ({ repository, prNumber }) {
+  const { count } = await knex('review-apps').count().where({ repository, prNumber, isDeployed: false }).first();
+  return count === 0;
+};
