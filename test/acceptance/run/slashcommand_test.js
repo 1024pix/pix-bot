@@ -153,20 +153,20 @@ describe('Acceptance | Run | SlashCommand', function () {
     });
   });
 
-  describe('POST /slack/commands/deploy-pix-data-api-pix', function () {
-    it('responds with 200 and deploys pix-data-api-pix-production', async function () {
+  describe('POST /slack/commands/deploy-pix-api-to-pg', function () {
+    it('responds with 200 and deploys pix-api-to-pg-production', async function () {
       const body = {
         text: 'v0.0.1',
       };
       const res = await server.inject({
         method: 'POST',
-        url: '/slack/commands/deploy-pix-data-api-pix',
+        url: '/slack/commands/deploy-pix-api-to-pg',
         headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
         payload: body,
       });
       expect(res.statusCode).to.equal(200);
       expect(res.result.text).to.equal(
-        'Commande de déploiement de la release "v0.0.1" pour PIX data api pix en production bien reçue.',
+        'Commande de déploiement de la release "v0.0.1" pour PIX API to PG en production bien reçue.',
       );
     });
 
@@ -176,12 +176,12 @@ describe('Acceptance | Run | SlashCommand', function () {
       };
       nock(`https://auth.scalingo.com`).post('/v1/tokens/exchange').reply(200, {});
       const scalingo = nock('https://scalingo.production')
-        .post(`/v1/apps/pix-data-api-pix-production/scm_repo_link/manual_deploy`, { branch: 'v0.0.1' })
+        .post(`/v1/apps/pix-api-to-pg-production/scm_repo_link/manual_deploy`, { branch: 'v0.0.1' })
         .reply(200, {});
 
       server.inject({
         method: 'POST',
-        url: '/slack/commands/deploy-pix-data-api-pix',
+        url: '/slack/commands/deploy-pix-api-to-pg',
         headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
         payload: body,
       });

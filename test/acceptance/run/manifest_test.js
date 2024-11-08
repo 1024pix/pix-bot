@@ -121,11 +121,11 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '/deploy-dbt $version',
             },
             {
-              command: '/deploy-pix-data-api-pix',
-              description: 'Déploie la version précisée de pix-data-api-pix en production',
+              command: '/deploy-pix-api-to-pg',
+              description: 'Déploie la version précisée de pix-api-to-pg en production',
               should_escape: false,
-              url: `http://${hostname}/slack/commands/deploy-pix-data-api-pix`,
-              usage_hint: '/deploy-pix-data-api-pix $version',
+              url: `http://${hostname}/slack/commands/deploy-pix-api-to-pg`,
+              usage_hint: '/deploy-pix-api-to-pg $version',
             },
             {
               command: '/deploy-metabase',

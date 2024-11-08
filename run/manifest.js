@@ -132,12 +132,12 @@ manifest.addInteractivity({
 });
 
 manifest.registerSlashCommand({
-  command: '/deploy-pix-data-api-pix',
-  path: '/slack/commands/deploy-pix-data-api-pix',
-  description: 'Déploie la version précisée de pix-data-api-pix en production',
-  usage_hint: '/deploy-pix-data-api-pix $version',
+  command: '/deploy-pix-api-to-pg',
+  path: '/slack/commands/deploy-pix-api-to-pg',
+  description: 'Déploie la version précisée de pix-api-to-pg en production',
+  usage_hint: '/deploy-pix-api-to-pg $version',
   should_escape: false,
-  handler: slackbotController.deployPixDataApiPix,
+  handler: slackbotController.deployPixApiToPg,
 });
 
 export default manifest;
