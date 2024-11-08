@@ -154,7 +154,7 @@ const configuration = (function () {
     PIX_TUTOS_APP_NAME: 'pix-tutos',
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
     PIX_DBT_APPS_NAME: ['pix-dbt-production', 'pix-dbt-external-production'],
-    PIX_DATA_API_PIX_APPS_NAME: ['pix-data-api-pix-production'],
+    PIX_API_TO_PG_APPS_NAME: ['pix-api-to-pg-production'],
 
     repoAppNames: _getJSON(process.env.REPO_APP_NAMES_MAPPING) || {},
   };
