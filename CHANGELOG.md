@@ -1,5 +1,24 @@
 # pix-bot Changelog
 
+## v1.105.0 (08/11/2024)
+
+
+### :rocket: Amélioration
+- [#461](https://github.com/1024pix/pix-bot/pull/461) [FEATURE] Ajouter un check Github lors du déploiement des review apps (PIX-14768).
+
+### :building_construction: Tech
+- [#462](https://github.com/1024pix/pix-bot/pull/462) [TECH] Renommer le endpoint /deploy-pix-data-api-pix.
+- [#454](https://github.com/1024pix/pix-bot/pull/454) [TECH] :package:  Ajout d'un client PG.
+- [#455](https://github.com/1024pix/pix-bot/pull/455) [TECH] :recycle:  Suppression d'un `await` inutile.
+
+### :arrow_up: Montée de version
+- [#459](https://github.com/1024pix/pix-bot/pull/459) [BUMP] Lock file maintenance (dossier racine).
+- [#457](https://github.com/1024pix/pix-bot/pull/457) [BUMP] Lock file maintenance.
+- [#456](https://github.com/1024pix/pix-bot/pull/456) [BUMP] Update dependency postgres to v16.
+- [#453](https://github.com/1024pix/pix-bot/pull/453) [BUMP] Lock file maintenance.
+- [#452](https://github.com/1024pix/pix-bot/pull/452) [BUMP] Lock file maintenance.
+- [#451](https://github.com/1024pix/pix-bot/pull/451) [BUMP] Update dependency node to v20.18.0.
+
 ## v1.104.4 (09/10/2024)
 
 
