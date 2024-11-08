@@ -4,7 +4,7 @@ jobs:
   build-and-test:
     docker:
       - image: cimg/node:20.18.0
-      - image: postgres:15.8-alpine
+      - image: postgres:16.3-alpine
         name: pg-pix-bot
         environment:
           POSTGRES_USER: circleci
