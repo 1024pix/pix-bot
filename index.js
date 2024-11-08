@@ -26,8 +26,6 @@ const init = async () => {
 
   taskScheduler(tasks);
 
-  throw new Error('Perdu');
-
   await server.start();
 
   logger.info({
