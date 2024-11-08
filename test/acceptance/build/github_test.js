@@ -1,8 +1,13 @@
 import { config } from '../../../config.js';
 import server from '../../../server.js';
 import { createGithubWebhookSignatureHeader, expect, nock, sinon, StatusCodes } from '../../test-helper.js';
+import { knex } from '../../../db/knex-database-connection.js';
 
 describe('Acceptance | Build | Github', function () {
+  afterEach(async function () {
+    await knex('review-apps').truncate();
+  });
+
   describe('POST /github/webhook', function () {
     function getAppNock({ reviewAppName, returnCode = StatusCodes.OK }) {
       let body = undefined;
@@ -24,6 +29,22 @@ describe('Acceptance | Build | Github', function () {
       return nock('https://scalingo.reviewApps')
         .post(`/v1/apps/${appName}/scm_repo_link/manual_review_app`, { pull_request_id: 2 })
         .reply(returnCode, body);
+    }
+
+    function getPullRequestNock({ repository, prNumber, sha }) {
+      return nock('https://api.github.com')
+        .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
+        .reply(201, { head: { sha } });
+    }
+
+    function addRADeploymentCheckNock({ repository, sha, status }) {
+      const body = {
+        context: 'check-ra-deployment',
+        state: status,
+      };
+      return nock('https://api.github.com')
+        .post(`/repos/1024pix/${repository}/statuses/${sha}`, body)
+        .reply(201, { started_at: new Date() });
     }
 
     function getManualDeployNock({ reviewAppName, branch = 'my-branch', returnCode = StatusCodes.OK }) {
@@ -66,7 +87,7 @@ describe('Acceptance | Build | Github', function () {
           };
         });
 
-        it('responds with 200, creates the RA on scalingo, disables autodeploy, pushes the git ref and comments the PR', async function () {
+        it('responds with 200, creates the RA on scalingo, disables autodeploy, pushes the git ref, comments the PR and add the deployment check', async function () {
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
 
           const scalingoDeploy1 = getManualReviewAppNock({ appName: 'pix-api-review', prNumber: 2 });
@@ -78,6 +99,12 @@ describe('Acceptance | Build | Github', function () {
           const scalingoSCMDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
           const scalingoSCMDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2' });
           const scalingoSCMDeploy3 = getManualDeployNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
+          const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+          const addRADeploymentCheck = addRADeploymentCheckNock({
+            repository: 'pix',
+            sha: 'my-sha',
+            status: 'pending',
+          });
 
           const githubNock = nock('https://api.github.com')
             .post('/repos/github-owner/pix/issues/2/comments')
@@ -107,6 +134,8 @@ describe('Acceptance | Build | Github', function () {
           expect(scalingoSCMDeploy2.isDone()).to.be.true;
           expect(scalingoSCMDeploy3.isDone()).to.be.true;
           expect(githubNock.isDone()).to.be.true;
+          expect(getPullRequest.isDone()).to.be.true;
+          expect(addRADeploymentCheck.isDone()).to.be.true;
         });
 
         it("responds with 200 and doesn't create the RA on scalingo when the PR is from a fork", async function () {
@@ -231,6 +260,9 @@ describe('Acceptance | Build | Github', function () {
         const scalingoDeploy2 = getManualDeployNock({ reviewAppName: 'pix-api-review-pr2' });
         const scalingoDeploy3 = getManualDeployNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
 
+        const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+        const addRADeploymentCheck = addRADeploymentCheckNock({ repository: 'pix', sha: 'my-sha', status: 'pending' });
+
         const res = await server.inject({
           method: 'POST',
           url: '/github/webhook',
@@ -251,6 +283,8 @@ describe('Acceptance | Build | Github', function () {
         expect(scalingoDeploy1.isDone()).to.be.true;
         expect(scalingoDeploy2.isDone()).to.be.true;
         expect(scalingoDeploy3.isDone()).to.be.true;
+        expect(getPullRequest.isDone()).to.be.true;
+        expect(addRADeploymentCheck.isDone()).to.be.true;
       });
 
       it("responds with 200 and doesn't trigger deployment when the PR state is not open", async function () {
@@ -339,6 +373,13 @@ describe('Acceptance | Build | Github', function () {
           const scalingoRAExists2 = getAppNock({ reviewAppName: 'pix-api-review-pr2' });
           const scalingoRAExists3 = getAppNock({ reviewAppName: 'pix-audit-logger-review-pr2' });
           const scalingoCreate1 = getManualReviewAppNock({ appName: 'pix-front-review', prNumber: 2 });
+          const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+          const addRADeploymentCheck = addRADeploymentCheckNock({
+            repository: 'pix',
+            sha: 'my-sha',
+            status: 'pending',
+          });
+
           const scalingoUpdateOpts1 = getScmRepoLinkNock({ reviewAppName: 'pix-front-review-pr2' });
 
           const scalingoDeploy1 = getManualDeployNock({ reviewAppName: 'pix-front-review-pr2' });
@@ -370,6 +411,8 @@ describe('Acceptance | Build | Github', function () {
           expect(scalingoCreate1.isDone()).to.be.true;
           expect(scalingoUpdateOpts1.isDone()).to.be.true;
           expect(scalingoDeploy1.isDone()).to.be.true;
+          expect(getPullRequest.isDone()).to.be.true;
+          expect(addRADeploymentCheck.isDone()).to.be.true;
         });
       });
 
@@ -413,6 +456,7 @@ describe('Acceptance | Build | Github', function () {
               reviewAppName: 'pix-audit-logger-review-pr2',
               returnCode: 500,
             });
+            addRADeploymentCheckNock({ repo: 'pix', sha: 'my-sha' });
 
             const res = await server.inject({
               method: 'POST',
@@ -451,6 +495,12 @@ describe('Acceptance | Build | Github', function () {
           const scalingoDeploy3 = getManualDeployNock({
             reviewAppName: 'pix-audit-logger-review-pr2',
           });
+          const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+          const addRADeploymentCheck = addRADeploymentCheckNock({
+            repository: 'pix',
+            sha: 'my-sha',
+            status: 'pending',
+          });
 
           const res = await server.inject({
             method: 'POST',
@@ -469,6 +519,8 @@ describe('Acceptance | Build | Github', function () {
           expect(scalingoDeploy1.isDone()).to.be.true;
           expect(scalingoDeploy2.isDone()).to.be.true;
           expect(scalingoDeploy3.isDone()).to.be.true;
+          expect(getPullRequest.isDone()).to.be.true;
+          expect(addRADeploymentCheck.isDone()).to.be.true;
           expect(res.statusCode).to.equal(200);
           expect(res.result).to.eql(
             'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review with pr 2',

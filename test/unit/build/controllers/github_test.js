@@ -384,7 +384,9 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         });
 
         const addMessageToPullRequestStub = sinon.stub();
-        const githubServiceStub = sinon.stub();
+        const githubServiceStub = {
+          addRADeploymentCheck: sinon.stub(),
+        };
 
         // when
         await githubController.handleRA(request, scalingoClientStub, addMessageToPullRequestStub, githubServiceStub);
@@ -407,6 +409,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           },
           { githubService: githubServiceStub },
         );
+        expect(githubServiceStub.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+          repository: 'pix',
+          prNumber: 3,
+          status: 'pending',
+        });
       });
 
       it('throws an error on scalingo deployment fails', async function () {
@@ -436,7 +443,13 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(false);
           const deployReviewAppStub = sinon.stub();
           const disableAutoDeployStub = sinon.stub();
-          const githubServiceStub = sinon.stub();
+          const addMessageToPullRequestStub = sinon.stub();
+          const githubServiceStub = {
+            addRADeploymentCheck: sinon.stub(),
+          };
+          const reviewAppRepositoryStub = {
+            create: sinon.stub(),
+          };
 
           scalingoClientStub.getInstance = sinon.stub().returns({
             deployUsingSCM: deployUsingSCMStub,
@@ -446,11 +459,25 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
 
           // when
-          const response = await githubController.handleRA(request, scalingoClientStub, githubServiceStub);
+          const response = await githubController.handleRA(
+            request,
+            scalingoClientStub,
+            addMessageToPullRequestStub,
+            githubServiceStub,
+            reviewAppRepositoryStub,
+          );
 
           // then
           expect(deployReviewAppStub.calledOnceWithExactly('pix-api-review', 3)).to.be.true;
           expect(disableAutoDeployStub.calledOnceWithExactly('pix-api-review-pr3')).to.be.true;
+          expect(
+            reviewAppRepositoryStub.create.calledWith({
+              name: 'pix-api-review-pr3',
+              repository: 'pix',
+              prNumber: 3,
+              parentApp: 'pix-api-review',
+            }),
+          ).to.be.true;
           expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
           expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
           expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;

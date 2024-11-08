@@ -20,7 +20,7 @@ beforeEach(function () {
 });
 
 // eslint-disable-next-line mocha/no-top-level-hooks
-afterEach(function () {
+afterEach(async function () {
   sinon.restore();
   nock.cleanAll();
 });

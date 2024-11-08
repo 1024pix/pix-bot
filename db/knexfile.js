@@ -26,13 +26,13 @@ function localAPIPostgresEnv(databaseUrl, knexAsyncStacktraceEnabled) {
   };
 }
 const environments = {
-  development: localAPIPostgresEnv(env.DATABASE_API_URL, env.KNEX_ASYNC_STACKTRACE_ENABLED),
+  development: localAPIPostgresEnv(env.DATABASE_URL, env.KNEX_ASYNC_STACKTRACE_ENABLED),
 
-  test: localAPIPostgresEnv(env.TEST_DATABASE_API_URL, env.KNEX_ASYNC_STACKTRACE_ENABLED),
+  test: localAPIPostgresEnv(env.TEST_DATABASE_URL, env.KNEX_ASYNC_STACKTRACE_ENABLED),
 
   production: {
     client: 'postgresql',
-    connection: env.DATABASE_API_URL,
+    connection: env.DATABASE_URL,
     pool: {
       min: Number.parseInt(env.DATABASE_API_CONNECTION_POOL_MIN_SIZE, 10) || 1,
       max: Number.parseInt(env.DATABASE_API_CONNECTION_POOL_MAX_SIZE, 10) || 1,
