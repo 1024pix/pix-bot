@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.105.2 (14/11/2024)
+
+
+### :bug: Correction
+- [#467](https://github.com/1024pix/pix-bot/pull/467) [BUGFIX] Mettre à jour le statut d'une RA quand elle est recréée.
+
+### :arrow_up: Montée de version
+- [#468](https://github.com/1024pix/pix-bot/pull/468) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.2 (dossier racine).
+
 ## v1.105.1 (14/11/2024)
 
 
