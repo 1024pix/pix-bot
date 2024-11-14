@@ -166,10 +166,10 @@ async function deployPullRequest(
       if (reviewAppExists) {
         await client.deployUsingSCM(reviewAppName, ref);
       } else {
+        await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
         await client.deployReviewApp(appName, prId);
         await client.disableAutoDeploy(reviewAppName);
         await client.deployUsingSCM(reviewAppName, ref);
-        await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
       }
       deployedRA.push({ name: appName, isCreated: !reviewAppExists });
     } catch (error) {
