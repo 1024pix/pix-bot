@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.105.1 (14/11/2024)
+
+
+### :bug: Correction
+- [#466](https://github.com/1024pix/pix-bot/pull/466) [BUGFIX] Insérer les review-apps en base avant le déploiement de Scalingo.
+
+### :arrow_up: Montée de version
+- [#465](https://github.com/1024pix/pix-bot/pull/465) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.105.0 (08/11/2024)
 
 
