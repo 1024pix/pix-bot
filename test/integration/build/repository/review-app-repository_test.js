@@ -31,7 +31,7 @@ describe('Integration | Build | Repository | Review App', function () {
     });
 
     describe('when a review app already exists', function () {
-      it('should throw an error', async function () {
+      it('should update creation date and set as not deployed', async function () {
         // given
         const name = 'pix-api-review-pr123';
         const repository = 'pix';
@@ -39,12 +39,20 @@ describe('Integration | Build | Repository | Review App', function () {
         const parentApp = 'pix-api-review';
 
         await reviewAppRepository.create({ name, repository, prNumber, parentApp });
+        const initialReviewApp = await knex('review-apps').where({ name }).first();
 
         // when
-        const error = await catchErr(reviewAppRepository.create)({ name, repository, prNumber, parentApp });
+        await reviewAppRepository.create({ name, repository, prNumber, parentApp });
 
         // then
-        expect(error.detail).to.equal('Key (name)=(pix-api-review-pr123) already exists.');
+        const mergedReviewApp = await knex('review-apps').where({ name }).first();
+        expect(mergedReviewApp).not.to.be.null;
+        expect(mergedReviewApp.name).to.equal(initialReviewApp.name);
+        expect(mergedReviewApp.repository).to.equal(initialReviewApp.repository);
+        expect(mergedReviewApp.prNumber).to.equal(initialReviewApp.prNumber);
+        expect(mergedReviewApp.parentApp).to.equal(initialReviewApp.parentApp);
+        expect(mergedReviewApp.isDeployed).to.be.false;
+        expect(mergedReviewApp.createdAt).not.to.equal(initialReviewApp.createdAt);
       });
     });
   });
