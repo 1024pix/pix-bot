@@ -197,17 +197,40 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
         });
 
-        it('should call handleCloseRA() method on closed action', async function () {
-          // given
-          sinon.stub(request, 'payload').value({ action: 'closed' });
+        describe('when action is `closed`', function () {
+          it('should call handleCloseRA() method on closed action', async function () {
+            // given
+            sinon.stub(request, 'payload').value({ action: 'closed' });
 
-          const handleCloseRA = sinon.stub();
+            const handleCloseRA = sinon.stub();
 
-          // when
-          await githubController.processWebhook(request, { handleCloseRA });
+            // when
+            await githubController.processWebhook(request, { handleCloseRA });
 
-          // then
-          expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
+            // then
+            expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
+          });
+
+          it('should call pullRequestRepository.remove() method', async function () {
+            // given
+            sinon.stub(request, 'payload').value({
+              action: 'closed',
+              number: 123,
+              repository: { name: 'pix-sample-repo' },
+            });
+
+            const handleCloseRA = sinon.stub();
+            const pullRequestRepository = { remove: sinon.stub() };
+
+            // when
+            await githubController.processWebhook(request, { handleCloseRA, pullRequestRepository });
+
+            // then
+            expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+              number: 123,
+              repositoryName: 'pix-sample-repo',
+            });
+          });
         });
 
         it('should ignore the action', async function () {
