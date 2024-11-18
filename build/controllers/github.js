@@ -257,6 +257,10 @@ async function processWebhook(
       return handleRA(request);
     }
     if (request.payload.action === 'closed') {
+      await pullRequestRepository.remove({
+        number: request.payload.number,
+        repositoryName: request.payload.repository.name,
+      });
       return handleCloseRA(request);
     }
     if (request.payload.action === 'labeled') {
@@ -285,7 +289,6 @@ async function processWebhook(
   }
 
   // TODO: check commits fail => j'enlève du tableau
-  // TODO: pull request merged => j'enlève du tableau
 }
 
 function _handleNoRACase(request) {
