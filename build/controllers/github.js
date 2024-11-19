@@ -285,6 +285,13 @@ async function processWebhook(
       });
     }
     return `Ignoring ${request.payload.action} action`;
+  } else if (eventName === 'check_suite') {
+    if (request.payload.action === 'completed' && request.payload.check_suite.conclusion !== 'success') {
+      await pullRequestRepository.remove({
+        number: request.payload.pull_requests[0].number,
+        repositoryName: request.payload.repository.name,
+      });
+    }
   } else {
     return `Ignoring ${eventName} event`;
   }

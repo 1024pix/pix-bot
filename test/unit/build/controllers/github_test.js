@@ -236,6 +236,35 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           expect(result).to.equal('Ignoring unhandled-action action');
         });
       });
+
+      describe('when event is check_suite', function () {
+        describe("when action is 'completed' and conclusion is not 'success'", function () {
+          it('should call pullRequestRepository.remove() method', async function () {
+            const request = {
+              headers: {
+                'x-github-event': 'check_suite',
+              },
+              payload: {
+                action: 'completed',
+                pull_requests: [{ number: 123 }],
+                repository: { name: 'pix-sample-repo' },
+                check_suite: { conclusion: 'failure' },
+              },
+            };
+
+            const pullRequestRepository = { remove: sinon.stub() };
+
+            // when
+            await githubController.processWebhook(request, { pullRequestRepository });
+
+            // then
+            expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+              number: 123,
+              repositoryName: 'pix-sample-repo',
+            });
+          });
+        });
+      });
     });
   });
 
