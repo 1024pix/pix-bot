@@ -132,6 +132,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           },
           payload: { action: 'nothing' },
         };
+
         ['opened', 'reopened', 'synchronize'].forEach((action) => {
           it(`should call handleRA() method on ${action} action`, async function () {
             // given
@@ -158,16 +159,19 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 repository: { name: 'pix-sample-repo' },
               });
 
+              const mergeQueue = sinon.stub();
               const pullRequestRepository = { save: sinon.stub() };
 
               // when
-              await githubController.processWebhook(request, { pullRequestRepository });
+              await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
 
               // then
               expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
                 number: 123,
                 repositoryName: 'pix-sample-repo',
               });
+
+              expect(mergeQueue).to.be.calledOnce;
             });
           });
         });
@@ -183,16 +187,19 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 repository: { name: 'pix-sample-repo' },
               });
 
+              const mergeQueue = sinon.stub();
               const pullRequestRepository = { remove: sinon.stub() };
 
               // when
-              await githubController.processWebhook(request, { pullRequestRepository });
+              await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
 
               // then
               expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
                 number: 123,
                 repositoryName: 'pix-sample-repo',
               });
+
+              expect(mergeQueue).to.be.calledOnce;
             });
           });
         });
@@ -211,10 +218,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             });
 
             const handleCloseRA = sinon.stub();
+            const mergeQueue = sinon.stub();
             const pullRequestRepository = { remove: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { handleCloseRA, pullRequestRepository });
+            await githubController.processWebhook(request, { handleCloseRA, pullRequestRepository, mergeQueue });
 
             // then
             expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
@@ -222,6 +230,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               repositoryName: 'pix-sample-repo',
             });
             expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
+            expect(mergeQueue).to.be.calledOnce;
           });
         });
 
@@ -252,16 +261,18 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               },
             };
 
+            const mergeQueue = sinon.stub();
             const pullRequestRepository = { remove: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { pullRequestRepository });
+            await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
 
             // then
             expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
               number: 123,
               repositoryName: 'pix-sample-repo',
             });
+            expect(mergeQueue).to.be.calledOnce;
           });
         });
       });

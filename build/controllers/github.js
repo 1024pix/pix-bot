@@ -8,6 +8,7 @@ import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 import * as reviewAppRepo from '../repository/review-app-repository.js';
 import * as _pullRequestRepository from '../repositories/pull-request-repository.js';
+import { mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
 const repositoryToScalingoAppsReview = {
   'pix-api-data': ['pix-api-data-integration'],
@@ -248,6 +249,7 @@ async function processWebhook(
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
     pullRequestRepository = _pullRequestRepository,
+    mergeQueue = _mergeQueue,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
@@ -262,6 +264,7 @@ async function processWebhook(
         number: request.payload.number,
         repositoryName: request.payload.pull_request.head.repo.name,
       });
+      await mergeQueue();
       return handleCloseRA(request);
     }
     if (request.payload.action === 'labeled') {
@@ -277,12 +280,14 @@ async function processWebhook(
         number: request.payload.number,
         repositoryName: request.payload.repository.name,
       });
+      await mergeQueue();
     }
     if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       await pullRequestRepository.remove({
         number: request.payload.number,
         repositoryName: request.payload.repository.name,
       });
+      await mergeQueue();
     }
     return `Ignoring ${request.payload.action} action`;
   } else if (eventName === 'check_suite') {
@@ -291,12 +296,11 @@ async function processWebhook(
         number: request.payload.pull_requests[0].number,
         repositoryName: request.payload.repository.name,
       });
+      await mergeQueue();
     }
   } else {
     return `Ignoring ${eventName} event`;
   }
-
-  // TODO: check commits fail => j'enlève du tableau
 }
 
 function _handleNoRACase(request) {
