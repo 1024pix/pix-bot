@@ -176,6 +176,8 @@ async function _handleIssueComment(
 
   const reviewAppName = `${reviewApps[0]}-pr${pull_number}`;
 
+  if (reviewAppName !== 'pix-front-review-pr10490') return 'non';
+
   const reviewAppExists = await client.reviewAppExists(reviewAppName);
   if (!reviewAppExists) {
     return `Review app ${reviewAppName} does not exist.`;
@@ -324,67 +326,7 @@ async function processWebhook(
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
-  if (eventName === 'push') {
-    return pushOnDefaultBranchWebhook(request);
-  } else if (eventName === 'pull_request') {
-    if (['opened', 'reopened', 'synchronize'].includes(request.payload.action)) {
-      return handleRA(request);
-    }
-    if (request.payload.action === 'closed') {
-      const repositoryName = request.payload.repository.full_name;
-      const isMerged = request.payload.pull_request.merged;
-      const status = isMerged ? MERGE_STATUS.MERGED : MERGE_STATUS.ABORTED;
-      await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number, status });
-      return handleCloseRA(request);
-    }
-    if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
-      await handleCloseRA(request);
-    }
-    if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
-      const belongsToPix = await githubService.checkUserBelongsToPix(request.payload.sender.login);
-      if (!belongsToPix) {
-        return `Ignoring ${request.payload.sender.login} label action`;
-      }
-      const repositoryName = request.payload.repository.full_name;
-      const isAllowedRepository = config.github.automerge.allowedRepositories.includes(repositoryName);
-      if (isAllowedRepository) {
-        await mergeQueue.managePullRequest({ repositoryName, number: request.payload.number });
-      }
-    }
-    if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
-      const repositoryName = request.payload.repository.full_name;
-      await mergeQueue.unmanagePullRequest({
-        repositoryName,
-        number: request.payload.number,
-        status: MERGE_STATUS.ABORTED,
-      });
-    }
-    return `Ignoring ${request.payload.action} action`;
-  } else if (eventName === 'check_suite') {
-    if (request.payload.action === 'completed') {
-      const repositoryName = request.payload.repository.full_name;
-
-      if (request.payload.check_suite.pull_requests.length === 0) {
-        return `check_suite is not related to any pull_request`;
-      }
-
-      const prNumber = request.payload.check_suite.pull_requests[0].number;
-      if (request.payload.check_suite.conclusion !== 'success') {
-        await mergeQueue.unmanagePullRequest({ repositoryName, number: prNumber, status: MERGE_STATUS.ABORTED });
-      } else {
-        const hasReadyToMergeLabel = await githubService.isPrLabelledWith({
-          repositoryName,
-          number: prNumber,
-          label: ':rocket: Ready to Merge',
-        });
-        if (hasReadyToMergeLabel) {
-          await mergeQueue.managePullRequest({ repositoryName, number: prNumber });
-        }
-      }
-      return `check_suite event handle`;
-    }
-    return `Ignoring '${request.payload.action}' action for check_suite event`;
-  } else if (eventName === 'issue_comment' && request.payload.action === 'edited') {
+  if (eventName === 'issue_comment' && request.payload.action === 'edited') {
     return handleIssueComment(request);
   } else {
     return `Ignoring ${eventName} event`;
