@@ -254,4 +254,140 @@ describe('Integration | Build | Repository | Review App', function () {
       });
     });
   });
+
+  describe('#scheduleDeployment', function () {
+    it('should update deployment columns', async function () {
+      // given
+      const application = {
+        name: 'ma-super-appli',
+        repository: 'monrepo',
+        prNumber: 666,
+        parentApp: 'maman',
+      };
+      const otherApplication = {
+        name: 'mon-autre-appli',
+        repository: 'monrepo',
+        prNumber: 888,
+        parentApp: 'maman',
+      };
+      await knex.insert([application, otherApplication]).into('review-apps');
+      const deploymentParams = {
+        name: application.name,
+        deployScmRef: 'ma-vieille-branche',
+        deployAfter: new Date('2025-01-14T14:29:14.416Z'),
+      };
+
+      // when
+      await reviewAppRepository.scheduleDeployment(deploymentParams);
+
+      // then
+      const reviewApps = await knex.select('deployScmRef', 'deployAfter').from('review-apps').orderBy('name');
+      expect(reviewApps).to.deep.equal([
+        {
+          deployScmRef: 'ma-vieille-branche',
+          deployAfter: new Date('2025-01-14T14:29:14.416Z'),
+        },
+        {
+          deployScmRef: null,
+          deployAfter: null,
+        },
+      ]);
+    });
+  });
+
+  describe('#markAsDeploying', function () {
+    it('should empty deployAfter column', async function () {
+      // given
+      const application = {
+        name: 'ma-super-appli',
+        repository: 'monrepo',
+        prNumber: 666,
+        parentApp: 'maman',
+        deployScmRef: 'branche1',
+        deployAfter: new Date('2025-01-14T14:29:14.416Z'),
+      };
+      const otherApplication = {
+        name: 'mon-autre-appli',
+        repository: 'monrepo',
+        prNumber: 888,
+        parentApp: 'maman',
+        deployScmRef: 'branche1',
+        deployAfter: new Date('2025-01-14T14:29:14.416Z'),
+      };
+      await knex.insert([application, otherApplication]).into('review-apps');
+
+      // when
+      await reviewAppRepository.markAsDeploying({
+        name: application.name,
+      });
+
+      // then
+      const reviewApps = await knex.select('deployAfter').from('review-apps').orderBy('name');
+      expect(reviewApps).to.deep.equal([
+        {
+          deployAfter: null,
+        },
+        {
+          deployAfter: new Date('2025-01-14T14:29:14.416Z'),
+        },
+      ]);
+    });
+  });
+
+  describe('#getForDeployment', () => {
+    let readyTime1, readyTime2, notReadyTime;
+
+    beforeEach(async function () {
+      const now = new Date();
+      readyTime1 = new Date(now.getTime() - 2000);
+      readyTime2 = new Date(now.getTime() - 1000);
+      notReadyTime = new Date(now.getTime() + 1000);
+
+      await knex
+        .insert({
+          name: 'l-appli-de-mon-cousin',
+          repository: 'monrepo',
+          prNumber: 666,
+          parentApp: 'maman',
+          deployScmRef: 'un-rameau',
+          deployAfter: notReadyTime,
+        })
+        .into('review-apps');
+      await knex
+        .insert({
+          name: 'l-appli-de-ma-grand-mere',
+          repository: 'monrepo',
+          prNumber: 777,
+          parentApp: 'maman',
+          deployScmRef: 'une-souche',
+          deployAfter: readyTime2,
+        })
+        .into('review-apps');
+      await knex
+        .insert({
+          name: 'ma-super-appli',
+          repository: 'monrepo',
+          prNumber: 888,
+          parentApp: 'maman',
+          deployScmRef: 'ma-nouvelle-branche',
+          deployAfter: readyTime1,
+        })
+        .into('review-apps');
+    });
+
+    it('should get the oldest ready deployment', async function () {
+      // when
+      const result = await reviewAppRepository.getForDeployment();
+
+      // then
+      expect(result).to.deep.contain({
+        name: 'ma-super-appli',
+        repository: 'monrepo',
+        prNumber: 888,
+        parentApp: 'maman',
+        deployScmRef: 'ma-nouvelle-branche',
+        deployAfter: readyTime1,
+      });
+    });
+  });
 });
