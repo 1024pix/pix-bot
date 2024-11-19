@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import ecoModeService from './build/services/eco-mode-service.js';
+import * as reviewAppDeployment from './build/services/review-app-deployment.js';
 import { createCronJob } from './common/services/cron-job.js';
 import github from './common/services/github.js';
 import { logger } from './common/services/logger.js';
@@ -13,6 +14,7 @@ import server from './server.js';
 
 const init = async () => {
   await ecoModeService.start();
+  await reviewAppDeployment.start();
 
   createCronJob(
     'Deploy Pix site',
@@ -32,6 +34,15 @@ const init = async () => {
     event: 'main',
     message: `Server running on "${server.info.uri}"`,
   });
+
+  process.on('SIGTERM', () => {
+    exitOnSignal('SIGTERM');
+  });
+  process.on('SIGINT', () => {
+    exitOnSignal('SIGINT');
+  });
 };
+
+function exitOnSignal() {}
 
 init();

@@ -7,6 +7,7 @@ describe('Acceptance | Build | Github', function () {
   beforeEach(async function () {
     await knex('review-apps').truncate();
     await knex('pull_requests').truncate();
+    await knex('review-apps-deployments').truncate();
   });
 
   describe('POST /github/webhook', function () {
