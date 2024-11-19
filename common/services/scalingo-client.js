@@ -170,8 +170,8 @@ class ScalingoClient {
   }
 
   async deleteReviewApp(appName) {
-    if (!appName.includes('review')) {
-      throw new Error('Cannot call deleteReviewApp for a non review app.');
+    if (!appName.match(/.*-pr\d+/g)) {
+      throw new Error(`Cannot call deleteReviewApp for the non review app ${appName}.`);
     }
 
     try {
