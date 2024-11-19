@@ -833,19 +833,18 @@ describe('Scalingo client', function () {
 
         // then
         expect(result).to.be.instanceOf(Error);
-        expect(result.message).to.equal('Cannot call deleteReviewApp for a non review app.');
+        expect(result.message).to.equal('Cannot call deleteReviewApp for the non review app pix-api-production.');
       });
     });
 
-    it('should delete the review app', async function () {
-      // given
-      const appName = 'pix-api-review-pr1';
+    ['pix-api-review-pr1', 'pix-data-api-pix-integration-pr17'].forEach((appName) => {
+      it('should delete the review app', async function () {
+        // when
+        await client.deleteReviewApp(appName);
 
-      // when
-      await client.deleteReviewApp(appName);
-
-      // then
-      expect(clientAppsDestroy).to.have.been.calledWithExactly(appName, appName);
+        // then
+        expect(clientAppsDestroy).to.have.been.calledWithExactly(appName, appName);
+      });
     });
   });
 });
