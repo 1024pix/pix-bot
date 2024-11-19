@@ -299,17 +299,7 @@ async function processWebhook(
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
-  if (eventName === 'push') {
-    return pushOnDefaultBranchWebhook(request);
-  } else if (eventName === 'pull_request') {
-    if (['opened', 'reopened', 'synchronize'].includes(request.payload.action)) {
-      return handleRA(request);
-    }
-    if (request.payload.action === 'closed') {
-      return handleCloseRA(request);
-    }
-    return `Ignoring ${request.payload.action} action`;
-  } else if (eventName === 'issue_comment' && request.payload.action === 'edited') {
+  if (eventName === 'issue_comment' && request.payload.action === 'edited') {
     return handleIssueComment(request);
   } else {
     return `Ignoring ${eventName} event`;
