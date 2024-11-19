@@ -187,7 +187,7 @@ async function _handleIssueComment(request, scalingoClient = ScalingoClient, git
 
   const branchName = await githubService.getPullRequestBranchName({ repo, owner, pull_number });
 
-  await client.deployUsingSCM(reviewAppName, branchName);
+  await client.deployUsingSCM(reviewAppName, branchName, config.ecoMode.deployDebounce);
 
   return 'ok';
 }
@@ -214,12 +214,12 @@ async function deployPullRequest(
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
       if (reviewAppExists) {
-        await client.deployUsingSCM(reviewAppName, ref);
+        await client.deployUsingSCM(reviewAppName, ref, config.ecoMode.deployDebounce);
       } else {
         await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
         await client.deployReviewApp(appName, prId);
         await client.disableAutoDeploy(reviewAppName);
-        await client.deployUsingSCM(reviewAppName, ref);
+        await client.deployUsingSCM(reviewAppName, ref, config.ecoMode.deployDebounce);
       }
       deployedRA.push({ name: appName, isCreated: !reviewAppExists });
     } catch (error) {

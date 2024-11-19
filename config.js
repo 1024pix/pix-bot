@@ -25,6 +25,7 @@ const configuration = (function () {
     ecoMode: {
       stopSchedule: process.env.REVIEW_APP_STOP_SCHEDULE,
       startSchedule: process.env.REVIEW_APP_START_SCHEDULE,
+      deployDebounce: _getNumber(process.env.REVIEW_APP_DEPLOY_DEBOUNCE, 30) * 1000,
     },
 
     baleen: {
