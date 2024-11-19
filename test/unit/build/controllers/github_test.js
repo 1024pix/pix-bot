@@ -198,25 +198,16 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         });
 
         describe('when action is `closed`', function () {
-          it('should call handleCloseRA() method on closed action', async function () {
-            // given
-            sinon.stub(request, 'payload').value({ action: 'closed' });
-
-            const handleCloseRA = sinon.stub();
-
-            // when
-            await githubController.processWebhook(request, { handleCloseRA });
-
-            // then
-            expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
-          });
-
           it('should call pullRequestRepository.remove() method', async function () {
             // given
             sinon.stub(request, 'payload').value({
               action: 'closed',
               number: 123,
-              repository: { name: 'pix-sample-repo' },
+              pull_request: {
+                head: {
+                  repo: { name: 'pix-sample-repo' },
+                },
+              },
             });
 
             const handleCloseRA = sinon.stub();
@@ -230,6 +221,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               number: 123,
               repositoryName: 'pix-sample-repo',
             });
+            expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
           });
         });
 
