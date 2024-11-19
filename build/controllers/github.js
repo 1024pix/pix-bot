@@ -7,6 +7,7 @@ import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 import * as reviewAppRepo from '../repository/review-app-repository.js';
+import * as _pullRequestRepository from '../repositories/pull-request-repository.js';
 
 const repositoryToScalingoAppsReview = {
   'pix-api-data': ['pix-api-data-integration'],
@@ -246,7 +247,7 @@ async function processWebhook(
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
-    pullRequestRepository,
+    pullRequestRepository = _pullRequestRepository,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
@@ -259,7 +260,7 @@ async function processWebhook(
     if (request.payload.action === 'closed') {
       await pullRequestRepository.remove({
         number: request.payload.number,
-        repositoryName: request.payload.repository.name,
+        repositoryName: request.payload.pull_request.head.repo.name,
       });
       return handleCloseRA(request);
     }
