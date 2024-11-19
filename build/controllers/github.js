@@ -151,7 +151,12 @@ async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
   return `Closed RA for PR ${prId} : ${result.join(', ')}.`;
 }
 
-async function _handleIssueComment(request, scalingoClient = ScalingoClient, githubService = commonGithubService) {
+async function _handleIssueComment(
+  request,
+  scalingoClient = ScalingoClient,
+  githubService = commonGithubService,
+  reviewAppDeploymentRepository = reviewAppDeploymentRepo,
+) {
   const payload = request.payload;
   const repo = payload.repository.name;
   const owner = payload.repository.owner.login;
@@ -192,7 +197,11 @@ async function _handleIssueComment(request, scalingoClient = ScalingoClient, git
 
   const branchName = await githubService.getPullRequestBranchName({ repo, owner, pull_number });
 
-  await client.deployUsingSCM(reviewAppName, branchName);
+  await reviewAppDeploymentRepository.save({
+    appName: reviewAppName,
+    scmRef: branchName,
+    after: getDeployAfter(),
+  });
 
   return 'ok';
 }
