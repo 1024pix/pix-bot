@@ -3,14 +3,15 @@ dotenv.config();
 
 import ecoModeService from './build/services/eco-mode-service.js';
 import { logger } from './common/services/logger.js';
-import { taskScheduler } from './run/services/task-scheduler.js';
+import { taskScheduler } from './common/services/task-scheduler.js';
 import runTasks from './run/services/tasks.js';
+import buildTasks from './build/services/tasks.js';
 import server from './server.js';
 
 const init = async () => {
   await ecoModeService.start();
 
-  taskScheduler(runTasks);
+  taskScheduler([...runTasks, ...buildTasks]);
 
   await server.start();
 

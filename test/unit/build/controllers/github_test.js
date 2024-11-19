@@ -609,15 +609,14 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       it('should call scalingo to deploy the corresponding applications', async function () {
         // given
         const scalingoClientStub = sinon.stub();
-        const deployUsingSCMStub = sinon.stub();
         const deployReviewAppStub = sinon.stub();
         const disableAutoDeployStub = sinon.stub();
         const reviewAppExistsStub = sinon.stub().resolves(false);
         const reviewAppRepositoryStub = {
           create: sinon.stub(),
+          scheduleDeployment: sinon.stub(),
         };
         scalingoClientStub.getInstance = sinon.stub().returns({
-          deployUsingSCM: deployUsingSCMStub,
           deployReviewApp: deployReviewAppStub,
           disableAutoDeploy: disableAutoDeployStub,
           reviewAppExists: reviewAppExistsStub,
@@ -638,17 +637,41 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         );
 
         // then
+        expect(deployReviewAppStub.getCall(0).calledWith('pix-api-review', 3)).to.be.true;
+        expect(disableAutoDeployStub.getCall(0).calledWith('pix-api-review-pr3')).to.be.true;
+        expect(
+          reviewAppRepositoryStub.scheduleDeployment.getCall(0).calledWithMatch({
+            name: 'pix-api-review-pr3',
+            deployScmRef: 'my-branch',
+          }),
+        ).to.be.true;
+
         expect(deployReviewAppStub.getCall(1).calledWith('pix-api-maddo-review', 3)).to.be.true;
         expect(disableAutoDeployStub.getCall(1).calledWith('pix-api-maddo-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.getCall(1).calledWith('pix-api-maddo-review-pr3', 'my-branch')).to.be.true;
+        expect(
+          reviewAppRepositoryStub.scheduleDeployment.getCall(1).calledWithMatch({
+            name: 'pix-api-maddo-review-pr3',
+            deployScmRef: 'my-branch',
+          }),
+        ).to.be.true;
 
         expect(deployReviewAppStub.getCall(2).calledWith('pix-audit-logger-review', 3)).to.be.true;
         expect(disableAutoDeployStub.getCall(2).calledWith('pix-audit-logger-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.getCall(2).calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
+        expect(
+          reviewAppRepositoryStub.scheduleDeployment.getCall(2).calledWithMatch({
+            name: 'pix-audit-logger-review-pr3',
+            deployScmRef: 'my-branch',
+          }),
+        ).to.be.true;
 
         expect(deployReviewAppStub.getCall(3).calledWith('pix-front-review', 3)).to.be.true;
         expect(disableAutoDeployStub.getCall(3).calledWith('pix-front-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.getCall(3).calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+        expect(
+          reviewAppRepositoryStub.scheduleDeployment.getCall(3).calledWithMatch({
+            name: 'pix-front-review-pr3',
+            deployScmRef: 'my-branch',
+          }),
+        ).to.be.true;
 
         expect(addMessageToPullRequestStub).to.have.been.calledOnceWithExactly(
           {
@@ -674,7 +697,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         it('should call scalingo to create and deploy the corresponding applications', async function () {
           // given
           const scalingoClientStub = sinon.stub();
-          const deployUsingSCMStub = sinon.stub();
           const reviewAppExistsStub = sinon.stub().resolves(true);
           reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(false);
           const deployReviewAppStub = sinon.stub();
@@ -685,10 +707,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           };
           const reviewAppRepositoryStub = {
             create: sinon.stub(),
+            scheduleDeployment: sinon.stub(),
           };
 
           scalingoClientStub.getInstance = sinon.stub().returns({
-            deployUsingSCM: deployUsingSCMStub,
             reviewAppExists: reviewAppExistsStub,
             deployReviewApp: deployReviewAppStub,
             disableAutoDeploy: disableAutoDeployStub,
@@ -714,13 +736,33 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               parentApp: 'pix-api-review',
             }),
           ).to.be.true;
-          expect(deployUsingSCMStub.getCall(0).calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.getCall(1).calledWith('pix-api-maddo-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.getCall(2).calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.getCall(3).calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+          expect(
+            reviewAppRepositoryStub.scheduleDeployment.firstCall.calledWithMatch({
+              name: 'pix-api-review-pr3',
+              deployScmRef: 'my-branch',
+            }),
+          ).to.be.true;
+          expect(
+            reviewAppRepositoryStub.scheduleDeployment.secondCall.calledWithMatch({
+              name: 'pix-api-maddo-review-pr3',
+              deployScmRef: 'my-branch',
+            }),
+          ).to.be.true;
+          expect(
+            reviewAppRepositoryStub.scheduleDeployment.thirdCall.calledWithMatch({
+              name: 'pix-audit-logger-review-pr3',
+              deployScmRef: 'my-branch',
+            }),
+          ).to.be.true;
+          expect(
+            reviewAppRepositoryStub.scheduleDeployment.getCall(3).calledWithMatch({
+              name: 'pix-front-review-pr3',
+              deployScmRef: 'my-branch',
+            }),
+          ).to.be.true;
 
           expect(response).to.equal(
-            'Triggered deployment of RA on app pix-api-review, pix-api-maddo-review, pix-audit-logger-review, pix-front-review with pr 3',
+            'Scheduled deployment of RA on app pix-api-review, pix-api-maddo-review, pix-audit-logger-review, pix-front-review with pr 3',
           );
         });
       });

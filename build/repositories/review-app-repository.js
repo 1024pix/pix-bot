@@ -7,6 +7,10 @@ export const create = async function ({ name, repository, prNumber, parentApp })
   });
 };
 
+export async function markAsDeploying({ name }, knexConn = knex) {
+  await knexConn('review-apps').update({ deployAfter: null }).where({ name });
+}
+
 export const markAsDeployed = async function ({ name }) {
   const result = await knex('review-apps')
     .update({ isDeployed: true })
@@ -37,3 +41,18 @@ export const areAllDeployed = async function ({ repository, prNumber }) {
     .first();
   return count === 0;
 };
+
+export async function scheduleDeployment({ name, deployScmRef, deployAfter }) {
+  await knex('review-apps').update({ deployScmRef, deployAfter }).where('name', name);
+}
+
+export async function getForDeployment(knexConn = knex) {
+  const deployments = await knexConn
+    .select()
+    .from('review-apps')
+    .where('deployAfter', '<', knexConn.raw('NOW()'))
+    .orderBy('deployAfter')
+    .first()
+    .forUpdate();
+  return deployments;
+}
