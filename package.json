@@ -3,7 +3,7 @@
   "version": "1.105.2",
   "description": "Automating development actions",
   "engines": {
-    "node": "^20.18.0"
+    "node": "^22.11.0"
   },
   "main": "index.js",
   "type": "module",
