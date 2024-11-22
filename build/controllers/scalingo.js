@@ -4,7 +4,7 @@ import { Attachment, Context, Message, Section } from 'slack-block-builder';
 import { logger } from '../../common/services/logger.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
 import { config } from '../../config.js';
-import * as reviewAppRepository from '../repository/review-app-repository.js';
+import * as reviewAppRepository from '../repositories/review-app-repository.js';
 import githubService from '../../common/services/github.js';
 import { ScalingoAppName } from '../../common/models/ScalingoAppName.js';
 

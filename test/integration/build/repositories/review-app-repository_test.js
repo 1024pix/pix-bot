@@ -1,6 +1,6 @@
 import { describe } from 'mocha';
 import { catchErr, expect } from '../../../test-helper.js';
-import * as reviewAppRepository from '../../../../build/repository/review-app-repository.js';
+import * as reviewAppRepository from '../../../../build/repositories/review-app-repository.js';
 import { knex } from '../../../../db/knex-database-connection.js';
 
 describe('Integration | Build | Repository | Review App', function () {
