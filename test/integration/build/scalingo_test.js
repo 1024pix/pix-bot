@@ -4,7 +4,7 @@ import slackPostMessageService from '../../../common/services/slack/surfaces/mes
 import server from '../../../server.js';
 import { expect, nock, sinon } from '../../test-helper.js';
 
-import * as reviewAppRepository from '../../../build/repository/review-app-repository.js';
+import * as reviewAppRepository from '../../../build/repositories/review-app-repository.js';
 import { knex } from '../../../db/knex-database-connection.js';
 import { logger } from '../../../common/services/logger.js';
 

@@ -6,7 +6,7 @@ import commonGithubService from '../../common/services/github.js';
 import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
-import * as reviewAppRepo from '../repository/review-app-repository.js';
+import * as reviewAppRepo from '../repositories/review-app-repository.js';
 import * as _pullRequestRepository from '../repositories/pull-request-repository.js';
 import { mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
