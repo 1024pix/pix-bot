@@ -6,6 +6,8 @@ import { logger } from './logger.js';
 
 const DEFAULT_OPTS = { withEnvSuffix: true };
 
+const debouncedDeployments = new Map();
+
 class ScalingoClient {
   constructor(client, environment) {
     this.client = client;
@@ -47,7 +49,26 @@ class ScalingoClient {
     return `${scalingoApp} ${releaseTag} has been deployed`;
   }
 
-  async deployUsingSCM(scalingoApp, releaseTag) {
+  async deployUsingSCM(scalingoApp, releaseTag, debounce) {
+    if (!debounce) return this.#requestDeploymentUsingSCM(scalingoApp, releaseTag);
+
+    if (debouncedDeployments.has(scalingoApp)) {
+      clearTimeout(debouncedDeployments.get(scalingoApp));
+    }
+
+    debouncedDeployments.set(
+      scalingoApp,
+      setTimeout(() => {
+        this.#requestDeploymentUsingSCM(scalingoApp, releaseTag).catch(() => {});
+        debouncedDeployments.delete(scalingoApp);
+      }, debounce),
+    );
+
+    logger.info({ message: `Deployment of ${scalingoApp} ${releaseTag} will be requested after ${debounce}ms` });
+    return `Deployment of ${scalingoApp} ${releaseTag} will be requested after ${debounce}ms`;
+  }
+
+  async #requestDeploymentUsingSCM(scalingoApp, releaseTag) {
     try {
       await this.client.SCMRepoLinks.manualDeploy(scalingoApp, releaseTag);
     } catch (e) {
@@ -179,6 +200,13 @@ class ScalingoClient {
     } catch (err) {
       logger.error(err);
     }
+  }
+
+  async bulkUpdateEnvVar(appName, variables) {
+    await this.client.Environment.bulkUpdate(
+      appName,
+      Object.entries(variables).map(([name, value]) => ({ name, value })),
+    );
   }
 }
 

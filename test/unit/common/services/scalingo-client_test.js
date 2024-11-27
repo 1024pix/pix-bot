@@ -847,4 +847,36 @@ describe('Scalingo client', function () {
       });
     });
   });
+
+  describe('#Scalingo.bulkUpdateEnvVar', function () {
+    let scalingoClient;
+    let bulkUpdateStub;
+
+    beforeEach(async function () {
+      bulkUpdateStub = sinon.stub();
+      const clientStub = {
+        clientFromToken: async function () {
+          return {
+            Environment: { bulkUpdate: bulkUpdateStub },
+          };
+        },
+      };
+      scalingoClient = await ScalingoClient.getInstance('production', clientStub);
+    });
+
+    it('should update several environment variables', async function () {
+      const appId = 'pix-front-review-pr2';
+      const variables = {
+        FOO: 'foo',
+        BAR: 'bar',
+      };
+
+      await scalingoClient.bulkUpdateEnvVar(appId, variables);
+
+      expect(bulkUpdateStub).to.have.been.calledWithExactly(appId, [
+        { name: 'FOO', value: 'foo' },
+        { name: 'BAR', value: 'bar' },
+      ]);
+    });
+  });
 });
