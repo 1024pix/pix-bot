@@ -46,6 +46,7 @@ describe('Acceptance | Scripts | release-pix-repo.sh', function () {
       ...process.env,
       GIT_USER_NAME: gitUser,
       GIT_USER_EMAIL: gitEmail,
+      LANG: 'en_US.UTF-8',
     };
 
     // when

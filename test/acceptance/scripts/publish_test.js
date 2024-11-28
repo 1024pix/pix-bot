@@ -47,6 +47,7 @@ describe('Acceptance | Scripts | publish.sh', function () {
       GIT_USER_EMAIL: gitEmail,
       GITHUB_OWNER: githubOwner,
       GITHUB_REPOSITORY: githubRepository,
+      LANG: 'en_US.UTF-8',
     };
 
     // when
