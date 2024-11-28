@@ -572,6 +572,67 @@ describe('Acceptance | Build | Github', function () {
       });
     });
 
+    describe('on labeled event', function () {
+      beforeEach(function () {
+        body = {
+          action: 'labeled',
+          number: 123,
+          pull_request: {
+            state: 'open',
+            labels: [],
+            head: {
+              ref: 'my-branch',
+              repo: {
+                name: 'pix',
+                fork: false,
+              },
+            },
+          },
+        };
+      });
+
+      it('responds with 200 and do nothing without no-review-app label', async function () {
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+        expect(res.statusCode).to.equal(200);
+        expect(res.result).to.eql('no-review-app label is not set for this PR');
+      });
+
+      it('it should delete existing review apps if no-review-app has been set', async function () {
+        // given
+        body.pull_request.labels = [{ name: 'no-review-app' }];
+        nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+        getAppNock({ reviewAppName: 'pix-api-review-pr123', returnCode: StatusCodes.OK });
+        getAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+        getAppNock({ reviewAppName: 'pix-front-review-pr123', returnCode: StatusCodes.OK });
+        deleteReviewAppNock({ reviewAppName: 'pix-api-review-pr123' });
+        deleteReviewAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+        deleteReviewAppNock({ reviewAppName: 'pix-front-review-pr123' });
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+
+        expect(response.payload).to.equal(
+          'Closed RA for PR 123 : pix-api-review-pr123, pix-audit-logger-review-pr123 (already closed), pix-front-review-pr123.',
+        );
+      });
+    });
+
     describe('on push event', function () {
       describe('on the default branch', function () {
         it('responds with 200 and deploys the corresponding integration applications', async function () {

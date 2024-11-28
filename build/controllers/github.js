@@ -257,6 +257,14 @@ async function processWebhook(
     if (request.payload.action === 'closed') {
       return handleCloseRA(request);
     }
+    if (request.payload.action === 'labeled') {
+      const labelsList = request.payload.pull_request.labels;
+      if (labelsList.some((label) => label.name == 'no-review-app')) {
+        return handleCloseRA(request);
+      } else {
+        return 'no-review-app label is not set for this PR';
+      }
+    }
     return `Ignoring ${request.payload.action} action`;
   } else {
     return `Ignoring ${eventName} event`;
