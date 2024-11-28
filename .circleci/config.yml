@@ -8,8 +8,8 @@ jobs:
         default: 22.14.0
         type: string
     docker:
-      - image: cimg/node:<<parameters.node-version>>
-      - image: postgres:15.8-alpine
+      - image: cimg/node:22.12.0
+      - image: postgres:15.10-alpine
         name: pg-pix-bot
         environment:
           POSTGRES_USER: circleci
