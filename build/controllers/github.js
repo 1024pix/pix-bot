@@ -267,13 +267,8 @@ async function processWebhook(
       await mergeQueue();
       return handleCloseRA(request);
     }
-    if (request.payload.action === 'labeled') {
-      const labelsList = request.payload.pull_request.labels;
-      if (labelsList.some((label) => label.name == 'no-review-app')) {
-        return handleCloseRA(request);
-      } else {
-        return 'no-review-app label is not set for this PR';
-      }
+    if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
+      await handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       await pullRequestRepository.save({
