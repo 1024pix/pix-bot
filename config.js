@@ -102,6 +102,7 @@ const configuration = (function () {
       automerge: {
         workflowId: process.env.GITHUB_AUTOMERGE_WORKFLOW_ID,
         repositoryName: process.env.GITHUB_AUTOMERGE_REPO_NAME,
+        workflowRef: process.env.GITHUB_AUTOMERGE_WORKFLOW_REF,
       },
     },
 
@@ -189,6 +190,7 @@ const configuration = (function () {
     config.github.webhookSecret = 'github-webhook-secret';
     config.github.automerge.workflowId = 'github-auto-merge-workflow-id';
     config.github.automerge.repositoryName = 'github-auto-merge-repo-name';
+    config.github.automerge.workflowRef = 'main';
 
     config.openApi.authorizationToken = 'open-api-token';
 

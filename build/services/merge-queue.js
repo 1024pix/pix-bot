@@ -1,7 +1,7 @@
 import { config } from '../../config.js';
 
 const GITHUB_WORKFLOW_DISPATCH_URL = `https://api.github.com/repos/${config.github.automerge.repositoryName}/actions/workflows/${config.github.automerge.workflowId}/dispatches`;
-const GITHUB_WORKFLOW_REF = 'main';
+const GITHUB_WORKFLOW_REF = config.github.automerge.workflowRef;
 
 import * as _pullRequestRepository from '../repositories/pull-request-repository.js';
 import { httpAgent as _httpAgent } from '../../common/http-agent.js';
