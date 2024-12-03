@@ -84,6 +84,8 @@ const configuration = (function () {
       authorizationToken: process.env.AUTHORIZATION_TOKEN,
     },
 
+    authorizationToken: process.env.PIX_BOT_TOKEN,
+
     slack: {
       requestSigningSecret: process.env.SLACK_SIGNING_SECRET || 'slack-super-signing-secret',
       botToken: process.env.SLACK_BOT_TOKEN,
@@ -200,6 +202,8 @@ const configuration = (function () {
     config.scalingo.production.apiUrl = 'https://scalingo.production';
 
     config.prismic.secret = 'prismic-secret';
+
+    config.authorizationToken = 'mon-super-token';
   }
 
   return config;
