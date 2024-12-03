@@ -262,7 +262,7 @@ async function processWebhook(
     if (request.payload.action === 'closed') {
       await pullRequestRepository.remove({
         number: request.payload.number,
-        repositoryName: request.payload.pull_request.head.repo.name,
+        repositoryName: request.payload.repository.full_name,
       });
       await mergeQueue();
       return handleCloseRA(request);
@@ -273,14 +273,14 @@ async function processWebhook(
     if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       await pullRequestRepository.save({
         number: request.payload.number,
-        repositoryName: request.payload.repository.name,
+        repositoryName: request.payload.repository.full_name,
       });
       await mergeQueue();
     }
     if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       await pullRequestRepository.remove({
         number: request.payload.number,
-        repositoryName: request.payload.repository.name,
+        repositoryName: request.payload.repository.full_name,
       });
       await mergeQueue();
     }
@@ -289,7 +289,7 @@ async function processWebhook(
     if (request.payload.action === 'completed' && request.payload.check_suite.conclusion !== 'success') {
       await pullRequestRepository.remove({
         number: request.payload.pull_requests[0].number,
-        repositoryName: request.payload.repository.name,
+        repositoryName: request.payload.repository.full_name,
       });
       await mergeQueue();
     }

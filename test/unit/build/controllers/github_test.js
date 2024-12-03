@@ -156,7 +156,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 action: 'labeled',
                 number: 123,
                 label: { name: ':rocket: Ready to Merge' },
-                repository: { name: 'pix-sample-repo' },
+                repository: { full_name: '1024pix/pix-sample-repo' },
               });
 
               const mergeQueue = sinon.stub();
@@ -168,7 +168,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               // then
               expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
                 number: 123,
-                repositoryName: 'pix-sample-repo',
+                repositoryName: '1024pix/pix-sample-repo',
               });
 
               expect(mergeQueue).to.be.calledOnce;
@@ -184,7 +184,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 action: 'unlabeled',
                 number: 123,
                 label: { name: ':rocket: Ready to Merge' },
-                repository: { name: 'pix-sample-repo' },
+                repository: { full_name: 'pix-sample-repo' },
               });
 
               const mergeQueue = sinon.stub();
@@ -210,11 +210,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             sinon.stub(request, 'payload').value({
               action: 'closed',
               number: 123,
-              pull_request: {
-                head: {
-                  repo: { name: 'pix-sample-repo' },
-                },
-              },
+              repository: { full_name: '1024pix/pix-sample-repo' },
             });
 
             const handleCloseRA = sinon.stub();
@@ -227,7 +223,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             // then
             expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
               number: 123,
-              repositoryName: 'pix-sample-repo',
+              repositoryName: '1024pix/pix-sample-repo',
             });
             expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
             expect(mergeQueue).to.be.calledOnce;
@@ -256,7 +252,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               payload: {
                 action: 'completed',
                 pull_requests: [{ number: 123 }],
-                repository: { name: 'pix-sample-repo' },
+                repository: { full_name: 'pix-sample-repo' },
                 check_suite: { conclusion: 'failure' },
               },
             };
@@ -435,6 +431,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       describe('when there is a no-review-app label on the PR', function () {
         it('should not create a Review App', async function () {
           // given
+          request.payload.label = { name: 'no-review-app' };
           sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'no-review-app' }]);
 
           // when
