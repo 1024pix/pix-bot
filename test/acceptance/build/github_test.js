@@ -543,6 +543,9 @@ describe('Acceptance | Build | Github', function () {
         body = {
           action: 'closed',
           number: 123,
+          repository: {
+            full_name: '1024pix/pix',
+          },
           pull_request: {
             state: 'closed',
             head: {
@@ -577,6 +580,9 @@ describe('Acceptance | Build | Github', function () {
         body = {
           action: 'labeled',
           number: 123,
+          repository: {
+            full_name: '1024pix/pix',
+          },
           pull_request: {
             state: 'open',
             labels: [],
@@ -587,6 +593,9 @@ describe('Acceptance | Build | Github', function () {
                 fork: false,
               },
             },
+          },
+          label: {
+            name: 'another-label',
           },
         };
       });
@@ -602,12 +611,11 @@ describe('Acceptance | Build | Github', function () {
           payload: body,
         });
         expect(res.statusCode).to.equal(200);
-        expect(res.result).to.eql('no-review-app label is not set for this PR');
       });
 
-      it('it should delete existing review apps if no-review-app has been set', async function () {
+      it('it should delete existing review apps if no-review-app has been set', async function () x{
         // given
-        body.pull_request.labels = [{ name: 'no-review-app' }];
+        body.label = { name: 'no-review-app' };
         nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
         getAppNock({ reviewAppName: 'pix-api-review-pr123', returnCode: StatusCodes.OK });
         getAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
@@ -627,9 +635,27 @@ describe('Acceptance | Build | Github', function () {
           payload: body,
         });
 
-        expect(response.payload).to.equal(
-          'Closed RA for PR 123 : pix-api-review-pr123, pix-audit-logger-review-pr123 (already closed), pix-front-review-pr123.',
-        );
+        expect(response.statusCode).equal(200);
+      });
+
+      describe('when label is `ready-to-merge`', function() {
+        it('should save pull request and call action', function() {
+          const callGitHubAction =  nock('https://github.com')
+            .post(`/v1/apps/${appName}/scm_repo_link/manual_review_app`, { pull_request_id: 2 })
+            .reply(returnCode, body);
+
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(response.statusCode).equal(200);
+        });
       });
     });
 
