@@ -613,7 +613,7 @@ describe('Acceptance | Build | Github', function () {
         expect(res.statusCode).to.equal(200);
       });
 
-      it('it should delete existing review apps if no-review-app has been set', async function () {
+      it('it should delete existing review apps if no-review-app has been set', async function () x{
         // given
         body.label = { name: 'no-review-app' };
         nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
@@ -636,6 +636,26 @@ describe('Acceptance | Build | Github', function () {
         });
 
         expect(response.statusCode).equal(200);
+      });
+
+      describe('when label is `ready-to-merge`', function() {
+        it('should save pull request and call action', function() {
+          const callGitHubAction =  nock('https://github.com')
+            .post(`/v1/apps/${appName}/scm_repo_link/manual_review_app`, { pull_request_id: 2 })
+            .reply(returnCode, body);
+
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(response.statusCode).equal(200);
+        });
       });
     });
 
