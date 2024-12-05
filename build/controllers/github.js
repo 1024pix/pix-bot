@@ -271,11 +271,15 @@ async function processWebhook(
       await handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
-      await pullRequestRepository.save({
-        number: request.payload.number,
-        repositoryName: request.payload.repository.full_name,
-      });
-      await mergeQueue();
+      const repositoryName = request.payload.repository.full_name;
+      const isAllowedRepository = config.github.automerge.allowedRepositories.includes(repositoryName);
+      if (isAllowedRepository) {
+        await pullRequestRepository.save({
+          number: request.payload.number,
+          repositoryName,
+        });
+        await mergeQueue();
+      }
     }
     if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       await pullRequestRepository.remove({

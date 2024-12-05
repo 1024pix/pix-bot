@@ -150,28 +150,58 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         describe('when action is `labeled`', function () {
           describe('when label is Ready-to-merge', function () {
-            it('should call pullRequestRepository.save() method', async function () {
-              // given
-              sinon.stub(request, 'payload').value({
-                action: 'labeled',
-                number: 123,
-                label: { name: ':rocket: Ready to Merge' },
-                repository: { full_name: '1024pix/pix-sample-repo' },
+            describe('when repo is allowed', function () {
+              it('should call pullRequestRepository.save() method', async function () {
+                // given
+                sinon.stub(config.github, 'automerge').value({
+                  allowedRepositories: ['1024pix/pix-sample-repo'],
+                });
+                sinon.stub(request, 'payload').value({
+                  action: 'labeled',
+                  number: 123,
+                  label: { name: ':rocket: Ready to Merge' },
+                  repository: { full_name: '1024pix/pix-sample-repo' },
+                });
+
+                const mergeQueue = sinon.stub();
+                const pullRequestRepository = { save: sinon.stub() };
+
+                // when
+                await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
+
+                // then
+                expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
+                  number: 123,
+                  repositoryName: '1024pix/pix-sample-repo',
+                });
+
+                expect(mergeQueue).to.be.calledOnce;
               });
+            });
 
-              const mergeQueue = sinon.stub();
-              const pullRequestRepository = { save: sinon.stub() };
+            describe('when repo is not allowed', function () {
+              it('should do nothing', async function () {
+                // given
+                sinon.stub(config.github, 'automerge').value({
+                  allowedRepositories: ['1024pix/another-repo'],
+                });
+                sinon.stub(request, 'payload').value({
+                  action: 'labeled',
+                  number: 123,
+                  label: { name: ':rocket: Ready to Merge' },
+                  repository: { full_name: '1024pix/pix-sample-repo' },
+                });
 
-              // when
-              await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
+                const mergeQueue = sinon.stub();
+                const pullRequestRepository = { save: sinon.stub() };
 
-              // then
-              expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
-                number: 123,
-                repositoryName: '1024pix/pix-sample-repo',
+                // when
+                await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
+
+                // then
+                expect(pullRequestRepository.save).to.have.not.been.called;
+                expect(mergeQueue).to.have.not.be.called;
               });
-
-              expect(mergeQueue).to.be.calledOnce;
             });
           });
         });

@@ -637,6 +637,27 @@ describe('Acceptance | Build | Github', function () {
 
         expect(response.statusCode).equal(200);
       });
+
+      describe('when label is `ready-to-merge`', function () {
+        it('should save pull request and call action', async function () {
+          const callGitHubAction = nock('https://github.com')
+            .post(`/v1/apps/${appName}/scm_repo_link/manual_review_app`, { pull_request_id: 2 })
+            .reply(returnCode, body);
+
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(callGitHubAction.isDone()).to.be.true;
+          expect(response.statusCode).equal(200);
+        });
+      });
     });
 
     describe('on push event', function () {

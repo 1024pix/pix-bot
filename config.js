@@ -13,6 +13,13 @@ function _getJSON(value) {
   return JSON.parse(value);
 }
 
+function _getArray(value) {
+  if (!value) {
+    return [];
+  }
+  return value.split(',');
+}
+
 function isFeatureEnabled(environmentVariable) {
   return environmentVariable === 'true';
 }
@@ -103,6 +110,7 @@ const configuration = (function () {
         workflowId: process.env.GITHUB_AUTOMERGE_WORKFLOW_ID,
         repositoryName: process.env.GITHUB_AUTOMERGE_REPO_NAME,
         workflowRef: process.env.GITHUB_AUTOMERGE_WORKFLOW_REF,
+        allowedRepositories: _getArray(process.env.GITHUB_AUTOMERGE_ALLOWED_REPOSITORIES),
       },
     },
 
