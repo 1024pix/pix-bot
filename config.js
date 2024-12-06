@@ -32,6 +32,7 @@ const configuration = (function () {
       appNamespaces: _getJSON(process.env.BALEEN_APP_NAMESPACES),
       CDNInvalidationRetryCount: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_COUNT, 3),
       CDNInvalidationRetryDelay: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_DELAY, 2000),
+      protectedFrontApps: _getJSON(process.env.BALEEN_PROTECTED_FRONT_APPS),
     },
 
     scalingo: {
@@ -109,6 +110,10 @@ const configuration = (function () {
       schedule: process.env.PIX_SITE_DEPLOY_SCHEDULE,
     },
 
+    datadog: {
+      token: process.env.DATADOG_TOKEN,
+    },
+
     tasks: {
       autoScaleEnabled: isFeatureEnabled(process.env.FT_AUTOSCALE_WEB),
       scheduleAutoScaleUp: process.env.SCHEDULE_AUTOSCALE_UP || '* 0 8 * * *',
@@ -164,6 +169,9 @@ const configuration = (function () {
 
     config.baleen.pat = 'baleen-pat';
     config.baleen.appNamespaces = _getJSON('{"Pix_Test":"Pix_Namespace","Pix_Test_2":"Pix Namespace 2"}');
+    config.baleen.protectedFrontApps = ['Pix_Test'];
+
+    config.datadog.token = 'token';
 
     config.github.token = undefined;
     config.github.owner = 'github-owner';
