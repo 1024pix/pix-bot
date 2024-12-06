@@ -1,4 +1,4 @@
-import process from 'node:process';
+import 'dotenv/config';
 
 function _getNumber(numberAsString, defaultIntNumber) {
   const number = parseInt(numberAsString, 10);
