@@ -20,6 +20,7 @@ import runRoutesApplication from './run/routes/applications.js';
 import deploySitesRoutes from './run/routes/deploy-sites.js';
 import runRoutesManifest from './run/routes/manifest.js';
 import runGitHubRoutes from './run/routes/github.js';
+import runSecurityRoutes from './run/routes/security.js';
 
 const manifests = [runManifest, buildManifest];
 const setupErrorHandling = function (server) {
@@ -40,6 +41,7 @@ server.route(runRoutesApplication);
 server.route(scalingoRoutes);
 server.route(deploySitesRoutes);
 server.route(runGitHubRoutes);
+server.route(runSecurityRoutes);
 
 registerSlashCommands(runDeployConfiguration.deployConfiguration, runManifest);
 
