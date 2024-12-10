@@ -3,6 +3,7 @@ import * as scalingo from 'scalingo';
 
 import { config } from '../../config.js';
 import { logger } from './logger.js';
+import { ScalingoAppName } from '../models/ScalingoAppName.js';
 
 const DEFAULT_OPTS = { withEnvSuffix: true };
 
@@ -170,7 +171,7 @@ class ScalingoClient {
   }
 
   async deleteReviewApp(appName) {
-    if (!appName.match(/.*-pr\d+/g)) {
+    if (!ScalingoAppName.isReviewApp(appName)) {
       throw new Error(`Cannot call deleteReviewApp for the non review app ${appName}.`);
     }
 
