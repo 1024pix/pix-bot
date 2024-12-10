@@ -1,5 +1,27 @@
 # pix-bot Changelog
 
+## v1.105.3 (10/12/2024)
+
+
+### :rocket: Amélioration
+- [#473](https://github.com/1024pix/pix-bot/pull/473) [FEATURE] Pix-15117 supprimer les RA lors de l'ajout du label no-review-app.
+
+### :bug: Correction
+- [#482](https://github.com/1024pix/pix-bot/pull/482) [BUGFIX] Corriger la manière de s'assurer qu'une application est bien une RA.
+
+### :arrow_up: Montée de version
+- [#481](https://github.com/1024pix/pix-bot/pull/481) [BUMP] Lock file maintenance (dossier racine).
+- [#478](https://github.com/1024pix/pix-bot/pull/478) [BUMP] Update dependency scalingo to ^0.9.0 (dossier racine).
+- [#476](https://github.com/1024pix/pix-bot/pull/476) [BUMP] Update dependency mocha to v11 (dossier racine).
+- [#475](https://github.com/1024pix/pix-bot/pull/475) [BUMP] Lock file maintenance (dossier racine).
+- [#472](https://github.com/1024pix/pix-bot/pull/472) [BUMP] Lock file maintenance (dossier racine).
+- [#458](https://github.com/1024pix/pix-bot/pull/458) [BUMP] Update node to v22 (major).
+- [#469](https://github.com/1024pix/pix-bot/pull/469) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.3 (dossier racine).
+- [#470](https://github.com/1024pix/pix-bot/pull/470) [BUMP] Lock file maintenance (dossier racine).
+
+### :coffee: Autre
+- [#471](https://github.com/1024pix/pix-bot/pull/471) [FEAT] Permettre la suppression de RA n'ayant pas "-review-pr" dans leur nom.
+
 ## v1.105.2 (14/11/2024)
 
 
