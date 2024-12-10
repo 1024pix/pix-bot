@@ -70,4 +70,22 @@ describe('Unit | Common | Models | ScalingoAppName', function () {
       expect(result).to.be.true;
     });
   });
+
+  describe('#isReviewApp', function () {
+    describe('when the application is not a review app', function () {
+      ['pix-api-production', 'pix-app-recette', 'pix-orga-integration'].forEach((appName) => {
+        it(`should return false for ${appName}`, function () {
+          expect(ScalingoAppName.isReviewApp(appName)).to.be.false;
+        });
+      });
+    });
+
+    describe('when the application is a review app', function () {
+      ['pix-api-review-pr123', 'pix-integration-pr76656'].forEach((appName) => {
+        it(`should return false for ${appName}`, function () {
+          expect(ScalingoAppName.isReviewApp(appName)).to.be.true;
+        });
+      });
+    });
+  });
 });

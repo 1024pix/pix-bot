@@ -6,6 +6,7 @@ import slackPostMessageService from '../../common/services/slack/surfaces/messag
 import { config } from '../../config.js';
 import * as reviewAppRepository from '../repository/review-app-repository.js';
 import githubService from '../../common/services/github.js';
+import { ScalingoAppName } from '../../common/models/ScalingoAppName.js';
 
 function getSlackMessageAttachments(payload) {
   const appName = payload.app_name;
@@ -90,7 +91,7 @@ const scalingo = {
       return h.response().code(200);
     }
 
-    if (!appName.includes('review-pr')) {
+    if (!ScalingoAppName.isReviewApp(appName)) {
       logger.error({ event, message: `The application ${appName} is not linked to a pull request.` });
       return h.response().code(200);
     }
