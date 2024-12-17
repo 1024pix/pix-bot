@@ -31,11 +31,11 @@ describe('Unit | Build | Services | merge-queue', function () {
       pullRequestRepository.isAtLeastOneMergeInProgress.resolves(false);
       pullRequestRepository.getOldest.resolves(pr);
 
-      const httpAgent = {
-        post: sinon.stub(),
+      const githubService = {
+        triggerWorkflow: sinon.stub(),
       };
 
-      await mergeQueue({ pullRequestRepository, httpAgent });
+      await mergeQueue({ pullRequestRepository, githubService });
 
       expect(pullRequestRepository.isAtLeastOneMergeInProgress).to.have.been.called;
       expect(pullRequestRepository.update).to.have.been.calledWithExactly({
@@ -43,9 +43,13 @@ describe('Unit | Build | Services | merge-queue', function () {
         repositoryName: 'foo/pix-project',
         isMerging: true,
       });
-      expect(httpAgent.post).to.have.been.calledWithExactly({
-        url: `https://api.github.com/repos/${config.github.automerge.repositoryName}/actions/workflows/${config.github.automerge.workflowId}/dispatches`,
-        payload: { ref: 'main', inputs: { pullRequest: 'foo/pix-project/1' } },
+      expect(githubService.triggerWorkflow).to.have.been.calledWithExactly({
+        workflow: {
+          id: config.github.automerge.workflowId,
+          repositoryName: config.github.automerge.repositoryName,
+          ref: config.github.automerge.workflowRef,
+        },
+        inputs: { pullRequest: 'foo/pix-project/1' },
       });
     });
   });
