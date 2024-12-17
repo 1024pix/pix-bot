@@ -636,4 +636,38 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#checkUserBelongsToPix', function () {
+    describe('when user belongs to Pix organization', function () {
+      it('returns true', async function () {
+        // given
+        const username = 'Gerrome';
+
+        const checkNock = nock('https://api.github.com').get(`/orgs/1024pix/members/${username}`).reply(204);
+
+        // when
+        const belongsToPix = await githubService.checkUserBelongsToPix(username);
+
+        // then
+        expect(belongsToPix).to.be.true;
+        expect(checkNock.isDone()).to.be.true;
+      });
+    });
+
+    describe('when user does not belong to Pix organization', function () {
+      it('returns false', async function () {
+        // given
+        const username = 'Gerrome';
+
+        const checkNock = nock('https://api.github.com').get(`/orgs/1024pix/members/${username}`).reply(404);
+
+        // when
+        const belongsToPix = await githubService.checkUserBelongsToPix(username);
+
+        // then
+        expect(belongsToPix).to.be.false;
+        expect(checkNock.isDone()).to.be.true;
+      });
+    });
+  });
 });
