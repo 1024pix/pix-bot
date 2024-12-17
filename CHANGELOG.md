@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.106.2 (17/12/2024)
+
+
+### :building_construction: Tech
+- [#486](https://github.com/1024pix/pix-bot/pull/486) [TECH] Supprimer l'action auto-merge.
+
+### :bug: Correction
+- [#488](https://github.com/1024pix/pix-bot/pull/488) [BUGFIX] Ajouter la route merge dans les routes du serveur.
+
 ## v1.106.1 (17/12/2024)
 
 
