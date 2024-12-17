@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.106.1 (17/12/2024)
+
+
+### :bug: Correction
+- [#487](https://github.com/1024pix/pix-bot/pull/487) [BUGFIX] Utiliser octokit pour trigger le dispatch worfklow event.
+
 ## v1.106.0 (17/12/2024)
 
 
