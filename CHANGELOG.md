@@ -1,5 +1,21 @@
 # pix-bot Changelog
 
+## v1.106.0 (17/12/2024)
+
+
+### :rocket: Amélioration
+- [#447](https://github.com/1024pix/pix-bot/pull/447) [FEATURE] Gérer une merge queue.
+
+### :building_construction: Tech
+- [#483](https://github.com/1024pix/pix-bot/pull/483) [TECH] Ajouter le déploiement des reviews app de pix-exploit.
+
+### :arrow_up: Montée de version
+- [#485](https://github.com/1024pix/pix-bot/pull/485) [BUMP] Lock file maintenance (dossier racine).
+- [#484](https://github.com/1024pix/pix-bot/pull/484) [BUMP] Lock file maintenance (dossier racine).
+
+### :coffee: Autre
+- [#477](https://github.com/1024pix/pix-bot/pull/477) [FEAT] Ajouter un webhook permettant de bloquer une ip et/ou un ja3 depuis Baleen.
+
 ## v1.105.3 (10/12/2024)
 
 
