@@ -8,6 +8,7 @@ import * as Hapi from '@hapi/hapi';
 import buildManifest from './build/manifest.js';
 import githubRoutes from './build/routes/github.js';
 import buildRoutesManifest from './build/routes/manifest.js';
+import mergeRoutes from './build/routes/merge.js';
 import scalingoRoutes from './build/routes/scalingo.js';
 import { commonConfig } from './common/config.js';
 import * as preResponseHandler from './common/pre-response-handler.js';
@@ -42,6 +43,7 @@ server.route(scalingoRoutes);
 server.route(deploySitesRoutes);
 server.route(runGitHubRoutes);
 server.route(runSecurityRoutes);
+server.route(mergeRoutes);
 
 registerSlashCommands(runDeployConfiguration.deployConfiguration, runManifest);
 
