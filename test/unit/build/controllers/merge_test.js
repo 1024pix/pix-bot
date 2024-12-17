@@ -28,9 +28,13 @@ describe('Unit | Controller | Merge', function () {
 
       const mergeQueue = sinon.stub();
       const pullRequestRepository = { remove: sinon.stub() };
+      const hStub = {
+        response: sinon.stub(),
+      };
+      hStub.response.returns({ code: () => {} });
 
       // when
-      await mergeController.handle(request, {}, { pullRequestRepository, mergeQueue });
+      await mergeController.handle(request, hStub, { pullRequestRepository, mergeQueue });
 
       // then
       expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
@@ -39,6 +43,7 @@ describe('Unit | Controller | Merge', function () {
       });
 
       expect(mergeQueue).to.be.calledOnce;
+      expect(hStub.response).to.be.calledOnce;
     });
   });
 });
