@@ -108,6 +108,23 @@ describe('Acceptance | Run | Security', function () {
                   ],
                   type: 'context',
                 },
+                {
+                  type: 'divider',
+                },
+                {
+                  elements: [
+                    {
+                      text: {
+                        type: 'plain_text',
+                        text: 'Désactiver',
+                      },
+                      action_id: 'disable-automatic-rule',
+                      style: 'danger',
+                      type: 'button',
+                    },
+                  ],
+                  type: 'actions',
+                },
               ],
               fallback: 'Règle de blocage mise en place sur Baleen.',
             },
