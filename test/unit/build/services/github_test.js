@@ -670,4 +670,25 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#triggerWorkflow', function () {
+    it('calls github API', async function () {
+      const workflow = {
+        id: 'lo',
+        repositoryName: 'aName',
+        ref: 'aRef',
+      };
+      const inputs = { pullRequest: 'aName/1234' };
+
+      const githubNock = nock('https://api.github.com')
+        .post(`/repos/${workflow.repositoryName}/actions/workflows/${workflow.id}/dispatches`, {
+          ref: workflow.ref,
+          inputs: inputs,
+        })
+        .reply(200);
+
+      await githubService.triggerWorkflow({ workflow, inputs });
+      expect(githubNock.isDone()).to.be.true;
+    });
+  });
 });

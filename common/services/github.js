@@ -489,6 +489,14 @@ const github = {
     });
     return response.status === 204;
   },
+
+  async triggerWorkflow({ workflow, inputs }) {
+    const octokit = _createOctokit();
+    await octokit.request(`POST /repos/${workflow.repositoryName}/actions/workflows/${workflow.id}/dispatches`, {
+      ref: workflow.ref,
+      inputs,
+    });
+  },
 };
 
 export default github;
