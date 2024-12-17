@@ -132,7 +132,8 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           },
           payload: { action: 'nothing' },
         };
-        ['opened', 'reopened'].forEach((action) => {
+
+        ['opened', 'reopened', 'synchronize'].forEach((action) => {
           it(`should call handleRA() method on ${action} action`, async function () {
             // given
             sinon.stub(request, 'payload').value({ action });
@@ -147,30 +148,153 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
         });
 
-        it('should call handleRA() method on synchronize action', async function () {
-          // given
-          sinon.stub(request, 'payload').value({ action: 'synchronize' });
+        describe('when action is `labeled`', function () {
+          describe('when user is not allowed to trigger an action from a label', function () {
+            it('should do nothing', async function () {
+              sinon.stub(config.github, 'automerge').value({
+                allowedRepositories: ['1024pix/pix-sample-repo'],
+              });
+              sinon.stub(request, 'payload').value({
+                action: 'labeled',
+                number: 123,
+                label: { name: ':rocket: Ready to Merge' },
+                repository: { full_name: '1024pix/pix-sample-repo' },
+                sender: {
+                  login: 'bob',
+                },
+              });
+              const mergeQueue = sinon.stub();
+              const githubService = { checkUserBelongsToPix: sinon.stub() };
+              githubService.checkUserBelongsToPix.resolves(false);
+              const pullRequestRepository = { save: sinon.stub() };
 
-          const handleRA = sinon.stub();
+              // when
+              await githubController.processWebhook(request, { mergeQueue, pullRequestRepository, githubService });
 
-          // when
-          await githubController.processWebhook(request, { handleRA });
+              // then
+              expect(pullRequestRepository.save).to.have.not.been.called;
+              expect(mergeQueue).to.have.not.be.called;
+            });
+          });
 
-          // then
-          expect(handleRA.calledOnceWithExactly(request)).to.be.true;
+          describe('when label is Ready-to-merge', function () {
+            describe('when repo is allowed', function () {
+              it('should call pullRequestRepository.save() method', async function () {
+                // given
+                sinon.stub(config.github, 'automerge').value({
+                  allowedRepositories: ['1024pix/pix-sample-repo'],
+                });
+                sinon.stub(request, 'payload').value({
+                  action: 'labeled',
+                  number: 123,
+                  label: { name: ':rocket: Ready to Merge' },
+                  repository: { full_name: '1024pix/pix-sample-repo' },
+                  sender: {
+                    login: 'ouiiiii',
+                  },
+                });
+
+                const mergeQueue = sinon.stub();
+                const pullRequestRepository = { save: sinon.stub() };
+                const githubService = { checkUserBelongsToPix: sinon.stub() };
+                githubService.checkUserBelongsToPix.resolves(true);
+
+                // when
+                await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
+
+                // then
+                expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
+                  number: 123,
+                  repositoryName: '1024pix/pix-sample-repo',
+                });
+
+                expect(mergeQueue).to.be.calledOnce;
+              });
+            });
+
+            describe('when repo is not allowed', function () {
+              it('should do nothing', async function () {
+                // given
+                sinon.stub(config.github, 'automerge').value({
+                  allowedRepositories: ['1024pix/another-repo'],
+                });
+                sinon.stub(request, 'payload').value({
+                  action: 'labeled',
+                  number: 123,
+                  label: { name: ':rocket: Ready to Merge' },
+                  repository: { full_name: '1024pix/pix-sample-repo' },
+                  sender: {
+                    login: 'Yolo',
+                  },
+                });
+
+                const mergeQueue = sinon.stub();
+                const pullRequestRepository = { save: sinon.stub() };
+                const githubService = { checkUserBelongsToPix: sinon.stub() };
+                githubService.checkUserBelongsToPix.resolves(true);
+                // when
+                await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
+
+                // then
+                expect(pullRequestRepository.save).to.have.not.been.called;
+                expect(mergeQueue).to.have.not.be.called;
+              });
+            });
+          });
         });
 
-        it('should call handleCloseRA() method on closed action', async function () {
-          // given
-          sinon.stub(request, 'payload').value({ action: 'closed' });
+        describe('when action is `unlabeled`', function () {
+          describe('when label is Ready-to-merge', function () {
+            it('should call pullRequestRepository.remove() method', async function () {
+              // given
+              sinon.stub(request, 'payload').value({
+                action: 'unlabeled',
+                number: 123,
+                label: { name: ':rocket: Ready to Merge' },
+                repository: { full_name: 'pix-sample-repo' },
+              });
 
-          const handleCloseRA = sinon.stub();
+              const mergeQueue = sinon.stub();
+              const pullRequestRepository = { remove: sinon.stub() };
 
-          // when
-          await githubController.processWebhook(request, { handleCloseRA });
+              // when
+              await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
 
-          // then
-          expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
+              // then
+              expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+                number: 123,
+                repositoryName: 'pix-sample-repo',
+              });
+
+              expect(mergeQueue).to.be.calledOnce;
+            });
+          });
+        });
+
+        describe('when action is `closed`', function () {
+          it('should call pullRequestRepository.remove() method', async function () {
+            // given
+            sinon.stub(request, 'payload').value({
+              action: 'closed',
+              number: 123,
+              repository: { full_name: '1024pix/pix-sample-repo' },
+            });
+
+            const handleCloseRA = sinon.stub();
+            const mergeQueue = sinon.stub();
+            const pullRequestRepository = { remove: sinon.stub() };
+
+            // when
+            await githubController.processWebhook(request, { handleCloseRA, pullRequestRepository, mergeQueue });
+
+            // then
+            expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+              number: 123,
+              repositoryName: '1024pix/pix-sample-repo',
+            });
+            expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
+            expect(mergeQueue).to.be.calledOnce;
+          });
         });
 
         it('should ignore the action', async function () {
@@ -182,6 +306,37 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
           // then
           expect(result).to.equal('Ignoring unhandled-action action');
+        });
+      });
+
+      describe('when event is check_suite', function () {
+        describe("when action is 'completed' and conclusion is not 'success'", function () {
+          it('should call pullRequestRepository.remove() method', async function () {
+            const request = {
+              headers: {
+                'x-github-event': 'check_suite',
+              },
+              payload: {
+                action: 'completed',
+                pull_requests: [{ number: 123 }],
+                repository: { full_name: 'pix-sample-repo' },
+                check_suite: { conclusion: 'failure' },
+              },
+            };
+
+            const mergeQueue = sinon.stub();
+            const pullRequestRepository = { remove: sinon.stub() };
+
+            // when
+            await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
+
+            // then
+            expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+              number: 123,
+              repositoryName: 'pix-sample-repo',
+            });
+            expect(mergeQueue).to.be.calledOnce;
+          });
         });
       });
     });
@@ -343,6 +498,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       describe('when there is a no-review-app label on the PR', function () {
         it('should not create a Review App', async function () {
           // given
+          request.payload.label = { name: 'no-review-app' };
           sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'no-review-app' }]);
 
           // when
@@ -357,7 +513,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         it('should not create a Review App', async function () {
           // given
           sinon.stub(request.payload.pull_request, 'state').value('closed');
-
           // when
           const response = await githubController.handleRA(request);
 
@@ -375,7 +530,9 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const deployReviewAppStub = sinon.stub();
         const disableAutoDeployStub = sinon.stub();
         const reviewAppExistsStub = sinon.stub().resolves(false);
-
+        const reviewAppRepositoryStub = {
+          create: sinon.stub(),
+        };
         scalingoClientStub.getInstance = sinon.stub().returns({
           deployUsingSCM: deployUsingSCMStub,
           deployReviewApp: deployReviewAppStub,
@@ -389,7 +546,13 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         };
 
         // when
-        await githubController.handleRA(request, scalingoClientStub, addMessageToPullRequestStub, githubServiceStub);
+        await githubController.handleRA(
+          request,
+          scalingoClientStub,
+          addMessageToPullRequestStub,
+          githubServiceStub,
+          reviewAppRepositoryStub,
+        );
 
         // then
 

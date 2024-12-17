@@ -480,6 +480,15 @@ const github = {
   },
   commentPullRequest,
   addRADeploymentCheck,
+
+  async checkUserBelongsToPix(username) {
+    const octokit = _createOctokit();
+    const response = await octokit.request('GET /orgs/{org}/members/{username}', {
+      org: '1024pix',
+      username,
+    });
+    return response.status === 204;
+  },
 };
 
 export default github;

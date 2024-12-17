@@ -4,8 +4,9 @@ import { createGithubWebhookSignatureHeader, expect, nock, sinon, StatusCodes } 
 import { knex } from '../../../db/knex-database-connection.js';
 
 describe('Acceptance | Build | Github', function () {
-  afterEach(async function () {
+  beforeEach(async function () {
     await knex('review-apps').truncate();
+    await knex('pull_requests').truncate();
   });
 
   describe('POST /github/webhook', function () {
@@ -543,6 +544,9 @@ describe('Acceptance | Build | Github', function () {
         body = {
           action: 'closed',
           number: 123,
+          repository: {
+            full_name: '1024pix/pix',
+          },
           pull_request: {
             state: 'closed',
             head: {
@@ -577,6 +581,9 @@ describe('Acceptance | Build | Github', function () {
         body = {
           action: 'labeled',
           number: 123,
+          repository: {
+            full_name: '1024pix/pix',
+          },
           pull_request: {
             state: 'open',
             labels: [],
@@ -587,6 +594,9 @@ describe('Acceptance | Build | Github', function () {
                 fork: false,
               },
             },
+          },
+          label: {
+            name: 'another-label',
           },
         };
       });
@@ -602,12 +612,11 @@ describe('Acceptance | Build | Github', function () {
           payload: body,
         });
         expect(res.statusCode).to.equal(200);
-        expect(res.result).to.eql('no-review-app label is not set for this PR');
       });
 
       it('it should delete existing review apps if no-review-app has been set', async function () {
         // given
-        body.pull_request.labels = [{ name: 'no-review-app' }];
+        body.label = { name: 'no-review-app' };
         nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
         getAppNock({ reviewAppName: 'pix-api-review-pr123', returnCode: StatusCodes.OK });
         getAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
@@ -627,9 +636,66 @@ describe('Acceptance | Build | Github', function () {
           payload: body,
         });
 
-        expect(response.payload).to.equal(
-          'Closed RA for PR 123 : pix-api-review-pr123, pix-audit-logger-review-pr123 (already closed), pix-front-review-pr123.',
-        );
+        expect(response.statusCode).equal(200);
+      });
+
+      describe('when label is `ready-to-merge`', function () {
+        it('should save pull request and call action', async function () {
+          const body = {
+            action: 'labeled',
+            number: 123,
+            repository: {
+              full_name: '1024pix/pix',
+            },
+            pull_request: {
+              state: 'open',
+              labels: [],
+              head: {
+                ref: 'my-branch',
+                repo: {
+                  name: 'pix',
+                  fork: false,
+                },
+              },
+            },
+            label: {
+              name: ':rocket: Ready to Merge',
+            },
+            sender: {
+              login: 'foo',
+            },
+          };
+          const workflowRepoName = config.github.automerge.repositoryName;
+          const workflowId = config.github.automerge.workflowId;
+          const workflowRef = config.github.automerge.workflowRef;
+
+          sinon.stub(config.github.automerge, 'allowedRepositories').value(['1024pix/pix']);
+
+          const checkUserBelongsToPixNock = nock('https://api.github.com')
+            .get(`/orgs/1024pix/members/${body.sender.login}`)
+            .reply(204);
+
+          const callGitHubAction = nock('https://api.github.com/')
+            .post(`/repos/${workflowRepoName}/actions/workflows/${workflowId}/dispatches`, {
+              ref: workflowRef,
+              inputs: { pullRequest: `1024pix/pix/${body.number}` },
+            })
+            .reply(200, {});
+
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(checkUserBelongsToPixNock.isDone()).to.be.true;
+          expect(callGitHubAction.isDone()).to.be.true;
+          expect(response.statusCode).equal(200);
+        });
       });
     });
 

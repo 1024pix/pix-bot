@@ -13,6 +13,13 @@ function _getJSON(value) {
   return JSON.parse(value);
 }
 
+function _getArray(value) {
+  if (!value) {
+    return [];
+  }
+  return value.split(',');
+}
+
 function isFeatureEnabled(environmentVariable) {
   return environmentVariable === 'true';
 }
@@ -84,6 +91,8 @@ const configuration = (function () {
       authorizationToken: process.env.AUTHORIZATION_TOKEN,
     },
 
+    authorizationToken: process.env.PIX_BOT_TOKEN,
+
     slack: {
       requestSigningSecret: process.env.SLACK_SIGNING_SECRET || 'slack-super-signing-secret',
       botToken: process.env.SLACK_BOT_TOKEN,
@@ -96,6 +105,13 @@ const configuration = (function () {
       owner: process.env.GITHUB_OWNER,
       repository: process.env.GITHUB_REPOSITORY,
       webhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
+
+      automerge: {
+        workflowId: process.env.GITHUB_AUTOMERGE_WORKFLOW_ID,
+        repositoryName: process.env.GITHUB_AUTOMERGE_REPO_NAME,
+        workflowRef: process.env.GITHUB_AUTOMERGE_WORKFLOW_REF,
+        allowedRepositories: _getArray(process.env.GITHUB_AUTOMERGE_ALLOWED_REPOSITORIES),
+      },
     },
 
     googleSheet: {
@@ -180,6 +196,9 @@ const configuration = (function () {
     config.github.owner = 'github-owner';
     config.github.repository = 'github-repository';
     config.github.webhookSecret = 'github-webhook-secret';
+    config.github.automerge.workflowId = 'github-auto-merge-workflow-id';
+    config.github.automerge.repositoryName = 'github-auto-merge-repo-name';
+    config.github.automerge.workflowRef = 'main';
 
     config.openApi.authorizationToken = 'open-api-token';
 
@@ -193,6 +212,8 @@ const configuration = (function () {
     config.scalingo.production.apiUrl = 'https://scalingo.production';
 
     config.prismic.secret = 'prismic-secret';
+
+    config.authorizationToken = 'mon-super-token';
   }
 
   return config;

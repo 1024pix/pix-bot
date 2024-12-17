@@ -6,7 +6,9 @@ import commonGithubService from '../../common/services/github.js';
 import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
-import * as reviewAppRepo from '../repository/review-app-repository.js';
+import * as reviewAppRepo from '../repositories/review-app-repository.js';
+import * as _pullRequestRepository from '../repositories/pull-request-repository.js';
+import { mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
 const repositoryToScalingoAppsReview = {
   'pix-api-data': ['pix-api-data-integration'],
@@ -246,6 +248,9 @@ async function processWebhook(
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
+    pullRequestRepository = _pullRequestRepository,
+    mergeQueue = _mergeQueue,
+    githubService = commonGithubService,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
@@ -256,17 +261,47 @@ async function processWebhook(
       return handleRA(request);
     }
     if (request.payload.action === 'closed') {
+      await pullRequestRepository.remove({
+        number: request.payload.number,
+        repositoryName: request.payload.repository.full_name,
+      });
+      await mergeQueue();
       return handleCloseRA(request);
     }
-    if (request.payload.action === 'labeled') {
-      const labelsList = request.payload.pull_request.labels;
-      if (labelsList.some((label) => label.name == 'no-review-app')) {
-        return handleCloseRA(request);
-      } else {
-        return 'no-review-app label is not set for this PR';
+    if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
+      await handleCloseRA(request);
+    }
+    if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
+      const belongsToPix = await githubService.checkUserBelongsToPix(request.payload.sender.login);
+      if (!belongsToPix) {
+        return `Ignoring ${request.payload.sender.login} label action`;
+      }
+      const repositoryName = request.payload.repository.full_name;
+      const isAllowedRepository = config.github.automerge.allowedRepositories.includes(repositoryName);
+      if (isAllowedRepository) {
+        await pullRequestRepository.save({
+          number: request.payload.number,
+          repositoryName,
+        });
+        await mergeQueue();
       }
     }
+    if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
+      await pullRequestRepository.remove({
+        number: request.payload.number,
+        repositoryName: request.payload.repository.full_name,
+      });
+      await mergeQueue();
+    }
     return `Ignoring ${request.payload.action} action`;
+  } else if (eventName === 'check_suite') {
+    if (request.payload.action === 'completed' && request.payload.check_suite.conclusion !== 'success') {
+      await pullRequestRepository.remove({
+        number: request.payload.pull_requests[0].number,
+        repositoryName: request.payload.repository.full_name,
+      });
+      await mergeQueue();
+    }
   } else {
     return `Ignoring ${eventName} event`;
   }
