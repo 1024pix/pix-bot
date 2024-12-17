@@ -2,8 +2,13 @@ version: 2.1
 
 jobs:
   build-and-test:
+    parameters:
+      node-version:
+        # renovate datasource=node-version depName=node
+        default: 22.12.0
+        type: string
     docker:
-      - image: cimg/node:22.11.0
+      - image: cimg/node:<<parameters.node-version>>
       - image: postgres:15.8-alpine
         name: pg-pix-bot
         environment:
