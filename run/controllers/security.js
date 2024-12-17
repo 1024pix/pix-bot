@@ -4,7 +4,7 @@ import { config } from '../../config.js';
 import * as cdnServices from '../services/cdn.js';
 import { logger } from '../../common/services/logger.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
-import { Attachment, Context, Message, Section } from 'slack-block-builder';
+import { Actions, Attachment, Button, Context, Divider, Message, Section } from 'slack-block-builder';
 
 const _buildSlackMessage = function ({ ip, ja3 }) {
   return {
@@ -17,6 +17,8 @@ const _buildSlackMessage = function ({ ip, ja3 }) {
             Section().fields(`IP`, `${ip}`),
             Section().fields(`JA3`, `${ja3}`),
             Context().elements(`At ${new Date().toLocaleString()}`),
+            Divider(),
+            Actions().elements(Button().text('Désactiver').actionId('disable-automatic-rule').danger()),
           )
           .fallback('Règle de blocage mise en place sur Baleen.'),
       )
