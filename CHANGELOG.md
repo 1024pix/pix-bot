@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.106.3 (18/12/2024)
+
+
+### :bug: Correction
+- [#489](https://github.com/1024pix/pix-bot/pull/489) [BUGFIX] Corriger l'injection de dépendance dans le controller merge.
+
+### :arrow_up: Montée de version
+- [#480](https://github.com/1024pix/pix-bot/pull/480) [BUMP] Update Node.js to v22.12.0.
+
 ## v1.106.2 (17/12/2024)
 
 
