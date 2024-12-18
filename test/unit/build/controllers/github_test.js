@@ -181,14 +181,15 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             describe('when repo is allowed', function () {
               it('should call pullRequestRepository.save() method', async function () {
                 // given
+                const repositoryName = '1024pix/pix-sample-repo';
                 sinon.stub(config.github, 'automerge').value({
-                  allowedRepositories: ['1024pix/pix-sample-repo'],
+                  allowedRepositories: [repositoryName],
                 });
                 sinon.stub(request, 'payload').value({
                   action: 'labeled',
                   number: 123,
                   label: { name: ':rocket: Ready to Merge' },
-                  repository: { full_name: '1024pix/pix-sample-repo' },
+                  repository: { full_name: repositoryName },
                   sender: {
                     login: 'ouiiiii',
                   },
@@ -205,10 +206,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 // then
                 expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
                   number: 123,
-                  repositoryName: '1024pix/pix-sample-repo',
+                  repositoryName,
                 });
 
-                expect(mergeQueue).to.be.calledOnce;
+                expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
               });
             });
 
@@ -247,11 +248,12 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           describe('when label is Ready-to-merge', function () {
             it('should call pullRequestRepository.remove() method', async function () {
               // given
+              const repositoryName = '1024pix/pix-sample-repo';
               sinon.stub(request, 'payload').value({
                 action: 'unlabeled',
                 number: 123,
                 label: { name: ':rocket: Ready to Merge' },
-                repository: { full_name: 'pix-sample-repo' },
+                repository: { full_name: repositoryName },
               });
 
               const mergeQueue = sinon.stub();
@@ -263,10 +265,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               // then
               expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
                 number: 123,
-                repositoryName: 'pix-sample-repo',
+                repositoryName: repositoryName,
               });
 
-              expect(mergeQueue).to.be.calledOnce;
+              expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
             });
           });
         });
@@ -274,10 +276,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         describe('when action is `closed`', function () {
           it('should call pullRequestRepository.remove() method', async function () {
             // given
+            const repositoryName = '1024pix/pix-sample-repo';
             sinon.stub(request, 'payload').value({
               action: 'closed',
               number: 123,
-              repository: { full_name: '1024pix/pix-sample-repo' },
+              repository: { full_name: repositoryName },
             });
 
             const handleCloseRA = sinon.stub();
@@ -290,10 +293,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             // then
             expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
               number: 123,
-              repositoryName: '1024pix/pix-sample-repo',
+              repositoryName,
             });
             expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
-            expect(mergeQueue).to.be.calledOnce;
+            expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
           });
         });
 
@@ -312,6 +315,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       describe('when event is check_suite', function () {
         describe("when action is 'completed' and conclusion is not 'success'", function () {
           it('should call pullRequestRepository.remove() method', async function () {
+            const repositoryName = '1024pix/pix-sample-repo';
             const request = {
               headers: {
                 'x-github-event': 'check_suite',
@@ -319,7 +323,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               payload: {
                 action: 'completed',
                 pull_requests: [{ number: 123 }],
-                repository: { full_name: 'pix-sample-repo' },
+                repository: { full_name: repositoryName },
                 check_suite: { conclusion: 'failure' },
               },
             };
@@ -333,9 +337,9 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             // then
             expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
               number: 123,
-              repositoryName: 'pix-sample-repo',
+              repositoryName,
             });
-            expect(mergeQueue).to.be.calledOnce;
+            expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
           });
         });
       });

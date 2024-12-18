@@ -4,15 +4,16 @@ import * as _pullRequestRepository from '../repositories/pull-request-repository
 import _githubService from '../../common/services/github.js';
 
 export async function mergeQueue({
+  repositoryName,
   pullRequestRepository = _pullRequestRepository,
   githubService = _githubService,
 } = {}) {
-  const isAtLeastOneMergeInProgress = await pullRequestRepository.isAtLeastOneMergeInProgress();
+  const isAtLeastOneMergeInProgress = await pullRequestRepository.isAtLeastOneMergeInProgress(repositoryName);
   if (isAtLeastOneMergeInProgress) {
     return;
   }
 
-  const pr = await pullRequestRepository.getOldest();
+  const pr = await pullRequestRepository.getOldest(repositoryName);
   if (!pr) {
     return;
   }

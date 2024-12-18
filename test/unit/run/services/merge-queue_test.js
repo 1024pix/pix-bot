@@ -5,12 +5,13 @@ import { config } from '../../../../config.js';
 describe('Unit | Build | Services | merge-queue', function () {
   context('when there is PR in merging', function () {
     it('should do nothing', async function () {
+      const repositoryName = Symbol('repository-name');
       const pullRequestRepository = {
         isAtLeastOneMergeInProgress: sinon.stub(),
       };
-      pullRequestRepository.isAtLeastOneMergeInProgress.resolves(true);
+      pullRequestRepository.isAtLeastOneMergeInProgress.withArgs(repositoryName).resolves(true);
 
-      await mergeQueue({ pullRequestRepository });
+      await mergeQueue({ repositoryName, pullRequestRepository });
 
       expect(pullRequestRepository.isAtLeastOneMergeInProgress).to.have.been.called;
     });
@@ -18,9 +19,10 @@ describe('Unit | Build | Services | merge-queue', function () {
 
   context('when there is no PR in merging', function () {
     it('should get oldest pull requests, mark as currently merging and trigger auto-merge', async function () {
+      const repositoryName = 'foo/pix-project';
       const pr = {
         number: 1,
-        repositoryName: 'foo/pix-project',
+        repositoryName,
         isMerging: false,
       };
       const pullRequestRepository = {
@@ -28,14 +30,14 @@ describe('Unit | Build | Services | merge-queue', function () {
         getOldest: sinon.stub(),
         update: sinon.stub(),
       };
-      pullRequestRepository.isAtLeastOneMergeInProgress.resolves(false);
-      pullRequestRepository.getOldest.resolves(pr);
+      pullRequestRepository.isAtLeastOneMergeInProgress.withArgs(repositoryName).resolves(false);
+      pullRequestRepository.getOldest.withArgs(repositoryName).resolves(pr);
 
       const githubService = {
         triggerWorkflow: sinon.stub(),
       };
 
-      await mergeQueue({ pullRequestRepository, githubService });
+      await mergeQueue({ repositoryName, pullRequestRepository, githubService });
 
       expect(pullRequestRepository.isAtLeastOneMergeInProgress).to.have.been.called;
       expect(pullRequestRepository.update).to.have.been.calledWithExactly({

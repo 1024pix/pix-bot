@@ -4,16 +4,16 @@ async function save({ number, repositoryName }) {
   return knex('pull_requests').insert({ number, repositoryName });
 }
 
-async function isAtLeastOneMergeInProgress() {
+async function isAtLeastOneMergeInProgress(repositoryName) {
   const isAtLeastOneMergeInProgress = await knex('pull_requests')
     .select('isMerging')
-    .where({ isMerging: true })
+    .where({ isMerging: true, repositoryName })
     .first();
   return Boolean(isAtLeastOneMergeInProgress);
 }
 
-async function getOldest() {
-  return knex('pull_requests').where({ isMerging: false }).orderBy('createdAt', 'asc').first();
+async function getOldest(repositoryName) {
+  return knex('pull_requests').where({ isMerging: false, repositoryName }).orderBy('createdAt', 'asc').first();
 }
 
 async function update({ number, repositoryName, isMerging }) {

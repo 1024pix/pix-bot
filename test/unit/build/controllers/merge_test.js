@@ -42,7 +42,7 @@ describe('Unit | Controller | Merge', function () {
         repositoryName: '1024pix/pix',
       });
 
-      expect(mergeQueue).to.be.calledOnce;
+      expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName: '1024pix/pix' });
       expect(hStub.response).to.be.calledOnce;
     });
   });

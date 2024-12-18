@@ -261,11 +261,12 @@ async function processWebhook(
       return handleRA(request);
     }
     if (request.payload.action === 'closed') {
+      const repositoryName = request.payload.repository.full_name;
       await pullRequestRepository.remove({
         number: request.payload.number,
-        repositoryName: request.payload.repository.full_name,
+        repositoryName,
       });
-      await mergeQueue();
+      await mergeQueue({ repositoryName });
       return handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
@@ -283,24 +284,26 @@ async function processWebhook(
           number: request.payload.number,
           repositoryName,
         });
-        await mergeQueue();
+        await mergeQueue({ repositoryName });
       }
     }
     if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
+      const repositoryName = request.payload.repository.full_name;
       await pullRequestRepository.remove({
         number: request.payload.number,
-        repositoryName: request.payload.repository.full_name,
+        repositoryName,
       });
-      await mergeQueue();
+      await mergeQueue({ repositoryName });
     }
     return `Ignoring ${request.payload.action} action`;
   } else if (eventName === 'check_suite') {
     if (request.payload.action === 'completed' && request.payload.check_suite.conclusion !== 'success') {
+      const repositoryName = request.payload.repository.full_name;
       await pullRequestRepository.remove({
         number: request.payload.pull_requests[0].number,
-        repositoryName: request.payload.repository.full_name,
+        repositoryName,
       });
-      await mergeQueue();
+      await mergeQueue({ repositoryName });
     }
   } else {
     return `Ignoring ${eventName} event`;

@@ -26,21 +26,24 @@ describe('PullRequestRepository', function () {
   });
 
   describe('#isAtLeastOneMergeInProgress', function () {
-    context('when there is at least one pr in merging', function () {
+    context('when there is at least one pr in merging for specify repository', function () {
       it('should return true', async function () {
-        await knex('pull_requests').insert({ number: 123, repositoryName: 'pix-sample-repo', isMerging: true });
+        const repositoryName = '1024pix/pix-sample-repo';
+        await knex('pull_requests').insert({ number: 123, repositoryName, isMerging: true });
 
-        const isMerging = await pullRequestRepository.isAtLeastOneMergeInProgress();
+        const isMerging = await pullRequestRepository.isAtLeastOneMergeInProgress(repositoryName);
 
         expect(isMerging).to.be.true;
       });
     });
 
-    context('when no pr are currently in progress', function () {
+    context('when no pr are currently in progress for specify repository', function () {
       it('should return false', async function () {
-        await knex('pull_requests').insert({ number: 123, repositoryName: 'pix-sample-repo', isMerging: false });
+        const repositoryName = '1024pix/pix-sample-repo';
+        await knex('pull_requests').insert({ number: 123, repositoryName, isMerging: false });
+        await knex('pull_requests').insert({ number: 123, repositoryName: '1024pix/another-repo', isMerging: true });
 
-        const isMerging = await pullRequestRepository.isAtLeastOneMergeInProgress();
+        const isMerging = await pullRequestRepository.isAtLeastOneMergeInProgress(repositoryName);
 
         expect(isMerging).to.be.false;
       });
@@ -50,34 +53,43 @@ describe('PullRequestRepository', function () {
   describe('#getOldest', function () {
     context('when there is at least one pr', function () {
       it('should return oldest pull request', async function () {
+        const repositoryName = '1024pix/pix-sample-repo';
         await knex('pull_requests').insert({
           number: 123,
-          repositoryName: 'pix-sample-repo',
+          repositoryName,
           isMerging: true,
           createdAt: new Date('2024-01-01'),
         });
         await knex('pull_requests').insert({
           number: 456,
-          repositoryName: 'pix-sample-repo',
+          repositoryName,
           isMerging: false,
           createdAt: new Date('2024-01-02'),
         });
         await knex('pull_requests').insert({
           number: 789,
-          repositoryName: 'pix-sample-repo',
+          repositoryName,
           isMerging: false,
           createdAt: new Date('2024-02-02'),
         });
 
-        const oldestPR = await pullRequestRepository.getOldest();
+        const oldestPR = await pullRequestRepository.getOldest(repositoryName);
 
         expect(oldestPR.number).to.be.equal(456);
       });
     });
 
-    context('when there are no pr', function () {
+    context('when there are no pr for given repository', function () {
       it('should return undefined', async function () {
-        const oldestPR = await pullRequestRepository.getOldest();
+        const repositoryWithoutPRInMergeQueue = '1024pix/repo-under-test';
+        await knex('pull_requests').insert({
+          number: 123,
+          repositoryName: '1024pix/another-repo',
+          isMerging: false,
+          createdAt: new Date('2024-01-01'),
+        });
+
+        const oldestPR = await pullRequestRepository.getOldest(repositoryWithoutPRInMergeQueue);
 
         expect(oldestPR).to.be.undefined;
       });
