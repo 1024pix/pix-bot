@@ -696,6 +696,89 @@ describe('Acceptance | Build | Github', function () {
           expect(callGitHubAction.isDone()).to.be.true;
           expect(response.statusCode).equal(200);
         });
+
+        it('should save pull request and do not call action when they are already merging pull request', async function () {
+          const body = {
+            action: 'labeled',
+            number: 123,
+            repository: {
+              full_name: '1024pix/pix',
+            },
+            pull_request: {
+              state: 'open',
+              labels: [],
+              head: {
+                ref: 'my-branch',
+                repo: {
+                  name: 'pix',
+                  fork: false,
+                },
+              },
+            },
+            label: {
+              name: ':rocket: Ready to Merge',
+            },
+            sender: {
+              login: 'foo',
+            },
+          };
+          const workflowRepoName = config.github.automerge.repositoryName;
+          const workflowId = config.github.automerge.workflowId;
+          const workflowRef = config.github.automerge.workflowRef;
+
+          sinon.stub(config.github.automerge, 'allowedRepositories').value(['1024pix/pix']);
+
+          const checkUserBelongsToPixNock = nock('https://api.github.com')
+            .get(`/orgs/1024pix/members/${body.sender.login}`)
+            .reply(204)
+            .persist();
+
+          const callGitHubAction = nock('https://api.github.com/')
+            .post(`/repos/${workflowRepoName}/actions/workflows/${workflowId}/dispatches`, {
+              ref: workflowRef,
+              inputs: { pullRequest: `1024pix/pix/${body.number}` },
+            })
+            .reply(200, {});
+
+          const secondPRForSameRepo = 567;
+          const shouldNotBeCalled = nock('https://api.github.com/')
+            .post(`/repos/${workflowRepoName}/actions/workflows/${workflowId}/dispatches`, {
+              ref: workflowRef,
+              inputs: { pullRequest: `1024pix/pix/${secondPRForSameRepo}` },
+            })
+            .reply(200, {});
+
+          await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          expect(checkUserBelongsToPixNock.isDone()).to.be.true;
+          expect(callGitHubAction.isDone()).to.be.true;
+
+          // when
+          body.number = secondPRForSameRepo;
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          // then
+          expect(shouldNotBeCalled.isDone()).to.be.false;
+          expect(response.statusCode).to.equal(200);
+          const secondPR = await knex('pull_requests').where({ repositoryName: '1024pix/pix', number: 567 }).first();
+          expect(secondPR.isMerging).to.be.false;
+        });
       });
     });
 

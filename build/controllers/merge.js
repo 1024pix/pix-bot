@@ -14,7 +14,7 @@ const mergeController = {
     const [organisation, repository, pullRequestNumber] = pullRequest.split('/');
     const repositoryName = `${organisation}/${repository}`;
     await dependencies.pullRequestRepository.remove({ number: Number(pullRequestNumber), repositoryName });
-    await dependencies.mergeQueue();
+    await dependencies.mergeQueue({ repositoryName });
     return h.response().code(204);
   },
 };
