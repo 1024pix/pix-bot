@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.107.0 (19/12/2024)
+
+
+### :rocket: Amélioration
+- [#490](https://github.com/1024pix/pix-bot/pull/490) [FEATURE] Avoir une merge queue par repository.
+
 ## v1.106.3 (18/12/2024)
 
 
