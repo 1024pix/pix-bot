@@ -497,6 +497,12 @@ const github = {
       inputs,
     });
   },
+
+  async isPrLabelledWith({ number, repositoryName, label }) {
+    const octokit = _createOctokit();
+    const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
+    return data.labels.some((ghLabel) => ghLabel.name === label);
+  },
 };
 
 export default github;

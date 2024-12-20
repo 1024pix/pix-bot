@@ -691,4 +691,64 @@ describe('Unit | Build | github-test', function () {
       expect(githubNock.isDone()).to.be.true;
     });
   });
+
+  describe('#isPrLabelledWith', function () {
+    let githubNock;
+    const repositoryName = '1024pix/pix';
+    const prNumber = 123;
+
+    beforeEach(function () {
+      const response = {
+        labels: [
+          {
+            id: 123,
+            node_id: 'MDU6TGFiZWwyMDgwNDU5NDY=',
+            url: 'https://api.github.com/repos/octocat/Hello-World/labels/%3Apanda%3A label',
+            name: ':panda: label',
+            description: 'Something is like a panda',
+            color: 'FFFFFF',
+            default: true,
+          },
+          {
+            id: 123,
+            node_id: 'MDU6TGFiZWwyMDgwNDU5NDY=',
+            url: 'https://api.github.com/repos/octocat/Hello-World/labels/working',
+            name: 'working',
+            description: 'Something is working',
+            color: 'f29efef',
+            default: true,
+          },
+        ],
+      };
+      githubNock = nock('https://api.github.com')
+        .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+        .reply(200, response);
+    });
+
+    describe('when PR is labelled with `:panda: label`', function () {
+      it('should return true for :panda: label', async function () {
+        const label = ':panda: label';
+
+        const hasPandaLabel = await githubService.isPrLabelledWith({
+          number: prNumber,
+          repositoryName,
+          label,
+        });
+        expect(hasPandaLabel).to.be.true;
+        expect(githubNock.isDone()).to.be.true;
+      });
+
+      it('should return false for bug', async function () {
+        const label = 'bug';
+
+        const hasBugLabel = await githubService.isPrLabelledWith({
+          number: prNumber,
+          repositoryName,
+          label,
+        });
+        expect(hasBugLabel).to.be.false;
+        expect(githubNock.isDone()).to.be.true;
+      });
+    });
+  });
 });
