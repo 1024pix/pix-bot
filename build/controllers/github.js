@@ -297,12 +297,26 @@ async function processWebhook(
     }
     return `Ignoring ${request.payload.action} action`;
   } else if (eventName === 'check_suite') {
-    if (request.payload.action === 'completed' && request.payload.check_suite.conclusion !== 'success') {
+    if (request.payload.action === 'completed') {
       const repositoryName = request.payload.repository.full_name;
-      await pullRequestRepository.remove({
-        number: request.payload.pull_requests[0].number,
-        repositoryName,
-      });
+      if (request.payload.check_suite.conclusion !== 'success') {
+        await pullRequestRepository.remove({
+          number: request.payload.pull_requests[0].number,
+          repositoryName,
+        });
+      } else {
+        const hasReadyToMergeLabel = await githubService.isPrLabelledWith({
+          repositoryName,
+          number: request.payload.pull_requests[0].number,
+          label: ':rocket: Ready to Merge',
+        });
+        if (hasReadyToMergeLabel) {
+          await pullRequestRepository.save({
+            number: request.payload.pull_requests[0].number,
+            repositoryName,
+          });
+        }
+      }
       await mergeQueue({ repositoryName });
     }
   } else {

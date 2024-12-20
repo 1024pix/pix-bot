@@ -314,7 +314,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
       describe('when event is check_suite', function () {
         describe("when action is 'completed' and conclusion is not 'success'", function () {
-          it('should call pullRequestRepository.remove() method', async function () {
+          it('should call pullRequestRepository.update() method', async function () {
             const repositoryName = '1024pix/pix-sample-repo';
             const request = {
               headers: {
@@ -337,6 +337,46 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             // then
             expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
               number: 123,
+              repositoryName,
+            });
+            expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
+          });
+        });
+
+        describe("when action is 'completed' and conclusion is'success'", function () {
+          it('should check PR as Ready to Merge label before saved it', async function () {
+            const repositoryName = '1024pix/pix-sample-repo';
+            const prNumber = 123;
+            const request = {
+              headers: {
+                'x-github-event': 'check_suite',
+              },
+              payload: {
+                action: 'completed',
+                pull_requests: [{ number: prNumber }],
+                repository: { full_name: repositoryName },
+                check_suite: { conclusion: 'success' },
+              },
+            };
+
+            const mergeQueue = sinon.stub();
+            const pullRequestRepository = { save: sinon.stub() };
+            const githubService = { isPrLabelledWith: sinon.stub() };
+
+            githubService.isPrLabelledWith
+              .resolves(false)
+              .withArgs({
+                repositoryName,
+                number: prNumber,
+                label: ':rocket: Ready to Merge',
+              })
+              .resolves(true);
+            // when
+            await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
+
+            // then
+            expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
+              number: prNumber,
               repositoryName,
             });
             expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
