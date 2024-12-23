@@ -38,6 +38,14 @@ export class MergeQueue {
       },
     });
   }
+
+  async managePullRequest({ repositoryName, number }) {
+    await this.#pullRequestRepository.save({
+      repositoryName,
+      number,
+    });
+    await this.manage({ repositoryName });
+  }
 }
 
 export const mergeQueue = new MergeQueue({ pullRequestRepository, githubService });

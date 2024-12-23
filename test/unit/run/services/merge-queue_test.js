@@ -3,7 +3,7 @@ import { MergeQueue } from '../../../../build/services/merge-queue.js';
 import { config } from '../../../../config.js';
 
 describe('Unit | Build | Services | merge-queue', function () {
-  describe('#manage', function() {
+  describe('#manage', function () {
     context('when there is PR in merging', function () {
       it('should do nothing', async function () {
         const repositoryName = Symbol('repository-name');
@@ -55,6 +55,28 @@ describe('Unit | Build | Services | merge-queue', function () {
           inputs: { pullRequest: 'foo/pix-project/1' },
         });
       });
+    });
+  });
+
+  describe('#managePullRequest', function () {
+    it('should save pr and call manage method', async function () {
+      const repositoryName = Symbol('repository-name');
+      const pullRequestNumber = Symbol('pull-request-number');
+
+      const pullRequestRepository = {
+        save: sinon.stub(),
+      };
+
+      const mergeQueue = new MergeQueue({ pullRequestRepository });
+      mergeQueue.manage = sinon.stub();
+
+      await mergeQueue.managePullRequest({ repositoryName, number: pullRequestNumber });
+
+      expect(pullRequestRepository.save).to.have.been.calledOnceWithExactly({
+        repositoryName,
+        number: pullRequestNumber,
+      });
+      expect(mergeQueue.manage).to.have.been.calledOnceWithExactly({ repositoryName });
     });
   });
 });
