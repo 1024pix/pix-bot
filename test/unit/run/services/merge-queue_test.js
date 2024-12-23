@@ -79,4 +79,26 @@ describe('Unit | Build | Services | merge-queue', function () {
       expect(mergeQueue.manage).to.have.been.calledOnceWithExactly({ repositoryName });
     });
   });
+
+  describe('#unmanagePullRequest', function () {
+    it('should remove pr and call manage method', async function () {
+      const repositoryName = Symbol('repository-name');
+      const pullRequestNumber = Symbol('pull-request-number');
+
+      const pullRequestRepository = {
+        remove: sinon.stub(),
+      };
+
+      const mergeQueue = new MergeQueue({ pullRequestRepository });
+      mergeQueue.manage = sinon.stub();
+
+      await mergeQueue.unmanagePullRequest({ repositoryName, number: pullRequestNumber });
+
+      expect(pullRequestRepository.remove).to.have.been.calledOnceWithExactly({
+        repositoryName,
+        number: pullRequestNumber,
+      });
+      expect(mergeQueue.manage).to.have.been.calledOnceWithExactly({ repositoryName });
+    });
+  });
 });

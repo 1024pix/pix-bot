@@ -46,6 +46,14 @@ export class MergeQueue {
     });
     await this.manage({ repositoryName });
   }
+
+  async unmanagePullRequest({ repositoryName, number }) {
+    await this.#pullRequestRepository.remove({
+      repositoryName,
+      number,
+    });
+    await this.manage({ repositoryName });
+  }
 }
 
 export const mergeQueue = new MergeQueue({ pullRequestRepository, githubService });
