@@ -23,6 +23,14 @@ describe('PullRequestRepository', function () {
         isMerging: false,
       });
     });
+
+    it('should ignore on conflict', async function () {
+      await pullRequestRepository.save({ number: 123, repositoryName: 'pix-sample-repo' });
+      await pullRequestRepository.save({ number: 123, repositoryName: 'pix-sample-repo' });
+
+      const result = await knex('pull_requests').select().where({ number: 123, repositoryName: 'pix-sample-repo' });
+      expect(result).to.be.lengthOf(1);
+    });
   });
 
   describe('#isAtLeastOneMergeInProgress', function () {
