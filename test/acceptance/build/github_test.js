@@ -988,6 +988,73 @@ describe('Acceptance | Build | Github', function () {
       });
     });
 
+    describe('on check_suite event', function () {
+      describe('when action is not handled', function () {
+        it('should do nothing and return ignoring message', async function () {
+          const body = {
+            action: 'requested',
+            repository: {
+              full_name: '1024pix/pix',
+            },
+            check_suite: {},
+          };
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'check_suite',
+            },
+            payload: body,
+          });
+
+          expect(response.statusCode).equal(200);
+          expect(response.payload).equal(`Ignoring 'requested' action for check_suite event`);
+        });
+      });
+
+      describe('when action is completed', function () {
+        it('should do merge queue tasks and return message', async function () {
+          const body = {
+            action: 'requested',
+            repository: {
+              full_name: '1024pix/pix',
+            },
+            check_suite: {
+              conclusion: 'failure',
+              pull_requests: [
+                {
+                  number: 123,
+                  state: 'open',
+                  labels: [],
+                  head: {
+                    ref: 'my-branch',
+                    repo: {
+                      name: 'pix',
+                      fork: false,
+                    },
+                  },
+                },
+              ],
+            },
+          };
+
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'check_suite',
+            },
+            payload: body,
+          });
+
+          expect(response.statusCode).equal(200);
+          expect(response.payload).equal(`Ignoring 'requested' action for check_suite event`);
+        });
+      });
+    });
+
     it('responds with 200 and do nothing for other event', async function () {
       body = {};
       const res = await server.inject({

@@ -319,7 +319,9 @@ async function processWebhook(
         }
       }
       await mergeQueue({ repositoryName });
+      return `check_suite event handle`;
     }
+    return `Ignoring '${request.payload.action}' action for check_suite event`;
   } else {
     return `Ignoring ${eventName} event`;
   }
