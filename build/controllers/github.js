@@ -249,7 +249,7 @@ async function processWebhook(
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
     pullRequestRepository = _pullRequestRepository,
-    mergeQueue = _mergeQueue,
+    mergeQueue = _mergeQueue.manage,
     githubService = commonGithubService,
   } = {},
 ) {
