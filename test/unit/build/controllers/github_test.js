@@ -195,21 +195,18 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                   },
                 });
 
-                const mergeQueue = sinon.stub();
-                const pullRequestRepository = { save: sinon.stub() };
+                const mergeQueue = { managePullRequest: sinon.stub() };
                 const githubService = { checkUserBelongsToPix: sinon.stub() };
                 githubService.checkUserBelongsToPix.resolves(true);
 
                 // when
-                await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
+                await githubController.processWebhook(request, { githubService, mergeQueue });
 
                 // then
-                expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
+                expect(mergeQueue.managePullRequest).to.be.calledOnceWithExactly({
                   number: 123,
                   repositoryName,
                 });
-
-                expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
               });
             });
 
@@ -256,19 +253,16 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 repository: { full_name: repositoryName },
               });
 
-              const mergeQueue = sinon.stub();
-              const pullRequestRepository = { remove: sinon.stub() };
+              const mergeQueue = { unmanagePullRequest: sinon.stub() };
 
               // when
-              await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
+              await githubController.processWebhook(request, { mergeQueue });
 
               // then
-              expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+              expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
                 number: 123,
                 repositoryName: repositoryName,
               });
-
-              expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
             });
           });
         });
@@ -284,19 +278,17 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             });
 
             const handleCloseRA = sinon.stub();
-            const mergeQueue = sinon.stub();
-            const pullRequestRepository = { remove: sinon.stub() };
+            const mergeQueue = { unmanagePullRequest: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { handleCloseRA, pullRequestRepository, mergeQueue });
+            await githubController.processWebhook(request, { handleCloseRA, mergeQueue });
 
             // then
-            expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+            expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
               number: 123,
               repositoryName,
             });
             expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
-            expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
           });
         });
 
@@ -327,18 +319,16 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               },
             };
 
-            const mergeQueue = sinon.stub();
-            const pullRequestRepository = { remove: sinon.stub() };
+            const mergeQueue = { unmanagePullRequest: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { pullRequestRepository, mergeQueue });
+            await githubController.processWebhook(request, { mergeQueue });
 
             // then
-            expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+            expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
               number: 123,
               repositoryName,
             });
-            expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
           });
         });
 
@@ -374,8 +364,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               },
             };
 
-            const mergeQueue = sinon.stub();
-            const pullRequestRepository = { save: sinon.stub() };
+            const mergeQueue = { managePullRequest: sinon.stub() };
             const githubService = { isPrLabelledWith: sinon.stub() };
 
             githubService.isPrLabelledWith
@@ -387,14 +376,13 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               })
               .resolves(true);
             // when
-            await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
+            await githubController.processWebhook(request, { githubService, mergeQueue });
 
             // then
-            expect(pullRequestRepository.save).to.be.calledOnceWithExactly({
+            expect(mergeQueue.managePullRequest).to.be.calledOnceWithExactly({
               number: prNumber,
               repositoryName,
             });
-            expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName });
           });
         });
       });

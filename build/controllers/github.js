@@ -7,7 +7,6 @@ import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 import * as reviewAppRepo from '../repositories/review-app-repository.js';
-import * as _pullRequestRepository from '../repositories/pull-request-repository.js';
 import { mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
 const repositoryToScalingoAppsReview = {
@@ -248,8 +247,7 @@ async function processWebhook(
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
     handleRA = _handleRA,
     handleCloseRA = _handleCloseRA,
-    pullRequestRepository = _pullRequestRepository,
-    mergeQueue = _mergeQueue.manage,
+    mergeQueue = _mergeQueue,
     githubService = commonGithubService,
   } = {},
 ) {
@@ -262,11 +260,7 @@ async function processWebhook(
     }
     if (request.payload.action === 'closed') {
       const repositoryName = request.payload.repository.full_name;
-      await pullRequestRepository.remove({
-        number: request.payload.number,
-        repositoryName,
-      });
-      await mergeQueue({ repositoryName });
+      await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number });
       return handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
@@ -280,20 +274,12 @@ async function processWebhook(
       const repositoryName = request.payload.repository.full_name;
       const isAllowedRepository = config.github.automerge.allowedRepositories.includes(repositoryName);
       if (isAllowedRepository) {
-        await pullRequestRepository.save({
-          number: request.payload.number,
-          repositoryName,
-        });
-        await mergeQueue({ repositoryName });
+        await mergeQueue.managePullRequest({ repositoryName, number: request.payload.number });
       }
     }
     if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       const repositoryName = request.payload.repository.full_name;
-      await pullRequestRepository.remove({
-        number: request.payload.number,
-        repositoryName,
-      });
-      await mergeQueue({ repositoryName });
+      await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number });
     }
     return `Ignoring ${request.payload.action} action`;
   } else if (eventName === 'check_suite') {
@@ -306,10 +292,7 @@ async function processWebhook(
 
       const prNumber = request.payload.check_suite.pull_requests[0].number;
       if (request.payload.check_suite.conclusion !== 'success') {
-        await pullRequestRepository.remove({
-          number: prNumber,
-          repositoryName,
-        });
+        await mergeQueue.unmanagePullRequest({ repositoryName, number: prNumber });
       } else {
         const hasReadyToMergeLabel = await githubService.isPrLabelledWith({
           repositoryName,
@@ -317,13 +300,9 @@ async function processWebhook(
           label: ':rocket: Ready to Merge',
         });
         if (hasReadyToMergeLabel) {
-          await pullRequestRepository.save({
-            number: prNumber,
-            repositoryName,
-          });
+          await mergeQueue.managePullRequest({ repositoryName, number: prNumber });
         }
       }
-      await mergeQueue({ repositoryName });
       return `check_suite event handle`;
     }
     return `Ignoring '${request.payload.action}' action for check_suite event`;

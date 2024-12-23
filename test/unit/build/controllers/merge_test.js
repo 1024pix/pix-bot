@@ -26,23 +26,21 @@ describe('Unit | Controller | Merge', function () {
         payload: { pullRequest: '1024pix/pix/123' },
       };
 
-      const mergeQueue = sinon.stub();
-      const pullRequestRepository = { remove: sinon.stub() };
+      const mergeQueue = { unmanagePullRequest: sinon.stub() };
       const hStub = {
         response: sinon.stub(),
       };
       hStub.response.returns({ code: () => {} });
 
       // when
-      await mergeController.handle(request, hStub, { pullRequestRepository, mergeQueue });
+      await mergeController.handle(request, hStub, { mergeQueue });
 
       // then
-      expect(pullRequestRepository.remove).to.be.calledOnceWithExactly({
+      expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
         number: 123,
         repositoryName: '1024pix/pix',
       });
 
-      expect(mergeQueue).to.be.calledOnceWithExactly({ repositoryName: '1024pix/pix' });
       expect(hStub.response).to.be.calledOnce;
     });
   });
