@@ -299,6 +299,11 @@ async function processWebhook(
   } else if (eventName === 'check_suite') {
     if (request.payload.action === 'completed') {
       const repositoryName = request.payload.repository.full_name;
+
+      if (request.payload.check_suite.pull_requests.length === 0) {
+        return `check_suite is not related to any pull_request`;
+      }
+
       const prNumber = request.payload.check_suite.pull_requests[0].number;
       if (request.payload.check_suite.conclusion !== 'success') {
         await pullRequestRepository.remove({

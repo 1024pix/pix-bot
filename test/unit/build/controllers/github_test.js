@@ -342,7 +342,24 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
         });
 
-        describe("when action is 'completed' and conclusion is'success'", function () {
+        describe("when action is 'completed' and conclusion is 'success'", function () {
+          it('should return ignoring message when not pr are related to check_suite', async function () {
+            const request = {
+              headers: {
+                'x-github-event': 'check_suite',
+              },
+              payload: {
+                action: 'completed',
+                repository: { full_name: '1024pix/pix-test' },
+                check_suite: { conclusion: 'success', pull_requests: [] },
+              },
+            };
+
+            const result = await githubController.processWebhook(request, {});
+
+            expect(result).to.equal('check_suite is not related to any pull_request');
+          });
+
           it('should check PR as Ready to Merge label before saved it', async function () {
             const repositoryName = '1024pix/pix-sample-repo';
             const prNumber = 123;
