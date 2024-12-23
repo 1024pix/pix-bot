@@ -1016,7 +1016,7 @@ describe('Acceptance | Build | Github', function () {
       describe('when action is completed', function () {
         it('should do merge queue tasks and return message', async function () {
           const body = {
-            action: 'requested',
+            action: 'completed',
             repository: {
               full_name: '1024pix/pix',
             },
@@ -1050,7 +1050,7 @@ describe('Acceptance | Build | Github', function () {
           });
 
           expect(response.statusCode).equal(200);
-          expect(response.payload).equal(`Ignoring 'requested' action for check_suite event`);
+          expect(response.payload).equal('check_suite event handle');
         });
       });
     });
