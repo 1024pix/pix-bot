@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.108.1 (23/12/2024)
+
+
+### :bug: Correction
+- [#493](https://github.com/1024pix/pix-bot/pull/493) [BUGFIX] Corriger le payload attendu lors d'un évènement check_suite.
+
 ## v1.108.0 (23/12/2024)
 
 
