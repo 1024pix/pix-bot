@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.108.2 (23/12/2024)
+
+
+### :bug: Correction
+- [#494](https://github.com/1024pix/pix-bot/pull/494) [BUGFIX] Eviter les 500 dans le controller GitHub.
+
 ## v1.108.1 (23/12/2024)
 
 
