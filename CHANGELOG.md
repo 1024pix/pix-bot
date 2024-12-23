@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.108.3 (23/12/2024)
+
+
+### :bug: Correction
+- [#495](https://github.com/1024pix/pix-bot/pull/495) [BUGFIX] Gérer le cas où la check_suite n'est pas liée à une PR.
+
 ## v1.108.2 (23/12/2024)
 
 
