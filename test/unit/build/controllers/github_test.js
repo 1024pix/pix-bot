@@ -322,9 +322,8 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               },
               payload: {
                 action: 'completed',
-                pull_requests: [{ number: 123 }],
                 repository: { full_name: repositoryName },
-                check_suite: { conclusion: 'failure' },
+                check_suite: { conclusion: 'failure', pull_requests: [{ number: 123 }] },
               },
             };
 
@@ -353,9 +352,8 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               },
               payload: {
                 action: 'completed',
-                pull_requests: [{ number: prNumber }],
                 repository: { full_name: repositoryName },
-                check_suite: { conclusion: 'success' },
+                check_suite: { conclusion: 'success', pull_requests: [{ number: prNumber }] },
               },
             };
 

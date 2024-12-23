@@ -299,20 +299,21 @@ async function processWebhook(
   } else if (eventName === 'check_suite') {
     if (request.payload.action === 'completed') {
       const repositoryName = request.payload.repository.full_name;
+      const prNumber = request.payload.check_suite.pull_requests[0].number;
       if (request.payload.check_suite.conclusion !== 'success') {
         await pullRequestRepository.remove({
-          number: request.payload.pull_requests[0].number,
+          number: prNumber,
           repositoryName,
         });
       } else {
         const hasReadyToMergeLabel = await githubService.isPrLabelledWith({
           repositoryName,
-          number: request.payload.pull_requests[0].number,
+          number: prNumber,
           label: ':rocket: Ready to Merge',
         });
         if (hasReadyToMergeLabel) {
           await pullRequestRepository.save({
-            number: request.payload.pull_requests[0].number,
+            number: prNumber,
             repositoryName,
           });
         }
