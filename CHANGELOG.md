@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.108.4 (23/12/2024)
+
+
+### :bug: Correction
+- [#496](https://github.com/1024pix/pix-bot/pull/496) [BUGFIX] Ne pas jetter d'erreur quand la PR est déjà dans la merge queue.
+
 ## v1.108.3 (23/12/2024)
 
 
