@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.108.0 (23/12/2024)
+
+
+### :rocket: Amélioration
+- [#491](https://github.com/1024pix/pix-bot/pull/491) [FEATURE] ajoute à la mergequeue lorsque la check_suite se met à jour.
+
+### :arrow_up: Montée de version
+- [#492](https://github.com/1024pix/pix-bot/pull/492) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.107.0 (19/12/2024)
 
 
