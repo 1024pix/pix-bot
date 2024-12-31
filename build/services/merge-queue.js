@@ -18,13 +18,14 @@ export class MergeQueue {
       return;
     }
 
-    const pr = await this.#pullRequestRepository.getOldest(repositoryName);
-    if (!pr) {
+    const pr = await this.#pullRequestRepository.findNotMerged(repositoryName);
+    if (pr.length === 0) {
       return;
     }
 
+    const nextMergingPr = pr[0];
     await this.#pullRequestRepository.update({
-      ...pr,
+      ...nextMergingPr,
       isMerging: true,
     });
     await this.#githubService.triggerWorkflow({
@@ -34,9 +35,25 @@ export class MergeQueue {
         ref: config.github.automerge.workflowRef,
       },
       inputs: {
-        pullRequest: `${pr.repositoryName}/${pr.number}`,
+        pullRequest: `${nextMergingPr.repositoryName}/${nextMergingPr.number}`,
       },
     });
+
+    await this.#githubService.setMergeQueueStatus({
+      status: 'pending',
+      description: 'En cours de merge',
+      repositoryFullName: repositoryName,
+      prNumber: pr[0].number,
+    });
+
+    for (let i = 1; i < pr.length; i++) {
+      await this.#githubService.setMergeQueueStatus({
+        status: 'pending',
+        description: `${i + 1}/${pr.length} dans la file d'attente`,
+        repositoryFullName: repositoryName,
+        prNumber: pr[i].number,
+      });
+    }
   }
 
   async managePullRequest({ repositoryName, number }) {

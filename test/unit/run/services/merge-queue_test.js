@@ -19,7 +19,7 @@ describe('Unit | Build | Services | merge-queue', function () {
     });
 
     context('when there is no PR in merging', function () {
-      it('should get oldest pull requests, mark as currently merging and trigger auto-merge', async function () {
+      it('should find not merged pull requests, mark latest as currently merging and trigger auto-merge', async function () {
         const repositoryName = 'foo/pix-project';
         const pr = {
           number: 1,
@@ -28,14 +28,15 @@ describe('Unit | Build | Services | merge-queue', function () {
         };
         const pullRequestRepository = {
           isAtLeastOneMergeInProgress: sinon.stub(),
-          getOldest: sinon.stub(),
+          findNotMerged: sinon.stub(),
           update: sinon.stub(),
         };
         pullRequestRepository.isAtLeastOneMergeInProgress.withArgs(repositoryName).resolves(false);
-        pullRequestRepository.getOldest.withArgs(repositoryName).resolves(pr);
+        pullRequestRepository.findNotMerged.withArgs(repositoryName).resolves([pr]);
 
         const githubService = {
           triggerWorkflow: sinon.stub(),
+          setMergeQueueStatus: sinon.stub(),
         };
 
         await new MergeQueue({ pullRequestRepository, githubService }).manage({ repositoryName });
@@ -53,6 +54,50 @@ describe('Unit | Build | Services | merge-queue', function () {
             ref: config.github.automerge.workflowRef,
           },
           inputs: { pullRequest: 'foo/pix-project/1' },
+        });
+      });
+
+      it('should create commit status for each pending pull request', async function () {
+        const repositoryName = 'foo/pix-project';
+        const prs = [
+          {
+            number: 1,
+            repositoryName,
+            isMerging: false,
+          },
+          {
+            number: 2,
+            repositoryName,
+            isMerging: false,
+          },
+        ];
+        const pullRequestRepository = {
+          isAtLeastOneMergeInProgress: sinon.stub(),
+          findNotMerged: sinon.stub(),
+          update: sinon.stub(),
+        };
+        pullRequestRepository.isAtLeastOneMergeInProgress.withArgs(repositoryName).resolves(false);
+        pullRequestRepository.findNotMerged.withArgs(repositoryName).resolves(prs);
+
+        const githubService = {
+          triggerWorkflow: sinon.stub(),
+          setMergeQueueStatus: sinon.stub(),
+        };
+
+        await new MergeQueue({ pullRequestRepository, githubService }).manage({ repositoryName });
+
+        expect(githubService.setMergeQueueStatus).to.have.been.calledTwice;
+        expect(githubService.setMergeQueueStatus.firstCall).to.have.been.calledWithExactly({
+          status: 'pending',
+          description: 'En cours de merge',
+          repositoryFullName: repositoryName,
+          prNumber: 1,
+        });
+        expect(githubService.setMergeQueueStatus.secondCall).to.have.been.calledWithExactly({
+          status: 'pending',
+          description: "2/2 dans la file d'attente",
+          repositoryFullName: repositoryName,
+          prNumber: 2,
         });
       });
     });

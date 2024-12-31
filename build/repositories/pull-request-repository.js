@@ -12,8 +12,8 @@ async function isAtLeastOneMergeInProgress(repositoryName) {
   return Boolean(isAtLeastOneMergeInProgress);
 }
 
-async function getOldest(repositoryName) {
-  return knex('pull_requests').where({ isMerging: false, repositoryName }).orderBy('createdAt', 'asc').first();
+async function findNotMerged(repositoryName) {
+  return knex('pull_requests').where({ isMerging: false, repositoryName }).orderBy('createdAt', 'asc');
 }
 
 async function update({ number, repositoryName, isMerging }) {
@@ -24,4 +24,4 @@ async function remove({ number, repositoryName }) {
   await knex('pull_requests').where({ number, repositoryName }).delete();
 }
 
-export { save, isAtLeastOneMergeInProgress, getOldest, update, remove };
+export { save, isAtLeastOneMergeInProgress, findNotMerged, update, remove };

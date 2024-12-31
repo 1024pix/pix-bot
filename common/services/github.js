@@ -359,26 +359,46 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
-async function addRADeploymentCheck({ repository, prNumber, status }) {
-  const checkName = 'check-ra-deployment';
+async function createCommitStatus({ context, repo, pull_number, description, state }) {
   const owner = '1024pix';
   const octokit = _createOctokit();
 
-  let response = await octokit.pulls.get({ owner: '1024pix', repo: repository, pull_number: prNumber });
+  let response = await octokit.pulls.get({ owner, repo, pull_number });
   const sha = response.data.head.sha;
 
   response = await octokit.repos.createCommitStatus({
     owner,
-    context: checkName,
-    repo: repository,
+    context,
+    description,
+    repo,
     sha,
-    state: status,
+    state,
   });
 
   const startedAt = response.data.started_at;
-  logger.info(`Check ${checkName} added for PR ${prNumber} in ${repository} with status ${status}`);
+  logger.info(`Check ${context} added for PR ${pull_number} in ${repo} with status ${state}`);
 
   return startedAt;
+}
+
+async function setMergeQueueStatus({ repositoryFullName, prNumber, status, description }) {
+  const repository = repositoryFullName.split('/')[1];
+  return createCommitStatus({
+    context: 'merge-queue-status',
+    repo: repository,
+    pull_number: prNumber,
+    state: status,
+    description,
+  });
+}
+
+async function addRADeploymentCheck({ repository, prNumber, status }) {
+  return createCommitStatus({
+    context: 'check-ra-deployment',
+    repo: repository,
+    pull_number: prNumber,
+    state: status,
+  });
 }
 
 const github = {
@@ -480,6 +500,7 @@ const github = {
   },
   commentPullRequest,
   addRADeploymentCheck,
+  setMergeQueueStatus,
 
   async checkUserBelongsToPix(username) {
     const octokit = _createOctokit();
