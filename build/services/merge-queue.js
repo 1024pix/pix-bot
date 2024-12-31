@@ -38,6 +38,22 @@ export class MergeQueue {
         pullRequest: `${nextMergingPr.repositoryName}/${nextMergingPr.number}`,
       },
     });
+
+    await this.#githubService.setMergeQueueStatus({
+      status: 'pending',
+      description: 'En cours de merge',
+      repositoryFullName: repositoryName,
+      prNumber: pr[0].number,
+    });
+
+    for (let i = 1; i < pr.length; i++) {
+      await this.#githubService.setMergeQueueStatus({
+        status: 'pending',
+        description: `${i + 1}/${pr.length} dans la file d'attente`,
+        repositoryFullName: repositoryName,
+        prNumber: pr[i].number,
+      });
+    }
   }
 
   async managePullRequest({ repositoryName, number }) {

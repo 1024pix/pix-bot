@@ -682,6 +682,15 @@ describe('Acceptance | Build | Github', function () {
             })
             .reply(200, {});
 
+          const prHeadCommit = 'aaaa';
+          const getPullRequestNock = nock('https://api.github.com')
+            .get(`/repos/1024pix/pix/pulls/123`)
+            .reply(200, { head: { sha: prHeadCommit } });
+
+          const createCheckNock = nock('https://api.github.com')
+            .post(`/repos/${body.repository.full_name}/statuses/${prHeadCommit}`)
+            .reply(201, { started_at: '2024-01-01' });
+
           const response = await server.inject({
             method: 'POST',
             url: '/github/webhook',
@@ -694,6 +703,8 @@ describe('Acceptance | Build | Github', function () {
 
           expect(checkUserBelongsToPixNock.isDone()).to.be.true;
           expect(callGitHubAction.isDone()).to.be.true;
+          expect(getPullRequestNock.isDone()).to.be.true;
+          expect(createCheckNock.isDone()).to.be.true;
           expect(response.statusCode).equal(200);
         });
 
@@ -739,6 +750,16 @@ describe('Acceptance | Build | Github', function () {
               inputs: { pullRequest: `1024pix/pix/${body.number}` },
             })
             .reply(200, {});
+
+          const prHeadCommit = 'aaaa';
+          nock('https://api.github.com')
+            .get(`/repos/1024pix/pix/pulls/123`)
+            .reply(200, { head: { sha: prHeadCommit } })
+            .persist();
+
+          nock('https://api.github.com')
+            .post(`/repos/${body.repository.full_name}/statuses/${prHeadCommit}`)
+            .reply(201, { started_at: '2024-01-01' });
 
           const secondPRForSameRepo = 567;
           const shouldNotBeCalled = nock('https://api.github.com/')
