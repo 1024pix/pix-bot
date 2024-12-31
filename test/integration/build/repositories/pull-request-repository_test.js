@@ -58,10 +58,16 @@ describe('PullRequestRepository', function () {
     });
   });
 
-  describe('#getOldest', function () {
+  describe('#findNotMerged', function () {
     context('when there is at least one pr', function () {
-      it('should return oldest pull request', async function () {
+      it('should return all pull requests', async function () {
         const repositoryName = '1024pix/pix-sample-repo';
+        await knex('pull_requests').insert({
+          number: 789,
+          repositoryName,
+          isMerging: false,
+          createdAt: new Date('2024-02-02'),
+        });
         await knex('pull_requests').insert({
           number: 123,
           repositoryName,
@@ -74,32 +80,24 @@ describe('PullRequestRepository', function () {
           isMerging: false,
           createdAt: new Date('2024-01-02'),
         });
-        await knex('pull_requests').insert({
-          number: 789,
-          repositoryName,
-          isMerging: false,
-          createdAt: new Date('2024-02-02'),
-        });
 
-        const oldestPR = await pullRequestRepository.getOldest(repositoryName);
-
-        expect(oldestPR.number).to.be.equal(456);
+        const notMergedPullRequests = await pullRequestRepository.findNotMerged(repositoryName);
+        expect(notMergedPullRequests.length).to.be.equal(2);
+        expect(notMergedPullRequests[0].number).to.equal(456);
       });
     });
 
     context('when there are no pr for given repository', function () {
-      it('should return undefined', async function () {
-        const repositoryWithoutPRInMergeQueue = '1024pix/repo-under-test';
+      it('should return empty array', async function () {
         await knex('pull_requests').insert({
           number: 123,
-          repositoryName: '1024pix/another-repo',
+          repositoryName: '1024pix/repo',
           isMerging: false,
           createdAt: new Date('2024-01-01'),
         });
 
-        const oldestPR = await pullRequestRepository.getOldest(repositoryWithoutPRInMergeQueue);
-
-        expect(oldestPR).to.be.undefined;
+        const notMergedPullRequests = await pullRequestRepository.findNotMerged('1024pix/another-repo');
+        expect(notMergedPullRequests).to.be.empty;
       });
     });
   });

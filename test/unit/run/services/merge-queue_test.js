@@ -19,7 +19,7 @@ describe('Unit | Build | Services | merge-queue', function () {
     });
 
     context('when there is no PR in merging', function () {
-      it('should get oldest pull requests, mark as currently merging and trigger auto-merge', async function () {
+      it('should find not merged pull requests, mark latest as currently merging and trigger auto-merge', async function () {
         const repositoryName = 'foo/pix-project';
         const pr = {
           number: 1,
@@ -28,11 +28,11 @@ describe('Unit | Build | Services | merge-queue', function () {
         };
         const pullRequestRepository = {
           isAtLeastOneMergeInProgress: sinon.stub(),
-          getOldest: sinon.stub(),
+          findNotMerged: sinon.stub(),
           update: sinon.stub(),
         };
         pullRequestRepository.isAtLeastOneMergeInProgress.withArgs(repositoryName).resolves(false);
-        pullRequestRepository.getOldest.withArgs(repositoryName).resolves(pr);
+        pullRequestRepository.findNotMerged.withArgs(repositoryName).resolves([pr]);
 
         const githubService = {
           triggerWorkflow: sinon.stub(),
