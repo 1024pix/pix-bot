@@ -604,6 +604,45 @@ describe('Unit | Build | github-test', function () {
     });
   });
 
+  describe('#setMergeQueueStatus', function () {
+    describe('when everything is OK', function () {
+      it('should create the merge queue status', async function () {
+        // given
+        const repositoryFullName = '1024pix/my-repository';
+        const sha = 'my-sha';
+        const prNumber = 1234;
+        const startedAt = new Date();
+
+        const getPullRequestNock = nock('https://api.github.com')
+          .get(`/repos/${repositoryFullName}/pulls/${prNumber}`)
+          .reply(200, { head: { sha } });
+
+        const body = {
+          context: 'merge-queue-status',
+          state: 'pending',
+          description: 'fuu',
+        };
+
+        const createCheckNock = nock('https://api.github.com')
+          .post(`/repos/${repositoryFullName}/statuses/${sha}`, body)
+          .reply(201, { started_at: startedAt });
+
+        // when
+        const result = await githubService.setMergeQueueStatus({
+          repositoryFullName,
+          prNumber,
+          status: 'pending',
+          description: 'fuu',
+        });
+
+        // then
+        expect(result).to.equal(startedAt.toISOString());
+        expect(getPullRequestNock.isDone()).to.be.true;
+        expect(createCheckNock.isDone()).to.be.true;
+      });
+    });
+  });
+
   describe('#addRADeploymentCheck', function () {
     describe('when everything is OK', function () {
       it('should create the check run', async function () {
