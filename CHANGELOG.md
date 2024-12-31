@@ -1,5 +1,18 @@
 # pix-bot Changelog
 
+## v1.109.0 (31/12/2024)
+
+
+### :rocket: Amélioration
+- [#501](https://github.com/1024pix/pix-bot/pull/501) [FEATURE] Indiquer dans les PRs qu'elles sont en cours de merge.
+
+### :building_construction: Tech
+- [#497](https://github.com/1024pix/pix-bot/pull/497) [TECH] Simplifier l'usage de la merge queue.
+
+### :arrow_up: Montée de version
+- [#499](https://github.com/1024pix/pix-bot/pull/499) [BUMP] Lock file maintenance (dossier racine).
+- [#498](https://github.com/1024pix/pix-bot/pull/498) [BUMP] Update dependency scalingo to ^0.10.0 (dossier racine).
+
 ## v1.108.4 (23/12/2024)
 
 
