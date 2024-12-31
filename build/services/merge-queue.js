@@ -1,35 +1,59 @@
 import { config } from '../../config.js';
 
-import * as _pullRequestRepository from '../repositories/pull-request-repository.js';
-import _githubService from '../../common/services/github.js';
+import * as pullRequestRepository from '../repositories/pull-request-repository.js';
+import githubService from '../../common/services/github.js';
 
-export async function mergeQueue({
-  repositoryName,
-  pullRequestRepository = _pullRequestRepository,
-  githubService = _githubService,
-} = {}) {
-  const isAtLeastOneMergeInProgress = await pullRequestRepository.isAtLeastOneMergeInProgress(repositoryName);
-  if (isAtLeastOneMergeInProgress) {
-    return;
+export class MergeQueue {
+  #pullRequestRepository;
+  #githubService;
+
+  constructor({ pullRequestRepository, githubService }) {
+    this.#pullRequestRepository = pullRequestRepository;
+    this.#githubService = githubService;
   }
 
-  const pr = await pullRequestRepository.getOldest(repositoryName);
-  if (!pr) {
-    return;
+  async manage({ repositoryName }) {
+    const isAtLeastOneMergeInProgress = await this.#pullRequestRepository.isAtLeastOneMergeInProgress(repositoryName);
+    if (isAtLeastOneMergeInProgress) {
+      return;
+    }
+
+    const pr = await this.#pullRequestRepository.getOldest(repositoryName);
+    if (!pr) {
+      return;
+    }
+
+    await this.#pullRequestRepository.update({
+      ...pr,
+      isMerging: true,
+    });
+    await this.#githubService.triggerWorkflow({
+      workflow: {
+        id: config.github.automerge.workflowId,
+        repositoryName: config.github.automerge.repositoryName,
+        ref: config.github.automerge.workflowRef,
+      },
+      inputs: {
+        pullRequest: `${pr.repositoryName}/${pr.number}`,
+      },
+    });
   }
 
-  await pullRequestRepository.update({
-    ...pr,
-    isMerging: true,
-  });
-  await githubService.triggerWorkflow({
-    workflow: {
-      id: config.github.automerge.workflowId,
-      repositoryName: config.github.automerge.repositoryName,
-      ref: config.github.automerge.workflowRef,
-    },
-    inputs: {
-      pullRequest: `${pr.repositoryName}/${pr.number}`,
-    },
-  });
+  async managePullRequest({ repositoryName, number }) {
+    await this.#pullRequestRepository.save({
+      repositoryName,
+      number,
+    });
+    await this.manage({ repositoryName });
+  }
+
+  async unmanagePullRequest({ repositoryName, number }) {
+    await this.#pullRequestRepository.remove({
+      repositoryName,
+      number,
+    });
+    await this.manage({ repositoryName });
+  }
 }
+
+export const mergeQueue = new MergeQueue({ pullRequestRepository, githubService });
