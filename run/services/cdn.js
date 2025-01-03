@@ -139,10 +139,12 @@ async function disableRule({ namespaceKey, ruleId }) {
     throw new Error('ruleId cannot be empty.');
   }
 
+  console.log(`${CDN_URL}/configs/custom-static-rules/${ruleId}`);
+
   try {
     await axios.patch(
       `${CDN_URL}/configs/custom-static-rules/${ruleId}`,
-      { enabled: true },
+      { enabled: false },
       {
         headers: {
           'X-Api-Key': config.baleen.pat,
