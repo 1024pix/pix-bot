@@ -1,6 +1,7 @@
 import { config } from '../../../config.js';
 import server from '../../../server.js';
 import { expect, nock, sinon } from '../../test-helper.js';
+import dayjs from 'dayjs';
 
 describe('Acceptance | Run | Security', function () {
   let now;
@@ -103,7 +104,7 @@ describe('Acceptance | Run | Security', function () {
                 {
                   elements: [
                     {
-                      text: `At ${now.toLocaleString()}`,
+                      text: `At ${dayjs(now).format('DD/MM/YYYY HH:mm:ss')}`,
                       type: 'mrkdwn',
                     },
                   ],
@@ -150,7 +151,7 @@ describe('Acceptance | Run | Security', function () {
       });
 
       expect(res.statusCode).to.equal(200);
-      expect(res.result).to.equal(`Règles de blocage ${addedRuleId} mises en place.`);
+      expect(res.result).to.equal(`Règles de blocage mises en place.`);
       expect(nock.isDone()).to.be.true;
     });
   });

@@ -4,27 +4,7 @@ import { config } from '../../config.js';
 import * as cdnServices from '../services/cdn.js';
 import { logger } from '../../common/services/logger.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
-import { Actions, Attachment, Button, Context, Divider, Message, Section } from 'slack-block-builder';
-
-const _buildSlackMessage = function ({ ip, ja3 }) {
-  return {
-    channel: `#${config.slack.blockedAccessesChannel}`,
-    message: 'Règle de blocage mise en place sur Baleen.',
-    attachments: Message()
-      .attachments(
-        Attachment({ color: '#106c1f' })
-          .blocks(
-            Section().fields(`IP`, `${ip}`),
-            Section().fields(`JA3`, `${ja3}`),
-            Context().elements(`At ${new Date().toLocaleString()}`),
-            Divider(),
-            Actions().elements(Button().text('Désactiver').actionId('disable-automatic-rule').danger()),
-          )
-          .fallback('Règle de blocage mise en place sur Baleen.'),
-      )
-      .buildToObject().attachments,
-  };
-};
+import { AutomaticRule } from '../models/AutomaticRule.js';
 
 const securities = {
   async blockAccessOnBaleen(request) {
@@ -64,9 +44,10 @@ const securities = {
     }
 
     try {
-      const result = await cdnServices.blockAccess({ ip, ja3, monitorId });
-      await slackPostMessageService.postMessage(_buildSlackMessage({ ip, ja3 }));
-      return result;
+      const addedRules = await cdnServices.blockAccess({ ip, ja3, monitorId });
+      const automaticRule = new AutomaticRule({ ip, ja3 });
+      await slackPostMessageService.postMessage(automaticRule.getInitialMessage({ addedRules }));
+      return `Règles de blocage mises en place.`;
     } catch (error) {
       if (error instanceof cdnServices.NamespaceNotFoundError) {
         return Boom.badRequest();
