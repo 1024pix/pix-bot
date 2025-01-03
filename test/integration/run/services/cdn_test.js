@@ -53,7 +53,7 @@ function _stubCustomStaticRulePost(namespaceKey, monitorId, ip, ja3) {
         ],
       ],
     })
-    .reply(200);
+    .reply(200, { id: '1234' });
 }
 
 describe('Integration | CDN', function () {
@@ -322,7 +322,7 @@ describe('Integration | CDN', function () {
 
       // then
       postCustomStaticRules.done();
-      expect(result).to.equal('Règle de blocage mise en place.');
+      expect(result).to.deep.equal([{ namespaceKey: 'namespace-key1', ruleId: '1234' }]);
     });
 
     it('should throw an error with statusCode and message', async function () {

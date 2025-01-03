@@ -4,6 +4,8 @@ import { getAppStatusFromScalingo } from '../services/slack/app-status-from-scal
 import * as commands from '../services/slack/commands.js';
 import shortcuts from '../services/slack/shortcuts.js';
 import viewSubmissions from '../services/slack/view-submissions.js';
+import blockActions from '../services/slack/block-actions.js';
+import { AutomaticRule } from '../models/AutomaticRule.js';
 
 function _getDeployStartedMessage(release, appName) {
   return `Commande de déploiement de la release "${release}" pour ${appName} en production bien reçue.`;
@@ -131,6 +133,8 @@ const slack = {
 
     const interactionType = payload.type;
 
+    console.log(JSON.stringify(payload));
+
     switch (interactionType) {
       case 'shortcut':
         if (payload.callback_id === 'deploy-release') {
@@ -156,6 +160,10 @@ const slack = {
         return null;
       case 'view_closed':
       case 'block_actions':
+        if (payload?.actions[0]?.action_id === AutomaticRule.DISABLE) {
+          return blockActions.disableAutomaticRule(payload);
+        }
+        return null;
       default:
         logger.info({ event: 'slack', message: 'This kind of interaction is not yet supported by Pix Bot.' });
         return null;
