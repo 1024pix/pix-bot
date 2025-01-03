@@ -20,7 +20,7 @@ async function postMessage({ message, attachments, channel = '#tech-releases', i
     if (!slackResponse.data.ok) {
       logger.error({
         event: 'slack-post-message',
-        message: `Slack error occured while sending message : ${slackResponse.data.error}`,
+        message: `Slack error occurred while sending message : ${slackResponse.data.error}`,
         stack: `Payload for error was ${JSON.stringify(payload)}`,
       });
     }
