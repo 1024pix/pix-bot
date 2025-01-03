@@ -58,7 +58,7 @@ describe('Unit | Common | Services | Slack | Surfaces | Messages | Post-Message'
       });
       expect(errorLoggerStub).to.have.been.calledOnceWith({
         event: 'slack-post-message',
-        message: 'Slack error occured while sending message : not_in_channel',
+        message: 'Slack error occurred while sending message : not_in_channel',
         stack: 'Payload for error was {"channel":"#mychannel","text":"test message","attachments":{}}',
       });
     });
