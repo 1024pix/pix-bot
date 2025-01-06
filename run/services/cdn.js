@@ -142,7 +142,7 @@ async function disableRule({ namespaceKey, ruleId }) {
   try {
     await axios.patch(
       `${CDN_URL}/configs/custom-static-rules/${ruleId}`,
-      { enabled: true },
+      { enabled: false },
       {
         headers: {
           'X-Api-Key': config.baleen.pat,
@@ -158,4 +158,4 @@ async function disableRule({ namespaceKey, ruleId }) {
   }
 }
 
-export { blockAccess, disableRule, invalidateCdnCache, NamespaceNotFoundError };
+export default { blockAccess, disableRule, invalidateCdnCache, NamespaceNotFoundError };
