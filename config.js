@@ -189,6 +189,7 @@ const configuration = (function () {
     config.baleen.protectedFrontApps = ['Pix_Test'];
 
     config.slack.blockedAccessesChannelId = 'C08700JG7QU';
+    config.slack.botToken = 'fakeToken';
 
     config.datadog.token = 'token';
 
