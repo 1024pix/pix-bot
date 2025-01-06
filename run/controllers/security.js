@@ -1,7 +1,7 @@
 import Boom from '@hapi/boom';
 
 import { config } from '../../config.js';
-import * as cdnServices from '../services/cdn.js';
+import cdnService from '../services/cdn.js';
 import { logger } from '../../common/services/logger.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
 import { AutomaticRule } from '../models/AutomaticRule.js';
@@ -44,12 +44,12 @@ const securities = {
     }
 
     try {
-      const addedRules = await cdnServices.blockAccess({ ip, ja3, monitorId });
+      const addedRules = await cdnService.blockAccess({ ip, ja3, monitorId });
       const automaticRule = new AutomaticRule({ ip, ja3 });
       await slackPostMessageService.postMessage(automaticRule.getInitialMessage({ addedRules }));
       return `Règles de blocage mises en place.`;
     } catch (error) {
-      if (error instanceof cdnServices.NamespaceNotFoundError) {
+      if (error instanceof cdnService.NamespaceNotFoundError) {
         return Boom.badRequest();
       }
       return error;

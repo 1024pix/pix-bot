@@ -1,7 +1,7 @@
 import { describe, it } from 'mocha';
 
 import { config } from '../../../../config.js';
-import * as cdn from '../../../../run/services/cdn.js';
+import cdnService from '../../../../run/services/cdn.js';
 import { catchErr, expect, nock } from '../../../test-helper.js';
 
 function _stubAccountDetails(namespace) {
@@ -83,7 +83,7 @@ describe('Integration | CDN', function () {
       const postInvalidationCache = _stubInvalidationCachePost(namespaceKey);
 
       // when
-      const result = await cdn.invalidateCdnCache(applicationName);
+      const result = await cdnService.invalidateCdnCache(applicationName);
 
       // then
       postInvalidationCache.done();
@@ -100,7 +100,7 @@ describe('Integration | CDN', function () {
       _stubInvalidationCachePost(namespaceKey);
 
       // when
-      await cdn.invalidateCdnCache(applicationName);
+      await cdnService.invalidateCdnCache(applicationName);
 
       // then
       getAccountDetails.done();
@@ -119,10 +119,10 @@ describe('Integration | CDN', function () {
           _stubInvalidationCachePost(namespaceKey);
 
           // when
-          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
 
           // then
-          expect(result).to.be.instanceOf(cdn.NamespaceNotFoundError);
+          expect(result).to.be.instanceOf(cdnService.NamespaceNotFoundError);
           expect(result.message).to.be.equal('A namespace could not been found.');
         });
       });
@@ -160,7 +160,7 @@ describe('Integration | CDN', function () {
             });
 
           // when
-          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
 
           // then
           const expected =
@@ -200,7 +200,7 @@ describe('Integration | CDN', function () {
             });
 
           // when
-          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
 
           // then
           const expected =
@@ -235,7 +235,7 @@ describe('Integration | CDN', function () {
             });
 
           // when
-          const result = await catchErr(cdn.invalidateCdnCache)(applicationName);
+          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
 
           // then
           const expected =
@@ -254,7 +254,7 @@ describe('Integration | CDN', function () {
         const monitorId = 'monitorId';
 
         // when
-        const error = await catchErr(cdn.blockAccess)({ ja3, monitorId });
+        const error = await catchErr(cdnService.blockAccess)({ ja3, monitorId });
 
         // then
         expect(error.message).to.equal('ip cannot be empty.');
@@ -269,7 +269,7 @@ describe('Integration | CDN', function () {
         const monitorId = 'monitorId';
 
         // when
-        const error = await catchErr(cdn.blockAccess)({ ip, ja3, monitorId });
+        const error = await catchErr(cdnService.blockAccess)({ ip, ja3, monitorId });
 
         // then
         expect(error.message).to.equal('ip cannot be empty.');
@@ -283,7 +283,7 @@ describe('Integration | CDN', function () {
         const monitorId = 'monitorId';
 
         // when
-        const error = await catchErr(cdn.blockAccess)({ ip, monitorId });
+        const error = await catchErr(cdnService.blockAccess)({ ip, monitorId });
 
         // then
         expect(error.message).to.equal('ja3 cannot be empty.');
@@ -298,7 +298,7 @@ describe('Integration | CDN', function () {
         const monitorId = 'monitorId';
 
         // when
-        const error = await catchErr(cdn.blockAccess)({ ip, ja3, monitorId });
+        const error = await catchErr(cdnService.blockAccess)({ ip, ja3, monitorId });
 
         // then
         expect(error.message).to.equal('ja3 cannot be empty.');
@@ -318,7 +318,7 @@ describe('Integration | CDN', function () {
       const postCustomStaticRules = _stubCustomStaticRulePost(namespaceKey, monitorId, ip, ja3);
 
       // when
-      const result = await cdn.blockAccess({ ip, ja3, monitorId });
+      const result = await cdnService.blockAccess({ ip, ja3, monitorId });
 
       // then
       postCustomStaticRules.done();
@@ -365,7 +365,7 @@ describe('Integration | CDN', function () {
         });
 
       // when
-      const result = await catchErr(cdn.blockAccess)({ monitorId, ip, ja3 });
+      const result = await catchErr(cdnService.blockAccess)({ monitorId, ip, ja3 });
 
       // then
       const expected =
