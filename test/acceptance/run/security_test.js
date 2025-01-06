@@ -69,7 +69,7 @@ describe('Acceptance | Run | Security', function () {
         },
       })
         .post('/api/chat.postMessage', {
-          channel: `#${config.slack.blockedAccessesChannel}`,
+          channel: `${config.slack.blockedAccessesChannelId}`,
           text: 'Règle de blocage mise en place sur Baleen.',
           attachments: [
             {

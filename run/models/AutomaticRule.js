@@ -17,7 +17,7 @@ export class AutomaticRule {
 
   #buildMessage({ isActive, addedRules }) {
     return {
-      channel: `#${config.slack.blockedAccessesChannel}`,
+      channel: `${config.slack.blockedAccessesChannelId}`,
       message: 'Règle de blocage mise en place sur Baleen.',
       attachments: Message()
         .attachments(

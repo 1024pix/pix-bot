@@ -97,7 +97,7 @@ const configuration = (function () {
       requestSigningSecret: process.env.SLACK_SIGNING_SECRET || 'slack-super-signing-secret',
       botToken: process.env.SLACK_BOT_TOKEN,
       webhookUrlForReporting: process.env.SLACK_WEBHOOK_URL_FOR_REPORTING,
-      blockedAccessesChannel: process.env.SLACK_BLOCKED_ACCESSES_CHANNEL,
+      blockedAccessesChannelId: process.env.SLACK_BLOCKED_ACCESSES_CHANNEL_ID,
     },
 
     github: {
@@ -188,7 +188,7 @@ const configuration = (function () {
     config.baleen.appNamespaces = _getJSON('{"Pix_Test":"Pix_Namespace","Pix_Test_2":"Pix Namespace 2"}');
     config.baleen.protectedFrontApps = ['Pix_Test'];
 
-    config.slack.blockedAccessesChannel = 'blocked-accesses-channel';
+    config.slack.blockedAccessesChannelId = 'C08700JG7QU';
 
     config.datadog.token = 'token';
 
