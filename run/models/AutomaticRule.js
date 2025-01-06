@@ -11,8 +11,33 @@ export class AutomaticRule {
     this.date = date;
   }
 
+  static parseMessage(message) {
+    const messageObject = message;
+
+    const ip = messageObject.attachments[0]?.blocks[0]?.fields[1]?.text;
+    if (!ip) {
+      throw new Error('IP field not found.');
+    }
+
+    const ja3 = messageObject.attachments[0]?.blocks[1]?.fields[1]?.text;
+    if (!ja3) {
+      throw new Error('JA3 field not found.');
+    }
+
+    const date = messageObject.attachments[0]?.blocks[2]?.elements[0]?.text?.slice(3);
+    if (!date) {
+      throw new Error('Date field not found.');
+    }
+
+    return new AutomaticRule({ ip, ja3, date: dayjs(date) });
+  }
+
   getInitialMessage({ addedRules }) {
     return this.#buildMessage({ isActive: true, addedRules });
+  }
+
+  getDeactivatedMessage() {
+    return this.#buildMessage({ isActive: false });
   }
 
   #buildMessage({ isActive, addedRules }) {
