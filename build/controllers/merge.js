@@ -1,4 +1,4 @@
-import { mergeQueue } from '../services/merge-queue.js';
+import { MERGE_STATUS, mergeQueue } from '../services/merge-queue.js';
 import { config } from '../../config.js';
 import Boom from '@hapi/boom';
 
@@ -12,7 +12,11 @@ const mergeController = {
     const { pullRequest } = request.payload;
     const [organisation, repository, pullRequestNumber] = pullRequest.split('/');
     const repositoryName = `${organisation}/${repository}`;
-    await dependencies.mergeQueue.unmanagePullRequest({ repositoryName, number: Number(pullRequestNumber) });
+    await dependencies.mergeQueue.unmanagePullRequest({
+      repositoryName,
+      number: Number(pullRequestNumber),
+      status: MERGE_STATUS.ERROR,
+    });
     return h.response().code(204);
   },
 };

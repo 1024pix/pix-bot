@@ -150,12 +150,19 @@ describe('Unit | Build | Services | merge-queue', function () {
       expect(githubService.setMergeQueueStatus).to.have.been.calledOnce;
     });
 
-
     const testCases = [
-      { status: MERGE_STATUS.MERGED, checkDescription: MERGE_STATUS_DETAILS.MERGED.description, checkStatus: 'success' },
+      {
+        status: MERGE_STATUS.MERGED,
+        checkDescription: MERGE_STATUS_DETAILS.MERGED.description,
+        checkStatus: 'success',
+      },
       { status: MERGE_STATUS.ERROR, checkDescription: MERGE_STATUS_DETAILS.ERROR.description, checkStatus: 'error' },
-      { status: MERGE_STATUS.ABORTED, checkDescription: MERGE_STATUS_DETAILS.ABORTED.description, checkStatus: 'success' },
-    ]
+      {
+        status: MERGE_STATUS.ABORTED,
+        checkDescription: MERGE_STATUS_DETAILS.ABORTED.description,
+        checkStatus: 'success',
+      },
+    ];
 
     testCases.forEach((testCase) => {
       it(`should update check status when pr status is '${testCase.status}'`, async function () {

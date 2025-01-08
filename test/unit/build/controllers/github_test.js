@@ -5,6 +5,7 @@ import url from 'node:url';
 import * as githubController from '../../../../build/controllers/github.js';
 import { config } from '../../../../config.js';
 import { catchErr, expect, sinon } from '../../../test-helper.js';
+import { MERGE_STATUS } from '../../../../build/services/merge-queue.js';
 
 describe('Unit | Controller | Github', function () {
   describe('#getMessageTemplate', function () {
@@ -262,12 +263,13 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
                 number: 123,
                 repositoryName: repositoryName,
+                status: MERGE_STATUS.ABORTED,
               });
             });
           });
         });
 
-        describe('when action is `closed`', function () {
+        describe('when action is `closed` and pr is not merged', function () {
           it('should call pullRequestRepository.remove() method', async function () {
             // given
             const repositoryName = '1024pix/pix-sample-repo';
@@ -275,6 +277,9 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               action: 'closed',
               number: 123,
               repository: { full_name: repositoryName },
+              pull_request: {
+                merged: false,
+              },
             });
 
             const handleCloseRA = sinon.stub();
@@ -287,6 +292,36 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
               number: 123,
               repositoryName,
+              status: MERGE_STATUS.ABORTED,
+            });
+            expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
+          });
+        });
+
+        describe('when action is `closed` and pr is merged', function () {
+          it('should call pullRequestRepository.remove() method', async function () {
+            // given
+            const repositoryName = '1024pix/pix-sample-repo';
+            sinon.stub(request, 'payload').value({
+              action: 'closed',
+              number: 123,
+              repository: { full_name: repositoryName },
+              pull_request: {
+                merged: true,
+              },
+            });
+
+            const handleCloseRA = sinon.stub();
+            const mergeQueue = { unmanagePullRequest: sinon.stub() };
+
+            // when
+            await githubController.processWebhook(request, { handleCloseRA, mergeQueue });
+
+            // then
+            expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
+              number: 123,
+              repositoryName,
+              status: MERGE_STATUS.MERGED,
             });
             expect(handleCloseRA.calledOnceWithExactly(request)).to.be.true;
           });
@@ -328,6 +363,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
               number: 123,
               repositoryName,
+              status: MERGE_STATUS.ABORTED,
             });
           });
         });

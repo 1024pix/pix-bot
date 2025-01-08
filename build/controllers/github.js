@@ -7,7 +7,7 @@ import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 import * as reviewAppRepo from '../repositories/review-app-repository.js';
-import { mergeQueue as _mergeQueue } from '../services/merge-queue.js';
+import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
 const repositoryToScalingoAppsReview = {
   'pix-api-data': ['pix-api-data-integration'],
@@ -260,7 +260,9 @@ async function processWebhook(
     }
     if (request.payload.action === 'closed') {
       const repositoryName = request.payload.repository.full_name;
-      await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number });
+      const isMerged = request.payload.pull_request.merged;
+      const status = isMerged ? MERGE_STATUS.MERGED : MERGE_STATUS.ABORTED;
+      await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number, status });
       return handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
@@ -279,7 +281,11 @@ async function processWebhook(
     }
     if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       const repositoryName = request.payload.repository.full_name;
-      await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number });
+      await mergeQueue.unmanagePullRequest({
+        repositoryName,
+        number: request.payload.number,
+        status: MERGE_STATUS.ABORTED,
+      });
     }
     return `Ignoring ${request.payload.action} action`;
   } else if (eventName === 'check_suite') {
@@ -292,7 +298,7 @@ async function processWebhook(
 
       const prNumber = request.payload.check_suite.pull_requests[0].number;
       if (request.payload.check_suite.conclusion !== 'success') {
-        await mergeQueue.unmanagePullRequest({ repositoryName, number: prNumber });
+        await mergeQueue.unmanagePullRequest({ repositoryName, number: prNumber, status: MERGE_STATUS.ABORTED });
       } else {
         const hasReadyToMergeLabel = await githubService.isPrLabelledWith({
           repositoryName,
