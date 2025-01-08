@@ -3,6 +3,18 @@ import { config } from '../../config.js';
 import * as pullRequestRepository from '../repositories/pull-request-repository.js';
 import githubService from '../../common/services/github.js';
 
+export const MERGE_STATUS = {
+  ABORTED: 'ABORTED',
+  ERROR: 'ERROR',
+  MERGED: 'MERGED',
+};
+
+export const MERGE_STATUS_DETAILS = {
+  ABORTED: { description: 'Merge plus géré', checkStatus: 'success' },
+  ERROR: { description: 'Error, merci de visiter la liste des essais', checkStatus: 'error' },
+  MERGED: { description: '', checkStatus: 'success' },
+};
+
 export class MergeQueue {
   #pullRequestRepository;
   #githubService;
@@ -64,7 +76,15 @@ export class MergeQueue {
     await this.manage({ repositoryName });
   }
 
-  async unmanagePullRequest({ repositoryName, number }) {
+  async unmanagePullRequest({ repositoryName, number, status }) {
+    const statusDetails = MERGE_STATUS_DETAILS[status];
+    await this.#githubService.setMergeQueueStatus({
+      status: statusDetails.checkStatus,
+      description: statusDetails.description,
+      repositoryFullName: repositoryName,
+      prNumber: number,
+    });
+
     await this.#pullRequestRepository.remove({
       repositoryName,
       number,
