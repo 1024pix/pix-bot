@@ -621,6 +621,7 @@ describe('Unit | Build | github-test', function () {
           context: 'merge-queue-status',
           state: 'pending',
           description: 'fuu',
+          target_url: 'https://github.com/1024pix/pix-actions/actions/workflows/auto-merge-dispatch.yml',
         };
 
         const createCheckNock = nock('https://api.github.com')

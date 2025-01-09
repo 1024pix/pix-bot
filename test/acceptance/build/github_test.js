@@ -66,6 +66,17 @@ describe('Acceptance | Build | Github', function () {
         .reply(returnCode);
     }
 
+    function getMergeCheckStatusNock({ repositoryFullName }) {
+      const prHeadCommit = 'sha1';
+      nock('https://api.github.com')
+        .get(`/repos/1024pix/pix/pulls/123`)
+        .reply(200, { head: { sha: prHeadCommit } });
+
+      return nock('https://api.github.com')
+        .post(`/repos/${repositoryFullName}/statuses/${prHeadCommit}`)
+        .reply(201, { started_at: '2024-01-01' });
+    }
+
     let body;
 
     ['opened', 'reopened'].forEach((action) => {
@@ -556,8 +567,11 @@ describe('Acceptance | Build | Github', function () {
                 fork: false,
               },
             },
+            merged: false,
           },
         };
+
+        getMergeCheckStatusNock({ repositoryFullName: body.repository.full_name });
 
         // when
         const response = await server.inject({
@@ -682,14 +696,7 @@ describe('Acceptance | Build | Github', function () {
             })
             .reply(200, {});
 
-          const prHeadCommit = 'aaaa';
-          const getPullRequestNock = nock('https://api.github.com')
-            .get(`/repos/1024pix/pix/pulls/123`)
-            .reply(200, { head: { sha: prHeadCommit } });
-
-          const createCheckNock = nock('https://api.github.com')
-            .post(`/repos/${body.repository.full_name}/statuses/${prHeadCommit}`)
-            .reply(201, { started_at: '2024-01-01' });
+          const mergeCheckNock = getMergeCheckStatusNock({ repositoryFullName: body.repository.full_name });
 
           const response = await server.inject({
             method: 'POST',
@@ -703,8 +710,7 @@ describe('Acceptance | Build | Github', function () {
 
           expect(checkUserBelongsToPixNock.isDone()).to.be.true;
           expect(callGitHubAction.isDone()).to.be.true;
-          expect(getPullRequestNock.isDone()).to.be.true;
-          expect(createCheckNock.isDone()).to.be.true;
+          expect(mergeCheckNock.isDone()).to.be.true;
           expect(response.statusCode).equal(200);
         });
 
@@ -1059,6 +1065,7 @@ describe('Acceptance | Build | Github', function () {
               ],
             },
           };
+          getMergeCheckStatusNock({ repositoryFullName: body.repository.full_name });
 
           const response = await server.inject({
             method: 'POST',

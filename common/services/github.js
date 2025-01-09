@@ -359,7 +359,7 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
-async function createCommitStatus({ context, repo, pull_number, description, state }) {
+async function createCommitStatus({ context, repo, pull_number, description, state, target_url }) {
   const owner = '1024pix';
   const octokit = _createOctokit();
 
@@ -373,6 +373,7 @@ async function createCommitStatus({ context, repo, pull_number, description, sta
     repo,
     sha,
     state,
+    target_url,
   });
 
   const startedAt = response.data.started_at;
@@ -389,6 +390,7 @@ async function setMergeQueueStatus({ repositoryFullName, prNumber, status, descr
     pull_number: prNumber,
     state: status,
     description,
+    target_url: 'https://github.com/1024pix/pix-actions/actions/workflows/auto-merge-dispatch.yml',
   });
 }
 
