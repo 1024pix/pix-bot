@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.110.0 (09/01/2025)
+
+
+### :rocket: Amélioration
+- [#502](https://github.com/1024pix/pix-bot/pull/502) [FEATURE] Mettre à jour le check de commit lorsqu'une PR n'est plus managée par la merge queue.
+
 ## v1.109.0 (31/12/2024)
 
 
