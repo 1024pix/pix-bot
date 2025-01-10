@@ -2,15 +2,17 @@ import { config } from '../../../../../config.js';
 import { httpAgent } from '../../../../http-agent.js';
 import { logger } from '../../../logger.js';
 
-async function postMessage({ message, attachments, channel = '#tech-releases', injectedHttpAgent = httpAgent }) {
-  const url = 'https://slack.com/api/chat.postMessage';
+async function updateMessage({ message, ts, attachments, channel = '#tech-releases', injectedHttpAgent = httpAgent }) {
+  const url = 'https://slack.com/api/chat.update';
 
   const headers = {
     'content-type': 'application/json',
     authorization: `Bearer ${config.slack.botToken}`,
   };
   const payload = {
-    channel: channel,
+    channel,
+    ts,
+    as_user: true,
     text: message,
     attachments: attachments,
   };
@@ -19,7 +21,7 @@ async function postMessage({ message, attachments, channel = '#tech-releases', i
   if (slackResponse.isSuccessful) {
     if (!slackResponse.data.ok) {
       logger.error({
-        event: 'slack-post-message',
+        event: 'slack-update-message',
         message: `Slack error occurred while sending message : ${slackResponse.data.error}`,
         stack: `Payload for error was ${JSON.stringify(payload)}`,
       });
@@ -27,4 +29,4 @@ async function postMessage({ message, attachments, channel = '#tech-releases', i
   }
 }
 
-export default { postMessage };
+export default { updateMessage };

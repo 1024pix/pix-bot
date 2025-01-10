@@ -92,9 +92,10 @@ async function blockAccess({ ip, ja3, monitorId }) {
 
   const namespaceKeys = await _getNamespaceKey(config.baleen.protectedFrontApps);
 
+  const addedRules = [];
   for (const namespaceKey of namespaceKeys) {
     try {
-      await axios.post(
+      const response = await axios.post(
         `${CDN_URL}/configs/custom-static-rules`,
         {
           category: 'block',
@@ -117,6 +118,8 @@ async function blockAccess({ ip, ja3, monitorId }) {
           },
         },
       );
+
+      addedRules.push({ namespaceKey, ruleId: response.data.id });
     } catch (error) {
       const cdnResponseMessage = JSON.stringify(error.response.data);
       const message = `Request failed with status code ${error.response.status} and message ${cdnResponseMessage}`;
@@ -124,7 +127,35 @@ async function blockAccess({ ip, ja3, monitorId }) {
     }
   }
 
-  return `Règle de blocage mise en place.`;
+  return addedRules;
 }
 
-export { blockAccess, invalidateCdnCache, NamespaceNotFoundError };
+async function disableRule({ namespaceKey, ruleId }) {
+  if (!namespaceKey || namespaceKey === '') {
+    throw new Error('namespaceKey cannot be empty.');
+  }
+
+  if (!ruleId || ruleId === '') {
+    throw new Error('ruleId cannot be empty.');
+  }
+
+  try {
+    await axios.patch(
+      `${CDN_URL}/configs/custom-static-rules/${ruleId}`,
+      { enabled: false },
+      {
+        headers: {
+          'X-Api-Key': config.baleen.pat,
+          'Content-type': 'application/json',
+          Cookie: `baleen-namespace=${namespaceKey}`,
+        },
+      },
+    );
+  } catch (error) {
+    const cdnResponseMessage = JSON.stringify(error.response.data);
+    const message = `Request failed with status code ${error.response.status} and message ${cdnResponseMessage}`;
+    throw new Error(message);
+  }
+}
+
+export default { blockAccess, disableRule, invalidateCdnCache, NamespaceNotFoundError };

@@ -1,6 +1,7 @@
 import { config } from '../../../config.js';
 import server from '../../../server.js';
 import { expect, nock, sinon } from '../../test-helper.js';
+import dayjs from 'dayjs';
 
 describe('Acceptance | Run | Security', function () {
   let now;
@@ -23,6 +24,7 @@ describe('Acceptance | Run | Security', function () {
       const monitorId = '1234';
       const ip = '127.0.0.1';
       const ja3 = '9709730930';
+      const addedRuleId = 'aa1c6158-9512-4e56-a93e-cc8c4de9bc23';
 
       nock('https://console.baleen.cloud/api', {
         reqheaders: {
@@ -58,7 +60,7 @@ describe('Acceptance | Run | Security', function () {
             ],
           ],
         })
-        .reply(200);
+        .reply(200, { id: addedRuleId });
 
       nock('https://slack.com', {
         reqheaders: {
@@ -67,7 +69,7 @@ describe('Acceptance | Run | Security', function () {
         },
       })
         .post('/api/chat.postMessage', {
-          channel: `#${config.slack.blockedAccessesChannel}`,
+          channel: `${config.slack.blockedAccessesChannelId}`,
           text: 'Règle de blocage mise en place sur Baleen.',
           attachments: [
             {
@@ -102,11 +104,29 @@ describe('Acceptance | Run | Security', function () {
                 {
                   elements: [
                     {
-                      text: `At ${now.toLocaleString()}`,
+                      text: `At ${dayjs(now).format('DD/MM/YYYY HH:mm:ss')}`,
                       type: 'mrkdwn',
                     },
                   ],
                   type: 'context',
+                },
+                {
+                  type: 'divider',
+                },
+                {
+                  elements: [
+                    {
+                      text: {
+                        type: 'plain_text',
+                        text: 'Désactiver',
+                      },
+                      action_id: 'disable-automatic-rule',
+                      style: 'danger',
+                      type: 'button',
+                      value: '[{"namespaceKey":"namespace-key1","ruleId":"aa1c6158-9512-4e56-a93e-cc8c4de9bc23"}]',
+                    },
+                  ],
+                  type: 'actions',
                 },
               ],
               fallback: 'Règle de blocage mise en place sur Baleen.',
@@ -131,7 +151,7 @@ describe('Acceptance | Run | Security', function () {
       });
 
       expect(res.statusCode).to.equal(200);
-      expect(res.result).to.eql('Règle de blocage mise en place.');
+      expect(res.result).to.equal(`Règles de blocage mises en place.`);
       expect(nock.isDone()).to.be.true;
     });
   });

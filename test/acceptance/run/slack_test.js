@@ -5,8 +5,12 @@ import {
   nock,
   nockGithubWithConfigChanges,
   nockGithubWithNoConfigChanges,
+  sinon,
   StatusCodes,
 } from '../../test-helper.js';
+import dayjs from 'dayjs';
+import { config } from '../../../config.js';
+import { AutomaticRule } from '../../../run/models/AutomaticRule.js';
 
 describe('Acceptance | Run | Slack', function () {
   describe('POST /run/slack/interactive-endpoint', function () {
@@ -451,6 +455,125 @@ describe('Acceptance | Run | Slack', function () {
             },
           });
         });
+      });
+    });
+
+    describe('when using the block action disable-automatic-rule', function () {
+      let clock;
+      let now;
+
+      beforeEach(function () {
+        now = new Date('2024-01-01');
+        clock = sinon.useFakeTimers({ now, toFake: ['Date'] });
+      });
+
+      afterEach(function () {
+        clock.restore();
+      });
+
+      it('should disable rule in CDN and update slack message', async function () {
+        // given
+        const ip = '127.0.0.1';
+        const ja3 = '9709730930';
+        const date = dayjs(now);
+        const rules = [
+          { namespaceKey: 'namespaceKey1', ruleId: 'ruleId1' },
+          { namespaceKey: 'namespaceKey2', ruleId: 'ruleId2' },
+        ];
+        const messageTimestamp = '1735836582.877169';
+
+        const body = {
+          type: 'block_actions',
+          message: {
+            ts: messageTimestamp,
+            attachments: [
+              {
+                blocks: [
+                  { fields: [{ text: 'IP' }, { text: ip }] },
+                  { fields: [{ text: 'JA3' }, { text: ja3 }] },
+                  { elements: [{ text: `At ${date.format('DD/MM/YYYY HH:mm:ss')}` }] },
+                ],
+              },
+            ],
+          },
+          actions: [
+            {
+              action_id: AutomaticRule.DISABLE,
+              value: JSON.stringify(rules),
+            },
+          ],
+        };
+
+        for (const rule of rules) {
+          nock('https://console.baleen.cloud/api', {
+            reqheaders: {
+              'X-Api-Key': config.baleen.pat,
+              'Content-type': 'application/json',
+              Cookie: `baleen-namespace=${rule.namespaceKey}`,
+            },
+          })
+            .patch(`/configs/custom-static-rules/${rule.ruleId}`, {
+              enabled: false,
+            })
+            .reply(200);
+        }
+
+        nock('https://slack.com', {
+          reqheaders: {
+            'Content-type': 'application/json',
+            Authorization: 'Bearer fakeToken',
+          },
+        })
+          .post(`/api/chat.update`, {
+            channel: 'C08700JG7QU',
+            ts: '1735836582.877169',
+            as_user: true,
+            text: 'Règle de blocage mise en place sur Baleen.',
+            attachments: [
+              {
+                color: '#106c1f',
+                blocks: [
+                  {
+                    fields: [
+                      { type: 'mrkdwn', text: 'IP' },
+                      { type: 'mrkdwn', text: '127.0.0.1' },
+                    ],
+                    type: 'section',
+                  },
+                  {
+                    fields: [
+                      { type: 'mrkdwn', text: 'JA3' },
+                      { type: 'mrkdwn', text: '9709730930' },
+                    ],
+                    type: 'section',
+                  },
+                  { elements: [{ type: 'mrkdwn', text: `At ${date.format('DD/MM/YYYY HH:mm:ss')}` }], type: 'context' },
+                  { type: 'divider' },
+                  {
+                    fields: [
+                      { type: 'mrkdwn', text: 'Règle désactivée le' },
+                      { type: 'mrkdwn', text: date.format('DD/MM/YYYY HH:mm:ss') },
+                    ],
+                    type: 'section',
+                  },
+                ],
+                fallback: 'Règle de blocage mise en place sur Baleen.',
+              },
+            ],
+          })
+          .reply(200);
+
+        // when
+        const res = await server.inject({
+          method: 'POST',
+          url: '/run/slack/interactive-endpoint',
+          headers: createSlackWebhookSignatureHeaders(JSON.stringify(body)),
+          payload: body,
+        });
+
+        // then
+        expect(res.statusCode).to.equal(200);
+        expect(nock.isDone()).to.be.true;
       });
     });
   });
