@@ -1,5 +1,7 @@
 import { knex } from '../../db/knex-database-connection.js';
 
+class PullRequestNotFoundError extends Error {}
+
 async function save({ number, repositoryName }) {
   return knex('pull_requests').insert({ number, repositoryName }).onConflict().ignore();
 }
@@ -24,4 +26,12 @@ async function remove({ number, repositoryName }) {
   await knex('pull_requests').where({ number, repositoryName }).delete();
 }
 
-export { save, isAtLeastOneMergeInProgress, findNotMerged, update, remove };
+async function get({ number, repositoryName }) {
+  const pullRequest = await knex('pull_requests').where({ number, repositoryName }).first();
+  if (pullRequest === undefined) {
+    throw new PullRequestNotFoundError();
+  }
+  return pullRequest;
+}
+
+export { save, isAtLeastOneMergeInProgress, findNotMerged, update, remove, get, PullRequestNotFoundError };
