@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.110.1 (10/01/2025)
+
+
+### :bug: Correction
+- [#503](https://github.com/1024pix/pix-bot/pull/503) [BUGFIX] Ajouter des checks de commit à propos du status de merge uniquement sur les PR dans la file de merge.
+
 ## v1.110.0 (09/01/2025)
 
 
