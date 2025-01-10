@@ -2,6 +2,7 @@ import { config } from '../../config.js';
 
 import * as pullRequestRepository from '../repositories/pull-request-repository.js';
 import githubService from '../../common/services/github.js';
+import { PullRequestNotFoundError } from '../repositories/pull-request-repository.js';
 
 export const MERGE_STATUS = {
   ABORTED: 'ABORTED',
@@ -77,6 +78,9 @@ export class MergeQueue {
   }
 
   async unmanagePullRequest({ repositoryName, number, status }) {
+    if (!(await this.pullRequestIsManaged({ repositoryName, number }))) {
+      return;
+    }
     const statusDetails = MERGE_STATUS_DETAILS[status];
     await this.#githubService.setMergeQueueStatus({
       status: statusDetails.checkStatus,
@@ -90,6 +94,18 @@ export class MergeQueue {
       number,
     });
     await this.manage({ repositoryName });
+  }
+
+  async pullRequestIsManaged({ repositoryName, number }) {
+    try {
+      await this.#pullRequestRepository.get({ repositoryName, number });
+      return true;
+    } catch (e) {
+      if (e instanceof PullRequestNotFoundError) {
+        return false;
+      }
+      throw e;
+    }
   }
 }
 
