@@ -1,7 +1,7 @@
 import Boom from '@hapi/boom';
 
 import { config } from '../../config.js';
-import * as cdnServices from '../services/cdn.js';
+import cdnService from '../services/cdn.js';
 
 const applications = {
   async invalidateCdnCache(request) {
@@ -10,9 +10,9 @@ const applications = {
     }
 
     try {
-      return await cdnServices.invalidateCdnCache(request.params.name);
+      return await cdnService.invalidateCdnCache(request.params.name);
     } catch (error) {
-      if (error instanceof cdnServices.NamespaceNotFoundError) {
+      if (error instanceof cdnService.NamespaceNotFoundError) {
         return Boom.badRequest();
       }
       return error;
