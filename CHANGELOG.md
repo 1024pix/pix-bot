@@ -1,5 +1,19 @@
 # pix-bot Changelog
 
+## v1.111.0 (28/01/2025)
+
+
+### :rocket: Amélioration
+- [#500](https://github.com/1024pix/pix-bot/pull/500) [FEATURE] Ajouter un bouton permettant de désactiver une règle de blocage auprès du CDN.
+- [#511](https://github.com/1024pix/pix-bot/pull/511) [FEATURE] Envoyer le commentaire de déploiement des RAs sur les PRs quelque soit leur état.
+
+### :arrow_up: Montée de version
+- [#510](https://github.com/1024pix/pix-bot/pull/510) [BUMP] Update Node.js to v22.13.1.
+- [#509](https://github.com/1024pix/pix-bot/pull/509) [BUMP] Lock file maintenance (dossier racine).
+- [#507](https://github.com/1024pix/pix-bot/pull/507) [BUMP] Lock file maintenance (dossier racine).
+- [#506](https://github.com/1024pix/pix-bot/pull/506) [BUMP] Update dependency scalingo to ^0.11.0 (dossier racine).
+- [#504](https://github.com/1024pix/pix-bot/pull/504) [BUMP] Update Node.js to v22.13.0.
+
 ## v1.110.1 (10/01/2025)
 
 
