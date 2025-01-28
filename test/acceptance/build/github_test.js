@@ -535,7 +535,7 @@ describe('Acceptance | Build | Github', function () {
           expect(addRADeploymentCheck.isDone()).to.be.true;
           expect(res.statusCode).to.equal(200);
           expect(res.result).to.eql(
-            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review with pr 2',
+            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 2',
           );
         });
       });
