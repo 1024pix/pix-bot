@@ -662,24 +662,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         });
       });
 
-      it('throws an error on scalingo deployment fails', async function () {
-        // given
-        const scalingoClientStub = sinon.stub();
-        const deployUsingSCMStub = sinon.stub().rejects(new Error('Deployment error'));
-        const reviewAppExistsStub = sinon.stub().resolves(true);
-        scalingoClientStub.getInstance = sinon.stub().returns({
-          deployUsingSCM: deployUsingSCMStub,
-          reviewAppExists: reviewAppExistsStub,
-        });
-
-        // when
-        const result = await catchErr(githubController.handleRA)(request, scalingoClientStub);
-
-        // then
-        expect(result).to.be.instanceOf(Error);
-        expect(result.message).to.equal('No RA deployed for repository pix and pr3');
-      });
-
       describe('when the review app does not exist', function () {
         it('should call scalingo to create and deploy the corresponding applications', async function () {
           // given

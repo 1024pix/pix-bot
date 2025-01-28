@@ -165,6 +165,7 @@ async function deployPullRequest(
     const reviewAppName = `${appName}-pr${prId}`;
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
+      deployedRA.push({ name: appName, isCreated: !reviewAppExists });
       if (reviewAppExists) {
         await client.deployUsingSCM(reviewAppName, ref);
       } else {
@@ -173,7 +174,6 @@ async function deployPullRequest(
         await client.disableAutoDeploy(reviewAppName);
         await client.deployUsingSCM(reviewAppName, ref);
       }
-      deployedRA.push({ name: appName, isCreated: !reviewAppExists });
     } catch (error) {
       logger.error({
         event: 'review-app',
