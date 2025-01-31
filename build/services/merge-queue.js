@@ -3,6 +3,7 @@ import { config } from '../../config.js';
 import * as pullRequestRepository from '../repositories/pull-request-repository.js';
 import githubService from '../../common/services/github.js';
 import { PullRequestNotFoundError } from '../repositories/pull-request-repository.js';
+import { logger } from '../../common/services/logger.js';
 
 export const MERGE_STATUS = {
   ABORTED: 'ABORTED',
@@ -40,6 +41,15 @@ export class MergeQueue {
     await this.#pullRequestRepository.update({
       ...nextMergingPr,
       isMerging: true,
+    });
+
+    logger.info({
+      event: 'current-merge-state',
+      message: `Repository: ${repositoryName}; PR en attente : ${pr.length}; ordre à venir : ${pr.map(({ number }) => number).join(',')}`,
+    });
+    logger.info({
+      event: 'dispatch-to-merge-action',
+      message: `Déclenchement de l'action de merge pour la PR : ${nextMergingPr.repositoryName} #${nextMergingPr.number}`,
     });
     await this.#githubService.triggerWorkflow({
       workflow: {
