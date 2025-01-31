@@ -526,6 +526,46 @@ const github = {
     const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
     return data.labels.some((ghLabel) => ghLabel.name === label);
   },
+
+  enableAutoMerge({ owner, repo, number }) {
+    let params = {
+      owner,
+      repo,
+      number
+    }
+    let query = `query GetPullRequestId($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $pullRequestNumber) {
+        id
+      }
+    }
+  }`;
+    let response = await octokit.graphql(query, params);
+    const prid = response.repository.pullRequest.id;
+    // console.log(prid);
+
+    params = {
+      pullRequestId: prid,
+      mergeMethod: 'MERGE'
+    };
+    query = `mutation ($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+    enablePullRequestAutoMerge(input: {
+      pullRequestId: $pullRequestId,
+      mergeMethod: $mergeMethod
+    }) {
+      pullRequest {
+        autoMergeRequest {
+          enabledAt
+          enabledBy {
+            login
+          }
+        }
+      }
+    }
+  }`;
+    response = await octokit.graphql(query, params);
+    return response.enablePullRequestAutoMerge.pullRequest.autoMergeRequest;
+  }
 };
 
 export default github;

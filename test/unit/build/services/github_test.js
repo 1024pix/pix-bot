@@ -791,4 +791,22 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#enableAutoMerge', function () {
+    it('calls github API', async function () {
+      // given
+      const repositoryName = '1024pix/pix';
+      const prNumber = 123;
+
+      const githubNock = nock('https://api.github.com')
+        .put(`/repos/${repositoryName}/pulls/${prNumber}/merge`, { merge_method: 'merge' })
+        .reply(200);
+
+      // when
+      await githubService.enableAutoMerge({ repositoryName, prNumber });
+
+      // then
+      expect(githubNock.isDone()).to.be.true;
+    });
+  })
 });
