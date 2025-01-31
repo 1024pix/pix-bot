@@ -41,16 +41,16 @@ export class MergeQueue {
       ...nextMergingPr,
       isMerging: true,
     });
-    await this.#githubService.triggerWorkflow({
-      workflow: {
-        id: config.github.automerge.workflowId,
-        repositoryName: config.github.automerge.repositoryName,
-        ref: config.github.automerge.workflowRef,
-      },
-      inputs: {
-        pullRequest: `${nextMergingPr.repositoryName}/${nextMergingPr.number}`,
-      },
-    });
+    // await this.#githubService.triggerWorkflow({
+    //   workflow: {
+    //     id: config.github.automerge.workflowId,
+    //     repositoryName: config.github.automerge.repositoryName,
+    //     ref: config.github.automerge.workflowRef,
+    //   },
+    //   inputs: {
+    //     pullRequest: `${nextMergingPr.repositoryName}/${nextMergingPr.number}`,
+    //   },
+    // });
 
     await this.#githubService.setMergeQueueStatus({
       status: 'pending',
