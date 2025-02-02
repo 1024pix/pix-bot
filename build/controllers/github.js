@@ -7,6 +7,7 @@ import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 import * as reviewAppRepo from '../repositories/review-app-repository.js';
+import * as reviewAppDeploymentRepo from '../repositories/review-app-deployment-repository.js';
 import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
 const repositoryToScalingoAppsReview = {
@@ -69,6 +70,7 @@ async function _handleRA(
   addMessageToPullRequest = _addMessageToPullRequest,
   githubService = commonGithubService,
   reviewAppRepository = reviewAppRepo,
+  reviewAppDeploymentRepository = reviewAppDeploymentRepo,
 ) {
   const payload = request.payload;
   const prId = payload.number;
@@ -90,9 +92,10 @@ async function _handleRA(
     addMessageToPullRequest,
     githubService,
     reviewAppRepository,
+    reviewAppDeploymentRepository,
   );
 
-  return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
+  return `Scheduled deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
 async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
@@ -153,6 +156,7 @@ async function deployPullRequest(
   addMessageToPullRequest,
   githubService,
   reviewAppRepository,
+  reviewAppDeploymentRepository,
 ) {
   const deployedRA = [];
   let client;
@@ -167,12 +171,20 @@ async function deployPullRequest(
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
       deployedRA.push({ name: appName, isCreated: !reviewAppExists });
       if (reviewAppExists) {
-        await client.deployUsingSCM(reviewAppName, ref);
+        await reviewAppDeploymentRepository.save({
+          appName: reviewAppName,
+          scmRef: ref,
+          after: getDeployAfter(),
+        });
       } else {
         await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
         await client.deployReviewApp(appName, prId);
         await client.disableAutoDeploy(reviewAppName);
-        await client.deployUsingSCM(reviewAppName, ref);
+        await reviewAppDeploymentRepository.save({
+          appName: reviewAppName,
+          scmRef: ref,
+          after: getDeployAfter(),
+        });
       }
     } catch (error) {
       logger.error({
@@ -339,6 +351,12 @@ function _handleNoRACase(request) {
   }
 
   return { shouldContinue: true };
+}
+
+function getDeployAfter() {
+  const now = new Date();
+  const deployAfter = new Date(now.getTime() + config.scalingo.reviewApps.deployDebounce);
+  return deployAfter;
 }
 
 export {
