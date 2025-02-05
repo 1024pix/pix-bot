@@ -88,6 +88,17 @@ If not, create a custom one in the folder.
 
 ## Test 
 
+You need Docker and npm locally
+
+### Automatic tests
+
+```zsh
+# start db with
+docker compose up -d
+```
+
+If you need a local server : `npm start`
+
 ### GitHub integration
 
 Generate a secret and store it in `.env`file `GITHUB_WEBHOOK_SECRET` variable.

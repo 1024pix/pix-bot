@@ -102,6 +102,19 @@ describe('Acceptance | Run | Security', function () {
                   type: 'section',
                 },
                 {
+                  fields: [
+                    {
+                      text: 'Rules',
+                      type: 'mrkdwn',
+                    },
+                    {
+                      text: 'namespace-key1: aa1c6158-9512-4e56-a93e-cc8c4de9bc23',
+                      type: 'mrkdwn',
+                    },
+                  ],
+                  type: 'section',
+                },
+                {
                   elements: [
                     {
                       text: `At ${dayjs(now).format('DD/MM/YYYY HH:mm:ss')}`,

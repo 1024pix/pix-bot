@@ -480,6 +480,7 @@ describe('Acceptance | Run | Slack', function () {
           { namespaceKey: 'namespaceKey1', ruleId: 'ruleId1' },
           { namespaceKey: 'namespaceKey2', ruleId: 'ruleId2' },
         ];
+        // const rulesId = rules.map(addedRule => ({ [addedRule.namespaceKey]: addedRule.ruleId}));
         const messageTimestamp = '1735836582.877169';
 
         const body = {
@@ -491,6 +492,7 @@ describe('Acceptance | Run | Slack', function () {
                 blocks: [
                   { fields: [{ text: 'IP' }, { text: ip }] },
                   { fields: [{ text: 'JA3' }, { text: ja3 }] },
+                  { fields: [{ text: 'Rules' }, { text: 'namespaceKey1: ruleId1\nnamespaceKey2: ruleId2' }] },
                   { elements: [{ text: `At ${date.format('DD/MM/YYYY HH:mm:ss')}` }] },
                 ],
               },
@@ -544,6 +546,13 @@ describe('Acceptance | Run | Slack', function () {
                     fields: [
                       { type: 'mrkdwn', text: 'JA3' },
                       { type: 'mrkdwn', text: '9709730930' },
+                    ],
+                    type: 'section',
+                  },
+                  {
+                    fields: [
+                      { type: 'mrkdwn', text: 'Rules' },
+                      { type: 'mrkdwn', text: 'namespaceKey1: ruleId1\nnamespaceKey2: ruleId2' },
                     ],
                     type: 'section',
                   },

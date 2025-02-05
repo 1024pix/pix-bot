@@ -45,8 +45,8 @@ const securities = {
 
     try {
       const addedRules = await cdnService.blockAccess({ ip, ja3, monitorId });
-      const automaticRule = new AutomaticRule({ ip, ja3 });
-      await slackPostMessageService.postMessage(automaticRule.getInitialMessage({ addedRules }));
+      const automaticRule = new AutomaticRule({ ip, ja3, rulesId: addedRules });
+      await slackPostMessageService.postMessage(automaticRule.getInitialMessage());
       return `Règles de blocage mises en place.`;
     } catch (error) {
       if (error instanceof cdnService.NamespaceNotFoundError) {

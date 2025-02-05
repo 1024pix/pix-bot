@@ -19,7 +19,7 @@ describe('Unit | Run | Services | Slack | Block Actions', function () {
     clock.restore();
   });
 
-  describe('#disableAutomaticRule', function () {
+  describe.only('#disableAutomaticRule', function () {
     it('should disable rule in CDN and update the slack message', async function () {
       // given
       sinon.stub(cdnService, 'disableRule').resolves();
