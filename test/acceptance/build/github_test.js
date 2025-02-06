@@ -546,9 +546,11 @@ describe('Acceptance | Build | Github', function () {
         // given
         nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
         getAppNock({ reviewAppName: 'pix-api-review-pr123', returnCode: StatusCodes.OK });
+        getAppNock({ reviewAppName: 'pix-api-maddo-review-pr123', returnCode: StatusCodes.OK });
         getAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
         getAppNock({ reviewAppName: 'pix-front-review-pr123', returnCode: StatusCodes.OK });
         deleteReviewAppNock({ reviewAppName: 'pix-api-review-pr123' });
+        deleteReviewAppNock({ reviewAppName: 'pix-api-maddo-review-pr123' });
         deleteReviewAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
         deleteReviewAppNock({ reviewAppName: 'pix-front-review-pr123' });
 
@@ -585,7 +587,7 @@ describe('Acceptance | Build | Github', function () {
         });
 
         expect(response.payload).to.equal(
-          'Closed RA for PR 123 : pix-api-review-pr123, pix-audit-logger-review-pr123 (already closed), pix-front-review-pr123.',
+          'Closed RA for PR 123 : pix-api-review-pr123, pix-api-maddo-review-pr123, pix-audit-logger-review-pr123 (already closed), pix-front-review-pr123.',
         );
       });
     });
