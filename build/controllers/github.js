@@ -7,6 +7,7 @@ import { logger } from '../../common/services/logger.js';
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 import * as reviewAppRepo from '../repositories/review-app-repository.js';
+import * as reviewAppDeploymentRepo from '../repositories/review-app-deployment-repository.js';
 import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
 const repositoryToScalingoAppsReview = {
@@ -24,6 +25,10 @@ const repositoryToScalingoAppsReview = {
   'pix-ui': ['pix-ui-review'],
   pix: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
   pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
+};
+
+const repositoryToScalingoOnDemandAppsReview = {
+  pix: ['pix-front-review'],
 };
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -69,6 +74,7 @@ async function _handleRA(
   addMessageToPullRequest = _addMessageToPullRequest,
   githubService = commonGithubService,
   reviewAppRepository = reviewAppRepo,
+  reviewAppDeploymentRepository = reviewAppDeploymentRepo,
 ) {
   const payload = request.payload;
   const prId = payload.number;
@@ -90,6 +96,7 @@ async function _handleRA(
     addMessageToPullRequest,
     githubService,
     reviewAppRepository,
+    reviewAppDeploymentRepository,
   );
 
   return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
@@ -144,6 +151,63 @@ async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
   return `Closed RA for PR ${prId} : ${result.join(', ')}.`;
 }
 
+async function _handleIssueComment(
+  request,
+  scalingoClient = ScalingoClient,
+  githubService = commonGithubService,
+  reviewAppDeploymentRepository = reviewAppDeploymentRepo,
+) {
+  const payload = request.payload;
+  const repo = payload.repository.name;
+  const owner = payload.repository.owner.login;
+  const reviewApps = repositoryToScalingoOnDemandAppsReview[repo];
+  const pull_number = payload.issue.number;
+
+  if (!reviewApps) {
+    return `${repo} is not managed by Pix Bot nor on-demand review app.`;
+  }
+  let client;
+
+  try {
+    client = await scalingoClient.getInstance('reviewApps');
+  } catch (error) {
+    throw new Error(`Scalingo auth APIError: ${error.message}`);
+  }
+
+  const reviewAppName = `${reviewApps[0]}-pr${pull_number}`;
+
+  if (reviewAppName !== 'pix-front-review-pr10490') return 'non';
+
+  const reviewAppExists = await client.reviewAppExists(reviewAppName);
+  if (!reviewAppExists) {
+    return `Review app ${reviewAppName} does not exist.`;
+  }
+
+  const selectedApps = Array.from(payload.comment.body.matchAll(/^- \[[xX]\].+<!-- ([\w-]+) -->$/gm), ([, app]) => app);
+
+  if (selectedApps.length > 0) {
+    await client.bulkUpdateEnvVar(reviewAppName, {
+      CI_FRONT_TASKS: selectedApps.map((app) => `ci:${app}`).join(' '),
+      BUILD_FRONT_TASKS: selectedApps.map((app) => `build:${app}`).join(' '),
+    });
+  } else {
+    await client.bulkUpdateEnvVar(reviewAppName, {
+      CI_FRONT_TASKS: 'ci:none',
+      BUILD_FRONT_TASKS: 'build:none',
+    });
+  }
+
+  const branchName = await githubService.getPullRequestBranchName({ repo, owner, pull_number });
+
+  await reviewAppDeploymentRepository.save({
+    appName: reviewAppName,
+    scmRef: branchName,
+    after: getDeployAfter(),
+  });
+
+  return 'ok';
+}
+
 async function deployPullRequest(
   scalingoClient,
   reviewApps,
@@ -153,6 +217,7 @@ async function deployPullRequest(
   addMessageToPullRequest,
   githubService,
   reviewAppRepository,
+  reviewAppDeploymentRepository,
 ) {
   const deployedRA = [];
   let client;
@@ -167,12 +232,20 @@ async function deployPullRequest(
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
       deployedRA.push({ name: appName, isCreated: !reviewAppExists });
       if (reviewAppExists) {
-        await client.deployUsingSCM(reviewAppName, ref);
+        await reviewAppDeploymentRepository.save({
+          appName: reviewAppName,
+          scmRef: ref,
+          after: getDeployAfter(),
+        });
       } else {
         await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
         await client.deployReviewApp(appName, prId);
         await client.disableAutoDeploy(reviewAppName);
-        await client.deployUsingSCM(reviewAppName, ref);
+        await reviewAppDeploymentRepository.save({
+          appName: reviewAppName,
+          scmRef: ref,
+          after: getDeployAfter(),
+        });
       }
     } catch (error) {
       logger.error({
@@ -249,69 +322,12 @@ async function processWebhook(
     handleCloseRA = _handleCloseRA,
     mergeQueue = _mergeQueue,
     githubService = commonGithubService,
+    handleIssueComment = _handleIssueComment,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
-  if (eventName === 'push') {
-    return pushOnDefaultBranchWebhook(request);
-  } else if (eventName === 'pull_request') {
-    if (['opened', 'reopened', 'synchronize'].includes(request.payload.action)) {
-      return handleRA(request);
-    }
-    if (request.payload.action === 'closed') {
-      const repositoryName = request.payload.repository.full_name;
-      const isMerged = request.payload.pull_request.merged;
-      const status = isMerged ? MERGE_STATUS.MERGED : MERGE_STATUS.ABORTED;
-      await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number, status });
-      return handleCloseRA(request);
-    }
-    if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
-      await handleCloseRA(request);
-    }
-    if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
-      const belongsToPix = await githubService.checkUserBelongsToPix(request.payload.sender.login);
-      if (!belongsToPix) {
-        return `Ignoring ${request.payload.sender.login} label action`;
-      }
-      const repositoryName = request.payload.repository.full_name;
-      const isAllowedRepository = config.github.automerge.allowedRepositories.includes(repositoryName);
-      if (isAllowedRepository) {
-        await mergeQueue.managePullRequest({ repositoryName, number: request.payload.number });
-      }
-    }
-    if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
-      const repositoryName = request.payload.repository.full_name;
-      await mergeQueue.unmanagePullRequest({
-        repositoryName,
-        number: request.payload.number,
-        status: MERGE_STATUS.ABORTED,
-      });
-    }
-    return `Ignoring ${request.payload.action} action`;
-  } else if (eventName === 'check_suite') {
-    if (request.payload.action === 'completed') {
-      const repositoryName = request.payload.repository.full_name;
-
-      if (request.payload.check_suite.pull_requests.length === 0) {
-        return `check_suite is not related to any pull_request`;
-      }
-
-      const prNumber = request.payload.check_suite.pull_requests[0].number;
-      if (request.payload.check_suite.conclusion !== 'success') {
-        await mergeQueue.unmanagePullRequest({ repositoryName, number: prNumber, status: MERGE_STATUS.ABORTED });
-      } else {
-        const hasReadyToMergeLabel = await githubService.isPrLabelledWith({
-          repositoryName,
-          number: prNumber,
-          label: ':rocket: Ready to Merge',
-        });
-        if (hasReadyToMergeLabel) {
-          await mergeQueue.managePullRequest({ repositoryName, number: prNumber });
-        }
-      }
-      return `check_suite event handle`;
-    }
-    return `Ignoring '${request.payload.action}' action for check_suite event`;
+  if (eventName === 'issue_comment' && request.payload.action === 'edited') {
+    return handleIssueComment(request);
   } else {
     return `Ignoring ${eventName} event`;
   }
@@ -339,6 +355,12 @@ function _handleNoRACase(request) {
   }
 
   return { shouldContinue: true };
+}
+
+function getDeployAfter() {
+  const now = new Date();
+  const deployAfter = new Date(now.getTime() + config.scalingo.reviewApps.deployDebounce);
+  return deployAfter;
 }
 
 export {
