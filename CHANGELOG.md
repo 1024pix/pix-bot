@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.113.0 (07/02/2025)
+
+
+### :rocket: Amélioration
+- [#516](https://github.com/1024pix/pix-bot/pull/516) [FEATURE] Déploiement de maddo à la création/mise à jour des reviews app.
+
+### :building_construction: Tech
+- [#512](https://github.com/1024pix/pix-bot/pull/512) [TECH] Ajouter des logs pour simplifier le debug de la merge queue.
+
+### :bug: Correction
+- [#515](https://github.com/1024pix/pix-bot/pull/515) [BUGFIX] Corriger le sample.env.
+
 ## v1.111.0 (28/01/2025)
 
 
