@@ -638,19 +638,27 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         );
 
         // then
+        expect(deployReviewAppStub.getCall(1).calledWith('pix-api-maddo-review', 3)).to.be.true;
+        expect(disableAutoDeployStub.getCall(1).calledWith('pix-api-maddo-review-pr3')).to.be.true;
+        expect(deployUsingSCMStub.getCall(1).calledWith('pix-api-maddo-review-pr3', 'my-branch')).to.be.true;
 
-        expect(deployReviewAppStub.secondCall.calledWith('pix-audit-logger-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.secondCall.calledWith('pix-audit-logger-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
+        expect(deployReviewAppStub.getCall(2).calledWith('pix-audit-logger-review', 3)).to.be.true;
+        expect(disableAutoDeployStub.getCall(2).calledWith('pix-audit-logger-review-pr3')).to.be.true;
+        expect(deployUsingSCMStub.getCall(2).calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
 
-        expect(deployReviewAppStub.thirdCall.calledWith('pix-front-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.thirdCall.calledWith('pix-front-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+        expect(deployReviewAppStub.getCall(3).calledWith('pix-front-review', 3)).to.be.true;
+        expect(disableAutoDeployStub.getCall(3).calledWith('pix-front-review-pr3')).to.be.true;
+        expect(deployUsingSCMStub.getCall(3).calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
 
         expect(addMessageToPullRequestStub).to.have.been.calledOnceWithExactly(
           {
             repositoryName: 'pix',
-            scalingoReviewApps: ['pix-api-review', 'pix-audit-logger-review', 'pix-front-review'],
+            scalingoReviewApps: [
+              'pix-api-review',
+              'pix-api-maddo-review',
+              'pix-audit-logger-review',
+              'pix-front-review',
+            ],
             pullRequestId: 3,
           },
           { githubService: githubServiceStub },
@@ -706,12 +714,13 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               parentApp: 'pix-api-review',
             }),
           ).to.be.true;
-          expect(deployUsingSCMStub.firstCall.calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.secondCall.calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.thirdCall.calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+          expect(deployUsingSCMStub.getCall(0).calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
+          expect(deployUsingSCMStub.getCall(1).calledWith('pix-api-maddo-review-pr3', 'my-branch')).to.be.true;
+          expect(deployUsingSCMStub.getCall(2).calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
+          expect(deployUsingSCMStub.getCall(3).calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
 
           expect(response).to.equal(
-            'Triggered deployment of RA on app pix-api-review, pix-audit-logger-review, pix-front-review with pr 3',
+            'Triggered deployment of RA on app pix-api-review, pix-api-maddo-review, pix-audit-logger-review, pix-front-review with pr 3',
           );
         });
       });
@@ -782,7 +791,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         // then
         expect(response).to.equal(
-          'Closed RA for PR 3 : pix-api-review-pr3, pix-audit-logger-review-pr3 (already closed), pix-front-review-pr3.',
+          'Closed RA for PR 3 : pix-api-review-pr3, pix-api-maddo-review-pr3 (already closed), pix-audit-logger-review-pr3 (already closed), pix-front-review-pr3.',
         );
       });
     });

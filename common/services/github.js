@@ -61,7 +61,7 @@ function _createOctokit() {
   octokit.hook.error('request', async (error) => {
     logger.error({
       event: 'github',
-      message: error.response.data,
+      message: error.response?.data,
     });
 
     return error;
