@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.113.1 (11/02/2025)
+
+
+### :rocket: Amélioration
+- [#518](https://github.com/1024pix/pix-bot/pull/518) [FEATURE] Donner accès aux statistiques rollup sur les RAs pix-epreuves.
+
+### :bug: Correction
+- [#517](https://github.com/1024pix/pix-bot/pull/517) [BUGFIX] Ajouter MaDDo dans le message Github pix-bot.
+
 ## v1.113.0 (07/02/2025)
 
 
