@@ -170,7 +170,7 @@ const configuration = (function () {
     PIX_DATAWAREHOUSE_REPO_NAME: 'pix-db-replication',
     PIX_DATAWAREHOUSE_APPS_NAME: ['pix-datawarehouse', 'pix-datawarehouse-ex', 'pix-datawarehouse-data'],
 
-    PIX_APPS: ['app', 'certif', 'admin', 'orga', 'api', 'junior', 'audit-logger'],
+    PIX_APPS: ['app', 'certif', 'admin', 'orga', 'api', 'api-maddo', 'junior', 'audit-logger'],
     PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
     PIX_TUTOS_APP_NAME: 'pix-tutos',
