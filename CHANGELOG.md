@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.114.0 (17/02/2025)
+
+
+### :rocket: Amélioration
+- [#519](https://github.com/1024pix/pix-bot/pull/519) [FEATURE] Déployer l’application pix-api-maddo-{environment} (PIX-16552).
+
 ## v1.113.1 (11/02/2025)
 
 
