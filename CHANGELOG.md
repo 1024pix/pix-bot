@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.114.1 (17/02/2025)
+
+
+### :bug: Correction
+- [#520](https://github.com/1024pix/pix-bot/pull/520) [BUGFIX] Redeployer la dernière version d'une app comportant un tiret dans son nom.
+
+### :arrow_up: Montée de version
+- [#514](https://github.com/1024pix/pix-bot/pull/514) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.114.0 (17/02/2025)
 
 
