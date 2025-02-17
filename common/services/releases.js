@@ -42,7 +42,7 @@ const releasesService = {
 
     const results = await Promise.all(
       config.PIX_APPS.map((pixApp) => {
-        return client.deployFromArchive(`pix-${pixApp}`, sanitizedReleaseTag);
+        return client.deployFromArchive(pixApp, sanitizedReleaseTag);
       }),
     );
 
