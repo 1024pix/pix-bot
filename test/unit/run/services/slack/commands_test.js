@@ -228,13 +228,13 @@ describe('Unit | Run | Services | Slack | Commands', function () {
   describe('#getAndDeployLastVersion', function () {
     it('should redeploy last version of an app', async function () {
       // given
-      const appName = 'pix-admin-integration';
+      const appName = 'pix-api-maddo-integration';
 
       // when
       await getAndDeployLastVersion({ appName });
 
       // then
-      sinon.assert.calledWith(releasesService.deployPixRepo, 'pix', 'pix-admin', 'v1.0.0', 'integration');
+      sinon.assert.calledWith(releasesService.deployPixRepo, 'pix', 'pix-api-maddo', 'v1.0.0', 'integration');
     });
 
     it('should throw an error if appName is incorrect', async function () {

@@ -112,31 +112,17 @@ async function _getAndDeployLastVersion({ appName }) {
   const lastReleaseTag = await githubServices.getLatestReleaseTag(config.PIX_REPO_NAME);
   const sanitizedAppName = appName.trim().toLowerCase();
 
-  const appNameParts = sanitizedAppName.split('-');
-  const environment = appNameParts[appNameParts.length - 1];
+  const [, shortAppName, environment] = sanitizedAppName.match(/(.*)-(.*)$/);
 
-  if (!_isAppFromPixRepo({ appName: sanitizedAppName })) {
+  if (!_isAppFromPixRepo({ shortAppName, environment })) {
     throw Error('L‘application doit faire partie du repo Pix');
   }
 
-  const shortAppName = appNameParts[0] + '-' + appNameParts[1];
   await releasesService.deployPixRepo(config.PIX_REPO_NAME, shortAppName, lastReleaseTag, environment);
 }
 
-function _isAppFromPixRepo({ appName }) {
-  const appNameParts = appName.split('-');
-
-  if (appNameParts.length != 3) {
-    return false;
-  }
-
-  const [appNamePrefix, shortAppName, environment] = appName.split('-');
-
-  return (
-    appNamePrefix === 'pix' &&
-    config.PIX_APPS.includes(shortAppName) &&
-    config.PIX_APPS_ENVIRONMENTS.includes(environment)
-  );
+function _isAppFromPixRepo({ shortAppName, environment }) {
+  return config.PIX_APPS.includes(shortAppName) && config.PIX_APPS_ENVIRONMENTS.includes(environment);
 }
 
 async function deployTagUsingSCM(appNames, tag) {
