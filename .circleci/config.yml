@@ -9,7 +9,7 @@ jobs:
         type: string
     docker:
       - image: cimg/node:<<parameters.node-version>>
-      - image: postgres:15.8-alpine
+      - image: postgres:16.6-alpine
         name: pg-pix-bot
         environment:
           POSTGRES_USER: circleci
