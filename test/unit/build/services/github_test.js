@@ -363,7 +363,7 @@ describe('Unit | Build | github-test', function () {
 
     beforeEach(function () {
       now = new Date();
-      clock = sinon.useFakeTimers(now);
+      clock = sinon.useFakeTimers({ now, toFake: ['Date'] });
     });
 
     afterEach(function () {
