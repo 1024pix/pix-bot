@@ -1,4 +1,6 @@
+import github from '../../common/services/github.js';
 import { config } from '../../config.js';
+import { deploy } from './deploy.js';
 import * as taskAutoScaleWeb from './tasks/autoscale-web.js';
 
 const tasks = [
@@ -24,6 +26,16 @@ const tasks = [
         region: config.tasks.autoScaleRegion,
         autoScalingParameters: config.tasks.autoScaleDownSettings,
       });
+    },
+  },
+  {
+    name: 'Deploy Pix site',
+    enabled: true,
+    schedule: config.pixSiteDeploy.schedule,
+    handler: async () => {
+      const repoName = config.PIX_SITE_REPO_NAME;
+      const releaseTag = await github.getLatestReleaseTag(repoName);
+      deploy(repoName, config.PIX_SITE_APPS, releaseTag);
     },
   },
 ];
