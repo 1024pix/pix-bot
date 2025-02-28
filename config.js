@@ -77,6 +77,7 @@ const configuration = (function () {
       repositoryToScalingoIntegration: {
         pix: [
           'pix-api-integration',
+          'pix-api-maddo-integration',
           'pix-audit-logger-integration',
           'pix-app-integration',
           'pix-certif-integration',
