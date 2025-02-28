@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.115.0 (28/02/2025)
+
+
+### :rocket: Amélioration
+- [#524](https://github.com/1024pix/pix-bot/pull/524) [FEATURE] Ajouter maddo dans la liste des apps à déployer en integration. .
+
+### :arrow_up: Montée de version
+- [#442](https://github.com/1024pix/pix-bot/pull/442) [BUMP] Update dependency sinon to v19 (dossier racine).
+- [#479](https://github.com/1024pix/pix-bot/pull/479) [BUMP] Update dependency postgres to v16.6.
+- [#522](https://github.com/1024pix/pix-bot/pull/522) [BUMP] Lock file maintenance (dossier racine).
+- [#521](https://github.com/1024pix/pix-bot/pull/521) [BUMP] Update Node.js to v22.14.0.
+
 ## v1.114.1 (17/02/2025)
 
 
