@@ -791,4 +791,27 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#getPullRequestBranchName', function () {
+    it('should retrieve branch name for pull request id', async function () {
+      // given
+      nock('https://api.github.com')
+        .get('/repos/toto/lasticot/pulls/666')
+        .reply(200, {
+          number: 666,
+          head: {
+            ref: 'pix-12345-feature-bug',
+          },
+        });
+      const owner = 'toto';
+      const repo = 'lasticot';
+      const pull_number = 666;
+
+      // when
+      const branchName = await githubService.getPullRequestBranchName({ owner, repo, pull_number });
+
+      // then
+      expect(branchName).to.equal('pix-12345-feature-bug');
+    });
+  });
 });
