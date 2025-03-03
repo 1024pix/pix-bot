@@ -35,7 +35,7 @@ describe('Acceptance | Build | Github', function () {
     function getPullRequestNock({ repository, prNumber, sha }) {
       return nock('https://api.github.com')
         .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
-        .reply(201, { head: { sha } });
+        .reply(200, { head: { sha } });
     }
 
     function addRADeploymentCheckNock({ repository, sha, status }) {
@@ -645,7 +645,7 @@ describe('Acceptance | Build | Github', function () {
         expect(res.statusCode).to.equal(200);
       });
 
-      it('it should delete existing review apps if no-review-app has been set', async function () {
+      it('it should delete existing review apps if no-review-app has been set and add successful check-ra-deployment', async function () {
         // given
         body.label = { name: 'no-review-app' };
         nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
@@ -655,6 +655,8 @@ describe('Acceptance | Build | Github', function () {
         deleteReviewAppNock({ reviewAppName: 'pix-api-review-pr123' });
         deleteReviewAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
         deleteReviewAppNock({ reviewAppName: 'pix-front-review-pr123' });
+        const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 123, sha: 'my-sha' });
+        const addRADeploymentCheck = addRADeploymentCheckNock({ repository: 'pix', sha: 'my-sha', status: 'success' });
 
         // when
         const response = await server.inject({
@@ -668,6 +670,8 @@ describe('Acceptance | Build | Github', function () {
         });
 
         expect(response.statusCode).equal(200);
+        expect(getPullRequest.isDone()).to.be.true;
+        expect(addRADeploymentCheck.isDone()).to.be.true;
       });
 
       describe('when label is `ready-to-merge`', function () {

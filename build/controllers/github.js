@@ -95,9 +95,14 @@ async function _handleRA(
   return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
-async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
+async function _handleCloseRA(
+  request,
+  scalingoClient = ScalingoClient,
+  reviewAppRepository = reviewAppRepo,
+  githubService = commonGithubService,
+) {
   const payload = request.payload;
-  const prId = payload.number;
+  const prNumber = payload.number;
   const repository = payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
 
@@ -115,9 +120,11 @@ async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
   }
 
   for (const appName of reviewApps) {
-    const reviewAppName = `${appName}-pr${prId}`;
+    const reviewAppName = `${appName}-pr${prNumber}`;
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
+      // we remove the review app in any case
+      await reviewAppRepository.remove({ name: reviewAppName });
       if (reviewAppExists) {
         await client.deleteReviewApp(reviewAppName);
         closedRA.push({ name: appName, isClosed: true, isAlreadyClosed: false });
@@ -132,16 +139,20 @@ async function _handleCloseRA(request, scalingoClient = ScalingoClient) {
         data: {
           repository,
           reviewApp: reviewAppName,
-          pr: prId,
+          pr: prNumber,
         },
       });
     }
   }
   const result = closedRA.map((ra) =>
-    ra.isAlreadyClosed ? `${ra.name}-pr${prId} (already closed)` : `${ra.name}-pr${prId}`,
+    ra.isAlreadyClosed ? `${ra.name}-pr${prNumber} (already closed)` : `${ra.name}-pr${prNumber}`,
   );
+  const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
+  if (areAllDeployed) {
+    await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
+  }
 
-  return `Closed RA for PR ${prId} : ${result.join(', ')}.`;
+  return `Closed RA for PR ${prNumber} : ${result.join(', ')}.`;
 }
 
 async function deployPullRequest(
@@ -331,7 +342,7 @@ function _handleNoRACase(request) {
   if (!reviewApps) {
     return { message: 'No RA configured for this repository', shouldContinue: false };
   }
-  if (labelsList.some((label) => label.name == 'no-review-app')) {
+  if (labelsList.some((label) => label.name === 'no-review-app')) {
     return { message: 'RA disabled for this PR', shouldContinue: false };
   }
   if (state !== 'open') {
