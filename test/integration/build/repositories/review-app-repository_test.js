@@ -221,4 +221,37 @@ describe('Integration | Build | Repository | Review App', function () {
       expect(areAllDeployed).to.be.false;
     });
   });
+
+  describe('remove', function () {
+    it('it should remove the review app', async function () {
+      // given
+      const name = 'pix-api-review-pr123';
+      const repository = 'pix';
+      const prNumber = 123;
+      const parentApp = 'pix-api-review';
+
+      await reviewAppRepository.create({ name, repository, prNumber, parentApp });
+
+      // when
+      const result = await reviewAppRepository.remove({ name });
+
+      // then
+      expect(result).to.equal(1);
+      const removedReviewApp = await knex('review-apps').where({ name }).first();
+      expect(removedReviewApp).to.be.undefined;
+    });
+
+    describe('when the review-app does not exist', function () {
+      it('it should not throw an exception', async function () {
+        // given
+        const name = 'unknown-review-app';
+
+        // when
+        const result = await reviewAppRepository.remove({ name });
+
+        // then
+        expect(result).to.equal(0);
+      });
+    });
+  });
 });

@@ -37,3 +37,7 @@ export const areAllDeployed = async function ({ repository, prNumber }) {
     .first();
   return count === 0;
 };
+
+export const remove = async function ({ name }) {
+  return knex('review-apps').where({ name }).del();
+};
