@@ -265,7 +265,7 @@ async function processWebhook(
       await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number, status });
       return handleCloseRA(request);
     }
-    if (request.payload.action === 'labeled' && request.payload.label.name == 'no-review-app') {
+    if (request.payload.action === 'labeled' && request.payload.label.name === 'no-review-app') {
       await handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
