@@ -1,6 +1,6 @@
 import { CronJob } from 'cron';
 
-import { logger } from '../../common/services/logger.js';
+import { logger } from './logger.js';
 
 const parisTimezone = 'Europe/Paris';
 
