@@ -6,7 +6,7 @@ const parisTimezone = 'Europe/Paris';
 
 const taskScheduler = function (tasksList) {
   const scheduleTask = ({ schedule, handler }) => {
-    new CronJob({
+    CronJob.from({
       cronTime: schedule,
       onTick: handler,
       onComplete: null,
