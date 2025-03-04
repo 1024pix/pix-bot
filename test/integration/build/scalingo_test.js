@@ -343,7 +343,7 @@ describe('Integration | Build | Scalingo', function () {
 
           const getPullRequestNock = nock('https://api.github.com')
             .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
-            .reply(201, { head: { sha } });
+            .reply(200, { head: { sha } });
 
           const addRADeploymentCheckNock = nock('https://api.github.com')
             .post(`/repos/1024pix/${repository}/statuses/${sha}`, {
@@ -398,7 +398,7 @@ describe('Integration | Build | Scalingo', function () {
         const sha = 'a-commit-sha';
         const getPullRequestNock = nock('https://api.github.com')
           .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
-          .reply(201, { head: { sha } });
+          .reply(200, { head: { sha } });
 
         const addRADeploymentCheckNock = nock('https://api.github.com')
           .post(`/repos/1024pix/${repository}/statuses/${sha}`, {

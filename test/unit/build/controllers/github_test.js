@@ -776,6 +776,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const scalingoClientStub = sinon.stub();
         const reviewAppExistsStub = sinon.stub();
         const deleteReviewAppStub = sinon.stub();
+        const reviewAppRepositoryStub = {
+          remove: sinon.stub(),
+          areAllDeployed: sinon.stub().resolves(false),
+        };
 
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
@@ -787,21 +791,23 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
-        const response = await githubController.handleCloseRA(request, scalingoClientStub);
+        const response = await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub);
 
         // then
         expect(response).to.equal(
           'Closed RA for PR 3 : pix-api-review-pr3, pix-api-maddo-review-pr3 (already closed), pix-audit-logger-review-pr3 (already closed), pix-front-review-pr3.',
         );
       });
-    });
 
-    describe('when a Review App exists', function () {
-      it('should close this Review App', async function () {
+      it('should remove the review app in database anyway', async function () {
         // given
         const scalingoClientStub = sinon.stub();
         const reviewAppExistsStub = sinon.stub();
         const deleteReviewAppStub = sinon.stub();
+        const reviewAppRepositoryStub = {
+          remove: sinon.stub(),
+          areAllDeployed: sinon.stub().resolves(false),
+        };
 
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
@@ -813,12 +819,77 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
-        await githubController.handleCloseRA(request, scalingoClientStub);
+        await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub);
 
         // then
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-api-review-pr3' })).to.be.true;
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-front-review-pr3' })).to.be.true;
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-audit-logger-review-pr3' })).to.be.true;
+      });
+    });
+
+    describe('when a Review App exists', function () {
+      it('should close this Review App and remove the entry in DB', async function () {
+        // given
+        const scalingoClientStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub();
+        const deleteReviewAppStub = sinon.stub();
+        const reviewAppRepositoryStub = {
+          remove: sinon.stub(),
+          areAllDeployed: sinon.stub().resolves(false),
+        };
+
+        scalingoClientStub.getInstance = sinon.stub().returns({
+          reviewAppExists: reviewAppExistsStub,
+          deleteReviewApp: deleteReviewAppStub,
+        });
+
+        reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
+
+        // when
+        await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub);
+
+        // then
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-api-review-pr3' })).to.be.true;
         expect(deleteReviewAppStub.calledWith('pix-api-review-pr3')).to.be.true;
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-audit-logger-review-pr3' })).to.be.true;
         expect(deleteReviewAppStub.calledWith('pix-audit-logger-review-pr3')).to.be.false;
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-front-review-pr3' })).to.be.true;
         expect(deleteReviewAppStub.calledWith('pix-front-review-pr3')).to.be.true;
+      });
+
+      describe('when all the review apps are removed', function () {
+        it('should set the check-ra-deployment check as succeeded', async function () {
+          // given
+          const scalingoClientStub = sinon.stub();
+          const reviewAppExistsStub = sinon.stub();
+          const deleteReviewAppStub = sinon.stub();
+          const reviewAppRepositoryStub = {
+            remove: sinon.stub(),
+            areAllDeployed: sinon.stub().resolves(true),
+          };
+          const githubServiceStub = {
+            addRADeploymentCheck: sinon.stub(),
+          };
+
+          scalingoClientStub.getInstance = sinon.stub().returns({
+            reviewAppExists: reviewAppExistsStub,
+            deleteReviewApp: deleteReviewAppStub,
+          });
+
+          reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
+          reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+
+          // when
+          await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub, githubServiceStub);
+
+          // then
+          expect(
+            githubServiceStub.addRADeploymentCheck.calledWith({ repository: 'pix', prNumber: 3, status: 'success' }),
+          ).to.be.true;
+        });
       });
     });
   });
