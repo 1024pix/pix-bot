@@ -128,7 +128,7 @@ const slack = {
     };
   },
 
-  interactiveEndpoint(request) {
+  async interactiveEndpoint(request) {
     const payload = request.pre.payload;
 
     const interactionType = payload.type;
@@ -136,10 +136,10 @@ const slack = {
     switch (interactionType) {
       case 'shortcut':
         if (payload.callback_id === 'deploy-release') {
-          shortcuts.openViewDeployReleaseTagSelection(payload);
+          await shortcuts.openViewDeployReleaseTagSelection(payload);
         }
         if (payload.callback_id === 'scalingo-app-creation') {
-          shortcuts.openViewCreateAppOnScalingoSelection(payload);
+          await shortcuts.openViewCreateAppOnScalingoSelection(payload);
         }
         return null;
       case 'view_submission':
