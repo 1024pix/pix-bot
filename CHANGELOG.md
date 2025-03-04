@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.115.1 (04/03/2025)
+
+
+### :bug: Correction
+- [#526](https://github.com/1024pix/pix-bot/pull/526) [BUGFIX] Corriger le fonctionnement du commit status `check-ra-deployment` avec le label `no-review-app`.
+
+### :arrow_up: Montée de version
+- [#525](https://github.com/1024pix/pix-bot/pull/525) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.115.0 (28/02/2025)
 
 
