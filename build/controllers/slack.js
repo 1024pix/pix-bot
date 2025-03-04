@@ -56,7 +56,7 @@ const slack = {
     };
   },
 
-  interactiveEndpoint(request) {
+  async interactiveEndpoint(request) {
     const payload = request.pre.payload;
 
     const interactionType = payload.type;
@@ -69,7 +69,7 @@ const slack = {
           if (!github.isBuildStatusOK({ branchName: releaseBranch })) {
             return this._interruptRelease();
           }
-          shortcuts.openViewPublishReleaseTypeSelection(payload);
+          await shortcuts.openViewPublishReleaseTypeSelection(payload);
         }
         return null;
       case 'view_submission':
