@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 
 import Boom from '@hapi/boom';
 import { Octokit } from '@octokit/rest';
+import { graphql } from '@octokit/graphql';
 import _ from 'lodash';
 import fetch from 'node-fetch';
 import tsscmp from 'tsscmp';
@@ -527,45 +528,40 @@ const github = {
     return data.labels.some((ghLabel) => ghLabel.name === label);
   },
 
-  enableAutoMerge({ owner, repo, number }) {
-    let params = {
-      owner,
-      repo,
-      number
-    }
-    let query = `query GetPullRequestId($owner: String!, $repo: String!, $pullRequestNumber: Int!) {
-    repository(owner: $owner, name: $repo) {
-      pullRequest(number: $pullRequestNumber) {
-        id
-      }
-    }
-  }`;
-    let response = await octokit.graphql(query, params);
-    const prid = response.repository.pullRequest.id;
-    // console.log(prid);
+  async enableAutoMerge({ number, repositoryName }) {
+    const graphqlWithAuth = graphql.defaults({
+      request: { fetch },
+      headers: {
+        authorization: `token ${config.github.token}`,
+      },
+    });
 
-    params = {
-      pullRequestId: prid,
-      mergeMethod: 'MERGE'
-    };
-    query = `mutation ($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
-    enablePullRequestAutoMerge(input: {
-      pullRequestId: $pullRequestId,
-      mergeMethod: $mergeMethod
-    }) {
-      pullRequest {
-        autoMergeRequest {
-          enabledAt
-          enabledBy {
-            login
+    const octokit = _createOctokit();
+    const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
+    const pullRequestId = data.id;
+    const { pullRequest } = await graphqlWithAuth(
+      `mutation ($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+        enablePullRequestAutoMerge(input: {
+          pullRequestId: $pullRequestId,
+          mergeMethod: $mergeMethod
+        }) {
+          pullRequest {
+            autoMergeRequest {
+              enabledAt
+              enabledBy {
+                login
+              }
+            }
           }
         }
-      }
-    }
-  }`;
-    response = await octokit.graphql(query, params);
-    return response.enablePullRequestAutoMerge.pullRequest.autoMergeRequest;
-  }
+      }`,
+      {
+        pullRequestId,
+        mergeMethod: 'MERGE',
+      },
+    );
+    return pullRequest.autoMergeRequest;
+  },
 };
 
 export default github;

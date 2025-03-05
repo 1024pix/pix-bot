@@ -797,16 +797,28 @@ describe('Unit | Build | github-test', function () {
       // given
       const repositoryName = '1024pix/pix';
       const prNumber = 123;
+      const prId = '456';
 
-      const githubNock = nock('https://api.github.com')
-        .put(`/repos/${repositoryName}/pulls/${prNumber}/merge`, { merge_method: 'merge' })
-        .reply(200);
+      const pullRequestNock = nock('https://api.github.com')
+        .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+        .reply(200, { id: prId });
+
+      const mutationNock = nock('https://api.github.com')
+        .post('/graphql')
+        .reply(200, {
+          data: {
+            pullRequest: {
+              autoMergerRequest: {},
+            },
+          },
+        });
 
       // when
-      await githubService.enableAutoMerge({ repositoryName, prNumber });
+      await githubService.enableAutoMerge({ repositoryName, number: prNumber });
 
       // then
-      expect(githubNock.isDone()).to.be.true;
+      expect(pullRequestNock.isDone()).to.be.true;
+      expect(mutationNock.isDone()).to.be.true;
     });
-  })
+  });
 });
