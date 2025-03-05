@@ -11,9 +11,15 @@ import {
 import dayjs from 'dayjs';
 import { config } from '../../../config.js';
 import { AutomaticRule } from '../../../run/models/AutomaticRule.js';
+import { knex } from '../../../db/knex-database-connection.js';
 
 describe('Acceptance | Run | Slack', function () {
   describe('POST /run/slack/interactive-endpoint', function () {
+    beforeEach(async function () {
+      await knex('release-settings').delete();
+      await knex('release-settings').insert({ repositoryName: 'pix', environment: 'production' });
+    });
+
     it('responds with 204', async function () {
       const body = {
         type: 'view_closed',
