@@ -52,6 +52,9 @@ export class MergeQueue {
     //   },
     // });
 
+    // TODO : Rebase
+    // TODO: EnableAutoMerge
+
     await this.#githubService.setMergeQueueStatus({
       status: 'pending',
       description: 'En cours de merge',
