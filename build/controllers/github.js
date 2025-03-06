@@ -92,7 +92,7 @@ async function _handleRA(
     reviewAppRepository,
   );
 
-  return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
+  return `Scheduled deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
 }
 
 async function _handleCloseRA(
@@ -178,12 +178,21 @@ async function deployPullRequest(
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
       deployedRA.push({ name: appName, isCreated: !reviewAppExists });
       if (reviewAppExists) {
-        await client.deployUsingSCM(reviewAppName, ref);
+        await reviewAppRepository.scheduleDeployment({
+          name: reviewAppName,
+          deployScmRef: ref,
+          deployAfter: getDeployAfter(),
+        });
       } else {
         await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
         await client.deployReviewApp(appName, prId);
         await client.disableAutoDeploy(reviewAppName);
-        await client.deployUsingSCM(reviewAppName, ref);
+
+        await reviewAppRepository.scheduleDeployment({
+          name: reviewAppName,
+          deployScmRef: ref,
+          deployAfter: getDeployAfter(),
+        });
       }
     } catch (error) {
       logger.error({
@@ -350,6 +359,10 @@ function _handleNoRACase(request) {
   }
 
   return { shouldContinue: true };
+}
+
+function getDeployAfter() {
+  return new Date(Date.now() + config.scalingo.reviewApps.deployDebounce);
 }
 
 export {

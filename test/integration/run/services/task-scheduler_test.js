@@ -1,5 +1,5 @@
 import { logger } from '../../../../common/services/logger.js';
-import { taskScheduler } from '../../../../run/services/task-scheduler.js';
+import { taskScheduler } from '../../../../common/services/task-scheduler.js';
 import { expect, sinon } from '../../../test-helper.js';
 
 describe('Integration | Run | Services | schedule-task', function () {
