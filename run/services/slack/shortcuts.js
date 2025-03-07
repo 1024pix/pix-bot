@@ -11,7 +11,8 @@ const shortcuts = {
 
   openViewCreateAppOnScalingoSelectionCallbackId: createAppOnScalingoModal.callbackId,
 
-  openViewDeployReleaseTagSelection(payload) {
+  async openViewDeployReleaseTagSelection(payload) {
+    const data = await deployReleaseTagSelectionModal.getView(payload.trigger_id);
     const options = {
       method: 'POST',
       url: openViewUrl,
@@ -19,7 +20,7 @@ const shortcuts = {
         'content-type': 'application/json',
         authorization: `Bearer ${config.slack.botToken}`,
       },
-      data: deployReleaseTagSelectionModal.getView(payload.trigger_id),
+      data,
     };
     return axios(options);
   },
