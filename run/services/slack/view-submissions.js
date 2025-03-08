@@ -7,6 +7,7 @@ import slackGetUserInfos from '../../../common/services/slack/surfaces/user-info
 import { config } from '../../../config.js';
 import releaseDeploymentConfirmationModal from './surfaces/modals/deploy-release/release-deployment-confirmation.js';
 import applicationCreationConfirmationModal from './surfaces/modals/scalingo-apps/application-creation-confirmation.js';
+import { updateStatus } from '../../../common/repositories/release-settings.repository.js';
 
 const viewSubmissions = {
   async submitReleaseTagSelection(payload) {
@@ -63,6 +64,18 @@ const viewSubmissions = {
     const message = `app ${applicationName} created <${invitationLink}|invitation link>`;
     const channel = `@${payload.user.id}`;
     slackPostMessageService.postMessage({ message, channel });
+    return {
+      response_action: 'clear',
+    };
+  },
+
+  async submitLockRelease(payload) {
+    const reason = payload.view.state.values['lock-reason']['lock-reason-value'].value;
+    await updateStatus({ repositoryName: 'pix', environment: 'production', authorizeDeployment: false, reason });
+    const message = `⛔️La mise en production a été bloquée par <@${payload.user.id}>. Motif: ${reason}. Faire /mep/unlock pour débloquer, une fois la situation réglée`;
+    slackPostMessageService.postMessage({
+      message,
+    });
     return {
       response_action: 'clear',
     };

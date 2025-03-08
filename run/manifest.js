@@ -126,6 +126,13 @@ manifest.registerShortcut({
   description: "Lance la création d'une application sur Scalingo",
 });
 
+manifest.registerShortcut({
+  name: 'MEP/lock',
+  type: 'global',
+  callback_id: 'lock-release',
+  description: 'Bloquer la mise en production.',
+});
+
 manifest.addInteractivity({
   path: '/run/slack/interactive-endpoint',
   handler: slackbotController.interactiveEndpoint,

@@ -33,6 +33,12 @@ describe('Acceptance | Run | Manifest', function () {
               callback_id: 'scalingo-app-creation',
               description: "Lance la création d'une application sur Scalingo",
             },
+            {
+              name: 'MEP/lock',
+              type: 'global',
+              callback_id: 'lock-release',
+              description: 'Bloquer la mise en production.',
+            },
           ],
           slash_commands: [
             {
