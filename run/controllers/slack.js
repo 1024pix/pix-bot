@@ -137,23 +137,23 @@ const slack = {
       case 'shortcut':
         if (payload.callback_id === 'deploy-release') {
           await shortcuts.openViewDeployReleaseTagSelection(payload);
-        }
-        if (payload.callback_id === 'scalingo-app-creation') {
+        } else if (payload.callback_id === 'scalingo-app-creation') {
           await shortcuts.openViewCreateAppOnScalingoSelection(payload);
+        } else if (payload.callback_id === 'lock-release') {
+          await shortcuts.openViewLockRelease(payload);
         }
         return null;
       case 'view_submission':
         if (payload.view.callback_id === shortcuts.openViewDeployReleaseTagSelectionCallbackId) {
           return viewSubmissions.submitReleaseTagSelection(payload);
-        }
-        if (payload.view.callback_id === shortcuts.openViewCreateAppOnScalingoSelectionCallbackId) {
+        } else if (payload.view.callback_id === shortcuts.openViewCreateAppOnScalingoSelectionCallbackId) {
           return viewSubmissions.submitApplicationNameSelection(payload);
-        }
-        if (payload.view.callback_id === viewSubmissions.submitReleaseTagSelectionCallbackId) {
+        } else if (payload.view.callback_id === viewSubmissions.submitReleaseTagSelectionCallbackId) {
           return viewSubmissions.submitReleaseDeploymentConfirmation(payload);
-        }
-        if (payload.view.callback_id === viewSubmissions.submitApplicationNameSelectionCallbackId) {
+        } else if (payload.view.callback_id === viewSubmissions.submitApplicationNameSelectionCallbackId) {
           return viewSubmissions.submitCreateAppOnScalingoConfirmation(payload);
+        } else if (payload.view.callback_id === shortcuts.openViewLockReleaseCallbackId) {
+          return viewSubmissions.submitLockRelease(payload);
         }
         return null;
       case 'block_actions':
@@ -166,6 +166,15 @@ const slack = {
         logger.info({ event: 'slack', message: 'This kind of interaction is not yet supported by Pix Bot.' });
         return null;
     }
+  },
+
+  async unlockRelease(request) {
+    const payload = request.pre.payload;
+    commands.unlockRelease(payload);
+
+    return {
+      text: 'La commande a été transmise.',
+    };
   },
 };
 
