@@ -147,4 +147,13 @@ manifest.registerSlashCommand({
   handler: slackbotController.deployPixApiToPg,
 });
 
+manifest.registerSlashCommand({
+  command: '/MEP/unlock',
+  path: '/slack/commands/unlock-release',
+  description: 'Débloquer la mise en production.',
+  usage_hint: '',
+  should_escape: false,
+  handler: slackbotController.unlockRelease,
+});
+
 export default manifest;

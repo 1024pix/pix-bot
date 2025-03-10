@@ -6,6 +6,7 @@ import ScalingoClient from '../../../common/services/scalingo-client.js';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 import { config } from '../../../config.js';
 import { deploy } from '../deploy.js';
+import { updateProduction } from '../../../common/repositories/release-settings.repository.js';
 
 function sendResponse(responseUrl, text) {
   axios.post(
@@ -214,6 +215,13 @@ async function deployPixApiToPg(payload) {
   await deployTagUsingSCM(config.PIX_API_TO_PG_APPS_NAME, version);
 }
 
+async function unlockRelease(payload) {
+  await updateProduction('pix', false);
+  slackPostMessageService.postMessage({
+    message: `La MEP a été débloquée par @${payload.user.id} 😅 il est de nouveau possible de la lancer.`,
+  });
+}
+
 export {
   createAndDeployDbStats,
   createAndDeployEmberTestingLibrary,
@@ -227,4 +235,5 @@ export {
   deployDBT,
   deployPixApiToPg,
   getAndDeployLastVersion,
+  unlockRelease,
 };

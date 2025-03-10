@@ -167,6 +167,15 @@ const slack = {
         return null;
     }
   },
+
+  async unlockRelease(request) {
+    const payload = request.pre.payload;
+    commands.unlockRelease(payload);
+
+    return {
+      text: 'La commande a été transmise.',
+    };
+  },
 };
 
 export default slack;
