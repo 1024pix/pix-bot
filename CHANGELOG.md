@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.115.2 (11/03/2025)
+
+
+### :building_construction: Tech
+- [#529](https://github.com/1024pix/pix-bot/pull/529) [TECH] Renommer `pix-data-api-pix` en `pix-api-to-pg`.
+
+### :arrow_up: Montée de version
+- [#508](https://github.com/1024pix/pix-bot/pull/508) [BUMP] Update dependency eslint-config-prettier to v10 (dossier racine).
+- [#513](https://github.com/1024pix/pix-bot/pull/513) [BUMP] Update dependency nock to v14 (dossier racine).
+- [#523](https://github.com/1024pix/pix-bot/pull/523) [BUMP] Update dependency cron to v4 (dossier racine).
+
 ## v1.115.1 (04/03/2025)
 
 
