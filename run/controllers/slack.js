@@ -135,13 +135,11 @@ const slack = {
 
     switch (interactionType) {
       case 'shortcut':
-        console.log(payload.callback_id);
         if (payload.callback_id === 'deploy-release') {
           await shortcuts.openViewDeployReleaseTagSelection(payload);
         } else if (payload.callback_id === 'scalingo-app-creation') {
           await shortcuts.openViewCreateAppOnScalingoSelection(payload);
         } else if (payload.callback_id === 'lock-release') {
-          console.log('lock release was found');
           await shortcuts.openViewLockRelease(payload);
         }
         return null;
@@ -168,6 +166,15 @@ const slack = {
         logger.info({ event: 'slack', message: 'This kind of interaction is not yet supported by Pix Bot.' });
         return null;
     }
+  },
+
+  async unlockRelease(request) {
+    const payload = request.pre.payload;
+    commands.unlockRelease(payload);
+
+    return {
+      text: 'La commande a été transmise.',
+    };
   },
 };
 
