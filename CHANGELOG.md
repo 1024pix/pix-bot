@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.117.0 (14/03/2025)
+
+
+### :building_construction: Tech
+- [#533](https://github.com/1024pix/pix-bot/pull/533) [TECH] Ajouter pix-exploit-front-review et renommer pix-exploit-review.
+
 ## v1.116.0 (14/03/2025)
 
 
