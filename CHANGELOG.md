@@ -1,5 +1,21 @@
 # pix-bot Changelog
 
+## v1.116.0 (14/03/2025)
+
+
+### :rocket: Amélioration
+- [#528](https://github.com/1024pix/pix-bot/pull/528) [FEATURE] Ajouter des commandes Slack pour bloquer ou débloquer les mise en production.
+- [#527](https://github.com/1024pix/pix-bot/pull/527) [FEATURE] Autoriser ou non les mises en production (PIX-16839).
+
+### :building_construction: Tech
+- [#531](https://github.com/1024pix/pix-bot/pull/531) [TECH] Ajouter nodemon et une commande pour lancer Pix Bot en mode dev.
+
+### :bug: Correction
+- [#532](https://github.com/1024pix/pix-bot/pull/532) [BUGFIX] Mettre à jour le commit status check-ra-deployment lorsque le label no-review-app est ajouté à la création de la PR.
+
+### :arrow_up: Montée de version
+- [#530](https://github.com/1024pix/pix-bot/pull/530) [BUMP] Update dependency axios to v1.8.2 [SECURITY].
+
 ## v1.115.2 (11/03/2025)
 
 
