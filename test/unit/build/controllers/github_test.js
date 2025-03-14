@@ -579,16 +579,19 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       });
 
       describe('when there is a no-review-app label on the PR', function () {
-        it('should not create a Review App', async function () {
+        it('should not create a Review App and update check-ra-deployment check', async function () {
           // given
-          request.payload.label = { name: 'no-review-app' };
           sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'no-review-app' }]);
+          const githubServiceMock = { addRADeploymentCheck: sinon.stub() };
 
           // when
-          const response = await githubController.handleRA(request);
+          const response = await githubController.handleRA(request, null, null, githubServiceMock);
 
           // then
           expect(response).to.equal('RA disabled for this PR');
+          expect(
+            githubServiceMock.addRADeploymentCheck.calledWith({ repository: 'pix', prNumber: 3, status: 'success' }),
+          ).to.be.true;
         });
       });
 

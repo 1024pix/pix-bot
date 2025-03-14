@@ -200,6 +200,9 @@ describe('Acceptance | Build | Github', function () {
 
         it('responds with 200 and do nothing for a pr labelled with no-review-app', async function () {
           body.pull_request.labels = [{ name: 'no-review-app' }];
+          getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'sha' });
+          addRADeploymentCheckNock({ repository: 'pix', sha: 'sha', status: 'success' });
+
           const res = await server.inject({
             method: 'POST',
             url: '/github/webhook',
@@ -211,6 +214,7 @@ describe('Acceptance | Build | Github', function () {
           });
           expect(res.statusCode).to.equal(200);
           expect(res.result).to.eql('RA disabled for this PR');
+          expect(nock.isDone());
         });
 
         describe('when Scalingo API client throws an error', function () {
@@ -367,8 +371,11 @@ describe('Acceptance | Build | Github', function () {
         expect(res.result).to.eql('Ignoring edited action');
       });
 
-      it('responds with 200 and do nothing for a pr labelled with no-review-app', async function () {
+      it('responds with 200 and update check-ra-deployment for a pr labelled with no-review-app', async function () {
         body.pull_request.labels = [{ name: 'no-review-app' }];
+        getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'sha' });
+        addRADeploymentCheckNock({ repository: 'pix', sha: 'sha', status: 'success' });
+
         const res = await server.inject({
           method: 'POST',
           url: '/github/webhook',
@@ -380,6 +387,7 @@ describe('Acceptance | Build | Github', function () {
         });
         expect(res.statusCode).to.equal(200);
         expect(res.result).to.eql('RA disabled for this PR');
+        expect(nock.isDone());
       });
 
       describe('when RA does not already exist', function () {

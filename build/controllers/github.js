@@ -76,7 +76,7 @@ async function _handleRA(
   const repository = payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
 
-  const { shouldContinue, message } = _handleNoRACase(request);
+  const { shouldContinue, message } = await _handleNoRACase(request, githubService);
   if (!shouldContinue) {
     return message;
   }
@@ -328,13 +328,14 @@ async function processWebhook(
   }
 }
 
-function _handleNoRACase(request) {
+async function _handleNoRACase(request, githubService) {
   const payload = request.payload;
   const repository = payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
   const isFork = payload.pull_request.head.repo.fork;
   const labelsList = payload.pull_request.labels;
   const state = payload.pull_request.state;
+  const prNumber = payload.number;
 
   if (isFork) {
     return { message: 'No RA for a fork', shouldContinue: false };
@@ -343,6 +344,7 @@ function _handleNoRACase(request) {
     return { message: 'No RA configured for this repository', shouldContinue: false };
   }
   if (labelsList.some((label) => label.name === 'no-review-app')) {
+    await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
     return { message: 'RA disabled for this PR', shouldContinue: false };
   }
   if (state !== 'open') {
