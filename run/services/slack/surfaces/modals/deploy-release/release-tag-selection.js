@@ -1,30 +1,46 @@
 import { Blocks, Elements, Modal } from 'slack-block-builder';
+import { getStatus } from '../../../../../../common/repositories/release-settings.repository.js';
 
 const callbackId = 'release-tag-selection';
 
-function modal() {
-  return Modal({
+function modal(isSubmitable = true, reason = null) {
+  const headers = {
     title: 'Déployer une release',
     callbackId,
-    submit: 'Déployer',
-    close: 'Annuler',
-  }).blocks([
-    Blocks.Input({
-      blockId: 'deploy-release-tag',
-      label: 'Numéro de release',
-    }).element(
-      Elements.TextInput({
-        actionId: 'release-tag-value',
-        placeholder: 'Ex : v2.130.0',
+    submit: isSubmitable ? 'Déployer' : null,
+    close: isSubmitable ? 'Annuler' : 'Fermer',
+  };
+  let block;
+  if (isSubmitable) {
+    block = [
+      Blocks.Input({
+        blockId: 'deploy-release-tag',
+        label: 'Numéro de release',
+      }).element(
+        Elements.TextInput({
+          actionId: 'release-tag-value',
+          placeholder: 'Ex : v2.130.0',
+        }),
+      ),
+    ];
+  } else {
+    block = [
+      Blocks.Section({
+        text: 'La mep est actuellement bloquée.',
       }),
-    ),
-  ]);
+      Blocks.Section({
+        text: reason,
+      }),
+    ];
+  }
+  return Modal(headers).blocks(block);
 }
 
-const getView = (triggerId) => {
+const getView = async (triggerId) => {
+  const { authorizeDeployment, blockReason } = await getStatus({ repositoryName: 'pix' });
   return {
     trigger_id: triggerId,
-    view: modal().buildToObject(),
+    view: modal(authorizeDeployment, blockReason).buildToObject(),
   };
 };
 
