@@ -126,6 +126,13 @@ manifest.registerShortcut({
   description: "Lance la création d'une application sur Scalingo",
 });
 
+manifest.registerShortcut({
+  name: 'MEP/lock',
+  type: 'global',
+  callback_id: 'lock-release',
+  description: 'Bloquer la mise en production.',
+});
+
 manifest.addInteractivity({
   path: '/run/slack/interactive-endpoint',
   handler: slackbotController.interactiveEndpoint,
@@ -138,6 +145,14 @@ manifest.registerSlashCommand({
   usage_hint: '/deploy-pix-api-to-pg $version',
   should_escape: false,
   handler: slackbotController.deployPixApiToPg,
+});
+
+manifest.registerSlashCommand({
+  command: '/MEP/unlock',
+  path: '/slack/commands/unlock-release',
+  description: 'Débloquer la mise en production.',
+  should_escape: false,
+  handler: slackbotController.unlockRelease,
 });
 
 export default manifest;

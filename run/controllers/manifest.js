@@ -16,13 +16,16 @@ const manifestRequest = {
         },
         shortcuts: manifest.shortcuts,
         slash_commands: manifest.slashCommands.map(({ command, path, description, usage_hint, should_escape }) => {
-          return {
+          const commandObject = {
             command,
             url: `${url}${path}`,
             description,
-            usage_hint,
             should_escape,
           };
+          if (usage_hint) {
+            commandObject.usage_hint = usage_hint;
+          }
+          return commandObject;
         }),
       },
       oauth_config: {

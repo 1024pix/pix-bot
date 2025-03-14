@@ -11,7 +11,7 @@ describe('Acceptance | Run | Manifest', function () {
       });
       const hostname = server.info.host + ':0';
       expect(res.statusCode).to.equal(200);
-      expect(res.result).to.eql({
+      expect(res.result).to.deep.eql({
         display_information: {
           name: 'Pix Bot Run',
         },
@@ -32,6 +32,12 @@ describe('Acceptance | Run | Manifest', function () {
               type: 'global',
               callback_id: 'scalingo-app-creation',
               description: "Lance la création d'une application sur Scalingo",
+            },
+            {
+              name: 'MEP/lock',
+              type: 'global',
+              callback_id: 'lock-release',
+              description: 'Bloquer la mise en production.',
             },
           ],
           slash_commands: [
@@ -126,6 +132,12 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
               url: `http://${hostname}/slack/commands/deploy-pix-api-to-pg`,
               usage_hint: '/deploy-pix-api-to-pg $version',
+            },
+            {
+              command: '/MEP/unlock',
+              description: 'Débloquer la mise en production.',
+              url: `http://${hostname}/slack/commands/unlock-release`,
+              should_escape: false,
             },
             {
               command: '/deploy-metabase',

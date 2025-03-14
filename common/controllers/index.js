@@ -5,6 +5,7 @@ import releasePublicationConfirmationModal from '../../build/services/slack/surf
 import releaseTypeSelectionModal from '../../build/services/slack/surfaces/modals/publish-release/release-type-selection.js';
 import releaseDeploymentConfirmationModal from '../../run/services/slack/surfaces/modals/deploy-release/release-deployment-confirmation.js';
 import releaseTagSelectionModal from '../../run/services/slack/surfaces/modals/deploy-release/release-tag-selection.js';
+import lockReleaseDeployment from '../../run/services/slack/surfaces/modals/deploy-release/lock-release-deployment.js';
 import createAppOnScalingoSelectionModal from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation.js';
 import submitApplicationNameSelectionModal from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation-confirmation.js';
 
@@ -25,6 +26,7 @@ const controllers = {
       { name: 'release-deployment-confirmation', view: releaseDeploymentConfirmationModal.sampleView() },
       { name: 'release-publication-confirmation', view: releasePublicationConfirmationModal.sampleView() },
       { name: 'application-creation-confirmation', view: submitApplicationNameSelectionModal.sampleView() },
+      { name: 'lock-release-view', view: lockReleaseDeployment.sampleView() },
     ];
     return views
       .map(({ name, view }) => {
