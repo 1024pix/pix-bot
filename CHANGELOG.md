@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.118.0 (18/03/2025)
+
+
+### :rocket: Amélioration
+- [#534](https://github.com/1024pix/pix-bot/pull/534) [FEATURE] Ajouter le lien pour la RA de l'interface Pix exploit.
+
+### :arrow_up: Montée de version
+- [#535](https://github.com/1024pix/pix-bot/pull/535) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.117.0 (14/03/2025)
 
 
