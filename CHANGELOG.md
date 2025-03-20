@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.118.1 (20/03/2025)
+
+
+### :bug: Correction
+- [#536](https://github.com/1024pix/pix-bot/pull/536) [BUGFIX] Ajouter les liens des variables d'environnement pour les pr de pix exploit (PIX-17107).
+
 ## v1.118.0 (18/03/2025)
 
 
