@@ -48,16 +48,16 @@ class ScalingoClient {
     return `${scalingoApp} ${releaseTag} has been deployed`;
   }
 
-  async deployUsingSCM(scalingoApp, releaseTag) {
+  async deployUsingSCM(scalingoApp, scmRef) {
     try {
-      await this.client.SCMRepoLinks.manualDeploy(scalingoApp, releaseTag);
+      await this.client.SCMRepoLinks.manualDeploy(scalingoApp, scmRef);
     } catch (e) {
       logger.error({ event: 'scalingo', message: e });
-      throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
+      throw new Error(`Unable to deploy ${scalingoApp} ${scmRef}`);
     }
 
-    logger.info({ message: `Deployment of ${scalingoApp} ${releaseTag} has been requested` });
-    return `Deployment of ${scalingoApp} ${releaseTag} has been requested`;
+    logger.info({ message: `Deployment of ${scalingoApp} ${scmRef} has been requested` });
+    return `Deployment of ${scalingoApp} ${scmRef} has been requested`;
   }
 
   async getAppInfo(target) {
