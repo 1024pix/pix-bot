@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.118.2 (24/03/2025)
+
+
+### :building_construction: Tech
+- [#538](https://github.com/1024pix/pix-bot/pull/538) [TECH] Ne pas déployer de pix-exploit-front-review-pr-*.
+
+### :arrow_up: Montée de version
+- [#537](https://github.com/1024pix/pix-bot/pull/537) [BUMP] Lock file maintenance (dossier racine).
+
 ## v1.118.1 (20/03/2025)
 
 
