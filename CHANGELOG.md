@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.118.3 (26/03/2025)
+
+
+### :coffee: Autre
+- [#539](https://github.com/1024pix/pix-bot/pull/539) [REVERT] Revenir à l'ancien template pour Pix exploit.
+
 ## v1.118.2 (24/03/2025)
 
 
