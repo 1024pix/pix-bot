@@ -24,6 +24,7 @@ const repositoryToScalingoAppsReview = {
   'pix-ui': ['pix-ui-review'],
   pix: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
   pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
+  securix: ['pix-securix-review'],
 };
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
