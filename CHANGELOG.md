@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.118.4 (27/03/2025)
+
+
+### :rocket: Amélioration
+- [#540](https://github.com/1024pix/pix-bot/pull/540) [FEATURE] pix-epreuves: Lien vers le viewer de composants.
+
 ## v1.118.3 (26/03/2025)
 
 
