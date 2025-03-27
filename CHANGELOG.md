@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.119.0 (27/03/2025)
+
+
+### :rocket: Amélioration
+- [#541](https://github.com/1024pix/pix-bot/pull/541) [FEATURE] Ajouter le repo securix.
+
 ## v1.118.4 (27/03/2025)
 
 
