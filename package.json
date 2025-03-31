@@ -85,7 +85,7 @@
     "nodemon": "^3.1.9",
     "prettier": "^3.0.0",
     "simple-git": "^3.15.1",
-    "sinon": "^19.0.0",
+    "sinon": "^20.0.0",
     "sinon-chai": "^4.0.0"
   }
 }
