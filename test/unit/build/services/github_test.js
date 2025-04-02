@@ -791,4 +791,160 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#isMergeable', function () {
+    describe('when mergeable state is null', function () {
+      it('should poll get pull request until mergeable state is defined', async function () {
+        // given
+        const repositoryName = '1024pix/pix';
+        const prNumber = 123;
+        const prNodeId = '456';
+
+        const pullRequestNockCall1 = nock('https://api.github.com')
+          .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+          .reply(200, { node_id: prNodeId, mergeable: null })
+          .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+          .reply(200, { node_id: prNodeId, mergeable: true });
+
+        // when
+        await githubService.isMergeable({ repositoryName, number: prNumber, pollDelay: 0 });
+
+        // then
+        expect(pullRequestNockCall1.isDone()).to.be.true;
+      });
+    });
+
+    describe('when mergeable state is false', function () {
+      it('should return false', async function () {
+        // given
+        const repositoryName = '1024pix/pix';
+        const prNumber = 123;
+        const prNodeId = '456';
+
+        const pullRequestNockCall1 = nock('https://api.github.com')
+          .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+          .reply(200, { node_id: prNodeId, mergeable: false });
+
+        // when
+        const isMergeable = await githubService.isMergeable({ repositoryName, number: prNumber, pollDelay: 0 });
+
+        // then
+        expect(pullRequestNockCall1.isDone()).to.be.true;
+        expect(isMergeable).to.be.false;
+      });
+    });
+
+    describe('when mergeable state is true', function () {
+      it('calls github API to update branch with rebase method', async function () {
+        // given
+        const repositoryName = '1024pix/pix';
+        const prNumber = 123;
+        const prNodeId = '456';
+
+        const pullRequestNock = nock('https://api.github.com')
+          .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+          .reply(200, { node_id: prNodeId, mergeable: true });
+
+        // when
+        const isMergeable = await githubService.isMergeable({ repositoryName, number: prNumber, pollDelay: 0 });
+
+        // then
+        expect(pullRequestNock.isDone()).to.be.true;
+        expect(isMergeable).to.be.true;
+      });
+    });
+  });
+
+  describe('#updatePullRequestBranch', function () {
+    describe('when mergeable state is false', function () {
+      it('should not try to update pull_request', async function () {
+        // given
+        const repositoryName = '1024pix/pix';
+        const prNumber = 123;
+        const prNodeId = '456';
+
+        const pullRequestNockCall1 = nock('https://api.github.com')
+          .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+          .reply(200, { node_id: prNodeId, mergeable: false });
+
+        // when
+        const updated = await githubService.updatePullRequestBranch({ repositoryName, number: prNumber, pollDelay: 0 });
+
+        // then
+        expect(pullRequestNockCall1.isDone()).to.be.true;
+        expect(updated).to.be.false;
+      });
+    });
+
+    describe('when mergeable state is true', function () {
+      it('calls github API to update branch with rebase method', async function () {
+        // given
+        const repositoryName = '1024pix/pix';
+        const prNumber = 123;
+        const prNodeId = '456';
+
+        const pullRequestNock = nock('https://api.github.com')
+          .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+          .reply(200, { node_id: prNodeId, mergeable: true })
+          .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+          .reply(200, { node_id: prNodeId, mergeable: true });
+
+        const mutationNock = nock('https://api.github.com')
+          .post('/graphql', {
+            query: /.*/,
+            variables: { pullRequestId: prNodeId, updateMethod: 'REBASE' },
+          })
+          .reply(200, {
+            data: {
+              pullRequest: {
+                autoMergerRequest: {},
+              },
+            },
+          });
+
+        // when
+        const updated = await githubService.updatePullRequestBranch({ repositoryName, number: prNumber, pollDelay: 0 });
+
+        // then
+        expect(pullRequestNock.isDone()).to.be.true;
+        expect(mutationNock.isDone()).to.be.true;
+        expect(updated).to.be.true;
+      });
+    });
+  });
+
+  describe('#enableAutoMerge', function () {
+    it('calls github API to enable auto merge mutation', async function () {
+      // given
+      const repositoryName = '1024pix/pix';
+      const prNumber = 123;
+      const prNodeId = '456';
+
+      const pullRequestNock = nock('https://api.github.com')
+        .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+        .reply(200, { node_id: prNodeId });
+
+      const mutationNock = nock('https://api.github.com')
+        .post('/graphql', {
+          query: /.*/,
+          variables: { pullRequestId: prNodeId, mergeMethod: 'MERGE' },
+        })
+        .reply(200, {
+          data: {
+            enablePullRequestAutoMerge: {
+              pullRequest: {
+                autoMergerRequest: {},
+              },
+            },
+          },
+        });
+
+      // when
+      await githubService.enableAutoMerge({ repositoryName, number: prNumber });
+
+      // then
+      expect(pullRequestNock.isDone()).to.be.true;
+      expect(mutationNock.isDone()).to.be.true;
+    });
+  });
 });

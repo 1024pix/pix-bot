@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 
 import Boom from '@hapi/boom';
 import { Octokit } from '@octokit/rest';
+import { graphql } from '@octokit/graphql';
 import _ from 'lodash';
 import fetch from 'node-fetch';
 import tsscmp from 'tsscmp';
@@ -486,6 +487,12 @@ const github = {
     return commits.length > 0;
   },
 
+  async getPullRequestDetails({ number, repositoryName }) {
+    const octokit = _createOctokit();
+    const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
+    return data;
+  },
+
   verifyWebhookSignature(request) {
     const { headers, payload } = request;
 
@@ -503,6 +510,8 @@ const github = {
   commentPullRequest,
   addRADeploymentCheck,
   setMergeQueueStatus,
+
+  createCommitStatus,
 
   async checkUserBelongsToPix(username) {
     const octokit = _createOctokit();
@@ -525,6 +534,90 @@ const github = {
     const octokit = _createOctokit();
     const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
     return data.labels.some((ghLabel) => ghLabel.name === label);
+  },
+
+  async isMergeable({ number, repositoryName, pollDelay = 10_000 }) {
+    const octokit = _createOctokit();
+    let data;
+    do {
+      const response = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
+      data = response.data;
+      await new Promise((resolve) => setTimeout(resolve, pollDelay));
+    } while (data.mergeable === null);
+
+    return data.mergeable;
+  },
+
+  async updatePullRequestBranch({ number, repositoryName, pollDelay = 10_000 }) {
+    const graphqlWithAuth = graphql.defaults({
+      request: { fetch },
+      headers: {
+        authorization: `token ${config.github.token}`,
+      },
+    });
+
+    if (!(await this.isMergeable({ number, repositoryName, pollDelay }))) {
+      return false;
+    }
+
+    const octokit = _createOctokit();
+    const response = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
+
+    const pullRequestId = response.data.node_id;
+    await graphqlWithAuth(
+      `mutation ($pullRequestId: ID!, $updateMethod: PullRequestBranchUpdateMethod!) {
+        updatePullRequestBranch(input: {
+          pullRequestId: $pullRequestId,
+          updateMethod: $updateMethod
+        }) {
+          pullRequest {
+            updatedAt,
+          }
+        }
+      }`,
+      {
+        pullRequestId,
+        updateMethod: 'REBASE',
+      },
+    );
+
+    return true;
+  },
+
+  async enableAutoMerge({ number, repositoryName }) {
+    const graphqlWithAuth = graphql.defaults({
+      request: { fetch },
+      headers: {
+        authorization: `token ${config.github.token}`,
+      },
+    });
+
+    const octokit = _createOctokit();
+    const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
+
+    const pullRequestId = data.node_id;
+    const { enablePullRequestAutoMerge } = await graphqlWithAuth(
+      `mutation ($pullRequestId: ID!, $mergeMethod: PullRequestMergeMethod!) {
+        enablePullRequestAutoMerge(input: {
+          pullRequestId: $pullRequestId,
+          mergeMethod: $mergeMethod
+        }) {
+          pullRequest {
+            autoMergeRequest {
+              enabledAt
+              enabledBy {
+                login
+              }
+            }
+          }
+        }
+      }`,
+      {
+        pullRequestId,
+        mergeMethod: 'MERGE',
+      },
+    );
+    return enablePullRequestAutoMerge.pullRequest.autoMergeRequest;
   },
 };
 
