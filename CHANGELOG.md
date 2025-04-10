@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.120.1 (10/04/2025)
+
+
+### :bug: Correction
+- [#547](https://github.com/1024pix/pix-bot/pull/547) [BUGFIX] Corriger le déploiement de securix.
+
 ## v1.120.0 (10/04/2025)
 
 
