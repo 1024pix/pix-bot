@@ -210,6 +210,15 @@ async function createAndDeployPixTutosRelease(payload) {
   );
 }
 
+async function createAndDeployPixSecurixRelease(payload) {
+  await _publishAndDeployRelease(
+    config.PIX_SECURIX_REPO_NAME,
+    [config.PIX_SECURIX_APP_NAME],
+    payload.text,
+    payload.response_url,
+  );
+}
+
 async function deployPixApiToPg(payload) {
   const version = payload.text;
   await deployTagUsingSCM(config.PIX_API_TO_PG_APPS_NAME, version);
@@ -231,6 +240,7 @@ export {
   createAndDeployPixLCMS,
   createAndDeployPixSiteRelease,
   createAndDeployPixTutosRelease,
+  createAndDeployPixSecurixRelease,
   createAndDeployPixUI,
   deployAirflow,
   deployDBT,

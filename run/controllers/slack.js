@@ -84,6 +84,15 @@ const slack = {
     };
   },
 
+  createAndDeployPixSecurixRelease(request) {
+    const payload = request.pre.payload;
+    commands.createAndDeployPixSecurixRelease(payload);
+
+    return {
+      text: _getDeployStartedMessage(payload.text, 'PIX Securix'),
+    };
+  },
+
   createAndDeployPixTutosRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixTutosRelease(payload);
