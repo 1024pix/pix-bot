@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.120.0 (10/04/2025)
+
+
+### :rocket: Amélioration
+- [#546](https://github.com/1024pix/pix-bot/pull/546) [FEATURE]: Ajouter une commande slack de release et de déploiement pour l'application pix-securix.
+- [#542](https://github.com/1024pix/pix-bot/pull/542) [FEATURE] Utiliser le nouveau nom de domaine du viewer pix-epreuves.
+
+### :arrow_up: Montée de version
+- [#543](https://github.com/1024pix/pix-bot/pull/543) [BUMP] Lock file maintenance (dossier racine).
+- [#544](https://github.com/1024pix/pix-bot/pull/544) [BUMP] Update dependency sinon to v20 (dossier racine).
+
 ## v1.119.0 (27/03/2025)
 
 
