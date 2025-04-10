@@ -86,6 +86,15 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
+  command: '/deploy-pix-securix',
+  path: '/slack/commands/create-and-deploy-pix-securix-release',
+  description: 'Créer une release de Pix Securix',
+  usage_hint: '[patch, minor, major]',
+  should_escape: false,
+  handler: slackbotController.createAndDeployPixSecurixRelease,
+});
+
+manifest.registerSlashCommand({
   command: '/deploy-airflow',
   path: '/slack/commands/deploy-airflow',
   description: 'Déploie la version précisée de Airflow en production',

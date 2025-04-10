@@ -13,6 +13,7 @@ import {
   createAndDeployPixLCMS,
   createAndDeployPixSiteRelease,
   createAndDeployPixTutosRelease,
+  createAndDeployPixSecurixRelease,
   createAndDeployPixUI,
   getAndDeployLastVersion,
 } from '../../../../../run/services/slack/commands.js';
@@ -290,6 +291,25 @@ describe('Unit | Run | Services | Slack | Commands', function () {
     it('should publish a new release', function () {
       // then
       sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-tutos', 'minor');
+    });
+
+    it('should deploy the release', function () {
+      // then
+      sinon.assert.calledWith(releasesService.deployPixRepo);
+    });
+  });
+
+  describe('#createAndDeployPixSecurixRelease', function () {
+    beforeEach(async function () {
+      // given
+      const payload = { text: 'minor' };
+      // when
+      await createAndDeployPixSecurixRelease(payload);
+    });
+
+    it('should publish a new release', function () {
+      // then
+      sinon.assert.calledWith(releasesService.publishPixRepo, 'securix', 'minor');
     });
 
     it('should deploy the release', function () {

@@ -106,6 +106,13 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '[patch, minor, major]',
             },
             {
+              command: '/deploy-pix-securix',
+              description: 'Créer une release de Pix Securix',
+              should_escape: false,
+              url: `http://${hostname}/slack/commands/create-and-deploy-pix-securix-release`,
+              usage_hint: '[patch, minor, major]',
+            },
+            {
               command: '/deploy-airflow',
               description: 'Déploie la version précisée de Airflow en production',
               should_escape: false,
