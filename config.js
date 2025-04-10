@@ -47,6 +47,9 @@ const configuration = (function () {
       reviewApps: {
         token: process.env.SCALINGO_TOKEN_REVIEW_APPS,
         apiUrl: process.env.SCALINGO_API_URL_REVIEW_APPS || 'https://api.osc-fr1.scalingo.com',
+        deployDebounce: _getNumber(process.env.REVIEW_APP_DEPLOY_DEBOUNCE, 15) * 1000,
+        deploySchedule: process.env.DEPLOY_REVIEW_APPS_SCHEDULE ?? '*/15 * * * * *',
+        deployRetryAfter: _getNumber(process.env.REVIEW_APP_DEPLOY_RETRY_AFTER, 30) * 1000,
       },
       integration: {
         token: process.env.SCALINGO_TOKEN_INTEGRATION,
