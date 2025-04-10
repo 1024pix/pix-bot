@@ -183,7 +183,7 @@ const configuration = (function () {
     ],
     PIX_APPS_ENVIRONMENTS: ['integration', 'recette', 'production'],
     PIX_SECURIX_REPO_NAME: 'securix',
-    PIX_SECURIX_APP_NAME: 'pix-securix-production',
+    PIX_SECURIX_APP_NAME: 'pix-securix',
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
     PIX_TUTOS_APP_NAME: 'pix-tutos',
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
