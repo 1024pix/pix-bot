@@ -36,12 +36,12 @@ describe('Unit | Build | Services | merge-queue', function () {
         pullRequestRepository.isAtLeastOneMergeInProgress.withArgs(repositoryName).resolves(false);
         pullRequestRepository.findNotMerged.withArgs(repositoryName).resolves([pr]);
 
-        const githubService = {
-          triggerWorkflow: sinon.stub(),
-          setMergeQueueStatus: sinon.stub(),
+        const pullRequestMergeService = {
+          merge: sinon.stub(),
+          areMergeConditionsMet: sinon.stub(),
         };
 
-        await new MergeQueue({ pullRequestRepository, githubService }).manage({ repositoryName });
+        await new MergeQueue({ pullRequestRepository, pullRequestMergeService }).manage({ repositoryName });
 
         expect(pullRequestRepository.isAtLeastOneMergeInProgress).to.have.been.called;
         expect(pullRequestRepository.update).to.have.been.calledWithExactly({
@@ -49,13 +49,13 @@ describe('Unit | Build | Services | merge-queue', function () {
           repositoryName: 'foo/pix-project',
           isMerging: true,
         });
-        expect(githubService.triggerWorkflow).to.have.been.calledWithExactly({
-          workflow: {
-            id: config.github.automerge.workflowId,
-            repositoryName: config.github.automerge.repositoryName,
-            ref: config.github.automerge.workflowRef,
-          },
-          inputs: { pullRequest: 'foo/pix-project/1' },
+        expect(pullRequestMergeService.areMergeConditionsMet).to.have.been.calledWithExactly({
+          number: 1,
+          repositoryName: 'foo/pix-project',
+        });
+        expect(pullRequestMergeService.merge).to.have.been.calledWithExactly({
+          number: 1,
+          repositoryName: 'foo/pix-project',
         });
       });
 
