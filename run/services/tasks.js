@@ -1,5 +1,6 @@
 import { config } from '../../config.js';
 import * as taskAutoScaleWeb from './tasks/autoscale-web.js';
+import * as taskRelease from './tasks/release.js';
 
 class Task {
   constructor({ name, enabled, schedule, job, params }) {
@@ -34,10 +35,20 @@ const tasks = [
     schedule: config.tasks.scheduleAutoScaleDown,
     job: taskAutoScaleWeb,
     params: {
-        applicationName: config.tasks.autoScaleApplicationName,
-        region: config.tasks.autoScaleRegion,
-        autoScalingParameters: config.tasks.autoScaleDownSettings,
-      }
+      applicationName: config.tasks.autoScaleApplicationName,
+      region: config.tasks.autoScaleRegion,
+      autoScalingParameters: config.tasks.autoScaleDownSettings,
+    },
+  }),
+  new Task({
+    name: 'monorepoRelease',
+    enabled: config.tasks.monorepoReleaseEnabled,
+    schedule: config.tasks.monorepoReleaseSchedule,
+    job: taskRelease,
+    params: {
+      repository: config.tasks.monorepoReleaseRepository,
+      branch: config.tasks.monorepoReleaseBranch,
+    },
   }),
 ];
 

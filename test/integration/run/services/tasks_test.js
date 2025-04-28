@@ -15,9 +15,15 @@ describe('Integration | Run | Services | Scheduled Tasks', function () {
     sinon.stub(config.tasks, 'scheduleAutoScaleDown').value('* * * * * *');
     sinon.stub(config.tasks, 'autoScaleDownSettings').value({ min: 0, max: 10 });
 
+    sinon.stub(config.tasks, 'monorepoReleaseEnabled').value(true);
+    sinon.stub(config.tasks, 'monorepoReleaseSchedule').value('* * * * * *');
+    sinon.stub(config.tasks, 'monorepoReleaseRepository').value('repository');
+    sinon.stub(config.tasks, 'monorepoReleaseBranch').value('branch');
+
     const { tasks } = await import('../../../../run/services/tasks.js');
     morningAutoScaleTask = tasks.filter((task) => task.name === 'morningAutoScale')[0];
     eveningAutoScaleTask = tasks.filter((task) => task.name === 'eveningAutoScale')[0];
+    monorepoReleaseTask = tasks.filter((task) => task.name === 'monorepoRelease')[0];
   });
 
   describe('morningAutoScale', function () {
@@ -63,6 +69,24 @@ describe('Integration | Run | Services | Scheduled Tasks', function () {
           autoScalingParameters: { min: 0, max: 10 },
         }),
       ).to.be.true;
+    });
+  });
+
+  describe('monorepoRelease', function () {
+    it('should call handler task function with the right parameters', async function () {
+      // given
+      monorepoReleaseTask.job = {
+        run: sinon.stub(),
+      };
+
+      // when
+      await monorepoReleaseTask.handler();
+
+      // then
+      expect(monorepoReleaseTask.enabled).to.equal(true);
+      expect(monorepoReleaseTask.schedule).to.equal('* * * * * *');
+      expect(monorepoReleaseTask.job.run.calledOnceWithExactly({ repository: 'repository', branch: 'branch' })).to.be
+        .true;
     });
   });
 });
