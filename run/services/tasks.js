@@ -1,31 +1,44 @@
 import { config } from '../../config.js';
 import * as taskAutoScaleWeb from './tasks/autoscale-web.js';
 
+class Task {
+  constructor({ name, enabled, schedule, job, params }) {
+    this.name = name;
+    this.enabled = enabled;
+    this.schedule = schedule;
+    this.job = job;
+    this.params = params;
+    this.context = this;
+  }
+
+  async handler() {
+    return this.job.run(this.params);
+  }
+}
+
 const tasks = [
-  {
+  new Task({
     name: 'morningAutoScale',
     enabled: config.tasks.autoScaleEnabled,
     schedule: config.tasks.scheduleAutoScaleUp,
-    handler: async ({ task = taskAutoScaleWeb }) => {
-      await task.run({
-        applicationName: config.tasks.autoScaleApplicationName,
-        region: config.tasks.autoScaleRegion,
-        autoScalingParameters: config.tasks.autoScaleUpSettings,
-      });
+    job: taskAutoScaleWeb,
+    params: {
+      applicationName: config.tasks.autoScaleApplicationName,
+      region: config.tasks.autoScaleRegion,
+      autoScalingParameters: config.tasks.autoScaleUpSettings,
     },
-  },
-  {
+  }),
+  new Task({
     name: 'eveningAutoScale',
     enabled: config.tasks.autoScaleEnabled,
     schedule: config.tasks.scheduleAutoScaleDown,
-    handler: async ({ task = taskAutoScaleWeb }) => {
-      await task.run({
+    job: taskAutoScaleWeb,
+    params: {
         applicationName: config.tasks.autoScaleApplicationName,
         region: config.tasks.autoScaleRegion,
         autoScalingParameters: config.tasks.autoScaleDownSettings,
-      });
-    },
-  },
+      }
+  }),
 ];
 
-export default tasks;
+export { tasks };
