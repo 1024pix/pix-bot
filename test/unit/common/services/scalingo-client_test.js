@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
 
 import ScalingoClient from '../../../../common/services/scalingo-client.js';
 import { config } from '../../../../config.js';

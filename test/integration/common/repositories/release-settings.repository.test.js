@@ -1,9 +1,9 @@
 import * as releaseSettingsRepository from '../../../../common/repositories/release-settings.repository.js';
 import { knex } from '../../../../db/knex-database-connection.js';
 import { expect, sinon } from '../../../test-helper.js';
-import { describe } from 'mocha';
 
 const TABLE_NAME = 'release-settings';
+
 describe('integration | repositories | action-active', function () {
   beforeEach(async function () {
     await knex(TABLE_NAME).delete();
@@ -46,7 +46,7 @@ describe('integration | repositories | action-active', function () {
     });
   });
 
-  describe('#updateStatus', () => {
+  describe('#updateStatus', function () {
     it('should update the status of deployment authorization', async function () {
       // given
       const repositoryName = 'repository-name';

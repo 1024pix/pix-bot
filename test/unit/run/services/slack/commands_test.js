@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
 
 import githubServices from '../../../../../common/services/github.js';
 import releasesService from '../../../../../common/services/releases.js';

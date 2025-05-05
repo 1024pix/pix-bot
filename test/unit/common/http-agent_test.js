@@ -35,6 +35,7 @@ describe('Unit | Common | http-agent', function () {
         });
       });
     });
+
     context('when an error occurs', function () {
       context('when error.response exists', function () {
         it('should return statusCode and response', async function () {
@@ -61,6 +62,7 @@ describe('Unit | Common | http-agent', function () {
           });
         });
       });
+
       context('when error.response does not exists', function () {
         it('should return the error message', async function () {
           // given

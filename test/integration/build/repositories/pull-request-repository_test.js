@@ -1,7 +1,6 @@
 import * as pullRequestRepository from '../../../../build/repositories/pull-request-repository.js';
 import { knex } from '../../../../db/knex-database-connection.js';
 import { catchErr, expect } from '../../../test-helper.js';
-import { describe } from 'mocha';
 import { PullRequestNotFoundError } from '../../../../build/repositories/pull-request-repository.js';
 
 describe('PullRequestRepository', function () {

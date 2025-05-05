@@ -53,6 +53,7 @@ describe('view-submissions', function () {
         });
       });
     });
+
     context('when application name is valid', function () {
       it('should return response', async function () {
         // given
