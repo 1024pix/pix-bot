@@ -8,7 +8,7 @@ import { logger } from './common/services/logger.js';
 import { config } from './config.js';
 import { deploy } from './run/services/deploy.js';
 import { taskScheduler } from './run/services/task-scheduler.js';
-import tasks from './run/services/tasks.js';
+import { tasks } from './run/services/tasks.js';
 import server from './server.js';
 
 const init = async () => {

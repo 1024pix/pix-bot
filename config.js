@@ -146,6 +146,10 @@ const configuration = (function () {
         min: process.env.SCHEDULE_AUTOSCALE_DOWN_SETTINGS_MIN,
         max: process.env.SCHEDULE_AUTOSCALE_DOWN_SETTINGS_MAX,
       },
+      monorepoReleaseEnabled: isFeatureEnabled(process.env.FT_MONOREPO_RELEASE),
+      monorepoReleaseSchedule: process.env.MONOREPO_RELEASE_SCHEDULE,
+      monorepoReleaseRepository: process.env.MONOREPO_RELEASE_REPOSITORY,
+      monorepoReleaseBranch: process.env.MONOREPO_RELEASE_BRANCH,
     },
 
     PIX_REPO_NAME: 'pix',
