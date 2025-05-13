@@ -1,5 +1,3 @@
-import { describe, it } from 'mocha';
-
 import { config } from '../../../../config.js';
 import cdnService from '../../../../run/services/cdn.js';
 import { catchErr, expect, nock } from '../../../test-helper.js';

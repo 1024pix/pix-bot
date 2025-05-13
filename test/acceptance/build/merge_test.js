@@ -1,7 +1,6 @@
 import server from '../../../server.js';
 import { expect, nock } from '../../test-helper.js';
 import { knex } from '../../../db/knex-database-connection.js';
-import { describe } from 'mocha';
 import { config } from '../../../config.js';
 
 describe('Acceptance | Build | Merge', function () {

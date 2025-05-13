@@ -1,4 +1,3 @@
-import { describe, it } from 'mocha';
 import cdnService from '../../../../../run/services/cdn.js';
 import slackService from '../../../../../common/services/slack/surfaces/messages/update-message.js';
 import blockActions from '../../../../../run/services/slack/block-actions.js';
