@@ -1,8 +1,7 @@
 import { logger } from '../../../common/services/logger.js';
 import githubService from '../../../common/services/github.js';
-import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 
-async function run({ repository, branch }, github = githubService, slack = slackPostMessageService) {
+async function run({ repository, branch }, github = githubService) {
   logger.info({
     event: 'release',
     message: `Starting ${repository} release.`,
@@ -14,10 +13,6 @@ async function run({ repository, branch }, github = githubService, slack = slack
         repositoryName: repository,
         ref: branch,
       },
-    });
-    await slack.postMessage({
-      message: '',
-      channel: '',
     });
 
     logger.info({
