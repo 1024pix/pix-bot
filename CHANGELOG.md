@@ -1,5 +1,23 @@
 # pix-bot Changelog
 
+## v1.121.0 (14/05/2025)
+
+
+### :rocket: Amélioration
+- [#555](https://github.com/1024pix/pix-bot/pull/555) [FEATURE] Permettre au webhook de release de déployer sur osc-fr1.
+- [#549](https://github.com/1024pix/pix-bot/pull/549) [FEATURE] Ajouter un job permettant de déclencher le workflow de release (PIX-17050).
+
+### :bug: Correction
+- [#554](https://github.com/1024pix/pix-bot/pull/554) [BUGFIX] Supprimer du code inutile.
+
+### :arrow_up: Montée de version
+- [#552](https://github.com/1024pix/pix-bot/pull/552) [BUMP] Update dependency postgres to v16.9.
+- [#553](https://github.com/1024pix/pix-bot/pull/553) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.11 (dossier racine).
+- [#551](https://github.com/1024pix/pix-bot/pull/551) [BUMP] Update dependency eslint-plugin-mocha to v11 (dossier racine).
+- [#545](https://github.com/1024pix/pix-bot/pull/545) [BUMP] Lock file maintenance (dossier racine).
+- [#548](https://github.com/1024pix/pix-bot/pull/548) [BUMP] Update dependency postgres to v16.8.
+- [#550](https://github.com/1024pix/pix-bot/pull/550) [BUMP] Update Node.js to v22.15.0.
+
 ## v1.120.1 (10/04/2025)
 
 
