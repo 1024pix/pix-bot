@@ -26,9 +26,11 @@ async function releaseWebhook(request, repoAppMapping = config.repoAppNames, inj
 }
 
 async function deployFromArchive(appNames, tag, repository, scalingoClient) {
-  const client = await scalingoClient.getInstance('production');
   return Promise.all(
-    appNames.map((appName) => {
+    appNames.map(async (appName) => {
+      const appNameFragment = appName.split('-');
+      const instance = appNameFragment[appNameFragment.length - 1];
+      const client = await scalingoClient.getInstance(instance);
       return client.deployFromArchive(appName, tag, repository, { withEnvSuffix: false });
     }),
   );

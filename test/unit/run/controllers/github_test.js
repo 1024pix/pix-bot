@@ -60,7 +60,7 @@ describe('Unit | Run | Controller | Github', function () {
   });
 
   describe('#releaseWebhook', function () {
-    context('when repo is handle', function () {
+    context('when repo is handled', function () {
       it('should deploy release', async function () {
         // given
         const request = {
@@ -77,28 +77,34 @@ describe('Unit | Run | Controller | Github', function () {
         };
         const deployFromArchive = sinon.stub();
         const injectedConfigurationRepoAppMapping = {
-          'pix-repo-test': ['pix-app-name-production', 'pix-app-name-2-production'],
+          'pix-repo-test': ['pix-app-name-production', 'pix-app-name-2-production', 'pix-app-name-recette'],
         };
         const injectedScalingoClientStub = {
-          getInstance: () => ({
+          getInstance: sinon.spy(() => ({
             deployFromArchive,
-          }),
+          })),
         };
 
         // when
         await githubController.releaseWebhook(request, injectedConfigurationRepoAppMapping, injectedScalingoClientStub);
 
         // then
+        expect(injectedScalingoClientStub.getInstance.firstCall).to.be.calledWith('production');
         expect(deployFromArchive.firstCall).to.be.calledWith('pix-app-name-production', 'v0.1.0', 'pix-repo-test', {
           withEnvSuffix: false,
         });
+        expect(injectedScalingoClientStub.getInstance.secondCall).to.be.calledWith('production');
         expect(deployFromArchive.secondCall).to.be.calledWith('pix-app-name-2-production', 'v0.1.0', 'pix-repo-test', {
+          withEnvSuffix: false,
+        });
+        expect(injectedScalingoClientStub.getInstance.thirdCall).to.be.calledWith('recette');
+        expect(deployFromArchive.thirdCall).to.be.calledWith('pix-app-name-recette', 'v0.1.0', 'pix-repo-test', {
           withEnvSuffix: false,
         });
       });
     });
 
-    context('when repo is not handle', function () {
+    context('when repo is not handled', function () {
       it('should not try to deploy release', async function () {
         // given
         const request = {
