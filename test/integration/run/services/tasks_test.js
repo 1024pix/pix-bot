@@ -2,7 +2,7 @@ import { config } from '../../../../config.js';
 import { expect, sinon } from '../../../test-helper.js';
 
 describe('Integration | Run | Services | Scheduled Tasks', function () {
-  let morningAutoScaleTask, eveningAutoScaleTask, monorepoReleaseTask;
+  let morningAutoScaleTask, eveningAutoScaleTask, monorepoReleaseTask, monorepoReleaseProductionTask;
 
   beforeEach(async function () {
     sinon.stub(config.tasks, 'autoScaleEnabled').value(true);
@@ -20,10 +20,14 @@ describe('Integration | Run | Services | Scheduled Tasks', function () {
     sinon.stub(config.tasks, 'monorepoReleaseRepository').value('repository');
     sinon.stub(config.tasks, 'monorepoReleaseBranch').value('branch');
 
+    sinon.stub(config.tasks, 'monorepoReleaseProductionEnabled').value(true);
+    sinon.stub(config.tasks, 'monorepoReleaseProductionSchedule').value('* * * * * *');
+
     const { tasks } = await import('../../../../run/services/tasks.js');
     morningAutoScaleTask = tasks.filter((task) => task.name === 'morningAutoScale')[0];
     eveningAutoScaleTask = tasks.filter((task) => task.name === 'eveningAutoScale')[0];
     monorepoReleaseTask = tasks.filter((task) => task.name === 'monorepoRelease')[0];
+    monorepoReleaseProductionTask = tasks.filter((task) => task.name === 'monorepoReleaseProduction')[0];
   });
 
   describe('morningAutoScale', function () {
@@ -87,6 +91,23 @@ describe('Integration | Run | Services | Scheduled Tasks', function () {
       expect(monorepoReleaseTask.schedule).to.equal('* * * * * *');
       expect(monorepoReleaseTask.job.run.calledOnceWithExactly({ repository: 'repository', branch: 'branch' })).to.be
         .true;
+    });
+  });
+
+  describe('monorepoReleaseProduction', function () {
+    it('should call handler task function with the right parameters', async function () {
+      // given
+      monorepoReleaseProductionTask.job = {
+        run: sinon.stub(),
+      };
+
+      // when
+      await monorepoReleaseProductionTask.handler();
+
+      // then
+      expect(monorepoReleaseProductionTask.enabled).to.equal(true);
+      expect(monorepoReleaseProductionTask.schedule).to.equal('* * * * * *');
+      expect(monorepoReleaseProductionTask.job.run.calledOnceWithExactly({ repository: 'repository' })).to.be.true;
     });
   });
 });
