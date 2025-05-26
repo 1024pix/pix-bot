@@ -2,12 +2,18 @@ import { config } from '../../../../../config.js';
 import { httpAgent } from '../../../../http-agent.js';
 import { logger } from '../../../logger.js';
 
-async function postMessage({ message, attachments, channel = '#tech-releases', injectedHttpAgent = httpAgent }) {
+async function postMessage({
+  message,
+  attachments,
+  channel = '#tech-releases',
+  injectedHttpAgent = httpAgent,
+  token = config.slack.botToken,
+}) {
   const url = 'https://slack.com/api/chat.postMessage';
 
   const headers = {
     'content-type': 'application/json',
-    authorization: `Bearer ${config.slack.botToken}`,
+    authorization: `Bearer ${token}`,
   };
   const payload = {
     channel: channel,
