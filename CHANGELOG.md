@@ -1,5 +1,23 @@
 # pix-bot Changelog
 
+## v1.122.0 (30/05/2025)
+
+
+### :rocket: Amélioration
+- [#563](https://github.com/1024pix/pix-bot/pull/563) [FEATURE] Lancer la mise en production automatiquement.
+
+### :building_construction: Tech
+- [#566](https://github.com/1024pix/pix-bot/pull/566) [TECH] Retourner une erreur lorsqu'au moins une RA n'a pas été déployée.
+
+### :arrow_up: Montée de version
+- [#564](https://github.com/1024pix/pix-bot/pull/564) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.15 (dossier racine).
+- [#561](https://github.com/1024pix/pix-bot/pull/561) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.14 (dossier racine).
+- [#557](https://github.com/1024pix/pix-bot/pull/557) [BUMP] Lock file maintenance (dossier racine).
+- [#560](https://github.com/1024pix/pix-bot/pull/560) [BUMP] Update Node.js to v22.15.1.
+- [#559](https://github.com/1024pix/pix-bot/pull/559) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.13 (dossier racine).
+- [#558](https://github.com/1024pix/pix-bot/pull/558) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.12 (dossier racine).
+- [#556](https://github.com/1024pix/pix-bot/pull/556) [BUMP] Update dependency lint-staged to v16 (dossier racine).
+
 ## v1.121.0 (14/05/2025)
 
 
