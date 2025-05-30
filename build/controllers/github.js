@@ -177,7 +177,6 @@ async function deployPullRequest(
     const reviewAppName = `${appName}-pr${prId}`;
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
-      deployedRA.push({ name: appName, isCreated: !reviewAppExists });
       if (reviewAppExists) {
         await client.deployUsingSCM(reviewAppName, ref);
       } else {
@@ -186,6 +185,7 @@ async function deployPullRequest(
         await client.disableAutoDeploy(reviewAppName);
         await client.deployUsingSCM(reviewAppName, ref);
       }
+      deployedRA.push({ name: appName, isCreated: !reviewAppExists });
     } catch (error) {
       logger.error({
         event: 'review-app',
@@ -199,10 +199,6 @@ async function deployPullRequest(
         },
       });
     }
-  }
-
-  if (deployedRA.length === 0) {
-    throw new Error(`No RA deployed for repository ${repository} and pr${prId}`);
   }
 
   await githubService.addRADeploymentCheck({ repository, prNumber: prId, status: 'pending' });
@@ -222,6 +218,11 @@ async function deployPullRequest(
       message: `Created RA for repo ${repository} PR ${prId}`,
     });
   }
+
+  if (deployedRA.length !== reviewApps.length) {
+    throw new Error(`Some RA have not been deployed for repository ${repository} and pr${prId}`);
+  }
+
   logger.info({
     event: 'review-app',
     message: `PR${prId} deployement triggered on RA for repo ${repository}`,
