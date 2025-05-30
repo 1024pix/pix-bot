@@ -1,6 +1,7 @@
 import { config } from '../../config.js';
 import * as taskAutoScaleWeb from './tasks/autoscale-web.js';
 import * as taskRelease from './tasks/release.js';
+import * as taskReleaseProduction from './tasks/release-production.js';
 
 class Task {
   constructor({ name, enabled, schedule, job, params }) {
@@ -48,6 +49,15 @@ const tasks = [
     params: {
       repository: config.tasks.monorepoReleaseRepository,
       branch: config.tasks.monorepoReleaseBranch,
+    },
+  }),
+  new Task({
+    name: 'monorepoReleaseProduction',
+    enabled: config.tasks.monorepoReleaseProductionEnabled,
+    schedule: config.tasks.monorepoReleaseProductionSchedule,
+    job: taskReleaseProduction,
+    params: {
+      repository: config.tasks.monorepoReleaseRepository,
     },
   }),
 ];

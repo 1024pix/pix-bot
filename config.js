@@ -99,6 +99,8 @@ const configuration = (function () {
       botToken: process.env.SLACK_BOT_TOKEN,
       webhookUrlForReporting: process.env.SLACK_WEBHOOK_URL_FOR_REPORTING,
       blockedAccessesChannelId: process.env.SLACK_BLOCKED_ACCESSES_CHANNEL_ID,
+      releaseBotToken: process.env.RELEASE_BOT_TOKEN,
+      releaseChannelId: process.env.RELEASE_CHANNEL_ID,
     },
 
     github: {
@@ -150,6 +152,8 @@ const configuration = (function () {
       monorepoReleaseSchedule: process.env.MONOREPO_RELEASE_SCHEDULE,
       monorepoReleaseRepository: process.env.MONOREPO_RELEASE_REPOSITORY,
       monorepoReleaseBranch: process.env.MONOREPO_RELEASE_BRANCH,
+      monorepoReleaseProductionEnabled: isFeatureEnabled(process.env.FT_MONOREPO_RELEASE_PRODUCTION),
+      monorepoReleaseProductionSchedule: process.env.MONOREPO_RELEASE_PRODUCTION_SCHEDULE,
     },
 
     PIX_REPO_NAME: 'pix',
