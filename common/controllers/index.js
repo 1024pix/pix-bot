@@ -1,6 +1,7 @@
 import pkg from '../../package.json' with { type: 'json' };
 const { description, name, version } = pkg;
 
+import * as deploymentNotifier from '../services/deployment-notifier.js';
 import releasePublicationConfirmationModal from '../../build/services/slack/surfaces/modals/publish-release/release-publication-confirmation.js';
 import releaseTypeSelectionModal from '../../build/services/slack/surfaces/modals/publish-release/release-type-selection.js';
 import releaseDeploymentConfirmationModal from '../../run/services/slack/surfaces/modals/deploy-release/release-deployment-confirmation.js';
@@ -33,6 +34,12 @@ const controllers = {
         return `<a href="${view.getPreviewUrl()}">View ${name}</a>`;
       })
       .join('<br>');
+  },
+
+  newAppDeployed(request, h) {
+    const { appName, tag } = request.payload;
+    deploymentNotifier.run({ tag, appName });
+    return h.response().code(200);
   },
 };
 

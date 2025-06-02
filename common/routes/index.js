@@ -11,6 +11,11 @@ const routeIndex = [
     path: '/slackviews',
     handler: indexController.getSlackViews,
   },
+  {
+    method: 'POST',
+    path: '/deployment-succeeded',
+    handler: indexController.newAppDeployed,
+  },
 ];
 
 export default routeIndex;
