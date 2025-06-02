@@ -1,5 +1,5 @@
 const TABLE_NAME = 'deployments';
-const APPLICATIONS = ['pix-app', 'pix-orga', 'pix-admin', 'pix-certif', 'pix-junior', 'audit-logger'];
+const APPLICATIONS = ['pix-app', 'pix-orga', 'pix-admin', 'pix-certif', 'pix-junior', 'pix-audit-logger', 'pix-api'];
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }

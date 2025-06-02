@@ -3,6 +3,7 @@ const { version } = pkg;
 
 import server from '../../../server.js';
 import { expect, StatusCodes } from '../../test-helper.js';
+import { knex } from '../../../db/knex-database-connection.js';
 
 describe('Acceptance | Common | Index', function () {
   describe('on every route', function () {
@@ -58,6 +59,25 @@ describe('Acceptance | Common | Index', function () {
         url: '/slackviews',
       });
       expect(res.statusCode).to.equal(200);
+    });
+  });
+
+  describe('POST /deployment-succeeded', function () {
+    it('should return 200 code http', async function () {
+      // when
+      const res = await server.inject({
+        method: 'POST',
+        url: '/deployment-succeeded',
+        payload: {
+          appName: 'pix-api-local',
+          tag: 'V1.0.0',
+        },
+      });
+
+      // then
+      expect(res.statusCode).to.equal(200);
+      const result = await knex('deployments').where({ tag: 'V1.0.0' }).first();
+      expect(result['pix-api']).to.be.true;
     });
   });
 });
