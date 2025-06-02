@@ -50,7 +50,7 @@
     "@1024pix/scalingo-review-app-manager": "^2.1.15",
     "@hapi/boom": "^10.0.0",
     "@hapi/hapi": "^21.1.0",
-    "@octokit/rest": "^21.0.0",
+    "@octokit/rest": "^22.0.0",
     "axios": "^1.2.1",
     "axios-retry": "^4.0.0",
     "cron": "^4.0.0",
