@@ -14,7 +14,7 @@ const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
   'pix-data': ['pix-airflow-review'],
   'pix-api-to-pg': ['pix-data-api-pix-integration'],
-  'pix-db-replication': ['pix-datawarehouse-integration'],
+  'pix-db-replication': ['pix-datawarehouse-review'],
   'pix-db-stats': ['pix-db-stats-review'],
   'pix-editor': ['pix-lcms-review'],
   'pix-epreuves': ['pix-epreuves-review'],
