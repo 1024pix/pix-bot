@@ -1,6 +1,6 @@
 import { logger } from '../../../common/services/logger.js';
 import githubService from '../../../common/services/github.js';
-import postMessage from '../../../common/services/slack/surfaces/messages/post-message.js';
+import slackPostMessage from '../../../common/services/slack/surfaces/messages/post-message.js';
 import { getStatus } from '../../../common/repositories/release-settings.repository.js';
 import { config } from '../../../config.js';
 import releasesService from '../../../common/services/releases.js';
@@ -47,7 +47,7 @@ async function run({ repository, dependencies = { github: githubService, _postMe
 export { run };
 
 function _postMessage(message) {
-  return postMessage({
+  return slackPostMessage.postMessage({
     message,
     token: config.slack.releaseBotToken,
     channel: config.slack.releaseChannelId,
