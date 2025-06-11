@@ -8,6 +8,8 @@ import releaseTagSelectionModal from '../../run/services/slack/surfaces/modals/d
 import lockReleaseDeployment from '../../run/services/slack/surfaces/modals/deploy-release/lock-release-deployment.js';
 import createAppOnScalingoSelectionModal from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation.js';
 import submitApplicationNameSelectionModal from '../../run/services/slack/surfaces/modals/scalingo-apps/application-creation-confirmation.js';
+import * as applicationsDeploymentService from '../services/applications-deployment.service.js';
+import { config } from '../../config.js';
 
 const controllers = {
   getApiInfo() {
@@ -33,6 +35,23 @@ const controllers = {
         return `<a href="${view.getPreviewUrl()}">View ${name}</a>`;
       })
       .join('<br>');
+  },
+
+  async applicationIsDeployed(request, h) {
+    if (request.query.token !== config.authorizationToken) {
+      return h.response().code(401);
+    }
+    const environment = request.query.environment;
+    const app = request.payload.app_name;
+    const version = request.payload.type_data.git_ref;
+    if (!applicationsDeploymentService.isPixApplication(app)) {
+      return h.response().code(422);
+    } else if (request.payload.type_data.status !== 'success') {
+      return h.response().code(200);
+    }
+    await applicationsDeploymentService.addNewVersion({ environment, version });
+    await applicationsDeploymentService.markAppHasDeployed({ version, environment, app });
+    return h.response().code(200);
   },
 };
 
