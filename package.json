@@ -14,7 +14,7 @@
     "deploy:minor": "npm version minor && npm run deploy:tag",
     "deploy:patch": "npm version patch && npm run deploy:tag",
     "deploy:tag": "git push --tags && git push",
-    "db:new-migration": "npx knex --knexfile ./db/knexfile.js  migrate:make $migrationname",
+    "db:new-migration": "npx knex --knexfile ./db/knexfile.js  migrate:make --stub $PWD/db/template.js $migrationname",
     "db:create": "node ./db/create-database.js",
     "db:delete": "node ./db/drop-database.js",
     "db:empty": "node ./db/empty-database.js",
