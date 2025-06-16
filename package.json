@@ -47,7 +47,7 @@
   },
   "homepage": "https://github.com/1024pix/pix-bot#readme",
   "dependencies": {
-    "@1024pix/scalingo-review-app-manager": "^2.1.16",
+    "@1024pix/scalingo-review-app-manager": "^2.1.17",
     "@hapi/boom": "^10.0.0",
     "@hapi/hapi": "^21.1.0",
     "@octokit/rest": "^22.0.0",
