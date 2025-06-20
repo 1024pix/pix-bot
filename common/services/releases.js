@@ -89,7 +89,7 @@ const releasesService = {
 async function _runScriptWithArgument(scriptFileName, exec, ...args) {
   const scriptsDirectory = `${process.cwd()}/scripts`;
   const { stdout, stderr } = await exec(`${scriptsDirectory}/${scriptFileName} ${args.join(' ')}`);
-  logger.error({ event: 'release', message: `stdout: ${stdout}` });
+  logger.info({ event: 'release', message: `stdout: ${stdout}` });
   const lastLine = stdout.split('\n').slice(-2, -1).pop();
   logger.error({ event: 'release', message: `stderr: ${stderr}` });
   return lastLine;
