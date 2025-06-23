@@ -1,5 +1,28 @@
 # pix-bot Changelog
 
+## v1.123.0 (23/06/2025)
+
+
+### :rocket: Amélioration
+- [#574](https://github.com/1024pix/pix-bot/pull/574) [FEATURE] Notifier via slack lorsque le déploiement des applications est terminé.
+- [#571](https://github.com/1024pix/pix-bot/pull/571) [FEATURE] Ajouter un template de migration pour la db.
+
+### :building_construction: Tech
+- [#572](https://github.com/1024pix/pix-bot/pull/572) [TECH] Modifier l'application template pour les review apps de pix-db-replication.
+
+### :bug: Correction
+- [#577](https://github.com/1024pix/pix-bot/pull/577) [BUGFIX] Utiliser le bon level de log au moment des releases.
+- [#570](https://github.com/1024pix/pix-bot/pull/570) [BUGFIX] Corriger l'appelle à la fonction d'envoie de message dans la tâche de mise en production.
+
+### :arrow_up: Montée de version
+- [#578](https://github.com/1024pix/pix-bot/pull/578) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.18 (dossier racine).
+- [#576](https://github.com/1024pix/pix-bot/pull/576) [BUMP] Update dependency sinon to v21 (dossier racine).
+- [#575](https://github.com/1024pix/pix-bot/pull/575) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.17 (dossier racine).
+- [#565](https://github.com/1024pix/pix-bot/pull/565) [BUMP] Update Node.js to v22.16.0.
+- [#573](https://github.com/1024pix/pix-bot/pull/573) [BUMP] Update dependency scalingo to ^0.12.0 (dossier racine).
+- [#568](https://github.com/1024pix/pix-bot/pull/568) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.16 (dossier racine).
+- [#567](https://github.com/1024pix/pix-bot/pull/567) [BUMP] Update dependency @octokit/rest to v22 (dossier racine).
+
 ## v1.122.0 (30/05/2025)
 
 
