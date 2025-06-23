@@ -108,10 +108,10 @@ describe('Integration | Common | Services | Applications deployment', function (
   describe('#isPixApplication', function () {
     it('should return true if the applications is from PIX_APPS', function () {
       // given
-      const applicationName = 'pix-app';
+      const applicationName = 'pix-app-local';
 
       // when
-      const result = applicationsDeploymentService.isPixApplication(applicationName);
+      const result = applicationsDeploymentService.isPixApplication({ applicationName, environment: 'local' });
 
       // then
       expect(result).to.be.true;

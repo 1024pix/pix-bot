@@ -44,7 +44,7 @@ const controllers = {
     const environment = request.query.environment;
     const app = request.payload.app_name;
     const version = request.payload.type_data.git_ref;
-    if (!applicationsDeploymentService.isPixApplication(app)) {
+    if (!applicationsDeploymentService.isPixApplication({ applicationName: app, environment })) {
       return h.response().code(422);
     } else if (request.payload.type_data.status !== 'success') {
       return h.response().code(200);

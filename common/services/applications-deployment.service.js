@@ -20,8 +20,8 @@ async function markAppHasDeployed({ app, version, environment }) {
   }
 }
 
-function isPixApplication(applicationName) {
-  return config.PIX_APPS.includes(applicationName);
+function isPixApplication({ applicationName, environment }) {
+  return config.PIX_APPS.map((app) => `${app}-${environment}`).includes(applicationName);
 }
 
 export { addNewVersion, markAppHasDeployed, isPixApplication };
