@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.123.1 (24/06/2025)
+
+
+### :bug: Correction
+- [#579](https://github.com/1024pix/pix-bot/pull/579) [BUGFIX] Utiliser le nom complet des applications pour le déploiement.
+
 ## v1.123.0 (23/06/2025)
 
 
