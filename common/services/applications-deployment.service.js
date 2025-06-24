@@ -13,7 +13,7 @@ async function markAppHasDeployed({ app, version, environment }) {
   await applicationsDeployment.markHasDeployed({ version, environment, app });
   if (await _checkIfAllApplicationsHasDeployed({ environment, version })) {
     await slackPostMessageService.postMessage({
-      message: `Bonjour 👋 la mise en ${environment} de toute les applications a bien été effectuée!`,
+      message: `La mise en ${environment} de toutes les applications a bien été effectuée !`,
       channel: config.slack.releaseChannelId,
       token: config.slack.releaseBotToken,
     });
