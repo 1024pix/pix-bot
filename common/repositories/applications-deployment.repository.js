@@ -8,7 +8,7 @@ async function createVersion({ version, environment }) {
     return {
       version,
       environment,
-      'app-name': app,
+      'app-name': `${app}-${environment}`,
     };
   });
   await knex(TABLE_NAME).insert(appWithVersions);

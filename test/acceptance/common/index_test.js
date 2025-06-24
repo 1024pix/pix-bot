@@ -77,7 +77,7 @@ describe('Acceptance | Common | Index', function () {
           git_ref: 'v1.0.0',
           status: 'success',
         },
-        app_name: 'pix-app',
+        app_name: 'pix-app-local',
       };
 
       // when
@@ -90,7 +90,7 @@ describe('Acceptance | Common | Index', function () {
       // then
       expect(res.statusCode).to.equal(StatusCodes.OK);
       const pixApp = await knex('applications_deployments')
-        .where({ environment: 'local', version: 'v1.0.0', 'app-name': 'pix-app' })
+        .where({ environment: 'local', version: 'v1.0.0', 'app-name': 'pix-app-local' })
         .first();
       expect(pixApp['is-deployed']).to.be.true;
     });
@@ -103,7 +103,7 @@ describe('Acceptance | Common | Index', function () {
         await knex('applications_deployments').insert({
           environment,
           version,
-          'app-name': application,
+          'app-name': `${application}-${environment}`,
           'is-deployed': true,
         });
       }
@@ -116,7 +116,7 @@ describe('Acceptance | Common | Index', function () {
           git_ref: version,
           status: 'success',
         },
-        app_name: config.PIX_APPS[0],
+        app_name: `${config.PIX_APPS[0]}-${environment}`,
       };
 
       // when
@@ -130,7 +130,7 @@ describe('Acceptance | Common | Index', function () {
       expect(res.statusCode).to.equal(StatusCodes.OK);
       expect(slackPostMessageService.postMessage.calledOnce).to.be.true;
       const application = await knex('applications_deployments')
-        .where({ environment, version, 'app-name': config.PIX_APPS[0] })
+        .where({ environment, version, 'app-name': `${config.PIX_APPS[0]}-${environment}` })
         .first();
       expect(application['is-deployed']).to.be.true;
     });
@@ -163,7 +163,7 @@ describe('Acceptance | Common | Index', function () {
           git_ref: 'v1.0.0',
           status: 'success',
         },
-        app_name: 'pix-app',
+        app_name: 'pix-app-local',
       };
 
       // when
@@ -183,7 +183,7 @@ describe('Acceptance | Common | Index', function () {
         await knex('applications_deployments').insert({
           environment: 'local',
           version: 'v1.0.0',
-          'app-name': app,
+          'app-name': `${app}-local`,
           'is-deployed': false,
         });
       }
@@ -192,7 +192,7 @@ describe('Acceptance | Common | Index', function () {
           git_ref: 'v1.0.0',
           status: 'failure',
         },
-        app_name: 'pix-app',
+        app_name: 'pix-app-local',
       };
 
       // when
@@ -205,7 +205,7 @@ describe('Acceptance | Common | Index', function () {
       // then
       expect(res.statusCode).to.equal(StatusCodes.OK);
       const pixApp = await knex('applications_deployments')
-        .where({ environment: 'local', version: 'v1.0.0', 'app-name': 'pix-app' })
+        .where({ environment: 'local', version: 'v1.0.0', 'app-name': 'pix-app-local' })
         .first();
       expect(pixApp['is-deployed']).to.be.false;
     });

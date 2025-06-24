@@ -25,7 +25,7 @@ describe('Integration | Common | Repositories | Applications deployment', functi
         expect(result[index]).to.deep.equal({
           version,
           environment,
-          'app-name': result[index]['app-name'],
+          'app-name': `${result[index]['app-name']}`,
           'is-deployed': false,
           'deployed-at': null,
         });
