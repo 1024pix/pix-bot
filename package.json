@@ -60,7 +60,7 @@
     "lodash": "^4.17.21",
     "node-fetch": "^3.0.0",
     "pg": "^8.13.0",
-    "scalingo": "^0.12.0",
+    "scalingo": "^0.13.0",
     "slack-block-builder": "^2.7.2",
     "tsscmp": "^1.0.6"
   },
