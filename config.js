@@ -32,6 +32,9 @@ const configuration = (function () {
     ecoMode: {
       stopSchedule: process.env.REVIEW_APP_STOP_SCHEDULE,
       startSchedule: process.env.REVIEW_APP_START_SCHEDULE,
+      ignoredReviewApps: process.env.REVIEW_APP_ECO_MODE_IGNORED_APPS,
+      pollTimeInterval: process.env.REVIEW_APP_ECO_MODE_POLL_TIME_INTERVAL || 6000,
+      pollMaxAttempts: process.env.REVIEW_APP_ECO_MODE_POLL_MAX_ATTEMPTS || 50,
     },
 
     baleen: {
