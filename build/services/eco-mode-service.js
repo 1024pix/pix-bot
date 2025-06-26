@@ -10,7 +10,9 @@ const ecoModeService = {
     const stopCronTime = config.ecoMode.stopSchedule;
     const startCronTime = config.ecoMode.startSchedule;
     const timeZone = process.env.TIME_ZONE || 'Europe/Paris';
-    const ignoredReviewApps = process.env.IGNORED_REVIEW_APPS ? process.env.IGNORED_REVIEW_APPS.split(',') : [];
+    const ignoredReviewApps = config.ecoMode.ignoredReviewApps ? config.ecoMode.ignoredReviewApps.split(',') : [];
+    const pollMaxAttempts = config.ecoMode.pollMaxAttempts;
+    const pollTimeInterval = config.ecoMode.pollTimeInterval;
 
     if (!stopCronTime || !startCronTime) {
       logger.info({
@@ -24,6 +26,8 @@ const ecoModeService = {
       restartCronTime: startCronTime,
       timeZone,
       ignoredReviewApps,
+      pollMaxAttempts,
+      pollTimeInterval,
     });
     reviewAppManager.startEcoMode();
   },
