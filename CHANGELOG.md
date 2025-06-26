@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.124.0 (26/06/2025)
+
+
+### :building_construction: Tech
+- [#583](https://github.com/1024pix/pix-bot/pull/583) [TECH] Augmenter le nombre d'essai l'intervalle de la vérification de démarrage d'une RA.
+
+### :bug: Correction
+- [#581](https://github.com/1024pix/pix-bot/pull/581) [BUGFIX] Corriger une typo.
+
+### :arrow_up: Montée de version
+- [#582](https://github.com/1024pix/pix-bot/pull/582) [BUMP] Update dependency scalingo to ^0.13.0 (dossier racine).
+
 ## v1.123.1 (24/06/2025)
 
 
