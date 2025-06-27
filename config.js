@@ -104,6 +104,7 @@ const configuration = (function () {
       blockedAccessesChannelId: process.env.SLACK_BLOCKED_ACCESSES_CHANNEL_ID,
       releaseBotToken: process.env.RELEASE_BOT_TOKEN,
       releaseChannelId: process.env.RELEASE_CHANNEL_ID,
+      releaseComunicationChannelId: process.env.SLACK_RELEASE_CHANNEL_COMMUNICATION,
       teamPoId: process.env.SLACK_TEAM_PO_ID || '',
     },
 
