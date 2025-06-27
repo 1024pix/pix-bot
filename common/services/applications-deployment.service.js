@@ -12,8 +12,21 @@ async function addNewVersion({ version, environment }) {
 async function markAppHasDeployed({ app, version, environment }) {
   await applicationsDeployment.markHasDeployed({ version, environment, app });
   if (await _checkIfAllApplicationsHasDeployed({ environment, version })) {
+    let message;
+
+    switch (environment) {
+      case 'production':
+        message = `La mise en production de la ${version} a bien été effectuée :rocket: vous pouvez communiquer sur <#${config.slack.releaseComunicationChannelId}>. <!subteam^${config.slack.teamPoId}>`;
+        break;
+      case 'recette':
+        message = `La mise en recette de la ${version} a bien été effectuée, vous pouvez mettre vos messages en :thread: <!subteam^${config.slack.teamPoId}>`;
+        break;
+      default:
+        message = `La mise en ${environment} de la ${version} a bien été effectuée.`;
+        break;
+    }
     await slackPostMessageService.postMessage({
-      message: `La mise en ${environment} de toutes les applications a bien été effectuée !`,
+      message,
       channel: config.slack.releaseChannelId,
       token: config.slack.releaseBotToken,
     });
