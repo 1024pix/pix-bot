@@ -28,9 +28,7 @@ async function run({ repository, dependencies = { github: githubService, _postMe
       await dependencies._postMessage(`Rappel: la Mise en production est bloquée. Motif: ${blockReason}`);
       return;
     }
-    await dependencies._postMessage(
-      `🚨 La mise en production de la ${releaseTag} commence. Merci de surveiller son bon déroulement.`,
-    );
+    await dependencies._postMessage(`Hello :salut_main: Je lanse la mise en production de la ${releaseTag} !`);
     dependencies.releasesService.deploy(dependencies.releasesService.environments.production, releaseTag);
   } catch (error) {
     logger.error({

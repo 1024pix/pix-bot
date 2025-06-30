@@ -7,7 +7,7 @@ describe('Unit | Run | Services | Tasks | Release production', function () {
   beforeEach(function () {
     dependencies = {
       github: {
-        getLatestReleaseTag: sinon.stub().resolves('V1.0.0'),
+        getLatestReleaseTag: sinon.stub().resolves('v1.0.0'),
         isBuildStatusOK: sinon.stub(),
       },
       _postMessage: sinon.stub(),
@@ -34,9 +34,9 @@ describe('Unit | Run | Services | Tasks | Release production', function () {
       expect(dependencies.github.isBuildStatusOK).to.have.been.called;
       expect(dependencies.getStatus).to.have.been.calledWith({ repositoryName: 'pix' });
       expect(dependencies._postMessage).to.have.been.calledWith(
-        `🚨 La mise en production de la V1.0.0 commence. Merci de surveiller son bon déroulement.`,
+        'Hello :salut_main: Je lanse la mise en production de la v1.0.0 !',
       );
-      expect(dependencies.releasesService.deploy).to.have.been.calledWith('production', 'V1.0.0');
+      expect(dependencies.releasesService.deploy).to.have.been.calledWith('production', 'v1.0.0');
     });
   });
 
