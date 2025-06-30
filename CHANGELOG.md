@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.125.1 (30/06/2025)
+
+
+### :building_construction: Tech
+- [#587](https://github.com/1024pix/pix-bot/pull/587) [TECH] Commenter le code vérifiant que le build de la version releasée a bien fonctionné avant de MEP.
+
+### :bug: Correction
+- [#585](https://github.com/1024pix/pix-bot/pull/585) [BUGFIX] Corriger le message lors du lancement de la mep.
+
 ## v1.125.0 (27/06/2025)
 
 
