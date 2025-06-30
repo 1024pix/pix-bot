@@ -108,6 +108,13 @@ const configuration = (function () {
       teamPoId: process.env.SLACK_TEAM_PO_ID || '',
     },
 
+    jira: {
+      host: process.env.JIRA_HOST,
+      userEmail: process.env.JIRA_USER_EMAIL,
+      apiToken: process.env.JIRA_API_TOKEN,
+      projectId: process.env.JIRA_PROJECT_ID,
+    },
+
     github: {
       token: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
       owner: process.env.GITHUB_OWNER,
