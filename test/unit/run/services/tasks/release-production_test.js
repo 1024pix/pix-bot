@@ -34,7 +34,7 @@ describe('Unit | Run | Services | Tasks | Release production', function () {
       // expect(dependencies.github.isBuildStatusOK).to.have.been.called;
       expect(dependencies.getStatus).to.have.been.calledWith({ repositoryName: 'pix' });
       expect(dependencies._postMessage).to.have.been.calledWith(
-        'Hello :salut_main: Je lance la mise en production de la v1.0.0 !',
+        'Hello :wave: Je lance la mise en production de la v1.0.0 !',
       );
       expect(dependencies.releasesService.deploy).to.have.been.calledWith('production', 'v1.0.0');
     });
