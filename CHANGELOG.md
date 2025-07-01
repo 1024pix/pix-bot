@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.126.0 (01/07/2025)
+
+
+### :rocket: Amélioration
+- [#586](https://github.com/1024pix/pix-bot/pull/586) [FEATURE] releaser la version Jira  à la fin du déploiement d'une version en production.
+
+### :arrow_up: Montée de version
+- [#588](https://github.com/1024pix/pix-bot/pull/588) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.20 (dossier racine).
+
 ## v1.125.1 (30/06/2025)
 
 
