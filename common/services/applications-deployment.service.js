@@ -52,7 +52,7 @@ async function _checkIfAllApplicationsHasDeployed({ version, environment }) {
   return applications.every((app) => app.isDeployed);
 }
 
-async function _handleJira(version) {
+export async function _handleJira(version) {
   try {
     const versions = await getVersionList();
     const jiraVersion = versions.find((jiraVersion) => jiraVersion.name === version);
@@ -63,7 +63,7 @@ async function _handleJira(version) {
   } catch (error) {
     logger.error({
       event: 'application deployment service',
-      message: 'Error during jira interraction',
+      message: 'Error during jira interaction',
       job: 'release version on jira',
       stack: 'service',
       data: error,
