@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.126.1 (02/07/2025)
+
+
+### :bug: Correction
+- [#590](https://github.com/1024pix/pix-bot/pull/590) [BUGFIX] Mettre à jour l'emoji du message de lancement de MEP (PIX-18553).
+
 ## v1.126.0 (01/07/2025)
 
 
