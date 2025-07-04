@@ -134,6 +134,12 @@ describe('Acceptance | Run | Manifest', function () {
               usage_hint: '/deploy-dbt $version',
             },
             {
+              command: '/deploy-pix-exploit',
+              url: `http://${hostname}/slack/commands/deploy-pix-exploit-release`,
+              description: 'Déploie la dernière release de pix-exploit en production',
+              should_escape: false,
+            },
+            {
               command: '/deploy-pix-api-to-pg',
               description: 'Déploie la version précisée de pix-api-to-pg en production',
               should_escape: false,
