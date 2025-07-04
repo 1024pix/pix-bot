@@ -177,6 +177,14 @@ const slack = {
     }
   },
 
+  async deployPixExploitRelease() {
+    commands.deployPixExploitRelease();
+
+    return {
+      text: 'Commande de déploiement sur la production bien reçue.',
+    };
+  },
+
   async unlockRelease(request) {
     const payload = request.pre.payload;
     commands.unlockRelease(payload);
