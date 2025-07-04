@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.127.1 (04/07/2025)
+
+
+### :bug: Correction
+- [#592](https://github.com/1024pix/pix-bot/pull/592) [BUGFIX] Corriger le déploiement de la dernière release de pix-exploit en production.
+
 ## v1.127.0 (04/07/2025)
 
 
