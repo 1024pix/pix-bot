@@ -227,7 +227,7 @@ async function deployPixApiToPg(payload) {
 
 async function deployPixExploitRelease() {
   const releaseTag = await github.getLatestReleaseTag(config.PIX_EXPLOIT_REPO_NAME);
-  await deployTagUsingSCM(config.PIX_EXPLOIT_APP_NAME, releaseTag);
+  await deployTagUsingSCM([config.PIX_EXPLOIT_APP_NAME], releaseTag);
 }
 
 async function unlockRelease(payload) {
