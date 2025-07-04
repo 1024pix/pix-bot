@@ -7,6 +7,7 @@ import slackPostMessageService from '../../../common/services/slack/surfaces/mes
 import { config } from '../../../config.js';
 import { deploy } from '../deploy.js';
 import { updateStatus } from '../../../common/repositories/release-settings.repository.js';
+import github from '../../../common/services/github.js';
 
 function sendResponse(responseUrl, text) {
   axios.post(
@@ -224,6 +225,11 @@ async function deployPixApiToPg(payload) {
   await deployTagUsingSCM(config.PIX_API_TO_PG_APPS_NAME, version);
 }
 
+async function deployPixExploitRelease() {
+  const releaseTag = await github.getLatestReleaseTag(config.PIX_EXPLOIT_REPO_NAME);
+  await deployTagUsingSCM(config.PIX_EXPLOIT_APP_NAME, releaseTag);
+}
+
 async function unlockRelease(payload) {
   await updateStatus({ repositoryName: 'pix', environment: 'production', authorizeDeployment: true });
   const message = `La mise en production a été débloquée par <@${payload.user_id}> 😅 il est de nouveau possible de la lancer.`;
@@ -244,6 +250,7 @@ export {
   createAndDeployPixUI,
   deployAirflow,
   deployDBT,
+  deployPixExploitRelease,
   deployPixApiToPg,
   getAndDeployLastVersion,
   unlockRelease,

@@ -121,6 +121,14 @@ manifest.registerSlashCommand({
   handler: slackbotController.deployDBT,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-pix-exploit',
+  path: '/slack/commands/deploy-pix-exploit-release',
+  description: 'Déploie la dernière release de pix-exploit en production',
+  should_escape: false,
+  handler: slackbotController.deployPixExploitRelease,
+});
+
 manifest.registerShortcut({
   name: 'MEP/Déployer une version',
   type: 'global',

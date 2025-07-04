@@ -210,6 +210,9 @@ const configuration = (function () {
     PIX_DBT_APPS_NAME: ['pix-dbt-production', 'pix-dbt-external-production'],
     PIX_API_TO_PG_APPS_NAME: ['pix-api-to-pg-production'],
 
+    PIX_EXPLOIT_REPO_NAME: 'pix-exploit',
+    PIX_EXPLOIT_APP_NAME: 'pix-exploit-production',
+
     repoAppNames: _getJSON(process.env.REPO_APP_NAMES_MAPPING) || {},
   };
 
