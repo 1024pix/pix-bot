@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.127.0 (04/07/2025)
+
+
+### :rocket: Amélioration
+- [#591](https://github.com/1024pix/pix-bot/pull/591) [FEATURE] Déployer pix-exploit depuis pix-bot.
+
 ## v1.126.1 (02/07/2025)
 
 
