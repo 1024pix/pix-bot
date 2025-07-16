@@ -59,11 +59,19 @@ const viewSubmissions = {
   async submitCreateAppOnScalingoConfirmation(payload) {
     const { applicationName, applicationEnvironment, userEmail } = JSON.parse(payload.view.private_metadata);
     const client = await ScalingoClient.getInstance(applicationEnvironment);
+
     const appId = await client.createApplication(applicationName);
     const invitationLink = await client.inviteCollaborator(appId, userEmail);
-    const message = `app ${applicationName} created <${invitationLink}|invitation link>`;
-    const channel = `@${payload.user.id}`;
-    slackPostMessageService.postMessage({ message, channel });
+    if (applicationName.includes('-production')) {
+      await client.addDeploymentNotificationOnSlack(applicationName);
+      const alertNotifier = await client.addAlertNotificationsOnSlack(applicationName);
+      await client.add5xxAlert(applicationName, alertNotifier.id);
+    }
+
+    await slackPostMessageService.postMessage({
+      message: `app ${applicationName} created <${invitationLink}|invitation link>`,
+      channel: `@${payload.user.id}`,
+    });
     return {
       response_action: 'clear',
     };
