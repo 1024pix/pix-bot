@@ -181,6 +181,63 @@ class ScalingoClient {
       logger.error(err);
     }
   }
+
+  async addDeploymentNotificationOnSlack(appName) {
+    const slackNotifierId = await this.#getNotifierId('slack');
+    const eventIds = await this.#getEventIds(['app_deployed']);
+
+    try {
+      const notifier = await this.client.Notifiers.create(appName, {
+        platform_id: slackNotifierId,
+        name: 'Deploy on #tech-releases',
+        active: true,
+        selected_event_ids: eventIds,
+        type_data: {
+          webhook_url: config.slack.techReleaseWebhookUrl,
+        },
+      });
+
+      logger.info(`Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`);
+
+      return notifier;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
+  async #getNotifierId(notifierName) {
+    let notifiers;
+    try {
+      notifiers = await this.client.NotificationPlatforms.list();
+    } catch (err) {
+      logger.error(err);
+    }
+
+    const notifier = notifiers.find((notifier) => notifier.name === notifierName);
+    if (!notifier) {
+      throw new Error(`Notifier ${notifierName} not found.`);
+    }
+
+    return notifier.id;
+  }
+
+  async #getEventIds(eventNames) {
+    let events;
+    try {
+      events = await this.client.Events.listEventTypes();
+    } catch (err) {
+      logger.error(err);
+    }
+
+    return eventNames.map((eventName) => {
+      const event = events.find((event) => event.name === eventName);
+      if (!event) {
+        throw new Error(`Event ${eventName} not found.`);
+      }
+      return event.id;
+    });
+  }
 }
 
 async function _isUrlReachable(url) {

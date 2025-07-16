@@ -106,6 +106,7 @@ const configuration = (function () {
       releaseChannelId: process.env.RELEASE_CHANNEL_ID,
       releaseComunicationChannelId: process.env.SLACK_RELEASE_CHANNEL_COMMUNICATION,
       teamPoId: process.env.SLACK_TEAM_PO_ID || '',
+      techReleaseWebhookUrl: process.env.SLACK_TECH_RELEASE_WEBHOOK_URL,
     },
 
     jira: {
@@ -225,6 +226,8 @@ const configuration = (function () {
 
     config.slack.blockedAccessesChannelId = 'C08700JG7QU';
     config.slack.botToken = 'fakeToken';
+    config.slack.techReleaseWebhookUrl = 'https://hooks.slack.com/services/techReleaseWebhookUrl';
+    config.slack.alertPixLogsWebhookUrl = 'https://hooks.slack.com/services/alertPixLogsWebhookUrl';
 
     config.datadog.token = 'token';
 

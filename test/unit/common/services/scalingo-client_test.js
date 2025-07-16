@@ -846,4 +846,109 @@ describe('Scalingo client', function () {
       });
     });
   });
+
+  describe('#Scalingo.addDeploymentNotificationOnSlack', function () {
+    let client;
+    let notificationPlatformList;
+    let eventTypeList;
+    let notifierCreate;
+
+    beforeEach(async function () {
+      const clientStub = {
+        clientFromToken: async function () {
+          notificationPlatformList = sinon.stub();
+          eventTypeList = sinon.stub();
+          notifierCreate = sinon.stub();
+          return {
+            NotificationPlatforms: { list: notificationPlatformList },
+            Events: { listEventTypes: eventTypeList },
+            Notifiers: { create: notifierCreate },
+          };
+        },
+      };
+      client = await ScalingoClient.getInstance('production', clientStub);
+    });
+
+    it('should add a slack deployment notification', async function () {
+      // given
+      const appName = 'pix-test-production';
+      notificationPlatformList.resolves([
+        { id: 'slack-id', name: 'slack' },
+        { id: 'webhook-id', name: 'webhook' },
+      ]);
+      eventTypeList.resolves([
+        { id: 'app_deployed-id', name: 'app_deployed' },
+        { id: 'app_restarted-id', name: 'app_restarted' },
+      ]);
+
+      const expectedCreatedNotifier = {
+        id: 'slack-notifier-id',
+        name: 'Deploy on #tech-releases',
+        type: 'slack',
+        app: appName,
+      };
+
+      notifierCreate
+        .withArgs(appName, {
+          platform_id: 'slack-id',
+          name: 'Deploy on #tech-releases',
+          active: true,
+          selected_event_ids: ['app_deployed-id'],
+          type_data: {
+            webhook_url: 'https://hooks.slack.com/services/techReleaseWebhookUrl',
+          },
+        })
+        .resolves(expectedCreatedNotifier);
+
+      // when
+      const notifier = await client.addDeploymentNotificationOnSlack(appName);
+
+      // then
+      expect(notifier).to.deep.equal(expectedCreatedNotifier);
+    });
+
+    describe('when notifier is not found', function () {
+      it('should throw an exception', async function () {
+        // given
+        const appName = 'pix-test-production';
+        notificationPlatformList.resolves([
+          { id: 'unknown-id', name: 'unknown' },
+          { id: 'webhook-id', name: 'webhook' },
+        ]);
+
+        // when
+        try {
+          await client.addDeploymentNotificationOnSlack(appName);
+        } catch (error) {
+          // then
+          expect(error).to.be.an.instanceof(Error);
+          expect(error.message).to.equal('Notifier slack not found.');
+        }
+      });
+    });
+
+    describe('when event is not found', function () {
+      it('should throw an exception', async function () {
+        // given
+        const appName = 'pix-test-production';
+        notificationPlatformList.resolves([
+          { id: 'slack-id', name: 'slack' },
+          { id: 'webhook-id', name: 'webhook' },
+        ]);
+        eventTypeList.resolves([
+          { id: 'app_destroyed-id', name: 'app_destroyed' },
+          { id: 'app_restarted-id', name: 'app_restarted' },
+        ]);
+
+        // when
+        try {
+          await client.addDeploymentNotificationOnSlack(appName);
+        } catch (error) {
+          // then
+          expect(error).to.be.an.instanceof(Error);
+          expect(error.message).to.equal('Event app_deployed not found.');
+        }
+      });
+    });
+  });
 });
