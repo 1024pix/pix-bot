@@ -1102,4 +1102,51 @@ describe('Scalingo client', function () {
       });
     });
   });
+
+  describe('#Scalingo.add5xxAlert', function () {
+    let client;
+    let alertCreate;
+
+    beforeEach(async function () {
+      const clientStub = {
+        clientFromToken: async function () {
+          alertCreate = sinon.stub();
+          return {
+            Alerts: { create: alertCreate },
+          };
+        },
+      };
+      client = await ScalingoClient.getInstance('production', clientStub);
+    });
+
+    it('should add a 5XX alert', async function () {
+      // given
+      const appName = 'pix-test-production';
+      const notifierId = 'notifier-id';
+
+      const expectedCreatedAlert = {
+        id: 'alert-id',
+        metric: '5XX',
+        container_type: 'web',
+        limit: 1,
+        duration_before_trigger: 0,
+      };
+
+      alertCreate
+        .withArgs(appName, {
+          container_type: 'web',
+          metric: '5XX',
+          limit: 1,
+          duration_before_trigger: 0,
+          notifiers: [notifierId],
+        })
+        .resolves(expectedCreatedAlert);
+
+      // when
+      const alert = await client.add5xxAlert(appName, notifierId);
+
+      // then
+      expect(alert).to.deep.equal(expectedCreatedAlert);
+    });
+  });
 });

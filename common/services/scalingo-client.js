@@ -253,6 +253,25 @@ class ScalingoClient {
     }
   }
 
+  async add5xxAlert(appName, notifierId) {
+    try {
+      const alert = await this.client.Alerts.create(appName, {
+        container_type: 'web',
+        metric: '5XX',
+        limit: 1,
+        duration_before_trigger: 0,
+        notifiers: [notifierId],
+      });
+
+      logger.info(`Alert on ${alert.metric} added for application ${appName}.`);
+
+      return alert;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
   async #getNotifierId(notifierName) {
     let notifiers;
     try {
