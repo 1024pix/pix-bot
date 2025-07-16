@@ -206,6 +206,53 @@ class ScalingoClient {
     }
   }
 
+  async addAlertNotificationsOnSlack(appName) {
+    const slackNotifierId = await this.#getNotifierId('slack');
+    const eventIds = await this.#getEventIds([
+      'app_restarted',
+      'app_crashed',
+      'app_crashed_repeated',
+      'app_stopped',
+      'app_deleted',
+      'addon_provisioned',
+      'addon_resumed',
+      'addon_suspended',
+      'addon_plan_changed',
+      'addon_db_upgraded',
+      'addon_deleted',
+      'domain_added',
+      'domain_edited',
+      'domain_removed',
+      'notifier_added',
+      'notifier_edited',
+      'notifier_removed',
+      'variable_added',
+      'variable_edited',
+      'variable_bulk_edited',
+      'variable_removed',
+      'addon_updated',
+    ]);
+
+    try {
+      const notifier = await this.client.Notifiers.create(appName, {
+        platform_id: slackNotifierId,
+        name: 'Events logger on #alerte-pix-logs',
+        active: true,
+        selected_event_ids: eventIds,
+        type_data: {
+          webhook_url: config.slack.alertPixLogsWebhookUrl,
+        },
+      });
+
+      logger.info(`Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`);
+
+      return notifier;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
   async #getNotifierId(notifierName) {
     let notifiers;
     try {

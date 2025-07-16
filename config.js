@@ -107,6 +107,7 @@ const configuration = (function () {
       releaseComunicationChannelId: process.env.SLACK_RELEASE_CHANNEL_COMMUNICATION,
       teamPoId: process.env.SLACK_TEAM_PO_ID || '',
       techReleaseWebhookUrl: process.env.SLACK_TECH_RELEASE_WEBHOOK_URL,
+      alertPixLogsWebhookUrl: process.env.SLACK_ALERT_PIX_LOGS_WEBHOOK_URL,
     },
 
     jira: {
