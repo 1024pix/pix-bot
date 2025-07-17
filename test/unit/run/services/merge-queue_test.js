@@ -1,6 +1,5 @@
 import { expect, sinon } from '../../../test-helper.js';
-import { MERGE_STATUS, MERGE_STATUS_DETAILS, MergeQueue } from '../../../../build/services/merge-queue.js';
-import { config } from '../../../../config.js';
+import { MERGE_STATUS, MergeQueue } from '../../../../build/services/merge-queue.js';
 import { PullRequestNotFoundError } from '../../../../build/repositories/pull-request-repository.js';
 import { describe } from 'mocha';
 
@@ -135,22 +134,22 @@ describe('Unit | Build | Services | merge-queue', function () {
 
         const pullRequestRepository = {
           remove: sinon.stub(),
+          get: sinon.stub(),
         };
-        const githubService = {
-          setMergeQueueStatus: sinon.stub(),
+        const mergeService = {
+          unmanage: sinon.stub(),
         };
 
-        const mergeQueue = new MergeQueue({ pullRequestRepository, githubService });
-        mergeQueue.pullRequestIsManaged = sinon.stub();
+        const mergeQueue = new MergeQueue({ pullRequestRepository, pullRequestMergeService: mergeService });
         mergeQueue.manage = sinon.stub();
 
-        mergeQueue.pullRequestIsManaged.withArgs({ repositoryName, number: pullRequestNumber }).resolves(false);
+        pullRequestRepository.get.withArgs({ repositoryName, number: pullRequestNumber }).resolves(null);
 
         await mergeQueue.unmanagePullRequest({ repositoryName, number: pullRequestNumber, status: MERGE_STATUS.ERROR });
 
         expect(pullRequestRepository.remove).to.have.not.been.called;
+        expect(mergeService.unmanage).to.have.not.been.called;
         expect(mergeQueue.manage).to.have.not.been.called;
-        expect(githubService.setMergeQueueStatus).to.have.not.been.called;
       });
     });
 
@@ -161,16 +160,18 @@ describe('Unit | Build | Services | merge-queue', function () {
 
         const pullRequestRepository = {
           remove: sinon.stub(),
+          get: sinon.stub(),
         };
-        const githubService = {
-          setMergeQueueStatus: sinon.stub(),
+        const mergeService = {
+          unmanage: sinon.stub(),
         };
 
-        const mergeQueue = new MergeQueue({ pullRequestRepository, githubService });
-        mergeQueue.pullRequestIsManaged = sinon.stub();
+        const mergeQueue = new MergeQueue({ pullRequestRepository, pullRequestMergeService: mergeService });
         mergeQueue.manage = sinon.stub();
 
-        mergeQueue.pullRequestIsManaged.withArgs({ repositoryName, number: pullRequestNumber }).resolves(true);
+        pullRequestRepository.get
+          .withArgs({ repositoryName, number: pullRequestNumber })
+          .resolves({ repositoryName, number: pullRequestNumber });
 
         await mergeQueue.unmanagePullRequest({ repositoryName, number: pullRequestNumber, status: MERGE_STATUS.ERROR });
 
@@ -179,53 +180,10 @@ describe('Unit | Build | Services | merge-queue', function () {
           number: pullRequestNumber,
         });
         expect(mergeQueue.manage).to.have.been.calledOnceWithExactly({ repositoryName });
-        expect(githubService.setMergeQueueStatus).to.have.been.calledOnce;
-      });
-
-      const testCases = [
-        {
-          status: MERGE_STATUS.MERGED,
-          checkDescription: MERGE_STATUS_DETAILS.MERGED.description,
-          checkStatus: 'success',
-        },
-        { status: MERGE_STATUS.ERROR, checkDescription: MERGE_STATUS_DETAILS.ERROR.description, checkStatus: 'error' },
-        {
-          status: MERGE_STATUS.ABORTED,
-          checkDescription: MERGE_STATUS_DETAILS.ABORTED.description,
-          checkStatus: 'success',
-        },
-      ];
-
-      testCases.forEach((testCase) => {
-        it(`should update check status when pr status is '${testCase.status}'`, async function () {
-          const repositoryName = Symbol('repository-name');
-          const pullRequestNumber = Symbol('pull-request-number');
-
-          const pullRequestRepository = {
-            remove: sinon.stub(),
-          };
-          const githubService = {
-            setMergeQueueStatus: sinon.stub(),
-          };
-
-          const mergeQueue = new MergeQueue({ pullRequestRepository, githubService });
-          mergeQueue.pullRequestIsManaged = sinon.stub();
-          mergeQueue.manage = sinon.stub();
-
-          mergeQueue.pullRequestIsManaged.resolves(true);
-
-          await mergeQueue.unmanagePullRequest({
-            repositoryName,
-            number: pullRequestNumber,
-            status: testCase.status,
-          });
-
-          expect(githubService.setMergeQueueStatus).to.have.been.calledOnceWithExactly({
-            status: testCase.checkStatus,
-            repositoryFullName: repositoryName,
-            prNumber: pullRequestNumber,
-            description: testCase.checkDescription,
-          });
+        expect(mergeService.unmanage).to.have.been.calledOnceWithExactly({
+          repositoryName,
+          number: pullRequestNumber,
+          status: MERGE_STATUS.ERROR,
         });
       });
     });

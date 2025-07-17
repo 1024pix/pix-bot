@@ -8,12 +8,6 @@ export const MERGE_STATUS = {
   MERGED: 'MERGED',
 };
 
-export const MERGE_STATUS_DETAILS = {
-  ABORTED: { description: 'Merge plus géré', checkStatus: 'success' },
-  ERROR: { description: 'Error, merci de visiter la liste des essais', checkStatus: 'error' },
-  MERGED: { description: '', checkStatus: 'success' },
-};
-
 export class MergeQueue {
   #pullRequestRepository;
   #mergeService;
@@ -41,7 +35,11 @@ export class MergeQueue {
     await this.#pullRequestRepository.update({ ...nextMergingPr, isMerging: true });
 
     for (let i = 0; i < prsToMerge.length; i++) {
-      await this.#mergeService.updateMergeQueuePosition({ ...prsToMerge[i], position: i + 1, total: prsToMerge.length +1 });
+      await this.#mergeService.updateMergeQueuePosition({
+        ...prsToMerge[i],
+        position: i + 1,
+        total: prsToMerge.length + 1,
+      });
     }
 
     for (const pr of prsNotReady) {
@@ -58,17 +56,11 @@ export class MergeQueue {
   }
 
   async unmanagePullRequest({ repositoryName, number, status }) {
-    if (!(await this.pullRequestIsManaged({ repositoryName, number }))) {
+    const pullRequest = await this.#pullRequestRepository.get({ repositoryName, number });
+    if (!pullRequest) {
       return;
     }
-    const statusDetails = MERGE_STATUS_DETAILS[status];
-    await this.#githubService.setMergeQueueStatus({
-      status: statusDetails.checkStatus,
-      description: statusDetails.description,
-      repositoryFullName: repositoryName,
-      prNumber: number,
-    });
-
+    this.#mergeService.unmanage({ ...pullRequest, status });
     await this.#pullRequestRepository.remove({
       repositoryName,
       number,

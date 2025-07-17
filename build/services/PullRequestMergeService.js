@@ -12,6 +12,12 @@ const BLOCKING_LABELS = [
 
 const MERGE_LABEL = ':rocket: Ready to Merge';
 
+const MERGE_STATUS_DETAILS = {
+  ABORTED: { description: 'Merge plus géré', checkStatus: 'success' },
+  ERROR: { description: 'Error, merci de visiter la liste des essais', checkStatus: 'error' },
+  MERGED: { description: '', checkStatus: 'success' },
+};
+
 export class PullRequestMergeService {
   constructor(dependencies = { githubService: githubService }) {
     this.githubService = dependencies.githubService;
@@ -40,14 +46,32 @@ export class PullRequestMergeService {
     await this.updateGitHubMergeQueueStatus({ repositoryName, number, text: 'En cours de merge' });
   }
 
+  async updateMergeQueuePosition({ repositoryName, number, position, total }) {
+    await this.updateGitHubMergeQueueStatus({
+      repositoryName,
+      number,
+      text: `${position}/${total} dans la file d'attente`,
+    });
+  }
+
+  async unmanage({ repositoryName, number, status }) {
+    const statusDetails = MERGE_STATUS_DETAILS[status];
+    await this.updateGitHubMergeQueueStatus({
+      repositoryName,
+      number,
+      text: statusDetails.description,
+      status: statusDetails.checkStatus,
+    });
+  }
+
   updateBranch({ repositoryName, number }) {
     this.githubService.updatePullRequestBranch({ number, repositoryName });
   }
 
-  async updateGitHubMergeQueueStatus({ repositoryName, number, text }) {
+  async updateGitHubMergeQueueStatus({ repositoryName, number, text, status = 'pending' }) {
     try {
       await this.githubService.setMergeQueueStatus({
-        status: 'pending',
+        status,
         description: text,
         repositoryFullName: repositoryName,
         prNumber: number,
@@ -55,13 +79,5 @@ export class PullRequestMergeService {
     } catch (_) {
       //
     }
-  }
-
-  async updateMergeQueuePosition({ repositoryName, number, position, total }) {
-    await this.updateGitHubMergeQueueStatus({
-      repositoryName,
-      number,
-      text: `${position}/${total} dans la file d'attente`,
-    });
   }
 }
