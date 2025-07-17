@@ -197,7 +197,10 @@ class ScalingoClient {
         },
       });
 
-      logger.info(`Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`);
+      logger.info({
+        event: 'scalingo',
+        message: `Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`,
+      });
 
       return notifier;
     } catch (error) {
@@ -244,11 +247,14 @@ class ScalingoClient {
         },
       });
 
-      logger.info(`Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`);
+      logger.info({
+        event: 'scalingo',
+        message: `Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`,
+      });
 
       return notifier;
     } catch (error) {
-      logger.error(error);
+      logger.error({ event: 'scalingo', message: error });
       throw error;
     }
   }
@@ -263,11 +269,11 @@ class ScalingoClient {
         notifiers: [notifierId],
       });
 
-      logger.info(`Alert on ${alert.metric} added for application ${appName}.`);
+      logger.info({ event: 'scalingo', message: `Alert on ${alert.metric} added for application ${appName}.` });
 
       return alert;
     } catch (error) {
-      logger.error(error);
+      logger.error({ event: 'scalingo', message: error });
       throw error;
     }
   }
@@ -277,7 +283,7 @@ class ScalingoClient {
     try {
       notifiers = await this.client.NotificationPlatforms.list();
     } catch (err) {
-      logger.error(err);
+      logger.error({ event: 'scalingo', message: err });
     }
 
     const notifier = notifiers.find((notifier) => notifier.name === notifierName);
@@ -293,7 +299,7 @@ class ScalingoClient {
     try {
       events = await this.client.Events.listEventTypes();
     } catch (err) {
-      logger.error(err);
+      logger.error({ event: 'scalingo', message: err });
     }
 
     return eventNames.map((eventName) => {
