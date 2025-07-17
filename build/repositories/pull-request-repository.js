@@ -28,10 +28,7 @@ async function remove({ number, repositoryName }) {
 
 async function get({ number, repositoryName }) {
   const pullRequest = await knex('pull_requests').where({ number, repositoryName }).first();
-  if (pullRequest === undefined) {
-    throw new PullRequestNotFoundError();
-  }
-  return pullRequest;
+  return pullRequest || null;
 }
 
 export { save, isAtLeastOneMergeInProgress, findNotMerged, update, remove, get, PullRequestNotFoundError };

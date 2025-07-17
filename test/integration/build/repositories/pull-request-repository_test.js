@@ -148,10 +148,10 @@ describe('PullRequestRepository', function () {
       expect({ number, repositoryName }).to.deep.equal({ number: 123, repositoryName: 'pix-sample-repo' });
     });
 
-    it('should throw an error when pr does not exist', async function () {
-      const error = await catchErr(pullRequestRepository.get)({ number: 12435, repositoryName: 'pix-sample-repo' });
+    it('should return null when pr does not exist', async function () {
+      const result = await pullRequestRepository.get({ number: 12435, repositoryName: 'pix-sample-repo' });
 
-      expect(error).to.instanceOf(PullRequestNotFoundError);
+      expect(result).to.be.null;
     });
   });
 });
