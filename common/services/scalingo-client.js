@@ -181,6 +181,135 @@ class ScalingoClient {
       logger.error(err);
     }
   }
+
+  async addDeploymentNotificationOnSlack(appName) {
+    const slackNotifierId = await this.#getNotifierId('slack');
+    const eventIds = await this.#getEventIds(['app_deployed']);
+
+    try {
+      const notifier = await this.client.Notifiers.create(appName, {
+        platform_id: slackNotifierId,
+        name: 'Deploy on #tech-releases',
+        active: true,
+        selected_event_ids: eventIds,
+        type_data: {
+          webhook_url: config.slack.techReleaseWebhookUrl,
+        },
+      });
+
+      logger.info({
+        event: 'scalingo',
+        message: `Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`,
+      });
+
+      return notifier;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  }
+
+  async addAlertNotificationsOnSlack(appName) {
+    const slackNotifierId = await this.#getNotifierId('slack');
+    const eventIds = await this.#getEventIds([
+      'app_restarted',
+      'app_crashed',
+      'app_crashed_repeated',
+      'app_stopped',
+      'app_deleted',
+      'addon_provisioned',
+      'addon_resumed',
+      'addon_suspended',
+      'addon_plan_changed',
+      'addon_db_upgraded',
+      'addon_deleted',
+      'domain_added',
+      'domain_edited',
+      'domain_removed',
+      'notifier_added',
+      'notifier_edited',
+      'notifier_removed',
+      'variable_added',
+      'variable_edited',
+      'variable_bulk_edited',
+      'variable_removed',
+      'addon_updated',
+    ]);
+
+    try {
+      const notifier = await this.client.Notifiers.create(appName, {
+        platform_id: slackNotifierId,
+        name: 'Events logger on #alerte-pix-logs',
+        active: true,
+        selected_event_ids: eventIds,
+        type_data: {
+          webhook_url: config.slack.alertPixLogsWebhookUrl,
+        },
+      });
+
+      logger.info({
+        event: 'scalingo',
+        message: `Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`,
+      });
+
+      return notifier;
+    } catch (error) {
+      logger.error({ event: 'scalingo', message: error });
+      throw error;
+    }
+  }
+
+  async add5xxAlert(appName, notifierId) {
+    try {
+      const alert = await this.client.Alerts.create(appName, {
+        container_type: 'web',
+        metric: '5XX',
+        limit: 1,
+        duration_before_trigger: 0,
+        notifiers: [notifierId],
+      });
+
+      logger.info({ event: 'scalingo', message: `Alert on ${alert.metric} added for application ${appName}.` });
+
+      return alert;
+    } catch (error) {
+      logger.error({ event: 'scalingo', message: error });
+      throw error;
+    }
+  }
+
+  async #getNotifierId(notifierName) {
+    let notifiers;
+    try {
+      notifiers = await this.client.NotificationPlatforms.list();
+    } catch (err) {
+      logger.error({ event: 'scalingo', message: err });
+    }
+
+    const notifier = notifiers.find((notifier) => notifier.name === notifierName);
+    if (!notifier) {
+      throw new Error(`Notifier ${notifierName} not found.`);
+    }
+
+    return notifier.id;
+  }
+
+  async #getEventIds(eventNames) {
+    let events;
+    try {
+      events = await this.client.Events.listEventTypes();
+    } catch (err) {
+      logger.error({ event: 'scalingo', message: err });
+    }
+
+    return eventNames.map((eventName) => {
+      const event = events.find((event) => event.name === eventName);
+      if (!event) {
+        throw new Error(`Event ${eventName} not found.`);
+      }
+      return event.id;
+    });
+  }
 }
 
 async function _isUrlReachable(url) {

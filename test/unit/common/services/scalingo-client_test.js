@@ -846,4 +846,307 @@ describe('Scalingo client', function () {
       });
     });
   });
+
+  describe('#Scalingo.addDeploymentNotificationOnSlack', function () {
+    let client;
+    let notificationPlatformList;
+    let eventTypeList;
+    let notifierCreate;
+
+    beforeEach(async function () {
+      const clientStub = {
+        clientFromToken: async function () {
+          notificationPlatformList = sinon.stub();
+          eventTypeList = sinon.stub();
+          notifierCreate = sinon.stub();
+          return {
+            NotificationPlatforms: { list: notificationPlatformList },
+            Events: { listEventTypes: eventTypeList },
+            Notifiers: { create: notifierCreate },
+          };
+        },
+      };
+      client = await ScalingoClient.getInstance('production', clientStub);
+    });
+
+    it('should add a slack deployment notification', async function () {
+      // given
+      const appName = 'pix-test-production';
+      notificationPlatformList.resolves([
+        { id: 'slack-id', name: 'slack' },
+        { id: 'webhook-id', name: 'webhook' },
+      ]);
+      eventTypeList.resolves([
+        { id: 'app_deployed-id', name: 'app_deployed' },
+        { id: 'app_restarted-id', name: 'app_restarted' },
+      ]);
+
+      const expectedCreatedNotifier = {
+        id: 'slack-notifier-id',
+        name: 'Deploy on #tech-releases',
+        type: 'slack',
+        app: appName,
+      };
+
+      notifierCreate
+        .withArgs(appName, {
+          platform_id: 'slack-id',
+          name: 'Deploy on #tech-releases',
+          active: true,
+          selected_event_ids: ['app_deployed-id'],
+          type_data: {
+            webhook_url: 'https://hooks.slack.com/services/techReleaseWebhookUrl',
+          },
+        })
+        .resolves(expectedCreatedNotifier);
+
+      // when
+      const notifier = await client.addDeploymentNotificationOnSlack(appName);
+
+      // then
+      expect(notifier).to.deep.equal(expectedCreatedNotifier);
+    });
+
+    describe('when notifier is not found', function () {
+      it('should throw an exception', async function () {
+        // given
+        const appName = 'pix-test-production';
+        notificationPlatformList.resolves([
+          { id: 'unknown-id', name: 'unknown' },
+          { id: 'webhook-id', name: 'webhook' },
+        ]);
+
+        // when
+        try {
+          await client.addDeploymentNotificationOnSlack(appName);
+        } catch (error) {
+          // then
+          expect(error).to.be.an.instanceof(Error);
+          expect(error.message).to.equal('Notifier slack not found.');
+        }
+      });
+    });
+
+    describe('when event is not found', function () {
+      it('should throw an exception', async function () {
+        // given
+        const appName = 'pix-test-production';
+        notificationPlatformList.resolves([
+          { id: 'slack-id', name: 'slack' },
+          { id: 'webhook-id', name: 'webhook' },
+        ]);
+        eventTypeList.resolves([
+          { id: 'app_destroyed-id', name: 'app_destroyed' },
+          { id: 'app_restarted-id', name: 'app_restarted' },
+        ]);
+
+        // when
+        try {
+          await client.addDeploymentNotificationOnSlack(appName);
+        } catch (error) {
+          // then
+          expect(error).to.be.an.instanceof(Error);
+          expect(error.message).to.equal('Event app_deployed not found.');
+        }
+      });
+    });
+  });
+
+  describe('#Scalingo.addAlertNotificationsOnSlack', function () {
+    let client;
+    let notificationPlatformList;
+    let eventTypeList;
+    let notifierCreate;
+
+    beforeEach(async function () {
+      const clientStub = {
+        clientFromToken: async function () {
+          notificationPlatformList = sinon.stub();
+          eventTypeList = sinon.stub();
+          notifierCreate = sinon.stub();
+          return {
+            NotificationPlatforms: { list: notificationPlatformList },
+            Events: { listEventTypes: eventTypeList },
+            Notifiers: { create: notifierCreate },
+          };
+        },
+      };
+      client = await ScalingoClient.getInstance('production', clientStub);
+    });
+
+    it('should add a slack deployment notification', async function () {
+      // given
+      const appName = 'pix-test-production';
+      notificationPlatformList.resolves([
+        { id: 'slack-id', name: 'slack' },
+        { id: 'webhook-id', name: 'webhook' },
+      ]);
+      eventTypeList.resolves([
+        { id: 'app_deployed-id', name: 'app_deployed' },
+        { id: 'app_restarted-id', name: 'app_restarted' },
+        { id: 'app_restarted-id', name: 'app_restarted' },
+        { id: 'app_crashed-id', name: 'app_crashed' },
+        { id: 'app_crashed_repeated-id', name: 'app_crashed_repeated' },
+        { id: 'app_stopped-id', name: 'app_stopped' },
+        { id: 'app_deleted-id', name: 'app_deleted' },
+        { id: 'addon_provisioned-id', name: 'addon_provisioned' },
+        { id: 'addon_resumed-id', name: 'addon_resumed' },
+        { id: 'addon_suspended-id', name: 'addon_suspended' },
+        { id: 'addon_plan_changed-id', name: 'addon_plan_changed' },
+        { id: 'addon_db_upgraded-id', name: 'addon_db_upgraded' },
+        { id: 'addon_deleted-id', name: 'addon_deleted' },
+        { id: 'domain_added-id', name: 'domain_added' },
+        { id: 'domain_edited-id', name: 'domain_edited' },
+        { id: 'domain_removed-id', name: 'domain_removed' },
+        { id: 'notifier_added-id', name: 'notifier_added' },
+        { id: 'notifier_edited-id', name: 'notifier_edited' },
+        { id: 'notifier_removed-id', name: 'notifier_removed' },
+        { id: 'variable_added-id', name: 'variable_added' },
+        { id: 'variable_edited-id', name: 'variable_edited' },
+        { id: 'variable_bulk_edited-id', name: 'variable_bulk_edited' },
+        { id: 'variable_removed-id', name: 'variable_removed' },
+        { id: 'addon_updated-id', name: 'addon_updated' },
+      ]);
+
+      const expectedCreatedNotifier = {
+        id: 'slack-notifier-id',
+        name: 'Events logger on #alerte-pix-logs',
+        type: 'slack',
+        app: appName,
+      };
+
+      notifierCreate
+        .withArgs(appName, {
+          platform_id: 'slack-id',
+          name: 'Events logger on #alerte-pix-logs',
+          active: true,
+          selected_event_ids: [
+            'app_restarted-id',
+            'app_crashed-id',
+            'app_crashed_repeated-id',
+            'app_stopped-id',
+            'app_deleted-id',
+            'addon_provisioned-id',
+            'addon_resumed-id',
+            'addon_suspended-id',
+            'addon_plan_changed-id',
+            'addon_db_upgraded-id',
+            'addon_deleted-id',
+            'domain_added-id',
+            'domain_edited-id',
+            'domain_removed-id',
+            'notifier_added-id',
+            'notifier_edited-id',
+            'notifier_removed-id',
+            'variable_added-id',
+            'variable_edited-id',
+            'variable_bulk_edited-id',
+            'variable_removed-id',
+            'addon_updated-id',
+          ],
+          type_data: {
+            webhook_url: 'https://hooks.slack.com/services/alertPixLogsWebhookUrl',
+          },
+        })
+        .resolves(expectedCreatedNotifier);
+
+      // when
+      const notifier = await client.addAlertNotificationsOnSlack(appName);
+
+      // then
+      expect(notifier).to.deep.equal(expectedCreatedNotifier);
+    });
+
+    describe('when notifier is not found', function () {
+      it('should throw an exception', async function () {
+        // given
+        const appName = 'pix-test-production';
+        notificationPlatformList.resolves([
+          { id: 'unknown-id', name: 'unknown' },
+          { id: 'webhook-id', name: 'webhook' },
+        ]);
+
+        // when
+        try {
+          await client.addAlertNotificationsOnSlack(appName);
+        } catch (error) {
+          // then
+          expect(error).to.be.an.instanceof(Error);
+          expect(error.message).to.equal('Notifier slack not found.');
+        }
+      });
+    });
+
+    describe('when an event is not found', function () {
+      it('should throw an exception', async function () {
+        // given
+        const appName = 'pix-test-production';
+        notificationPlatformList.resolves([
+          { id: 'slack-id', name: 'slack' },
+          { id: 'webhook-id', name: 'webhook' },
+        ]);
+        eventTypeList.resolves([
+          { id: 'app_restarted-id', name: 'app_restarted' },
+          { id: 'app_restarted-id', name: 'app_restarted' },
+          { id: 'app_crashed-id', name: 'app_crashed' },
+        ]);
+
+        // when
+        try {
+          await client.addAlertNotificationsOnSlack(appName);
+        } catch (error) {
+          // then
+          expect(error).to.be.an.instanceof(Error);
+          expect(error.message).to.equal('Event app_crashed_repeated not found.');
+        }
+      });
+    });
+  });
+
+  describe('#Scalingo.add5xxAlert', function () {
+    let client;
+    let alertCreate;
+
+    beforeEach(async function () {
+      const clientStub = {
+        clientFromToken: async function () {
+          alertCreate = sinon.stub();
+          return {
+            Alerts: { create: alertCreate },
+          };
+        },
+      };
+      client = await ScalingoClient.getInstance('production', clientStub);
+    });
+
+    it('should add a 5XX alert', async function () {
+      // given
+      const appName = 'pix-test-production';
+      const notifierId = 'notifier-id';
+
+      const expectedCreatedAlert = {
+        id: 'alert-id',
+        metric: '5XX',
+        container_type: 'web',
+        limit: 1,
+        duration_before_trigger: 0,
+      };
+
+      alertCreate
+        .withArgs(appName, {
+          container_type: 'web',
+          metric: '5XX',
+          limit: 1,
+          duration_before_trigger: 0,
+          notifiers: [notifierId],
+        })
+        .resolves(expectedCreatedAlert);
+
+      // when
+      const alert = await client.add5xxAlert(appName, notifierId);
+
+      // then
+      expect(alert).to.deep.equal(expectedCreatedAlert);
+    });
+  });
 });
