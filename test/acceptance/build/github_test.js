@@ -612,6 +612,7 @@ describe('Acceptance | Build | Github', function () {
               },
             },
             merged: false,
+            labels: [],
           },
         };
 

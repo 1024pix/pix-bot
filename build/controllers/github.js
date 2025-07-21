@@ -82,6 +82,10 @@ async function _handleRA(
     return message;
   }
 
+  if (isHera(request)) {
+    return 'Handled by Hera';
+  }
+
   const deployedRA = await deployPullRequest(
     scalingoClient,
     reviewApps,
@@ -109,6 +113,10 @@ async function _handleCloseRA(
 
   if (!reviewApps) {
     return `${repository} is not managed by Pix Bot.`;
+  }
+
+  if (isHera(request)) {
+    return 'Handled by Hera';
   }
 
   let client;
@@ -354,6 +362,10 @@ async function _handleNoRACase(request, githubService) {
   }
 
   return { shouldContinue: true };
+}
+
+function isHera(request) {
+  return request.payload.pull_request.labels.some((label) => label.name === 'Hera');
 }
 
 export {
