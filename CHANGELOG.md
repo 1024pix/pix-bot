@@ -1,5 +1,16 @@
 # pix-bot Changelog
 
+## v1.128.0 (21/07/2025)
+
+
+### :rocket: Amélioration
+- [#598](https://github.com/1024pix/pix-bot/pull/598) [FEATURE] Ignorer les PRs labelisées Hera.
+- [#596](https://github.com/1024pix/pix-bot/pull/596) [FEATURE] Ajouter des notifiers et alertes lors de la création d'une application de production.
+
+### :arrow_up: Montée de version
+- [#595](https://github.com/1024pix/pix-bot/pull/595) [BUMP] Update dependency dotenv to v17 (dossier racine).
+- [#594](https://github.com/1024pix/pix-bot/pull/594) [BUMP] Update dependency scalingo to ^0.14.0 (dossier racine).
+
 ## v1.127.1 (04/07/2025)
 
 
