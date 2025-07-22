@@ -122,6 +122,7 @@ const configuration = (function () {
       owner: process.env.GITHUB_OWNER,
       repository: process.env.GITHUB_REPOSITORY,
       webhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
+      pixBotEnvLabel: process.env.PIX_BOT_ENV ? `pix-bot-${process.env.PIX_BOT_ENV}` : undefined,
 
       automerge: {
         workflowId: process.env.GITHUB_AUTOMERGE_WORKFLOW_ID,

@@ -526,6 +526,36 @@ const github = {
     const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
     return data.labels.some((ghLabel) => ghLabel.name === label);
   },
+
+  async getPullRequestForEvent(eventName, request) {
+    if (eventName === 'push') {
+      return undefined;
+    }
+
+    if (eventName === 'pull_request') {
+      return request.payload.pull_request;
+    }
+
+    let repositoryName, prNumber;
+
+    if (eventName === 'check_suite') {
+      if (request.payload.check_suite.pull_requests.length === 0) {
+        return undefined;
+      }
+
+      repositoryName = request.payload.repository.full_name;
+      prNumber = request.payload.check_suite.pull_requests[0].number;
+    } else {
+      return undefined;
+    }
+
+    const octokit = _createOctokit();
+    const { data, status } = await octokit.request(`GET /repos/${repositoryName}/pulls/${prNumber}`);
+    if (status !== 200) {
+      throw new Error(`Pull request #${prNumber} not found in repository ${repositoryName}`);
+    }
+    return data;
+  },
 };
 
 export default github;

@@ -89,6 +89,102 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
   });
 
   describe('#processWebhook', function () {
+    describe('when pix-bot env is not defined', function () {
+      describe('when pull-request has a pix-bot env label', function () {
+        it('should ignore the event', async function () {
+          // given
+          const request = {
+            headers: {
+              'x-github-event': 'pull_request',
+            },
+            payload: {
+              pull_request: {
+                labels: [{ name: 'pix-bot-dummy' }, { name: 'Hera' }],
+              },
+            },
+          };
+
+          // when
+          const result = await githubController.processWebhook(request);
+
+          // then
+          expect(result).to.equal('Ignoring because pull request is labelled with a pix-bot-xxx label');
+        });
+      });
+
+      describe('when pull-request has no pix-bot env label', function () {
+        it('should handle the event', async function () {
+          // given
+          const request = {
+            headers: {
+              'x-github-event': 'pull_request',
+            },
+            payload: {
+              action: 'nothing',
+              pull_request: {
+                labels: [{ name: 'Hera' }],
+              },
+            },
+          };
+
+          // when
+          const result = await githubController.processWebhook(request);
+
+          // then
+          expect(result).to.equal('Ignoring nothing action');
+        });
+      });
+    });
+
+    describe('when pix-bot env is defined', function () {
+      describe('when pull-request does not have the corresponding pix-bot env label', function () {
+        it('should ignore the event', async function () {
+          // given
+          const request = {
+            headers: {
+              'x-github-event': 'pull_request',
+            },
+            payload: {
+              pull_request: {
+                labels: [{ name: 'pix-bot-review' }, { name: 'Hera' }],
+              },
+            },
+          };
+          sinon.stub(config.github, 'pixBotEnvLabel').value('pix-bot-integration');
+
+          // when
+          const result = await githubController.processWebhook(request);
+
+          // then
+          expect(result).to.equal(`Ignoring because pull request should have the pix-bot-integration label`);
+        });
+      });
+
+      describe('when pull-request has the corresponding pix-bot env label', function () {
+        it('should handle the event', async function () {
+          // given
+          const request = {
+            headers: {
+              'x-github-event': 'pull_request',
+            },
+            payload: {
+              action: 'nothing',
+              pull_request: {
+                labels: [{ name: 'Hera' }, { name: 'pix-bot-integration' }],
+              },
+            },
+          };
+          sinon.stub(config.github, 'pixBotEnvLabel').value('pix-bot-integration');
+
+          // when
+          const result = await githubController.processWebhook(request);
+
+          // then
+          expect(result).to.equal('Ignoring nothing action');
+        });
+      });
+    });
+
     describe('when event is not handled', function () {
       it('should ignore the event', async function () {
         // given
@@ -165,7 +261,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 },
               });
               const mergeQueue = sinon.stub();
-              const githubService = { checkUserBelongsToPix: sinon.stub() };
+              const githubService = { checkUserBelongsToPix: sinon.stub(), getPullRequestForEvent: sinon.stub() };
               githubService.checkUserBelongsToPix.resolves(false);
               const pullRequestRepository = { save: sinon.stub() };
 
@@ -197,7 +293,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 });
 
                 const mergeQueue = { managePullRequest: sinon.stub() };
-                const githubService = { checkUserBelongsToPix: sinon.stub() };
+                const githubService = { checkUserBelongsToPix: sinon.stub(), getPullRequestForEvent: sinon.stub() };
                 githubService.checkUserBelongsToPix.resolves(true);
 
                 // when
@@ -229,7 +325,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
                 const mergeQueue = sinon.stub();
                 const pullRequestRepository = { save: sinon.stub() };
-                const githubService = { checkUserBelongsToPix: sinon.stub() };
+                const githubService = { checkUserBelongsToPix: sinon.stub(), getPullRequestForEvent: sinon.stub() };
                 githubService.checkUserBelongsToPix.resolves(true);
                 // when
                 await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
@@ -284,9 +380,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
             const handleCloseRA = sinon.stub();
             const mergeQueue = { unmanagePullRequest: sinon.stub() };
+            const githubService = { getPullRequestForEvent: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { handleCloseRA, mergeQueue });
+            await githubController.processWebhook(request, { githubService, handleCloseRA, mergeQueue });
 
             // then
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
@@ -313,9 +410,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
             const handleCloseRA = sinon.stub();
             const mergeQueue = { unmanagePullRequest: sinon.stub() };
+            const githubService = { getPullRequestForEvent: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { handleCloseRA, mergeQueue });
+            await githubController.processWebhook(request, { githubService, handleCloseRA, mergeQueue });
 
             // then
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
@@ -355,9 +453,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             };
 
             const mergeQueue = { unmanagePullRequest: sinon.stub() };
+            const githubService = { getPullRequestForEvent: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { mergeQueue });
+            await githubController.processWebhook(request, { githubService, mergeQueue });
 
             // then
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
@@ -401,7 +500,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             };
 
             const mergeQueue = { managePullRequest: sinon.stub() };
-            const githubService = { isPrLabelledWith: sinon.stub() };
+            const githubService = { isPrLabelledWith: sinon.stub(), getPullRequestForEvent: sinon.stub() };
 
             githubService.isPrLabelledWith
               .resolves(false)
