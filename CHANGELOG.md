@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v1.130.0 (22/07/2025)
+
+
+### :rocket: Amélioration
+- [#600](https://github.com/1024pix/pix-bot/pull/600) [FEATURE] Permettre de pouvoir tester Pix Bot Integration 🤖.
+
+### :arrow_up: Montée de version
+- [#599](https://github.com/1024pix/pix-bot/pull/599) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.21 (dossier racine).
+
 ## v1.129.0 (22/07/2025)
 
 
