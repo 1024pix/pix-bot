@@ -791,4 +791,114 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#getPullRequestForEvent', function () {
+    let githubNock;
+    const repositoryName = '1024pix/pix';
+    const prNumber = 123;
+
+    describe('when event is push', function () {
+      it('returns undefined', async function () {
+        // when
+        const pullRequest = await githubService.getPullRequestForEvent('push', {});
+
+        // then
+        expect(pullRequest).to.be.undefined;
+      });
+    });
+
+    describe('when event is pull_request', function () {
+      it('returns pull request object from event', async function () {
+        // given
+        const expectedPullRequest = Symbol('expectedPullRequest');
+        const payload = {
+          pull_request: expectedPullRequest,
+        };
+
+        // when
+        const pullRequest = await githubService.getPullRequestForEvent('pull_request', { payload });
+
+        // then
+        expect(pullRequest).to.equal(expectedPullRequest);
+      });
+    });
+
+    describe('when event is check_suite', function () {
+      describe('when check suite is attached to no pull request', function () {
+        it('throws an error', async function () {
+          // given
+          const payload = {
+            check_suite: {
+              pull_requests: [],
+            },
+          };
+
+          // when
+          const pullRequest = await githubService.getPullRequestForEvent('check_suite', { payload });
+
+          // then
+          expect(pullRequest).to.be.undefined;
+        });
+      });
+
+      describe('when check suite is attached to a pull request', function () {
+        it('returns data for given repository and PR number', async function () {
+          // given
+          const payload = {
+            repository: {
+              full_name: repositoryName,
+            },
+            check_suite: {
+              pull_requests: [
+                {
+                  number: prNumber,
+                },
+              ],
+            },
+          };
+          const response = {
+            number: prNumber,
+            title: 'Ma super PR',
+            labels: [
+              {
+                id: 456,
+                name: ':panda: label',
+                color: 'FFFFFF',
+              },
+            ],
+          };
+          githubNock = nock('https://api.github.com')
+            .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+            .reply(200, response);
+
+          // when
+          const pullRequest = await githubService.getPullRequestForEvent('check_suite', { payload });
+
+          // then
+          expect(pullRequest).to.deep.equal({
+            number: prNumber,
+            title: 'Ma super PR',
+            labels: [
+              {
+                id: 456,
+                name: ':panda: label',
+                color: 'FFFFFF',
+              },
+            ],
+          });
+          expect(githubNock.isDone()).to.be.true;
+        });
+      });
+    });
+
+    describe('when event is unknown', function () {
+      it('returns undefined', async function () {
+        // when
+        const pullRequest = await githubService.getPullRequestForEvent('gollum', {});
+
+        // then
+        expect(pullRequest).to.be.undefined;
+      });
+    });
+  });
 });
