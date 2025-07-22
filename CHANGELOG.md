@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.129.0 (22/07/2025)
+
+
+### :building_construction: Tech
+- [#597](https://github.com/1024pix/pix-bot/pull/597) [TECH] Ajouter la configuration pour déployer les RA de pix-nina.
+
 ## v1.128.0 (21/07/2025)
 
 
