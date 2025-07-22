@@ -35,7 +35,7 @@ describe('Acceptance | Build | Github', function () {
     function getPullRequestNock({ repository, prNumber, sha }) {
       return nock('https://api.github.com')
         .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
-        .reply(200, { head: { sha } });
+        .reply(200, { head: { sha }, labels: [] });
     }
 
     function addRADeploymentCheckNock({ repository, sha, status }) {
@@ -1071,13 +1071,18 @@ describe('Acceptance | Build | Github', function () {
     describe('on check_suite event', function () {
       describe('when action is not handled', function () {
         it('should do nothing and return ignoring message', async function () {
+          // given
           const body = {
             action: 'requested',
             repository: {
               full_name: '1024pix/pix',
             },
-            check_suite: {},
+            check_suite: {
+              pull_requests: [],
+            },
           };
+
+          // when
           const response = await server.inject({
             method: 'POST',
             url: '/github/webhook',
@@ -1088,6 +1093,7 @@ describe('Acceptance | Build | Github', function () {
             payload: body,
           });
 
+          // then
           expect(response.statusCode).equal(200);
           expect(response.payload).equal(`Ignoring 'requested' action for check_suite event`);
         });
@@ -1095,6 +1101,9 @@ describe('Acceptance | Build | Github', function () {
 
       describe('when action is completed', function () {
         it('should do merge queue tasks and return message', async function () {
+          // given
+          const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 123, sha: 'my-sha' });
+
           const body = {
             action: 'completed',
             repository: {
@@ -1120,6 +1129,7 @@ describe('Acceptance | Build | Github', function () {
           };
           getMergeCheckStatusNock({ repositoryFullName: body.repository.full_name });
 
+          // given
           const response = await server.inject({
             method: 'POST',
             url: '/github/webhook',
@@ -1130,6 +1140,8 @@ describe('Acceptance | Build | Github', function () {
             payload: body,
           });
 
+          // then
+          expect(getPullRequest.isDone()).to.be.true;
           expect(response.statusCode).equal(200);
           expect(response.payload).equal('check_suite event handle');
         });

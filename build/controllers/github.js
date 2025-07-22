@@ -263,6 +263,32 @@ async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoCli
   return `Deploying branch ${branchName} on integration applications : ` + scalingoApps.join(', ');
 }
 
+function isHandledByThisEnv(pullRequest) {
+  if (config.github.pixBotEnvLabel) {
+    if (!pullRequest) {
+      return {
+        message: `Ignoring event attached to no pull request`,
+        shouldContinue: false,
+      };
+    }
+    if (pullRequest.labels.some((label) => label.name === config.github.pixBotEnvLabel)) {
+      return { shouldContinue: true };
+    }
+    return {
+      message: `Ignoring because pull request should have the ${config.github.pixBotEnvLabel} label`,
+      shouldContinue: false,
+    };
+  }
+
+  if (!pullRequest) {
+    return { shouldContinue: true };
+  }
+  if (pullRequest.labels.some((label) => label.name.startsWith('pix-bot-'))) {
+    return { message: 'Ignoring because pull request is labelled with a pix-bot-xxx label', shouldContinue: false };
+  }
+  return { shouldContinue: true };
+}
+
 async function processWebhook(
   request,
   {
@@ -274,6 +300,13 @@ async function processWebhook(
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
+  const pullRequest = await githubService.getPullRequestForEvent(eventName, request);
+
+  const { shouldContinue, message } = isHandledByThisEnv(pullRequest);
+  if (!shouldContinue) {
+    return message;
+  }
+
   if (eventName === 'push') {
     return pushOnDefaultBranchWebhook(request);
   } else if (eventName === 'pull_request') {
