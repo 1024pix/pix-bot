@@ -19,6 +19,7 @@ const repositoryToScalingoAppsReview = {
   'pix-editor': ['pix-lcms-review'],
   'pix-epreuves': ['pix-epreuves-review'],
   'pix-exploit': ['pix-exploit-review'],
+  'pix-nina': ['pix-nina-review'],
   'pix-site': ['pix-site-review', 'pix-pro-review'],
   'pix-tutos': ['pix-tutos-review'],
   'pix-ui': ['pix-ui-review'],
