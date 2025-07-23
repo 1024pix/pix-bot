@@ -1109,15 +1109,15 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       expect(githubService.commentPullRequest).to.have.been.calledWithExactly({
         repositoryName,
         pullRequestId: pullRequestNumber,
-        comment: `Choisissez les applications que vous souhaitez déployer :
+        comment: `Choisir les applications à déployer :
 
-- [ ] API <!-- api -->
-- [ ] Fronts <!-- front -->
-- [ ] Maddo <!-- api-maddo -->
-- [ ] Audit Logger <!-- audit-logger -->
+- [ ] Fronts <!-- pix-front-review -->
+- [ ] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
 
 > [!IMPORTANT]
-> N'oubliez pas de déployer l'api pour pouvoir accéder aux fronts (et à api-maddo)
+> N'oubliez pas de déployer l'API pour pouvoir accéder aux fronts et/ou à l’API MaDDo.
 
 Une fois les applications déployées, elles seront accessibles via les liens suivants :
 
