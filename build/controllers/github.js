@@ -30,8 +30,11 @@ const repositoryToScalingoAppsReview = {
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-function getMessageTemplate(repositoryName) {
-  const baseDir = path.join(__dirname, '..', 'templates', 'pull-request-messages');
+function getMessageTemplate(repositoryName, isHera = false) {
+  let baseDir = path.join(__dirname, '..', 'templates', 'pull-request-messages');
+  if (isHera) {
+    baseDir = path.join(baseDir, 'hera');
+  }
   let relativeFileName;
   if (fs.existsSync(path.join(baseDir, `${repositoryName}.md`))) {
     relativeFileName = `${repositoryName}.md`;
@@ -71,6 +74,7 @@ async function _handleRA(
   addMessageToPullRequest = _addMessageToPullRequest,
   githubService = commonGithubService,
   reviewAppRepository = reviewAppRepo,
+  handleHeraPullRequest = _handleHeraPullRequest,
 ) {
   const payload = request.payload;
   const prId = payload.number;
@@ -84,7 +88,7 @@ async function _handleRA(
   }
 
   if (isHera(request)) {
-    return 'Handled by Hera';
+    return handleHeraPullRequest(request);
   }
 
   const deployedRA = await deployPullRequest(
@@ -402,6 +406,49 @@ function isHera(request) {
   return request.payload.pull_request.labels.some((label) => label.name === 'Hera');
 }
 
+async function _handleHeraPullRequest(
+  request,
+  dependencies = {
+    handleHeraPullRequestOpened,
+  },
+) {
+  if (request.payload.action === 'opened') {
+    return dependencies.handleHeraPullRequestOpened(request);
+  }
+  return `Action ${request.payload.action} not handled for Hera pull request`;
+}
+
+async function handleHeraPullRequestOpened(request, dependencies = { addMessageToHeraPullRequest }) {
+  const pullRequestNumber = request.payload.number;
+  const repository = request.payload.pull_request.head.repo.name;
+  const reviewApps = repositoryToScalingoAppsReview[repository];
+
+  await dependencies.addMessageToHeraPullRequest({
+    repositoryName: repository,
+    reviewApps,
+    pullRequestNumber,
+  });
+
+  logger.info({
+    event: 'review-app',
+    message: `Commented on PR ${pullRequestNumber} in repository ${repository}`,
+  });
+  return `Commented on PR ${pullRequestNumber} in repository ${repository}`;
+}
+
+async function addMessageToHeraPullRequest(
+  { repositoryName, reviewApps, pullRequestNumber },
+  dependencies = { githubService: commonGithubService },
+) {
+  const template = getMessageTemplate(repositoryName, true);
+  const message = getMessage(repositoryName, pullRequestNumber, reviewApps, template);
+  await dependencies.githubService.commentPullRequest({
+    repositoryName,
+    pullRequestId: pullRequestNumber,
+    comment: message,
+  });
+}
+
 export {
   _addMessageToPullRequest as addMessageToPullRequest,
   getMessage,
@@ -410,4 +457,7 @@ export {
   processWebhook,
   _pushOnDefaultBranchWebhook as pushOnDefaultBranchWebhook,
   _handleCloseRA as handleCloseRA,
+  _handleHeraPullRequest as handleHeraPullRequest,
+  handleHeraPullRequestOpened,
+  addMessageToHeraPullRequest,
 };
