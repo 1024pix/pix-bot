@@ -87,7 +87,7 @@ async function _handleRA(
     return message;
   }
 
-  if (isHera(request)) {
+  if (isHera(request.payload.pull_request)) {
     return handleHeraPullRequest(request);
   }
 
@@ -120,7 +120,7 @@ async function _handleCloseRA(
     return `${repository} is not managed by Pix Bot.`;
   }
 
-  if (isHera(request)) {
+  if (isHera(request.payload.pull_request)) {
     return 'Handled by Hera';
   }
 
@@ -301,6 +301,7 @@ async function processWebhook(
     handleCloseRA = _handleCloseRA,
     mergeQueue = _mergeQueue,
     githubService = commonGithubService,
+    handleIssueComment = _handleIssueComment,
   } = {},
 ) {
   const eventName = request.headers['x-github-event'];
@@ -371,6 +372,11 @@ async function processWebhook(
       return `check_suite event handle`;
     }
     return `Ignoring '${request.payload.action}' action for check_suite event`;
+  } else if (eventName === 'issue_comment') {
+    if (request.payload.action === 'edited') {
+      return handleIssueComment({ request, pullRequest });
+    }
+    return `Ignoring issue comment ${request.payload.action}`;
   } else {
     return `Ignoring ${eventName} event`;
   }
@@ -402,8 +408,8 @@ async function _handleNoRACase(request, githubService) {
   return { shouldContinue: true };
 }
 
-function isHera(request) {
-  return request.payload.pull_request.labels.some((label) => label.name === 'Hera');
+function isHera(pullRequest) {
+  return pullRequest.labels.some((label) => label.name === 'Hera');
 }
 
 async function _handleHeraPullRequest(
@@ -449,6 +455,129 @@ async function addMessageToHeraPullRequest(
   });
 }
 
+async function _handleIssueComment(
+  { request, pullRequest },
+  dependencies = { reviewAppRepo, createReviewApp, removeReviewApp },
+) {
+  const repositoryName = pullRequest.head.repo.name;
+  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
+
+  const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, reviewApps);
+  if (!shouldContinue) {
+    return message;
+  }
+
+  const body = request.payload.comment.body;
+  const pullRequestNumber = request.payload.issue.number;
+  let selectedApps = Array.from(body.matchAll(/^- \[[xX]\].+<!-- ([\w-]+) -->$/gm), ([, app]) => app);
+
+  selectedApps = selectedApps.filter((app) => {
+    const isAllowed = reviewApps.includes(app);
+    if (!isAllowed) {
+      logger.warn({
+        event: 'review-app',
+        message: `selected app ${app} unknown for repository ${repositoryName}`,
+      });
+    }
+    return isAllowed;
+  });
+
+  const existingApps = await dependencies.reviewAppRepo.listParentAppForPullRequest({
+    repository: repositoryName,
+    prNumber: pullRequestNumber,
+  });
+
+  const reviewAppsToCreate = selectedApps
+    .filter((parentApp) => !existingApps.includes(parentApp))
+    .map((parentApp) => ({
+      parentApp,
+      reviewAppName: `${parentApp}-pr${pullRequestNumber}`,
+    }));
+  const reviewAppsToRemove = existingApps
+    .filter((parentApp) => !selectedApps.includes(parentApp))
+    .map((parentApp) => `${parentApp}-pr${pullRequestNumber}`);
+
+  const ref = pullRequest.head.ref;
+
+  for (const { reviewAppName, parentApp } of reviewAppsToCreate) {
+    await dependencies.createReviewApp({ reviewAppName, repositoryName, pullRequestNumber, ref, parentApp });
+  }
+
+  for (const reviewAppName of reviewAppsToRemove) {
+    await dependencies.removeReviewApp({ reviewAppName });
+  }
+
+  const messages = [];
+  if (reviewAppsToCreate.length) {
+    messages.push(`Created review apps: ${reviewAppsToCreate.map(({ reviewAppName }) => reviewAppName).join(', ')}`);
+  }
+  if (reviewAppsToRemove.length) {
+    messages.push(`Removed review apps: ${reviewAppsToRemove.join(', ')}`);
+  }
+  if (!messages.length) {
+    return 'Nothing to do';
+  }
+  return messages.join('\n');
+}
+
+function shouldHandleIssueComment(request, pullRequest, reviewApps) {
+  if (!reviewApps) {
+    return { shouldContinue: false, message: 'Repository is not managed by Pix Bot.' };
+  }
+
+  if (request.payload.comment.user.login !== 'pix-bot-github') {
+    return { shouldContinue: false, message: `Ignoring ${request.payload.comment.user.login} comment edition` };
+  }
+
+  if (pullRequest.head.repo.fork) {
+    return { message: 'No RA for a fork', shouldContinue: false };
+  }
+
+  if (pullRequest.state !== 'open') {
+    return { message: 'No RA for closed PR', shouldContinue: false };
+  }
+
+  if (!isHera(pullRequest)) {
+    return { shouldContinue: false, message: 'issue_comment events only handled for Hera pull requests' };
+  }
+
+  return { shouldContinue: true };
+}
+
+async function createReviewApp(
+  { reviewAppName, repositoryName, pullRequestNumber, ref, parentApp },
+  dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
+) {
+  const client = await dependencies.scalingoClient.getInstance('reviewApps');
+
+  const reviewAppExists = await client.reviewAppExists(reviewAppName);
+  if (reviewAppExists) {
+    return;
+  }
+
+  await dependencies.reviewAppRepo.create({
+    name: reviewAppName,
+    repository: repositoryName,
+    prNumber: pullRequestNumber,
+    parentApp,
+  });
+  await client.deployReviewApp(parentApp, pullRequestNumber);
+  await client.disableAutoDeploy(reviewAppName);
+  await client.deployUsingSCM(reviewAppName, ref);
+}
+
+async function removeReviewApp({ reviewAppName }, dependencies = { scalingoClient: ScalingoClient, reviewAppRepo }) {
+  const client = await dependencies.scalingoClient.getInstance('reviewApps');
+
+  const reviewAppExists = await client.reviewAppExists(reviewAppName);
+
+  await dependencies.reviewAppRepo.remove({ name: reviewAppName });
+
+  if (!reviewAppExists) return;
+
+  await client.deleteReviewApp(reviewAppName);
+}
+
 export {
   _addMessageToPullRequest as addMessageToPullRequest,
   getMessage,
@@ -460,4 +589,7 @@ export {
   _handleHeraPullRequest as handleHeraPullRequest,
   handleHeraPullRequestOpened,
   addMessageToHeraPullRequest,
+  _handleIssueComment as handleIssueComment,
+  createReviewApp,
+  removeReviewApp,
 };

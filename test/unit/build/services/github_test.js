@@ -891,6 +891,74 @@ describe('Unit | Build | github-test', function () {
       });
     });
 
+    describe('when event is issue_comment', function () {
+      describe('when issue_comment is not associated to a pull request', function () {
+        it('returns undefined', async function () {
+          // given
+          const payload = {
+            repository: {
+              full_name: repositoryName,
+            },
+            issue: {
+              number: prNumber,
+            },
+          };
+
+          // when
+          const result = await githubService.getPullRequestForEvent('issue_comment', { payload });
+
+          // then
+          expect(result).to.be.undefined;
+        });
+      });
+
+      describe('when issue_comment is associated to a pull request', function () {
+        it('returns data for given repository and PR number', async function () {
+          // given
+          const payload = {
+            repository: {
+              full_name: repositoryName,
+            },
+            issue: {
+              pull_request: {},
+              number: prNumber,
+            },
+          };
+          const response = {
+            number: prNumber,
+            title: 'Ma super PR',
+            labels: [
+              {
+                id: 456,
+                name: ':panda: label',
+                color: 'FFFFFF',
+              },
+            ],
+          };
+          githubNock = nock('https://api.github.com')
+            .get(`/repos/${repositoryName}/pulls/${prNumber}`)
+            .reply(200, response);
+
+          // when
+          const pullRequest = await githubService.getPullRequestForEvent('issue_comment', { payload });
+
+          // then
+          expect(pullRequest).to.deep.equal({
+            number: prNumber,
+            title: 'Ma super PR',
+            labels: [
+              {
+                id: 456,
+                name: ':panda: label',
+                color: 'FFFFFF',
+              },
+            ],
+          });
+          expect(githubNock.isDone()).to.be.true;
+        });
+      });
+    });
+
     describe('when event is unknown', function () {
       it('returns undefined', async function () {
         // when
