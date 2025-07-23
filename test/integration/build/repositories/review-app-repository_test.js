@@ -253,4 +253,43 @@ describe('Integration | Build | Repository | Review App', function () {
       });
     });
   });
+
+  describe('listParentAppForPullRequest', function () {
+    it('returns parent app name for a pull request', async function () {
+      // given
+      const repository = 'pix';
+      const prNumber = 123;
+
+      await knex('review-apps').insert({
+        repository,
+        prNumber,
+        parentApp: 'pix-certif-review',
+        name: 'pix-certif-review-pr123',
+      });
+      await knex('review-apps').insert({
+        repository,
+        prNumber,
+        parentApp: 'pix-api-review',
+        name: 'pix-api-review-pr123',
+      });
+      await knex('review-apps').insert({
+        repository,
+        prNumber: 456,
+        parentApp: 'pix-certif-review',
+        name: 'pix-certif-review-pr456',
+      });
+      await knex('review-apps').insert({
+        repository: 'pix-epreuves',
+        prNumber,
+        parentApp: 'pix-epreuves-review',
+        name: 'pix-epreuves-review-pr123',
+      });
+
+      // when
+      const reviewApps = await reviewAppRepository.listParentAppForPullRequest({ repository, prNumber });
+
+      // then
+      expect(reviewApps).to.deep.equal(['pix-api-review', 'pix-certif-review']);
+    });
+  });
 });

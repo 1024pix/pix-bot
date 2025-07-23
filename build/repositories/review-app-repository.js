@@ -41,3 +41,7 @@ export const areAllDeployed = async function ({ repository, prNumber }) {
 export const remove = async function ({ name }) {
   return knex('review-apps').where({ name }).del();
 };
+
+export const listParentAppForPullRequest = async function ({ repository, prNumber }) {
+  return knex.pluck('parentApp').from('review-apps').where({ repository, prNumber }).orderBy('parentApp');
+};
