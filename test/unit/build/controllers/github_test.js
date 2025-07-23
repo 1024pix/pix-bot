@@ -710,12 +710,21 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         it('delegates handling RA to Hera', async function () {
           // given
           sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'Hera' }]);
+          const handleHeraPullRequest = sinon.stub().resolves('Handled by Hera');
 
           // when
-          const response = await githubController.handleRA(request);
+          const response = await githubController.handleRA(
+            request,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            handleHeraPullRequest,
+          );
 
           // then
           expect(response).to.equal('Handled by Hera');
+          expect(handleHeraPullRequest).to.have.been.calledWithExactly(request);
         });
       });
     });
@@ -1018,6 +1027,119 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             githubServiceStub.addRADeploymentCheck.calledWith({ repository: 'pix', prNumber: 3, status: 'success' }),
           ).to.be.true;
         });
+      });
+    });
+  });
+
+  describe('#handleHeraPullRequest', function () {
+    describe('when action is opened', function () {
+      it('calls handleHeraPullRequestOpened', async function () {
+        // given
+        const handleHeraPullRequestOpened = sinon.stub().resolves('handleHeraPullRequestOpened');
+        const request = { payload: { action: 'opened' } };
+
+        // when
+        const result = await githubController.handleHeraPullRequest(request, { handleHeraPullRequestOpened });
+
+        // then
+        expect(result).to.equal('handleHeraPullRequestOpened');
+        expect(handleHeraPullRequestOpened).to.have.been.calledWithExactly(request);
+      });
+    });
+
+    describe('when action is not handled for Hera Pull Request', function () {
+      it('does nothing and returns message', async function () {
+        // given
+        const request = { payload: { action: 'unhandled' } };
+
+        // when
+        const result = await githubController.handleHeraPullRequest(request);
+
+        // then
+        expect(result).to.equal('Action unhandled not handled for Hera pull request');
+      });
+    });
+  });
+
+  describe('#handleHeraPullRequestOpened', function () {
+    it('adds a message on the pull request', async function () {
+      // given
+      const request = {
+        payload: {
+          number: 123,
+          pull_request: {
+            head: {
+              repo: {
+                name: 'pix',
+              },
+            },
+          },
+        },
+      };
+      const addMessageToHeraPullRequest = sinon.stub().resolves();
+
+      // when
+      await githubController.handleHeraPullRequestOpened(request, { addMessageToHeraPullRequest });
+
+      // then
+      expect(addMessageToHeraPullRequest).to.have.been.calledWithExactly({
+        repositoryName: 'pix',
+        reviewApps: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
+        pullRequestNumber: 123,
+      });
+    });
+  });
+
+  describe('#addMessageToHeraPullRequest', function () {
+    it('calls github API to comment pull request', async function () {
+      // given
+      const repositoryName = 'pix';
+      const pullRequestNumber = 123;
+      const githubService = {
+        commentPullRequest: sinon.stub().resolves(),
+      };
+
+      // when
+      await githubController.addMessageToHeraPullRequest(
+        { repositoryName, pullRequestNumber, reviewApps: [] },
+        { githubService },
+      );
+
+      // then
+      expect(githubService.commentPullRequest).to.have.been.calledWithExactly({
+        repositoryName,
+        pullRequestId: pullRequestNumber,
+        comment: `Choisissez les applications que vous souhaitez déployer :
+
+- [ ] API <!-- api -->
+- [ ] Fronts <!-- front -->
+- [ ] Maddo <!-- api-maddo -->
+- [ ] Audit Logger <!-- audit-logger -->
+
+> [!IMPORTANT]
+> N'oubliez pas de déployer l'api pour pouvoir accéder aux fronts (et à api-maddo)
+
+Une fois les applications déployées, elles seront accessibles via les liens suivants :
+
+- [App (.fr)](https://app-pr123.review.pix.fr)
+- [App (.org)](https://app-pr123.review.pix.org)
+- [Orga (.fr)](https://orga-pr123.review.pix.fr)
+- [Orga (.org)](https://orga-pr123.review.pix.org)
+- [Certif (.fr)](https://certif-pr123.review.pix.fr)
+- [Certif (.org)](https://certif-pr123.review.pix.org)
+- [Junior](https://junior-pr123.review.pix.fr)
+- [Admin](https://admin-pr123.review.pix.fr)
+- [API](https://api-pr123.review.pix.fr/api/)
+- [API MaDDo](https://pix-api-maddo-review-pr123.osc-fr1.scalingo.io/api/)
+- [Audit Logger](https://pix-audit-logger-review-pr123.osc-fr1.scalingo.io/api/)
+
+Les variables d'environnement seront accessibles via les liens suivants :
+
+- [scalingo front](https://dashboard.scalingo.com/apps/osc-fr1/pix-front-review-pr123/environment)
+- [scalingo api](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-review-pr123/environment)
+- [scalingo api-maddo](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-maddo-review-pr123/environment)
+- [scalingo audit-logger](https://dashboard.scalingo.com/apps/osc-fr1/pix-audit-logger-review-pr123/environment)
+`,
       });
     });
   });
