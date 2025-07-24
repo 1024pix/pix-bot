@@ -49,10 +49,14 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
   const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoReviewApps[0]}-pr${pullRequestId}/environment`;
   const shortenedRepositoryName = repositoryName.replace('pix-', '');
   const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
+  const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
+    .map((app) => `- [ ] ${app.replace('-review', '')} <!-- ${app} -->`)
+    .join('\n');
   const message = messageTemplate
     .replaceAll('{{pullRequestId}}', pullRequestId)
     .replaceAll('{{webApplicationUrl}}', webApplicationUrl)
-    .replaceAll('{{scalingoDashboardUrl}}', scalingoDashboardUrl);
+    .replaceAll('{{scalingoDashboardUrl}}', scalingoDashboardUrl)
+    .replaceAll('{{checkboxesForReviewAppsToBeDeployed}}', checkboxesForReviewAppsToBeDeployed);
   return message;
 }
 

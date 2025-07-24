@@ -1159,7 +1159,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
       // when
       await githubController.addMessageToHeraPullRequest(
-        { repositoryName, pullRequestNumber, reviewApps: [] },
+        {
+          repositoryName,
+          pullRequestNumber,
+          reviewApps: ['pix-front-review', 'pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review'],
+        },
         { githubService },
       );
 
@@ -1169,10 +1173,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         pullRequestId: pullRequestNumber,
         comment: `Choisir les applications à déployer :
 
-- [ ] Fronts <!-- pix-front-review -->
-- [ ] API <!-- pix-api-review -->
-- [ ] API MaDDo <!-- pix-api-maddo-review -->
-- [ ] Audit Logger <!-- pix-audit-logger-review -->
+- [ ] pix-front <!-- pix-front-review -->
+- [ ] pix-api <!-- pix-api-review -->
+- [ ] pix-api-maddo <!-- pix-api-maddo-review -->
+- [ ] pix-audit-logger <!-- pix-audit-logger-review -->
 
 > [!IMPORTANT]
 > N'oubliez pas de déployer l'API pour pouvoir accéder aux fronts et/ou à l’API MaDDo.
