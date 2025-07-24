@@ -416,10 +416,14 @@ async function _handleHeraPullRequest(
   request,
   dependencies = {
     handleHeraPullRequestOpened,
+    handleHeraPullRequestSynchronize,
   },
 ) {
   if (request.payload.action === 'opened') {
     return dependencies.handleHeraPullRequestOpened(request);
+  }
+  if (request.payload.action === 'synchronize') {
+    return dependencies.handleHeraPullRequestSynchronize(request);
   }
   return `Action ${request.payload.action} not handled for Hera pull request`;
 }
@@ -440,6 +444,32 @@ async function handleHeraPullRequestOpened(request, dependencies = { addMessageT
     message: `Commented on PR ${pullRequestNumber} in repository ${repository}`,
   });
   return `Commented on PR ${pullRequestNumber} in repository ${repository}`;
+}
+
+async function handleHeraPullRequestSynchronize(
+  request,
+  dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
+) {
+  const ref = request.payload.pull_request.head.ref;
+  const pullRequestNumber = request.payload.number;
+  const repository = request.payload.pull_request.head.repo.name;
+  const client = await dependencies.scalingoClient.getInstance('reviewApps');
+
+  const existingApps = await dependencies.reviewAppRepo.listForPullRequest({
+    repository,
+    prNumber: pullRequestNumber,
+  });
+
+  for (const app of existingApps) {
+    await client.deployUsingSCM(app.name, ref);
+  }
+
+  logger.info({
+    event: 'review-app',
+    message: `Deployed on PR ${pullRequestNumber} in repository ${repository}`,
+  });
+
+  return `Deployed on PR ${pullRequestNumber} in repository ${repository}`;
 }
 
 async function addMessageToHeraPullRequest(
@@ -482,20 +512,18 @@ async function _handleIssueComment(
     return isAllowed;
   });
 
-  const existingApps = await dependencies.reviewAppRepo.listParentAppForPullRequest({
+  const existingApps = await dependencies.reviewAppRepo.listForPullRequest({
     repository: repositoryName,
     prNumber: pullRequestNumber,
   });
 
   const reviewAppsToCreate = selectedApps
-    .filter((parentApp) => !existingApps.includes(parentApp))
+    .filter((parentApp) => !existingApps.some((app) => app.parentApp === parentApp))
     .map((parentApp) => ({
       parentApp,
       reviewAppName: `${parentApp}-pr${pullRequestNumber}`,
     }));
-  const reviewAppsToRemove = existingApps
-    .filter((parentApp) => !selectedApps.includes(parentApp))
-    .map((parentApp) => `${parentApp}-pr${pullRequestNumber}`);
+  const reviewAppsToRemove = existingApps.filter((app) => !selectedApps.includes(app.parentApp)).map((app) => app.name);
 
   const ref = pullRequest.head.ref;
 
@@ -588,6 +616,7 @@ export {
   _handleCloseRA as handleCloseRA,
   _handleHeraPullRequest as handleHeraPullRequest,
   handleHeraPullRequestOpened,
+  handleHeraPullRequestSynchronize,
   addMessageToHeraPullRequest,
   _handleIssueComment as handleIssueComment,
   createReviewApp,

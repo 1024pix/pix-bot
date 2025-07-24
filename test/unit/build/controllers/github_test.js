@@ -1090,6 +1090,21 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       });
     });
 
+    describe('when action is synchronize', function () {
+      it('calls handleHeraPullRequestSynchronize', async function () {
+        // given
+        const handleHeraPullRequestSynchronize = sinon.stub().resolves('handleHeraSynchronize');
+        const request = { payload: { action: 'synchronize' } };
+
+        // when
+        const result = await githubController.handleHeraPullRequest(request, { handleHeraPullRequestSynchronize });
+
+        // then
+        expect(result).to.equal('handleHeraSynchronize');
+        expect(handleHeraPullRequestSynchronize).to.have.been.calledWithExactly(request);
+      });
+    });
+
     describe('when action is not handled for Hera Pull Request', function () {
       it('does nothing and returns message', async function () {
         // given
@@ -1366,7 +1381,10 @@ Les variables d'environnement seront accessibles via les liens suivants :
     describe('when review apps are created or removed', function () {
       it('creates and removes review apps and returns a summary message', async function () {
         const reviewAppRepositoryStub = {
-          listParentAppForPullRequest: sinon.stub().resolves(['pix-api-review', 'pix-api-maddo-review']),
+          listForPullRequest: sinon.stub().resolves([
+            { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
+            { name: 'pix-api-maddo-review-pr123', parentApp: 'pix-api-maddo-review' },
+          ]),
         };
         const comment = `Choisir les applications à déployer :
 
@@ -1430,7 +1448,10 @@ Removed review apps: pix-api-maddo-review-pr123`);
     describe('when no review app is created nor removed', function () {
       it('should return "Nothing to do" message', async function () {
         const reviewAppRepositoryStub = {
-          listParentAppForPullRequest: sinon.stub().resolves(['pix-api-review', 'pix-api-maddo-review']),
+          listForPullRequest: sinon.stub().resolves([
+            { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
+            { name: 'pix-api-maddo-review-pr123', parentApp: 'pix-api-maddo-review' },
+          ]),
         };
         const comment = `Choisir les applications à déployer :
 
@@ -1589,6 +1610,55 @@ Removed review apps: pix-api-maddo-review-pr123`);
         expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
         expect(reviewAppRepo.remove).to.have.been.calledWithExactly({ name: reviewAppName });
       });
+    });
+  });
+
+  describe('#handleHeraPullRequestSynchronize', function () {
+    it('triggers manual deployments for existing apps', async function () {
+      // given
+      const request = {
+        payload: {
+          number: 123,
+          pull_request: {
+            head: {
+              ref: 'la-branche',
+              repo: {
+                name: 'pix',
+              },
+            },
+          },
+        },
+      };
+      const reviewAppRepo = {
+        listForPullRequest: sinon
+          .stub()
+          .resolves([{ name: 'pix-api-review-pr123' }, { name: 'pix-api-maddo-review-pr123' }]),
+      };
+      const scalingoClientInstance = {
+        deployUsingSCM: sinon.stub().resolves(),
+      };
+      const scalingoClient = {
+        getInstance: sinon.stub().resolves(scalingoClientInstance),
+      };
+
+      // when
+      const result = await githubController.handleHeraPullRequestSynchronize(request, {
+        reviewAppRepo,
+        scalingoClient,
+      });
+
+      // then
+      expect(result).to.equal('Deployed on PR 123 in repository pix');
+      expect(reviewAppRepo.listForPullRequest).to.have.been.calledWithExactly({ repository: 'pix', prNumber: 123 });
+      expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledTwice;
+      expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(
+        'pix-api-review-pr123',
+        'la-branche',
+      );
+      expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(
+        'pix-api-maddo-review-pr123',
+        'la-branche',
+      );
     });
   });
 });

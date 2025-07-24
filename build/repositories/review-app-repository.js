@@ -42,6 +42,6 @@ export const remove = async function ({ name }) {
   return knex('review-apps').where({ name }).del();
 };
 
-export const listParentAppForPullRequest = async function ({ repository, prNumber }) {
-  return knex.pluck('parentApp').from('review-apps').where({ repository, prNumber }).orderBy('parentApp');
+export const listForPullRequest = async function ({ repository, prNumber }) {
+  return knex.select('name', 'parentApp').from('review-apps').where({ repository, prNumber }).orderBy('parentApp');
 };
