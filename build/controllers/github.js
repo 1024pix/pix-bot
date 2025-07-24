@@ -10,7 +10,6 @@ import * as reviewAppRepo from '../repositories/review-app-repository.js';
 import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 
 const repositoryToScalingoAppsReview = {
-  'pix-api-data': ['pix-api-data-integration'],
   'pix-bot': ['pix-bot-review'],
   'pix-data': ['pix-airflow-review'],
   'pix-api-to-pg': ['pix-data-api-pix-integration'],
