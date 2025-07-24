@@ -545,6 +545,12 @@ const github = {
 
       repositoryName = request.payload.repository.full_name;
       prNumber = request.payload.check_suite.pull_requests[0].number;
+    } else if (eventName === 'issue_comment') {
+      if (!request.payload.issue.pull_request) {
+        return undefined;
+      }
+      repositoryName = request.payload.repository.full_name;
+      prNumber = request.payload.issue.number;
     } else {
       return undefined;
     }

@@ -521,6 +521,49 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           });
         });
       });
+
+      describe('when event is issue_comment', function () {
+        describe('when action is edited', function () {
+          it('should handle issue comment', async function () {
+            // given
+            const pullRequest = { labels: [] };
+            const githubService = { getPullRequestForEvent: sinon.stub().resolves(pullRequest) };
+            const request = {
+              headers: {
+                'x-github-event': 'issue_comment',
+              },
+              payload: { action: 'edited', comment: { body: 'je suis un commentaire modifié' } },
+            };
+            const handleIssueComment = sinon.stub().resolves('Handle issue comment');
+
+            // when
+            const result = await githubController.processWebhook(request, { githubService, handleIssueComment });
+
+            // then
+            expect(result).to.equal('Handle issue comment');
+            expect(handleIssueComment).to.have.been.calledWithExactly({ request, pullRequest });
+          });
+        });
+
+        describe('when action is not edited', function () {
+          it('should do nothing', async function () {
+            // given
+            const githubService = { getPullRequestForEvent: sinon.stub() };
+            const request = {
+              headers: {
+                'x-github-event': 'issue_comment',
+              },
+              payload: { action: 'deleted' },
+            };
+
+            // when
+            const result = await githubController.processWebhook(request, { githubService });
+
+            // then
+            expect(result).to.equal('Ignoring issue comment deleted');
+          });
+        });
+      });
     });
   });
 
@@ -1109,15 +1152,15 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       expect(githubService.commentPullRequest).to.have.been.calledWithExactly({
         repositoryName,
         pullRequestId: pullRequestNumber,
-        comment: `Choisissez les applications que vous souhaitez déployer :
+        comment: `Choisir les applications à déployer :
 
-- [ ] API <!-- api -->
-- [ ] Fronts <!-- front -->
-- [ ] Maddo <!-- api-maddo -->
-- [ ] Audit Logger <!-- audit-logger -->
+- [ ] Fronts <!-- pix-front-review -->
+- [ ] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
 
 > [!IMPORTANT]
-> N'oubliez pas de déployer l'api pour pouvoir accéder aux fronts (et à api-maddo)
+> N'oubliez pas de déployer l'API pour pouvoir accéder aux fronts et/ou à l’API MaDDo.
 
 Une fois les applications déployées, elles seront accessibles via les liens suivants :
 
@@ -1140,6 +1183,411 @@ Les variables d'environnement seront accessibles via les liens suivants :
 - [scalingo api-maddo](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-maddo-review-pr123/environment)
 - [scalingo audit-logger](https://dashboard.scalingo.com/apps/osc-fr1/pix-audit-logger-review-pr123/environment)
 `,
+      });
+    });
+  });
+
+  describe('#handleIssueComment', function () {
+    describe('when review apps are not configured for repository', function () {
+      it('should return message Repository is not managed by Pix Bot', async function () {
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix-toto',
+              fork: false,
+            },
+          },
+          state: 'open',
+          labels: [{ name: 'Hera' }],
+        };
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
+            },
+          },
+        };
+
+        const result = await githubController.handleIssueComment({ request, pullRequest });
+        expect(result).equal(`Repository is not managed by Pix Bot.`);
+      });
+    });
+
+    describe('when the comment is not authored by pix bot github', function () {
+      it('should return appropriate message', async function () {
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix',
+              fork: false,
+            },
+          },
+          state: 'open',
+          labels: [{ name: 'Hera' }],
+        };
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-hera',
+              },
+            },
+          },
+        };
+
+        const result = await githubController.handleIssueComment({ request, pullRequest });
+        expect(result).equal(`Ignoring pix-hera comment edition`);
+      });
+    });
+
+    describe('when repository is from a fork', function () {
+      it('should return appropriate message', async function () {
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix',
+              fork: true,
+            },
+          },
+          state: 'open',
+          labels: [{ name: 'Hera' }],
+        };
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
+            },
+          },
+        };
+
+        const result = await githubController.handleIssueComment({ request, pullRequest });
+        expect(result).equal(`No RA for a fork`);
+      });
+    });
+
+    describe('when the pull request is closed', function () {
+      it('should return appropriate message', async function () {
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix',
+              fork: false,
+            },
+          },
+          state: 'closed',
+          labels: [{ name: 'Hera' }],
+        };
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
+            },
+          },
+        };
+
+        const result = await githubController.handleIssueComment({ request, pullRequest });
+        expect(result).equal(`No RA for closed PR`);
+      });
+    });
+
+    describe('when the pull request has no Hera label', function () {
+      it('should return appropriate message', async function () {
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix',
+              fork: false,
+            },
+          },
+          state: 'open',
+          labels: [],
+        };
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
+            },
+          },
+        };
+
+        const result = await githubController.handleIssueComment({ request, pullRequest });
+        expect(result).equal(`issue_comment events only handled for Hera pull requests`);
+      });
+    });
+
+    describe('when review apps are created or removed', function () {
+      it('creates and removes review apps and returns a summary message', async function () {
+        const reviewAppRepositoryStub = {
+          listParentAppForPullRequest: sinon.stub().resolves(['pix-api-review', 'pix-api-maddo-review']),
+        };
+        const comment = `Choisir les applications à déployer :
+
+- [X] Fronts <!-- pix-front-review -->
+- [X] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+`;
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix',
+              fork: false,
+            },
+            ref: 'branche-a-deployer',
+          },
+          state: 'open',
+          labels: [{ name: 'Hera' }],
+        };
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
+              body: comment,
+            },
+          },
+        };
+        const createReviewApp = sinon.stub().resolves();
+        const removeReviewApp = sinon.stub().resolves();
+
+        const result = await githubController.handleIssueComment(
+          { request, pullRequest },
+          { reviewAppRepo: reviewAppRepositoryStub, createReviewApp, removeReviewApp },
+        );
+
+        expect(createReviewApp).to.have.been.calledWithExactly({
+          reviewAppName: 'pix-front-review-pr123',
+          repositoryName: 'pix',
+          pullRequestNumber: 123,
+          ref: 'branche-a-deployer',
+          parentApp: 'pix-front-review',
+        });
+        expect(removeReviewApp).to.have.been.calledWithExactly({
+          reviewAppName: 'pix-api-maddo-review-pr123',
+        });
+        expect(result).equal(`Created review apps: pix-front-review-pr123
+Removed review apps: pix-api-maddo-review-pr123`);
+      });
+    });
+
+    describe('when no review app is created nor removed', function () {
+      it('should return "Nothing to do" message', async function () {
+        const reviewAppRepositoryStub = {
+          listParentAppForPullRequest: sinon.stub().resolves(['pix-api-review', 'pix-api-maddo-review']),
+        };
+        const comment = `Choisir les applications à déployer :
+
+- [] Fronts <!-- pix-front-review -->
+- [X] API <!-- pix-api-review -->
+- [X] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+`;
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix',
+              fork: false,
+            },
+          },
+          state: 'open',
+          labels: [{ name: 'Hera' }],
+        };
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
+              body: comment,
+            },
+          },
+        };
+        const result = await githubController.handleIssueComment(
+          { request, pullRequest },
+          { reviewAppRepo: reviewAppRepositoryStub },
+        );
+        expect(result).equal('Nothing to do');
+      });
+    });
+  });
+
+  describe('#createReviewApp', function () {
+    describe('when review app does not exist on Scalingo', function () {
+      it('creates and deploys review app', async function () {
+        // given
+        const parentApp = 'pix-api-review';
+        const reviewAppName = 'pix-api-review-pr123';
+        const repositoryName = 'pix';
+        const pullRequestNumber = 123;
+        const ref = 'la-branche';
+
+        const reviewAppRepo = {
+          create: sinon.stub().resolves(),
+        };
+        const scalingoClientInstance = {
+          reviewAppExists: sinon.stub().resolves(false),
+          deployReviewApp: sinon.stub().resolves(),
+          disableAutoDeploy: sinon.stub().resolves(),
+          deployUsingSCM: sinon.stub().resolves(),
+        };
+        const scalingoClient = {
+          getInstance: sinon.stub().resolves(scalingoClientInstance),
+        };
+
+        // when
+        await githubController.createReviewApp(
+          { pullRequestNumber, ref, repositoryName, reviewAppName, parentApp },
+          { reviewAppRepo, scalingoClient },
+        );
+
+        // then
+        expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
+        expect(reviewAppRepo.create).to.have.been.calledWithExactly({
+          name: reviewAppName,
+          repository: repositoryName,
+          prNumber: pullRequestNumber,
+          parentApp,
+        });
+        expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
+        expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
+        expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
+      });
+    });
+
+    describe('when review app already exists on Scalingo', function () {
+      it('does nothing', async function () {
+        // given
+        const reviewAppName = 'pix-api-review-pr123';
+
+        const scalingoClientInstance = {
+          reviewAppExists: sinon.stub().resolves(true),
+        };
+        const scalingoClient = {
+          getInstance: sinon.stub().resolves(scalingoClientInstance),
+        };
+
+        // when
+        await githubController.createReviewApp({ reviewAppName }, { scalingoClient });
+
+        // then
+        expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
+      });
+    });
+  });
+
+  describe('#removeReviewApp', function () {
+    describe('when review app exists on Scalingo', function () {
+      it('removes review app', async function () {
+        // given
+        const reviewAppName = 'pix-api-review-pr123';
+
+        const reviewAppRepo = {
+          remove: sinon.stub().resolves(),
+        };
+        const scalingoClientInstance = {
+          reviewAppExists: sinon.stub().resolves(true),
+          deleteReviewApp: sinon.stub().resolves(),
+        };
+        const scalingoClient = {
+          getInstance: sinon.stub().resolves(scalingoClientInstance),
+        };
+
+        // when
+        await githubController.removeReviewApp({ reviewAppName }, { reviewAppRepo, scalingoClient });
+
+        // then
+        expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
+        expect(reviewAppRepo.remove).to.have.been.calledWithExactly({ name: reviewAppName });
+        expect(scalingoClientInstance.deleteReviewApp).to.have.been.calledWithExactly(reviewAppName);
+      });
+    });
+
+    describe('when review app does not exist on Scalingo', function () {
+      it('removes review app in database only', async function () {
+        // given
+        const reviewAppName = 'pix-api-review-pr123';
+
+        const reviewAppRepo = {
+          remove: sinon.stub().resolves(),
+        };
+        const scalingoClientInstance = {
+          reviewAppExists: sinon.stub().resolves(false),
+        };
+        const scalingoClient = {
+          getInstance: sinon.stub().resolves(scalingoClientInstance),
+        };
+
+        // when
+        await githubController.removeReviewApp({ reviewAppName }, { scalingoClient, reviewAppRepo });
+
+        // then
+        expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
+        expect(reviewAppRepo.remove).to.have.been.calledWithExactly({ name: reviewAppName });
       });
     });
   });
