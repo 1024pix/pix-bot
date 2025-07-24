@@ -53,21 +53,27 @@ describe('Unit | Controller | Github', function () {
   describe('#getMessage', function () {
     it('replace template placeholders with params', function () {
       const template = 'Hello, url {{webApplicationUrl}}, {{pullRequestId}} and {{scalingoDashboardUrl}}';
-      expect(githubController.getMessage('pix', '42', ['pix-review', 'pix-review2'], template)).to.equal(
+      expect(
+        githubController.getMessage('pix', '42', [{ appName: 'pix-review' }, { appName: 'pix-review2' }], template),
+      ).to.equal(
         'Hello, url https://pix-pr42.review.pix.fr, 42 and https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment',
       );
     });
 
     it('replace multiple values', function () {
       const template = '{{pullRequestId}}, {{pullRequestId}}';
-      expect(githubController.getMessage('pix', '43', ['pix-review'], template)).to.equal('43, 43');
+      expect(githubController.getMessage('pix', '43', [{ appName: 'pix-review' }], template)).to.equal('43, 43');
     });
   });
 
   describe('#addMessageToPullRequest', function () {
     it('should call gitHubService.commentPullRequest', async function () {
       // given
-      const data = { repositoryName: 'pix-bot', pullRequestId: 25, scalingoReviewApps: ['pix-bot-review'] };
+      const data = {
+        repositoryName: 'pix-bot',
+        pullRequestId: 25,
+        scalingoReviewApps: [{ appName: 'pix-bot-review' }],
+      };
       const githubService = {
         commentPullRequest: sinon.stub(),
       };
@@ -821,10 +827,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           {
             repositoryName: 'pix',
             scalingoReviewApps: [
-              'pix-api-review',
-              'pix-api-maddo-review',
-              'pix-audit-logger-review',
-              'pix-front-review',
+              { appName: 'pix-api-review', label: 'API' },
+              { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
+              { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
+              { appName: 'pix-front-review', label: 'Fronts' },
             ],
             pullRequestId: 3,
           },
@@ -1142,7 +1148,12 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       // then
       expect(addMessageToHeraPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
-        reviewApps: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
+        reviewApps: [
+          { appName: 'pix-api-review', label: 'API' },
+          { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
+          { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
+          { appName: 'pix-front-review', label: 'Fronts' },
+        ],
         pullRequestNumber: 123,
       });
     });
@@ -1162,7 +1173,12 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: ['pix-front-review', 'pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review'],
+          reviewApps: [
+            { appName: 'pix-front-review', label: 'Fronts' },
+            { appName: 'pix-api-review', label: 'API' },
+            { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
+            { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
+          ],
         },
         { githubService },
       );
@@ -1173,10 +1189,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         pullRequestId: pullRequestNumber,
         comment: `Choisir les applications à déployer :
 
-- [ ] pix-front <!-- pix-front-review -->
-- [ ] pix-api <!-- pix-api-review -->
-- [ ] pix-api-maddo <!-- pix-api-maddo-review -->
-- [ ] pix-audit-logger <!-- pix-audit-logger-review -->
+- [ ] Fronts <!-- pix-front-review -->
+- [ ] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
 
 > [!IMPORTANT]
 > N'oubliez pas de déployer l'API pour pouvoir accéder aux fronts et/ou à l’API MaDDo.
