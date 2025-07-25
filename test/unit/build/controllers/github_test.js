@@ -916,19 +916,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       };
     });
 
-    describe('when the PR is labeled Hera', function () {
-      it('delegates handling RA to Hera', async function () {
-        // given
-        sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'Hera' }]);
-
-        // when
-        const response = await githubController.handleCloseRA(request);
-
-        // then
-        expect(response).to.equal('Handled by Hera');
-      });
-    });
-
     describe('when the review app is not managed by Pix Bot', function () {
       it('should not try to close the review app', async function () {
         // given

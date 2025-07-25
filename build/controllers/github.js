@@ -120,10 +120,6 @@ async function _handleCloseRA(
     return `${repository} is not managed by Pix Bot.`;
   }
 
-  if (isHera(request.payload.pull_request)) {
-    return 'Handled by Hera';
-  }
-
   let client;
   const closedRA = [];
 
