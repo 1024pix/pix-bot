@@ -10,73 +10,6 @@ describe('Acceptance | Build | Github', function () {
   });
 
   describe('POST /github/webhook', function () {
-    function getAppNock({ reviewAppName, returnCode = StatusCodes.OK }) {
-      let body = undefined;
-      if (returnCode == StatusCodes.OK) {
-        body = { app: { name: reviewAppName } };
-      }
-      return nock('https://scalingo.reviewApps').get(`/v1/apps/${reviewAppName}`).reply(returnCode, body);
-    }
-
-    function createReviewAppNock({ appName, prNumber, returnCode = StatusCodes.CREATED }) {
-      let body = undefined;
-      if (returnCode == StatusCodes.CREATED) {
-        body = {
-          review_app: {
-            app_name: `${appName}-pr${prNumber}`,
-          },
-        };
-      }
-      return nock('https://scalingo.reviewApps')
-        .post(`/v1/apps/${appName}/scm_repo_link/manual_review_app`, { pull_request_id: 2 })
-        .reply(returnCode, body);
-    }
-
-    function getPullRequestNock({ repository, prNumber, sha }) {
-      return nock('https://api.github.com')
-        .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
-        .reply(200, { head: { sha }, labels: [] });
-    }
-
-    function addRADeploymentCheckNock({ repository, sha, status }) {
-      const body = {
-        context: 'check-ra-deployment',
-        state: status,
-      };
-      return nock('https://api.github.com')
-        .post(`/repos/1024pix/${repository}/statuses/${sha}`, body)
-        .reply(201, { started_at: new Date() });
-    }
-
-    function deployReviewAppNock({ reviewAppName, branch = 'my-branch', returnCode = StatusCodes.OK }) {
-      return nock('https://scalingo.reviewApps')
-        .post(`/v1/apps/${reviewAppName}/scm_repo_link/manual_deploy`, { branch: branch })
-        .reply(returnCode);
-    }
-
-    function disableAutoDeployNock({ reviewAppName, returnCode = StatusCodes.CREATED }) {
-      return nock('https://scalingo.reviewApps')
-        .patch(`/v1/apps/${reviewAppName}/scm_repo_link`, { scm_repo_link: { auto_deploy_enabled: false } })
-        .reply(returnCode);
-    }
-
-    function deleteReviewAppNock({ reviewAppName, returnCode = StatusCodes.NO_CONTENT }) {
-      nock('https://scalingo.reviewApps')
-        .delete(`/v1/apps/${reviewAppName}?current_name=${reviewAppName}`)
-        .reply(returnCode);
-    }
-
-    function getMergeCheckStatusNock({ repositoryFullName }) {
-      const prHeadCommit = 'sha1';
-      nock('https://api.github.com')
-        .get(`/repos/1024pix/pix/pulls/123`)
-        .reply(200, { head: { sha: prHeadCommit } });
-
-      return nock('https://api.github.com')
-        .post(`/repos/${repositoryFullName}/statuses/${prHeadCommit}`)
-        .reply(201, { started_at: '2024-01-01' });
-    }
-
     let body;
 
     ['opened', 'reopened'].forEach((action) => {
@@ -1177,4 +1110,215 @@ describe('Acceptance | Build | Github', function () {
       expect(res.statusCode).to.equal(401);
     });
   });
+
+  describe('POST /github/webhook (HERA)', function () {
+    describe(`on pull request opened event`, function () {
+      it('responds with 200, comments the PR', async function () {
+        // given
+        const body = {
+          action: 'opened',
+          number: 2,
+          pull_request: {
+            state: 'open',
+            labels: [{ name: 'Hera' }],
+            head: {
+              ref: 'my-branch',
+              repo: {
+                name: 'pix',
+                fork: false,
+              },
+            },
+          },
+        };
+        const createComment = createPullRequestCommentNock({ repository: 'pix', prNumber: 2 });
+
+        // when
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+
+        // then
+        expect(res.statusCode).to.equal(StatusCodes.OK);
+        expect(res.result).to.eql('Commented on PR 2 in repository pix');
+        expect(createComment.isDone()).to.be.true;
+      });
+    });
+
+    describe(`on pull request synchronize event`, function () {
+      it('responds with 200, deploy pull request review apps', async function () {
+        // given
+        const body = {
+          action: 'synchronize',
+          number: 2,
+          pull_request: {
+            state: 'open',
+            labels: [{ name: 'Hera' }],
+            head: {
+              ref: 'my-branch',
+              repo: {
+                name: 'pix',
+                fork: false,
+              },
+            },
+          },
+        };
+        const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+        await knex('review-apps').insert({
+          name: 'pix-front-review-pr2',
+          repository: 'pix',
+          prNumber: 2,
+          parentApp: 'pix-front-review',
+        });
+        const scalingoDeploy = deployReviewAppNock({ reviewAppName: 'pix-front-review-pr2' });
+
+        // when
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+
+        // then
+        expect(res.statusCode).to.equal(StatusCodes.OK);
+        expect(res.result).to.eql('Deployed on PR 2 in repository pix');
+        expect(scalingoAuth.isDone()).to.be.true;
+        expect(scalingoDeploy.isDone()).to.be.true;
+      });
+    });
+
+    describe(`on pull request reopened event`, function () {
+      it('responds with 200, edit pull request comment', async function () {
+        // given
+        const body = {
+          action: 'reopened',
+          number: 2,
+          pull_request: {
+            state: 'open',
+            labels: [{ name: 'Hera' }],
+            head: {
+              ref: 'my-branch',
+              repo: {
+                name: 'pix',
+                fork: false,
+              },
+            },
+          },
+        };
+        const getComment = getPullRequestCommentNock({ repository: 'pix', prNumber: 2 });
+        const editComment = editPullRequestCommentNock({ repository: 'pix', commentId: 1 });
+
+        // when
+        const res = await server.inject({
+          method: 'POST',
+          url: '/github/webhook',
+          headers: {
+            ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+            'x-github-event': 'pull_request',
+          },
+          payload: body,
+        });
+
+        // then
+        expect(res.statusCode).to.equal(StatusCodes.OK);
+        expect(res.result).to.eql('Comment updated on reopened PR 2 in repository pix');
+        expect(getComment.isDone()).to.be.true;
+        expect(editComment.isDone()).to.be.true;
+      });
+    });
+  });
 });
+
+function getAppNock({ reviewAppName, returnCode = StatusCodes.OK }) {
+  let body = undefined;
+  if (returnCode == StatusCodes.OK) {
+    body = { app: { name: reviewAppName } };
+  }
+  return nock('https://scalingo.reviewApps').get(`/v1/apps/${reviewAppName}`).reply(returnCode, body);
+}
+
+function createReviewAppNock({ appName, prNumber, returnCode = StatusCodes.CREATED }) {
+  let body = undefined;
+  if (returnCode == StatusCodes.CREATED) {
+    body = {
+      review_app: {
+        app_name: `${appName}-pr${prNumber}`,
+      },
+    };
+  }
+  return nock('https://scalingo.reviewApps')
+    .post(`/v1/apps/${appName}/scm_repo_link/manual_review_app`, { pull_request_id: 2 })
+    .reply(returnCode, body);
+}
+
+function getPullRequestNock({ repository, prNumber, sha }) {
+  return nock('https://api.github.com')
+    .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
+    .reply(200, { head: { sha }, labels: [] });
+}
+
+function addRADeploymentCheckNock({ repository, sha, status }) {
+  const body = {
+    context: 'check-ra-deployment',
+    state: status,
+  };
+  return nock('https://api.github.com')
+    .post(`/repos/1024pix/${repository}/statuses/${sha}`, body)
+    .reply(201, { started_at: new Date() });
+}
+
+function deployReviewAppNock({ reviewAppName, branch = 'my-branch', returnCode = StatusCodes.OK }) {
+  return nock('https://scalingo.reviewApps')
+    .post(`/v1/apps/${reviewAppName}/scm_repo_link/manual_deploy`, { branch: branch })
+    .reply(returnCode);
+}
+
+function disableAutoDeployNock({ reviewAppName, returnCode = StatusCodes.CREATED }) {
+  return nock('https://scalingo.reviewApps')
+    .patch(`/v1/apps/${reviewAppName}/scm_repo_link`, { scm_repo_link: { auto_deploy_enabled: false } })
+    .reply(returnCode);
+}
+
+function deleteReviewAppNock({ reviewAppName, returnCode = StatusCodes.NO_CONTENT }) {
+  nock('https://scalingo.reviewApps')
+    .delete(`/v1/apps/${reviewAppName}?current_name=${reviewAppName}`)
+    .reply(returnCode);
+}
+
+function getMergeCheckStatusNock({ repositoryFullName }) {
+  const prHeadCommit = 'sha1';
+  nock('https://api.github.com')
+    .get(`/repos/1024pix/pix/pulls/123`)
+    .reply(200, { head: { sha: prHeadCommit } });
+
+  return nock('https://api.github.com')
+    .post(`/repos/${repositoryFullName}/statuses/${prHeadCommit}`)
+    .reply(201, { started_at: '2024-01-01' });
+}
+
+function createPullRequestCommentNock({ repository, prNumber }) {
+  return nock('https://api.github.com')
+    .post(`/repos/github-owner/${repository}/issues/${prNumber}/comments`)
+    .reply(StatusCodes.OK, { user: { login: 'pix-bot-github' }, id: 1 });
+}
+
+function getPullRequestCommentNock({ repository, prNumber }) {
+  return nock('https://api.github.com')
+    .get(`/repos/github-owner/${repository}/issues/${prNumber}/comments`)
+    .reply(StatusCodes.OK, [{ user: { login: 'pix-bot-github' }, id: 1 }]);
+}
+
+function editPullRequestCommentNock({ repository, commentId }) {
+  return nock('https://api.github.com')
+    .patch(`/repos/github-owner/${repository}/issues/comments/${commentId}`)
+    .reply(StatusCodes.OK);
+}
