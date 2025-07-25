@@ -562,6 +562,36 @@ const github = {
     }
     return data;
   },
+
+  async getPullRequestComments({ repositoryName, pullRequestNumber }) {
+    const owner = config.github.owner;
+    const octokit = _createOctokit();
+
+    const { data, status } = await octokit.issues.listComments({
+      owner,
+      repo: repositoryName,
+      issue_number: pullRequestNumber,
+    });
+    if (status !== 200) {
+      throw new Error(`Comments not found for pull request #${pullRequestNumber} in repository ${repositoryName}`);
+    }
+    return data;
+  },
+
+  async editPullRequestComment({ repositoryName, commentId, newComment }) {
+    const owner = config.github.owner;
+    const octokit = _createOctokit();
+
+    const { status } = await octokit.issues.updateComment({
+      owner,
+      repo: repositoryName,
+      comment_id: commentId,
+      body: newComment,
+    });
+    if (status !== 200) {
+      throw new Error(`The comment #${commentId} has not been updated in repository ${repositoryName}`);
+    }
+  },
 };
 
 export default github;
