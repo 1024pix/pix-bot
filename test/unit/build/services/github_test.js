@@ -1007,7 +1007,7 @@ describe('Unit | Build | github-test', function () {
         const pullRequestNumber = 0;
         nock('https://api.github.com')
           .get(`/repos/github-owner/${repositoryName}/issues/${pullRequestNumber}/comments`)
-          .reply(StatusCodes.NOT_FOUND);
+          .reply(StatusCodes.BAD_REQUEST);
 
         // when
         const result = await catchErr(githubService.getPullRequestComments)({ repositoryName, pullRequestNumber });
@@ -1015,6 +1015,19 @@ describe('Unit | Build | github-test', function () {
         // then
         expect(result).to.be.instanceOf(Error);
         expect(result.message).to.equal('Comments not found for pull request #0 in repository a-repository');
+      });
+
+      it('should return 404 if no comment is found', async function () {
+        const repositoryName = 'a-repository';
+        const pullRequestNumber = 0;
+        nock('https://api.github.com')
+          .get(`/repos/github-owner/${repositoryName}/issues/${pullRequestNumber}/comments`)
+          .reply(StatusCodes.NOT_FOUND);
+
+        const comments = await githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
+
+        // then
+        expect(comments).to.deep.equal([]);
       });
     });
   });

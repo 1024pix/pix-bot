@@ -572,9 +572,14 @@ const github = {
       repo: repositoryName,
       issue_number: pullRequestNumber,
     });
+    if (status === 404) {
+      return [];
+    }
+
     if (status !== 200) {
       throw new Error(`Comments not found for pull request #${pullRequestNumber} in repository ${repositoryName}`);
     }
+
     return data;
   },
 
