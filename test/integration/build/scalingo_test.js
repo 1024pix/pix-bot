@@ -2,7 +2,6 @@ import slackPostMessageService from '../../../common/services/slack/surfaces/mes
 import server from '../../../server.js';
 import { expect, nock, sinon } from '../../test-helper.js';
 
-import * as reviewAppRepository from '../../../build/repositories/review-app-repository.js';
 import { knex } from '../../../db/knex-database-connection.js';
 import { logger } from '../../../common/services/logger.js';
 
@@ -125,7 +124,7 @@ describe('Integration | Build | Scalingo', function () {
       it('should not mark the review app as deployed', async function () {
         // given
         const appName = 'pix-api-review-pr123';
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: appName,
           repository: 'pix',
           prNumber: 123,
@@ -154,7 +153,7 @@ describe('Integration | Build | Scalingo', function () {
         expect(errorLoggerStub.calledWith({ event: 'review-app-deploy', message: `The event type is not deployment.` }))
           .to.be.true;
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
-        expect(reviewApp.isDeployed).to.be.false;
+        expect(reviewApp.status).to.equal('pending');
       });
     });
 
@@ -162,7 +161,7 @@ describe('Integration | Build | Scalingo', function () {
       it('should not mark the review app as deployed', async function () {
         // given
         const appName = 'pix-api-review-pr123';
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: appName,
           repository: 'pix',
           prNumber: 123,
@@ -191,7 +190,7 @@ describe('Integration | Build | Scalingo', function () {
         expect(errorLoggerStub.calledWith({ event: 'review-app-deploy', message: `The event type is not deployment.` }))
           .to.be.true;
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
-        expect(reviewApp.isDeployed).to.be.false;
+        expect(reviewApp.status).to.equal('pending');
       });
     });
 
@@ -199,7 +198,7 @@ describe('Integration | Build | Scalingo', function () {
       it('should not mark the review app as deployed', async function () {
         // given
         const appName = 'pix-api-review-pr123';
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: appName,
           repository: 'pix',
           prNumber: 123,
@@ -232,7 +231,7 @@ describe('Integration | Build | Scalingo', function () {
           }),
         ).to.be.true;
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
-        expect(reviewApp.isDeployed).to.be.false;
+        expect(reviewApp.status).to.equal('pending');
       });
     });
 
@@ -240,7 +239,7 @@ describe('Integration | Build | Scalingo', function () {
       it('should not mark the review app as deployed', async function () {
         // given
         const appName = 'pix-api-review-pr123';
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: appName,
           repository: 'pix',
           prNumber: 123,
@@ -273,7 +272,7 @@ describe('Integration | Build | Scalingo', function () {
           }),
         ).to.be.true;
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
-        expect(reviewApp.isDeployed).to.be.false;
+        expect(reviewApp.status).to.equal('pending');
       });
     });
 
@@ -281,13 +280,13 @@ describe('Integration | Build | Scalingo', function () {
       it('should mark the review app as deployed', async function () {
         // given
         const appName = 'pix-api-review-pr123';
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: appName,
           repository: 'pix',
           prNumber: 123,
           parentApp: 'pix-api-review',
         });
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: 'pix-front-review-pr123',
           repository: 'pix',
           prNumber: 123,
@@ -312,7 +311,7 @@ describe('Integration | Build | Scalingo', function () {
         // then
         expect(response.statusCode).to.equal(200);
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
-        expect(reviewApp.isDeployed).to.be.true;
+        expect(reviewApp.status).to.equal('success');
       });
 
       describe('when all the review apps are deployed', function () {
@@ -321,21 +320,21 @@ describe('Integration | Build | Scalingo', function () {
           const appName = 'pix-api-review-pr123';
           const repository = 'pix';
           const prNumber = 123;
-          await reviewAppRepository.create({ name: appName, repository, prNumber, parentApp: 'pix-api-review' });
-          await reviewAppRepository.create({
+          await knex('review-apps').insert({ name: appName, repository, prNumber, parentApp: 'pix-api-review' });
+          await knex('review-apps').insert({
             name: 'pix-front-review-pr123',
             repository,
             prNumber,
             parentApp: 'pix-api-review',
+            status: 'success',
           });
-          await reviewAppRepository.markAsDeployed({ name: 'pix-front-review-pr123' });
-          await reviewAppRepository.create({
+          await knex('review-apps').insert({
             name: 'pix-audit-logger-review-pr123',
             repository,
             prNumber,
             parentApp: 'pix-api-review',
+            status: 'success',
           });
-          await reviewAppRepository.markAsDeployed({ name: 'pix-audit-logger-review-pr123' });
 
           const sha = 'a-commit-sha';
 
@@ -375,18 +374,18 @@ describe('Integration | Build | Scalingo', function () {
     });
 
     describe('when the deployment status is error', function () {
-      it('should mark the review app as not deployed and set the check as failure', async function () {
+      it('should mark the review app as failure and set the check as failure', async function () {
         // given
         const appName = 'pix-api-review-pr123';
         const repository = 'pix';
         const prNumber = 123;
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: appName,
           repository,
           prNumber,
           parentApp: 'pix-api-review',
         });
-        await reviewAppRepository.create({
+        await knex('review-apps').insert({
           name: 'pix-front-review-pr123',
           repository,
           prNumber,
@@ -424,7 +423,7 @@ describe('Integration | Build | Scalingo', function () {
         // then
         expect(response.statusCode).to.equal(200);
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
-        expect(reviewApp.isDeployed).to.be.false;
+        expect(reviewApp.status).to.equal('failure');
         expect(getPullRequestNock.isDone()).to.be.true;
         expect(addRADeploymentCheckNock.isDone()).to.be.true;
       });
