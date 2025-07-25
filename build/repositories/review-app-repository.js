@@ -7,27 +7,10 @@ export const create = async function ({ name, repository, prNumber, parentApp })
   });
 };
 
-export const markAsDeployed = async function ({ name }) {
-  const result = await knex('review-apps')
-    .update({ status: 'success' })
-    .where({ name })
-    .returning(['repository', 'prNumber']);
-  if (result.length === 0) {
-    throw new Error(`${name} doesn't exist.`);
-  }
-  return result[0];
-};
-
-export const markAsFailed = async function ({ name }) {
-  const result = await knex('review-apps')
-    .update({ status: 'failure' })
-    .where({ name })
-    .returning(['repository', 'prNumber']);
-  if (result.length === 0) {
-    throw new Error(`${name} doesn't exist.`);
-  }
-  return result[0];
-};
+export async function setStatus({ name, status }) {
+  const [result] = await knex('review-apps').update({ status }).where({ name }).returning(['repository', 'prNumber']);
+  return result;
+}
 
 export const areAllDeployed = async function ({ repository, prNumber }) {
   const { count } = await knex('review-apps')

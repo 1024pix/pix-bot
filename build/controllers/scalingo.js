@@ -97,25 +97,39 @@ const scalingo = {
     }
 
     if (status.includes('error')) {
-      const { repository, prNumber } = await reviewAppRepository.markAsFailed({ name: appName });
+      const reviewApp = await reviewAppRepository.setStatus({ name: appName, status: 'failure' });
+      if (!reviewApp) {
+        logger.warn({ event, message: `Application ${appName} was not found` });
+        return h.response().code(200);
+      }
       logger.info({ event, message: `Application ${appName} marked as failed.` });
+
+      const { repository, prNumber } = reviewApp;
 
       logger.info({
         event,
         message: `Changing check-ra-deployment status to failure`,
+        data: { repository, prNumber },
       });
       await githubService.addRADeploymentCheck({ repository, prNumber, status: 'failure' });
       return h.response().code(200);
     }
 
-    const { repository, prNumber } = await reviewAppRepository.markAsDeployed({ name: appName });
+    const reviewApp = await reviewAppRepository.setStatus({ name: appName, status: 'success' });
+    if (!reviewApp) {
+      logger.warn({ event, message: `Application ${appName} was not found` });
+      return h.response().code(200);
+    }
     logger.info({ event, message: `Application ${appName} marked as deployed.` });
+
+    const { repository, prNumber } = reviewApp;
 
     const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
     if (areAllDeployed) {
       logger.info({
         event,
         message: `Changing check-ra-deployment status to success`,
+        data: { repository, prNumber },
       });
       await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
     }
