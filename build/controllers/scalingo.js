@@ -100,6 +100,10 @@ const scalingo = {
       const { repository, prNumber } = await reviewAppRepository.markAsFailed({ name: appName });
       logger.info({ event, message: `Application ${appName} marked as failed.` });
 
+      logger.info({
+        event,
+        message: `Changing check-ra-deployment status to failure`,
+      });
       await githubService.addRADeploymentCheck({ repository, prNumber, status: 'failure' });
       return h.response().code(200);
     }
@@ -109,6 +113,10 @@ const scalingo = {
 
     const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
     if (areAllDeployed) {
+      logger.info({
+        event,
+        message: `Changing check-ra-deployment status to success`,
+      });
       await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
     }
 
