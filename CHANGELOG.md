@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.131.0 (25/07/2025)
+
+
+### :rocket: Amélioration
+- [#607](https://github.com/1024pix/pix-bot/pull/607) [FEATURE] Ajout d'une colonne status sur review-apps.
+- [#603](https://github.com/1024pix/pix-bot/pull/603) [FEATURE] Gérer l’action synchronize sur les PR Hera.
+- [#602](https://github.com/1024pix/pix-bot/pull/602) [FEATURE] Sélectionner des apps à dépoyer en éditant le commentaire d'une pull request Hera (tech-days).
+- [#601](https://github.com/1024pix/pix-bot/pull/601) [FEATURE] Créer un message spécifique en cas de création de pull request labelisée Hera (tech-days).
+
+### :building_construction: Tech
+- [#605](https://github.com/1024pix/pix-bot/pull/605) [TECH] Fermeture de PR Hera.
+
 ## v1.130.0 (22/07/2025)
 
 
