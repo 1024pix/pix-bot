@@ -158,6 +158,10 @@ async function _handleCloseRA(
   );
   const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
   if (areAllDeployed) {
+    logger.info({
+      event: 'review-app',
+      message: `Changing check-ra-deployment status to success (close RA)`,
+    });
     await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
   }
 
@@ -209,6 +213,10 @@ async function deployPullRequest(
     }
   }
 
+  logger.info({
+    event: 'review-app',
+    message: `Changing check-ra-deployment status to pending (deploy PR)`,
+  });
   await githubService.addRADeploymentCheck({ repository, prNumber: prId, status: 'pending' });
 
   if (deployedRA.some(({ isCreated }) => isCreated)) {
@@ -393,6 +401,10 @@ async function _handleNoRACase(request, githubService) {
     return { message: 'No RA configured for this repository', shouldContinue: false };
   }
   if (labelsList.some((label) => label.name === 'no-review-app')) {
+    logger.info({
+      event: 'review-app',
+      message: `Changing check-ra-deployment status to success (no-review-app)`,
+    });
     await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
     return { message: 'RA disabled for this PR', shouldContinue: false };
   }

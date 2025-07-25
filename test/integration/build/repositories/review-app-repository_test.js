@@ -26,7 +26,7 @@ describe('Integration | Build | Repository | Review App', function () {
       expect(reviewApp.repository).to.equal(repository);
       expect(reviewApp.prNumber).to.equal(prNumber);
       expect(reviewApp.parentApp).to.equal(parentApp);
-      expect(reviewApp.isDeployed).to.be.false;
+      expect(reviewApp.status).to.equal('pending');
     });
 
     describe('when a review app already exists', function () {
@@ -37,8 +37,15 @@ describe('Integration | Build | Repository | Review App', function () {
         const prNumber = 123;
         const parentApp = 'pix-api-review';
 
-        await reviewAppRepository.create({ name, repository, prNumber, parentApp });
-        const initialReviewApp = await knex('review-apps').where({ name }).first();
+        const [initialReviewApp] = await knex('review-apps')
+          .insert({
+            name,
+            repository,
+            prNumber,
+            parentApp,
+            status: 'success',
+          })
+          .returning('*');
 
         // when
         await reviewAppRepository.create({ name, repository, prNumber, parentApp });
@@ -50,7 +57,7 @@ describe('Integration | Build | Repository | Review App', function () {
         expect(mergedReviewApp.repository).to.equal(initialReviewApp.repository);
         expect(mergedReviewApp.prNumber).to.equal(initialReviewApp.prNumber);
         expect(mergedReviewApp.parentApp).to.equal(initialReviewApp.parentApp);
-        expect(mergedReviewApp.isDeployed).to.be.false;
+        expect(mergedReviewApp.status).to.equal('pending');
         expect(mergedReviewApp.createdAt).not.to.equal(initialReviewApp.createdAt);
       });
     });
@@ -64,13 +71,18 @@ describe('Integration | Build | Repository | Review App', function () {
       const prNumber = 123;
       const parentApp = 'pix-api-review';
 
-      await reviewAppRepository.create({ name, repository, prNumber, parentApp });
+      await knex('review-apps').insert({
+        name,
+        repository,
+        prNumber,
+        parentApp,
+      });
 
       // when
       const result = await reviewAppRepository.markAsDeployed({ name });
 
       const updatedReviewApp = await knex('review-apps').where({ name }).first();
-      expect(updatedReviewApp.isDeployed).to.be.true;
+      expect(updatedReviewApp.status).to.equal('success');
       expect(result.repository).to.equal(repository);
       expect(result.prNumber).to.equal(prNumber);
     });
@@ -94,14 +106,18 @@ describe('Integration | Build | Repository | Review App', function () {
       const prNumber = 123;
       const parentApp = 'pix-api-review';
 
-      await reviewAppRepository.create({ name, repository, prNumber, parentApp });
-      await reviewAppRepository.markAsDeployed({ name });
+      await knex('review-apps').insert({
+        name,
+        repository,
+        prNumber,
+        parentApp,
+      });
 
       // when
       const result = await reviewAppRepository.markAsFailed({ name });
 
       const updatedReviewApp = await knex('review-apps').where({ name }).first();
-      expect(updatedReviewApp.isDeployed).to.be.false;
+      expect(updatedReviewApp.status).to.equal('failure');
       expect(result.repository).to.equal(repository);
       expect(result.prNumber).to.equal(prNumber);
     });
@@ -123,26 +139,26 @@ describe('Integration | Build | Repository | Review App', function () {
       const repository = 'pix';
       const prNumber = 123;
 
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'other-repo-review-pr1',
         repository: 'other-repo',
         prNumber: 1,
         parentApp: 'other-repo-review',
       });
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'pix-api-review-pr123',
         repository,
         prNumber,
         parentApp: 'pix-api-review',
+        status: 'success',
       });
-      await reviewAppRepository.markAsDeployed({ name: 'pix-api-review-pr123' });
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'pix-front-review-pr123',
         repository,
         prNumber,
         parentApp: 'pix-front-review',
+        status: 'success',
       });
-      await reviewAppRepository.markAsDeployed({ name: 'pix-front-review-pr123' });
 
       // when
       const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
@@ -155,33 +171,33 @@ describe('Integration | Build | Repository | Review App', function () {
       const repository = 'pix';
       const prNumber = 123;
 
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'other-repo-review-pr1',
         repository: 'other-repo',
         prNumber: 1,
         parentApp: 'other-repo-review',
       });
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'pix-api-review-pr123',
         repository,
         prNumber,
         parentApp: 'pix-api-review',
+        status: 'success',
       });
-      await reviewAppRepository.markAsDeployed({ name: 'pix-api-review-pr123' });
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'pix-front-review-pr123',
         repository,
         prNumber,
         parentApp: 'pix-front-review',
+        status: 'success',
       });
-      await reviewAppRepository.markAsDeployed({ name: 'pix-front-review-pr123' });
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'pix-api-maddo-review-pr123',
         repository,
         prNumber,
         parentApp: 'pix-api-maddo-review',
+        status: 'failure',
       });
-      await reviewAppRepository.markAsFailed({ name: 'pix-api-maddo-review-pr123' });
 
       // when
       const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
@@ -194,24 +210,25 @@ describe('Integration | Build | Repository | Review App', function () {
       const repository = 'pix';
       const prNumber = 123;
 
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'other-repo-review-pr1',
         repository: 'other-repo',
         prNumber: 1,
         parentApp: 'other-repo-review',
       });
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'pix-api-review-pr123',
         repository,
         prNumber,
         parentApp: 'pix-api-review',
+        status: 'success',
       });
-      await reviewAppRepository.markAsDeployed({ name: 'pix-api-review-pr123' });
-      await reviewAppRepository.create({
+      await knex('review-apps').insert({
         name: 'pix-front-review-pr123',
         repository,
         prNumber,
         parentApp: 'pix-front-review',
+        status: 'failure',
       });
 
       // when
