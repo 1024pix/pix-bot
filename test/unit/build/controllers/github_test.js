@@ -884,6 +884,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           };
           const reviewAppRepositoryStub = {
             create: sinon.stub(),
+            setStatus: sinon.stub(),
           };
 
           scalingoClientStub.getInstance = sinon.stub().returns({
@@ -903,20 +904,35 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           );
 
           // then
-          expect(deployReviewAppStub.calledOnceWithExactly('pix-api-review', 3)).to.be.true;
-          expect(disableAutoDeployStub.calledOnceWithExactly('pix-api-review-pr3')).to.be.true;
-          expect(
-            reviewAppRepositoryStub.create.calledWith({
-              name: 'pix-api-review-pr3',
-              repository: 'pix',
-              prNumber: 3,
-              parentApp: 'pix-api-review',
-            }),
-          ).to.be.true;
-          expect(deployUsingSCMStub.getCall(0).calledWith('pix-api-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.getCall(1).calledWith('pix-api-maddo-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.getCall(2).calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
-          expect(deployUsingSCMStub.getCall(3).calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
+          expect(deployReviewAppStub).to.have.been.calledOnceWithExactly('pix-api-review', 3);
+          expect(disableAutoDeployStub).to.have.been.calledOnceWithExactly('pix-api-review-pr3');
+          expect(reviewAppRepositoryStub.create).to.have.been.calledOnceWithExactly({
+            name: 'pix-api-review-pr3',
+            repository: 'pix',
+            prNumber: 3,
+            parentApp: 'pix-api-review',
+          });
+
+          expect(reviewAppRepositoryStub.setStatus.getCall(0)).to.have.been.calledWithExactly({
+            name: 'pix-api-maddo-review-pr3',
+            status: 'pending',
+          });
+          expect(reviewAppRepositoryStub.setStatus.getCall(1)).to.have.been.calledWithExactly({
+            name: 'pix-audit-logger-review-pr3',
+            status: 'pending',
+          });
+          expect(reviewAppRepositoryStub.setStatus.getCall(2)).to.have.been.calledWithExactly({
+            name: 'pix-front-review-pr3',
+            status: 'pending',
+          });
+
+          expect(deployUsingSCMStub.getCall(0)).to.have.been.calledWithExactly('pix-api-review-pr3', 'my-branch');
+          expect(deployUsingSCMStub.getCall(1)).to.have.been.calledWithExactly('pix-api-maddo-review-pr3', 'my-branch');
+          expect(deployUsingSCMStub.getCall(2)).to.have.been.calledWithExactly(
+            'pix-audit-logger-review-pr3',
+            'my-branch',
+          );
+          expect(deployUsingSCMStub.getCall(3)).to.have.been.calledWithExactly('pix-front-review-pr3', 'my-branch');
 
           expect(response).to.equal(
             'Triggered deployment of RA on app pix-api-review, pix-api-maddo-review, pix-audit-logger-review, pix-front-review with pr 3',
