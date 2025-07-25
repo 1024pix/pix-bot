@@ -1,9 +1,6 @@
 Choisir les applications à déployer :
 
-- [ ] Fronts <!-- pix-front-review -->
-- [ ] API <!-- pix-api-review -->
-- [ ] API MaDDo <!-- pix-api-maddo-review -->
-- [ ] Audit Logger <!-- pix-audit-logger-review -->
+{{checkboxesForReviewAppsToBeDeployed}}
 
 > [!IMPORTANT]
 > N'oubliez pas de déployer l'API pour pouvoir accéder aux fronts et/ou à l’API MaDDo.
