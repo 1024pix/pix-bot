@@ -1,5 +1,12 @@
 # pix-bot Changelog
 
+## v1.133.0 (25/07/2025)
+
+
+### :building_construction: Tech
+- [#608](https://github.com/1024pix/pix-bot/pull/608) [TECH] Utiliser la colonne `status` de la table `review-apps`.
+- [#606](https://github.com/1024pix/pix-bot/pull/606) [TECH] Supprimer un repo archivé.
+
 ## v1.131.0 (25/07/2025)
 
 
