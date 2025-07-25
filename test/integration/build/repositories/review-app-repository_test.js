@@ -254,7 +254,7 @@ describe('Integration | Build | Repository | Review App', function () {
     });
   });
 
-  describe('listParentAppForPullRequest', function () {
+  describe('listForPullRequest', function () {
     it('returns parent app name for a pull request', async function () {
       // given
       const repository = 'pix';
@@ -286,10 +286,13 @@ describe('Integration | Build | Repository | Review App', function () {
       });
 
       // when
-      const reviewApps = await reviewAppRepository.listParentAppForPullRequest({ repository, prNumber });
+      const reviewApps = await reviewAppRepository.listForPullRequest({ repository, prNumber });
 
       // then
-      expect(reviewApps).to.deep.equal(['pix-api-review', 'pix-certif-review']);
+      expect(reviewApps).to.deep.equal([
+        { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
+        { name: 'pix-certif-review-pr123', parentApp: 'pix-certif-review' },
+      ]);
     });
   });
 });
