@@ -39,6 +39,21 @@ const repositoryToScalingoAppsReview = {
   securix: [{ app: 'pix-securix-review' }],
 };
 
+const repositoryToScalingoAppsReviewHera = {
+  ...repositoryToScalingoAppsReview,
+  pix: [
+    { appName: 'pix-api-review', label: 'API' },
+    { appName: 'pix-front-review', label: 'Fronts', isHidden: true },
+    { appName: 'pix-app-review', label: 'App' },
+    { appName: 'pix-orga-review', label: 'Orga' },
+    { appName: 'pix-certif-review', label: 'Certif' },
+    { appName: 'pix-junior-review', label: 'Junior' },
+    { appName: 'pix-admin-review', label: 'Admin' },
+    { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
+    { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
+  ],
+};
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 function getMessageTemplate(repositoryName, isHera = false) {
@@ -62,6 +77,7 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
   const shortenedRepositoryName = repositoryName.replace('pix-', '');
   const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
   const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
+    .filter(({ isHidden }) => !isHidden)
     .map(({ appName, label }) => `- [ ] ${label ? label : appName.replace('-review', '')} <!-- ${appName} -->`)
     .join('\n');
   const message = messageTemplate
@@ -92,19 +108,20 @@ async function _handleRA(
   handleHeraPullRequest = _handleHeraPullRequest,
 ) {
   const payload = request.payload;
-  const prId = payload.number;
-  const ref = payload.pull_request.head.ref;
-  const repository = payload.pull_request.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repository];
 
   const { shouldContinue, message } = await _handleNoRACase(request, githubService);
   if (!shouldContinue) {
     return message;
   }
 
-  if (isHera(request.payload.pull_request)) {
+  if (isHera(payload.pull_request)) {
     return handleHeraPullRequest(request);
   }
+
+  const prId = payload.number;
+  const ref = payload.pull_request.head.ref;
+  const repository = payload.pull_request.head.repo.name;
+  const reviewApps = repositoryToScalingoAppsReview[repository];
 
   const deployedRA = await deployPullRequest(
     scalingoClient,
@@ -131,7 +148,9 @@ async function _handleCloseRA(
   const payload = request.payload;
   const prNumber = payload.number;
   const repository = payload.pull_request.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repository];
+  const reviewApps = isHera(payload.pull_request)
+    ? repositoryToScalingoAppsReviewHera[repository]
+    : repositoryToScalingoAppsReview[repository];
 
   if (!reviewApps) {
     return `${repository} is not managed by Pix Bot.`;
@@ -458,7 +477,7 @@ async function handleHeraPullRequestOpened(
 ) {
   const pullRequestNumber = request.payload.number;
   const repository = request.payload.pull_request.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repository];
+  const reviewApps = repositoryToScalingoAppsReviewHera[repository];
 
   await dependencies.addMessageToHeraPullRequest({
     repositoryName: repository,
@@ -518,7 +537,7 @@ async function handleHeraPullRequestReopened(
 ) {
   const pullRequestNumber = request.payload.number;
   const repositoryName = request.payload.pull_request.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
+  const reviewApps = repositoryToScalingoAppsReviewHera[repositoryName];
 
   await dependencies.updateMessageToHeraPullRequest({
     repositoryName,
@@ -583,7 +602,7 @@ async function _handleIssueComment(
   dependencies = { reviewAppRepo, createReviewApp, removeReviewApp, updateCheckRADeployment },
 ) {
   const repositoryName = pullRequest.head.repo.name;
-  const reviewAppNames = repositoryToScalingoAppsReview[repositoryName]?.map(({ appName }) => appName);
+  const reviewAppNames = repositoryToScalingoAppsReviewHera[repositoryName]?.map(({ appName }) => appName);
 
   const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, reviewAppNames);
   if (!shouldContinue) {
