@@ -251,12 +251,14 @@ describe('Integration | Build | Repository | Review App', function () {
         prNumber,
         parentApp: 'pix-certif-review',
         name: 'pix-certif-review-pr123',
+        status: 'pending',
       });
       await knex('review-apps').insert({
         repository,
         prNumber,
         parentApp: 'pix-api-review',
         name: 'pix-api-review-pr123',
+        status: 'failure',
       });
       await knex('review-apps').insert({
         repository,
@@ -276,8 +278,8 @@ describe('Integration | Build | Repository | Review App', function () {
 
       // then
       expect(reviewApps).to.deep.equal([
-        { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
-        { name: 'pix-certif-review-pr123', parentApp: 'pix-certif-review' },
+        { name: 'pix-api-review-pr123', parentApp: 'pix-api-review', status: 'failure' },
+        { name: 'pix-certif-review-pr123', parentApp: 'pix-certif-review', status: 'pending' },
       ]);
     });
   });

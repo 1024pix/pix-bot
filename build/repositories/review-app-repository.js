@@ -27,5 +27,9 @@ export const remove = async function ({ name }) {
 };
 
 export const listForPullRequest = async function ({ repository, prNumber }) {
-  return knex.select('name', 'parentApp').from('review-apps').where({ repository, prNumber }).orderBy('parentApp');
+  return knex
+    .select('name', 'parentApp', 'status')
+    .from('review-apps')
+    .where({ repository, prNumber })
+    .orderBy('parentApp');
 };
