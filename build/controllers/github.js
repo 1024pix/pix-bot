@@ -11,21 +11,32 @@ import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue
 import { updateCheckRADeployment } from '../usecases/updateCheckRADeployment.js';
 
 const repositoryToScalingoAppsReview = {
-  'pix-bot': ['pix-bot-review'],
-  'pix-data': ['pix-airflow-review'],
-  'pix-api-to-pg': ['pix-data-api-pix-integration'],
-  'pix-db-replication': ['pix-datawarehouse-review'],
-  'pix-db-stats': ['pix-db-stats-review'],
-  'pix-editor': ['pix-lcms-review'],
-  'pix-epreuves': ['pix-epreuves-review'],
-  'pix-exploit': ['pix-exploit-review'],
-  'pix-nina': ['pix-nina-review'],
-  'pix-site': ['pix-site-review', 'pix-pro-review'],
-  'pix-tutos': ['pix-tutos-review'],
-  'pix-ui': ['pix-ui-review'],
-  pix: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
-  pix4pix: ['pix-4pix-front-review', 'pix-4pix-api-review'],
-  securix: ['pix-securix-review'],
+  'pix-bot': [{ appName: 'pix-bot-review' }],
+  'pix-data': [{ appName: 'pix-airflow-review', label: 'Airflow' }],
+  'pix-api-to-pg': [{ appName: 'pix-data-api-pix-integration' }],
+  'pix-db-replication': [{ appName: 'pix-datawarehouse-review' }],
+  'pix-db-stats': [{ appName: 'pix-db-stats-review' }],
+  'pix-editor': [{ appName: 'pix-lcms-review' }],
+  'pix-epreuves': [{ appName: 'pix-epreuves-review' }],
+  'pix-exploit': [{ appName: 'pix-exploit-review' }],
+  'pix-nina': [{ appName: 'pix-nina-review' }],
+  'pix-site': [
+    { appName: 'pix-site-review', label: 'Pix Site' },
+    { appName: 'pix-pro-review', label: 'Pix Pro' },
+  ],
+  'pix-tutos': [{ appName: 'pix-tutos-review' }],
+  'pix-ui': [{ appName: 'pix-ui-review' }],
+  pix: [
+    { appName: 'pix-api-review', label: 'API' },
+    { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
+    { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
+    { appName: 'pix-front-review', label: 'Fronts' },
+  ],
+  pix4pix: [
+    { appName: 'pix-4pix-front-review', label: 'Fronts' },
+    { appName: 'pix-4pix-api-review', label: 'API' },
+  ],
+  securix: [{ app: 'pix-securix-review' }],
 };
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
@@ -47,13 +58,17 @@ function getMessageTemplate(repositoryName, isHera = false) {
 }
 
 function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate) {
-  const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoReviewApps[0]}-pr${pullRequestId}/environment`;
+  const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoReviewApps[0].appName}-pr${pullRequestId}/environment`;
   const shortenedRepositoryName = repositoryName.replace('pix-', '');
   const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
+  const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
+    .map(({ appName, label }) => `- [ ] ${label ? label : appName.replace('-review', '')} <!-- ${appName} -->`)
+    .join('\n');
   const message = messageTemplate
     .replaceAll('{{pullRequestId}}', pullRequestId)
     .replaceAll('{{webApplicationUrl}}', webApplicationUrl)
-    .replaceAll('{{scalingoDashboardUrl}}', scalingoDashboardUrl);
+    .replaceAll('{{scalingoDashboardUrl}}', scalingoDashboardUrl)
+    .replaceAll('{{checkboxesForReviewAppsToBeDeployed}}', checkboxesForReviewAppsToBeDeployed);
   return message;
 }
 
@@ -131,7 +146,7 @@ async function _handleCloseRA(
     throw new Error(`Scalingo auth APIError: ${error.message}`);
   }
 
-  for (const appName of reviewApps) {
+  for (const { appName } of reviewApps) {
     const reviewAppName = `${appName}-pr${prNumber}`;
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
@@ -182,7 +197,7 @@ async function deployPullRequest(
   } catch (error) {
     throw new Error(`Scalingo auth APIError: ${error.message}`);
   }
-  for (const appName of reviewApps) {
+  for (const { appName } of reviewApps) {
     const reviewAppName = `${appName}-pr${prId}`;
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
@@ -568,9 +583,9 @@ async function _handleIssueComment(
   dependencies = { reviewAppRepo, createReviewApp, removeReviewApp, updateCheckRADeployment },
 ) {
   const repositoryName = pullRequest.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
+  const reviewAppNames = repositoryToScalingoAppsReview[repositoryName]?.map(({ appName }) => appName);
 
-  const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, reviewApps);
+  const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, reviewAppNames);
   if (!shouldContinue) {
     return message;
   }
@@ -580,7 +595,7 @@ async function _handleIssueComment(
   let selectedApps = Array.from(body.matchAll(/^- \[[xX]\].+<!-- ([\w-]+) -->$/gm), ([, app]) => app);
 
   selectedApps = selectedApps.filter((app) => {
-    const isAllowed = reviewApps.includes(app);
+    const isAllowed = reviewAppNames.includes(app);
     if (!isAllowed) {
       logger.warn({
         event: 'review-app',
