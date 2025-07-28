@@ -970,7 +970,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const scalingoClientStub = sinon.stub();
         const reviewAppExistsStub = sinon.stub();
         const deleteReviewAppStub = sinon.stub();
-
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
@@ -979,7 +978,9 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         request.payload.pull_request.head.repo.name = 'unmanaged_repo';
 
         // when
-        const response = await githubController.handleCloseRA(request, scalingoClientStub);
+        const response = await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+        });
 
         expect(response).to.equal('unmanaged_repo is not managed by Pix Bot.');
       });
@@ -993,25 +994,32 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const deleteReviewAppStub = sinon.stub();
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
-          areAllDeployed: sinon.stub().resolves(false),
         };
-
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
+        const updateCheckRADeployment = sinon.stub().resolves();
 
         reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
-        const response = await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub);
+        const response = await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+          reviewAppRepo: reviewAppRepositoryStub,
+          updateCheckRADeployment,
+        });
 
         // then
         expect(response).to.equal(
           'Closed RA for PR 3 : pix-api-review-pr3, pix-api-maddo-review-pr3 (already closed), pix-audit-logger-review-pr3 (already closed), pix-front-review-pr3.',
         );
+        expect(updateCheckRADeployment).to.have.been.calledWith({
+          repositoryName: 'pix',
+          pullRequestNumber: 3,
+        });
       });
 
       it('should remove the review app in database anyway', async function () {
@@ -1021,25 +1029,32 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const deleteReviewAppStub = sinon.stub();
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
-          areAllDeployed: sinon.stub().resolves(false),
         };
-
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
+        const updateCheckRADeployment = sinon.stub().resolves();
 
         reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
-        await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub);
+        await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+          reviewAppRepo: reviewAppRepositoryStub,
+          updateCheckRADeployment,
+        });
 
         // then
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-api-review-pr3' })).to.be.true;
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-front-review-pr3' })).to.be.true;
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-audit-logger-review-pr3' })).to.be.true;
+        expect(updateCheckRADeployment).to.have.been.calledWith({
+          repositoryName: 'pix',
+          pullRequestNumber: 3,
+        });
       });
     });
 
@@ -1051,20 +1066,24 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const deleteReviewAppStub = sinon.stub();
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
-          areAllDeployed: sinon.stub().resolves(false),
         };
 
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
+        const updateCheckRADeployment = sinon.stub().resolves();
 
         reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
-        await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub);
+        await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+          reviewAppRepo: reviewAppRepositoryStub,
+          updateCheckRADeployment,
+        });
 
         // then
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-api-review-pr3' })).to.be.true;
@@ -1073,6 +1092,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         expect(deleteReviewAppStub.calledWith('pix-audit-logger-review-pr3')).to.be.false;
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-front-review-pr3' })).to.be.true;
         expect(deleteReviewAppStub.calledWith('pix-front-review-pr3')).to.be.true;
+        expect(updateCheckRADeployment).to.have.been.calledWith({
+          repositoryName: 'pix',
+          pullRequestNumber: 3,
+        });
       });
 
       describe('when all the review apps are removed', function () {
@@ -1083,11 +1106,8 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           const deleteReviewAppStub = sinon.stub();
           const reviewAppRepositoryStub = {
             remove: sinon.stub(),
-            areAllDeployed: sinon.stub().resolves(true),
           };
-          const githubServiceStub = {
-            addRADeploymentCheck: sinon.stub(),
-          };
+          const updateCheckRADeployment = sinon.stub().resolves();
 
           scalingoClientStub.getInstance = sinon.stub().returns({
             reviewAppExists: reviewAppExistsStub,
@@ -1098,12 +1118,17 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
 
           // when
-          await githubController.handleCloseRA(request, scalingoClientStub, reviewAppRepositoryStub, githubServiceStub);
+          await githubController.handleCloseRA(request, {
+            scalingoClient: scalingoClientStub,
+            reviewAppRepo: reviewAppRepositoryStub,
+            updateCheckRADeployment,
+          });
 
           // then
-          expect(
-            githubServiceStub.addRADeploymentCheck.calledWith({ repository: 'pix', prNumber: 3, status: 'success' }),
-          ).to.be.true;
+          expect(updateCheckRADeployment).to.have.been.calledWith({
+            repositoryName: 'pix',
+            pullRequestNumber: 3,
+          });
         });
       });
     });
@@ -1170,15 +1195,23 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         },
       };
       const addMessageToHeraPullRequest = sinon.stub().resolves();
+      const githubService = {
+        addRADeploymentCheck: sinon.stub().resolves(),
+      };
 
       // when
-      await githubController.handleHeraPullRequestOpened(request, { addMessageToHeraPullRequest });
+      await githubController.handleHeraPullRequestOpened(request, { addMessageToHeraPullRequest, githubService });
 
       // then
       expect(addMessageToHeraPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
         reviewApps: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
         pullRequestNumber: 123,
+      });
+      expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+        repository: 'pix',
+        prNumber: 123,
+        status: 'success',
       });
     });
   });
@@ -1391,6 +1424,8 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             { name: 'pix-api-maddo-review-pr123', parentApp: 'pix-api-maddo-review' },
           ]),
         };
+
+        const updateCheckRADeployment = sinon.stub().resolves();
         const comment = `Choisir les applications à déployer :
 
 - [X] Fronts <!-- pix-front-review -->
@@ -1432,7 +1467,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         const result = await githubController.handleIssueComment(
           { request, pullRequest },
-          { reviewAppRepo: reviewAppRepositoryStub, createReviewApp, removeReviewApp },
+          { reviewAppRepo: reviewAppRepositoryStub, createReviewApp, removeReviewApp, updateCheckRADeployment },
         );
 
         expect(createReviewApp).to.have.been.calledWithExactly({
@@ -1444,6 +1479,10 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         });
         expect(removeReviewApp).to.have.been.calledWithExactly({
           reviewAppName: 'pix-api-maddo-review-pr123',
+        });
+        expect(updateCheckRADeployment).to.have.been.calledWithExactly({
+          repositoryName: 'pix',
+          pullRequestNumber: 123,
         });
         expect(result).equal(`Created review apps: pix-front-review-pr123
 Removed review apps: pix-api-maddo-review-pr123`);
@@ -1638,6 +1677,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         listForPullRequest: sinon
           .stub()
           .resolves([{ name: 'pix-api-review-pr123' }, { name: 'pix-api-maddo-review-pr123' }]),
+        setStatus: sinon.stub().resolves(),
       };
       const scalingoClientInstance = {
         deployUsingSCM: sinon.stub().resolves(),
@@ -1645,11 +1685,13 @@ Removed review apps: pix-api-maddo-review-pr123`);
       const scalingoClient = {
         getInstance: sinon.stub().resolves(scalingoClientInstance),
       };
+      const updateCheckRADeployment = sinon.stub().resolves();
 
       // when
       const result = await githubController.handleHeraPullRequestSynchronize(request, {
         reviewAppRepo,
         scalingoClient,
+        updateCheckRADeployment,
       });
 
       // then
@@ -1664,6 +1706,19 @@ Removed review apps: pix-api-maddo-review-pr123`);
         'pix-api-maddo-review-pr123',
         'la-branche',
       );
+      expect(reviewAppRepo.setStatus).to.have.been.calledTwice;
+      expect(reviewAppRepo.setStatus).to.have.been.calledWithExactly({
+        name: 'pix-api-review-pr123',
+        status: 'pending',
+      });
+      expect(reviewAppRepo.setStatus).to.have.been.calledWithExactly({
+        name: 'pix-api-maddo-review-pr123',
+        status: 'pending',
+      });
+      expect(updateCheckRADeployment).to.have.been.calledOnceWithExactly({
+        repositoryName: 'pix',
+        pullRequestNumber: 123,
+      });
     });
   });
 
@@ -1683,15 +1738,23 @@ Removed review apps: pix-api-maddo-review-pr123`);
         },
       };
       const updateMessageToHeraPullRequest = sinon.stub().resolves();
+      const githubService = {
+        addRADeploymentCheck: sinon.stub().resolves(),
+      };
 
       // when
-      await githubController.handleHeraPullRequestReopened(request, { updateMessageToHeraPullRequest });
+      await githubController.handleHeraPullRequestReopened(request, { updateMessageToHeraPullRequest, githubService });
 
       // then
       expect(updateMessageToHeraPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
         reviewApps: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
         pullRequestNumber: 123,
+      });
+      expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+        repository: 'pix',
+        prNumber: 123,
+        status: 'success',
       });
     });
   });

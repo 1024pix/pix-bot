@@ -8,6 +8,7 @@ import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
 import * as reviewAppRepo from '../repositories/review-app-repository.js';
 import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue.js';
+import { updateCheckRADeployment } from '../usecases/updateCheckRADeployment.js';
 
 const repositoryToScalingoAppsReview = {
   'pix-bot': ['pix-bot-review'],
@@ -106,9 +107,11 @@ async function _handleRA(
 
 async function _handleCloseRA(
   request,
-  scalingoClient = ScalingoClient,
-  reviewAppRepository = reviewAppRepo,
-  githubService = commonGithubService,
+  dependencies = {
+    scalingoClient: ScalingoClient,
+    reviewAppRepo,
+    updateCheckRADeployment,
+  },
 ) {
   const payload = request.payload;
   const prNumber = payload.number;
@@ -123,7 +126,7 @@ async function _handleCloseRA(
   const closedRA = [];
 
   try {
-    client = await scalingoClient.getInstance('reviewApps');
+    client = await dependencies.scalingoClient.getInstance('reviewApps');
   } catch (error) {
     throw new Error(`Scalingo auth APIError: ${error.message}`);
   }
@@ -133,7 +136,7 @@ async function _handleCloseRA(
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
       // we remove the review app in any case
-      await reviewAppRepository.remove({ name: reviewAppName });
+      await dependencies.reviewAppRepo.remove({ name: reviewAppName });
       if (reviewAppExists) {
         await client.deleteReviewApp(reviewAppName);
         closedRA.push({ name: appName, isClosed: true, isAlreadyClosed: false });
@@ -153,18 +156,12 @@ async function _handleCloseRA(
       });
     }
   }
+
+  await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber });
+
   const result = closedRA.map((ra) =>
     ra.isAlreadyClosed ? `${ra.name}-pr${prNumber} (already closed)` : `${ra.name}-pr${prNumber}`,
   );
-  const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
-  if (areAllDeployed) {
-    logger.info({
-      event: 'review-app',
-      message: `Changing check-ra-deployment status to success (close RA)`,
-    });
-    await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
-  }
-
   return `Closed RA for PR ${prNumber} : ${result.join(', ')}.`;
 }
 
@@ -440,7 +437,10 @@ async function _handleHeraPullRequest(
   return `Action ${request.payload.action} not handled for Hera pull request`;
 }
 
-async function handleHeraPullRequestOpened(request, dependencies = { addMessageToHeraPullRequest }) {
+async function handleHeraPullRequestOpened(
+  request,
+  dependencies = { addMessageToHeraPullRequest, githubService: commonGithubService },
+) {
   const pullRequestNumber = request.payload.number;
   const repository = request.payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
@@ -449,6 +449,12 @@ async function handleHeraPullRequestOpened(request, dependencies = { addMessageT
     repositoryName: repository,
     reviewApps,
     pullRequestNumber,
+  });
+
+  await dependencies.githubService.addRADeploymentCheck({
+    repository,
+    prNumber: pullRequestNumber,
+    status: 'success',
   });
 
   logger.info({
@@ -460,7 +466,11 @@ async function handleHeraPullRequestOpened(request, dependencies = { addMessageT
 
 async function handleHeraPullRequestSynchronize(
   request,
-  dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
+  dependencies = {
+    scalingoClient: ScalingoClient,
+    reviewAppRepo,
+    updateCheckRADeployment,
+  },
 ) {
   const ref = request.payload.pull_request.head.ref;
   const pullRequestNumber = request.payload.number;
@@ -473,8 +483,11 @@ async function handleHeraPullRequestSynchronize(
   });
 
   for (const app of existingApps) {
+    await dependencies.reviewAppRepo.setStatus({ name: app.name, status: 'pending' });
     await client.deployUsingSCM(app.name, ref);
   }
+
+  await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber });
 
   logger.info({
     event: 'review-app',
@@ -484,7 +497,10 @@ async function handleHeraPullRequestSynchronize(
   return `Deployed on PR ${pullRequestNumber} in repository ${repository}`;
 }
 
-async function handleHeraPullRequestReopened(request, dependencies = { updateMessageToHeraPullRequest }) {
+async function handleHeraPullRequestReopened(
+  request,
+  dependencies = { updateMessageToHeraPullRequest, githubService: commonGithubService },
+) {
   const pullRequestNumber = request.payload.number;
   const repositoryName = request.payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repositoryName];
@@ -493,6 +509,12 @@ async function handleHeraPullRequestReopened(request, dependencies = { updateMes
     repositoryName,
     reviewApps,
     pullRequestNumber,
+  });
+
+  await dependencies.githubService.addRADeploymentCheck({
+    repository: repositoryName,
+    prNumber: pullRequestNumber,
+    status: 'success',
   });
 
   logger.info({
@@ -543,7 +565,7 @@ async function updateMessageToHeraPullRequest(
 
 async function _handleIssueComment(
   { request, pullRequest },
-  dependencies = { reviewAppRepo, createReviewApp, removeReviewApp },
+  dependencies = { reviewAppRepo, createReviewApp, removeReviewApp, updateCheckRADeployment },
 ) {
   const repositoryName = pullRequest.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repositoryName];
@@ -601,6 +623,7 @@ async function _handleIssueComment(
   if (!messages.length) {
     return 'Nothing to do';
   }
+  await dependencies.updateCheckRADeployment({ repositoryName, pullRequestNumber });
   return messages.join('\n');
 }
 

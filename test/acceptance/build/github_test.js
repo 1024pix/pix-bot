@@ -1131,6 +1131,12 @@ describe('Acceptance | Build | Github', function () {
           },
         };
         const createComment = createPullRequestCommentNock({ repository: 'pix', prNumber: 2 });
+        const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+        const addRADeploymentCheck = addRADeploymentCheckNock({
+          repository: 'pix',
+          sha: 'my-sha',
+          status: 'success',
+        });
 
         // when
         const res = await server.inject({
@@ -1147,6 +1153,8 @@ describe('Acceptance | Build | Github', function () {
         expect(res.statusCode).to.equal(StatusCodes.OK);
         expect(res.result).to.eql('Commented on PR 2 in repository pix');
         expect(createComment.isDone()).to.be.true;
+        expect(getPullRequest.isDone()).to.be.true;
+        expect(addRADeploymentCheck.isDone()).to.be.true;
       });
     });
 
@@ -1176,6 +1184,12 @@ describe('Acceptance | Build | Github', function () {
           parentApp: 'pix-front-review',
         });
         const scalingoDeploy = deployReviewAppNock({ reviewAppName: 'pix-front-review-pr2' });
+        const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+        const addRADeploymentCheck = addRADeploymentCheckNock({
+          repository: 'pix',
+          sha: 'my-sha',
+          status: 'pending',
+        });
 
         // when
         const res = await server.inject({
@@ -1193,6 +1207,8 @@ describe('Acceptance | Build | Github', function () {
         expect(res.result).to.eql('Deployed on PR 2 in repository pix');
         expect(scalingoAuth.isDone()).to.be.true;
         expect(scalingoDeploy.isDone()).to.be.true;
+        expect(getPullRequest.isDone()).to.be.true;
+        expect(addRADeploymentCheck.isDone()).to.be.true;
       });
     });
 
@@ -1216,6 +1232,12 @@ describe('Acceptance | Build | Github', function () {
         };
         const getComment = getPullRequestCommentNock({ repository: 'pix', prNumber: 2 });
         const editComment = editPullRequestCommentNock({ repository: 'pix', commentId: 1 });
+        const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+        const addRADeploymentCheck = addRADeploymentCheckNock({
+          repository: 'pix',
+          sha: 'my-sha',
+          status: 'success',
+        });
 
         // when
         const res = await server.inject({
@@ -1233,6 +1255,8 @@ describe('Acceptance | Build | Github', function () {
         expect(res.result).to.eql('Comment updated on reopened PR 2 in repository pix');
         expect(getComment.isDone()).to.be.true;
         expect(editComment.isDone()).to.be.true;
+        expect(getPullRequest.isDone()).to.be.true;
+        expect(addRADeploymentCheck.isDone()).to.be.true;
       });
     });
   });

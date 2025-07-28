@@ -102,111 +102,6 @@ describe('Integration | Build | Repository | Review App', function () {
     });
   });
 
-  describe('areAllDeployed', function () {
-    it('should return true when all applications are deployed', async function () {
-      // given
-      const repository = 'pix';
-      const prNumber = 123;
-
-      await knex('review-apps').insert({
-        name: 'other-repo-review-pr1',
-        repository: 'other-repo',
-        prNumber: 1,
-        parentApp: 'other-repo-review',
-      });
-      await knex('review-apps').insert({
-        name: 'pix-api-review-pr123',
-        repository,
-        prNumber,
-        parentApp: 'pix-api-review',
-        status: 'success',
-      });
-      await knex('review-apps').insert({
-        name: 'pix-front-review-pr123',
-        repository,
-        prNumber,
-        parentApp: 'pix-front-review',
-        status: 'success',
-      });
-
-      // when
-      const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
-
-      expect(areAllDeployed).to.be.true;
-    });
-
-    it('should return true when all applications but maddo are deployed', async function () {
-      // given
-      const repository = 'pix';
-      const prNumber = 123;
-
-      await knex('review-apps').insert({
-        name: 'other-repo-review-pr1',
-        repository: 'other-repo',
-        prNumber: 1,
-        parentApp: 'other-repo-review',
-      });
-      await knex('review-apps').insert({
-        name: 'pix-api-review-pr123',
-        repository,
-        prNumber,
-        parentApp: 'pix-api-review',
-        status: 'success',
-      });
-      await knex('review-apps').insert({
-        name: 'pix-front-review-pr123',
-        repository,
-        prNumber,
-        parentApp: 'pix-front-review',
-        status: 'success',
-      });
-      await knex('review-apps').insert({
-        name: 'pix-api-maddo-review-pr123',
-        repository,
-        prNumber,
-        parentApp: 'pix-api-maddo-review',
-        status: 'failure',
-      });
-
-      // when
-      const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
-
-      expect(areAllDeployed).to.be.true;
-    });
-
-    it('should return false when not all applications are deployed', async function () {
-      // given
-      const repository = 'pix';
-      const prNumber = 123;
-
-      await knex('review-apps').insert({
-        name: 'other-repo-review-pr1',
-        repository: 'other-repo',
-        prNumber: 1,
-        parentApp: 'other-repo-review',
-      });
-      await knex('review-apps').insert({
-        name: 'pix-api-review-pr123',
-        repository,
-        prNumber,
-        parentApp: 'pix-api-review',
-        status: 'success',
-      });
-      await knex('review-apps').insert({
-        name: 'pix-front-review-pr123',
-        repository,
-        prNumber,
-        parentApp: 'pix-front-review',
-        status: 'failure',
-      });
-
-      // when
-      const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
-
-      expect(areAllDeployed).to.be.false;
-    });
-  });
-
   describe('remove', function () {
     it('it should remove the review app', async function () {
       // given
@@ -251,12 +146,14 @@ describe('Integration | Build | Repository | Review App', function () {
         prNumber,
         parentApp: 'pix-certif-review',
         name: 'pix-certif-review-pr123',
+        status: 'pending',
       });
       await knex('review-apps').insert({
         repository,
         prNumber,
         parentApp: 'pix-api-review',
         name: 'pix-api-review-pr123',
+        status: 'failure',
       });
       await knex('review-apps').insert({
         repository,
@@ -276,8 +173,8 @@ describe('Integration | Build | Repository | Review App', function () {
 
       // then
       expect(reviewApps).to.deep.equal([
-        { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
-        { name: 'pix-certif-review-pr123', parentApp: 'pix-certif-review' },
+        { name: 'pix-api-review-pr123', parentApp: 'pix-api-review', status: 'failure' },
+        { name: 'pix-certif-review-pr123', parentApp: 'pix-certif-review', status: 'pending' },
       ]);
     });
   });
