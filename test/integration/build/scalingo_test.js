@@ -300,6 +300,16 @@ describe('Integration | Build | Scalingo', function () {
           app_name: appName,
           type: 'deployment',
         };
+        const getPullRequestNock = nock('https://api.github.com')
+          .get(`/repos/1024pix/pix/pulls/123`)
+          .reply(200, { head: { sha: 'abc123' } });
+
+        const addRADeploymentCheckNock = nock('https://api.github.com')
+          .post(`/repos/1024pix/pix/statuses/abc123`, {
+            context: 'check-ra-deployment',
+            state: 'pending',
+          })
+          .reply(201, { started_at: new Date() });
 
         // when
         const response = await server.inject({
@@ -312,6 +322,8 @@ describe('Integration | Build | Scalingo', function () {
         expect(response.statusCode).to.equal(200);
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
         expect(reviewApp.status).to.equal('success');
+        expect(getPullRequestNock.isDone()).to.be.true;
+        expect(addRADeploymentCheckNock.isDone()).to.be.true;
       });
 
       describe('when all the review apps are deployed', function () {

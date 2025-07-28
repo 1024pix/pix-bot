@@ -5,8 +5,8 @@ import { logger } from '../../common/services/logger.js';
 import slackPostMessageService from '../../common/services/slack/surfaces/messages/post-message.js';
 import { config } from '../../config.js';
 import * as reviewAppRepository from '../repositories/review-app-repository.js';
-import githubService from '../../common/services/github.js';
 import { ScalingoAppName } from '../../common/models/ScalingoAppName.js';
+import { updateCheckRADeployment } from '../usecases/updateCheckRADeployment.js';
 
 function getSlackMessageAttachments(payload) {
   const appName = payload.app_name;
@@ -111,7 +111,7 @@ const scalingo = {
         message: `Changing check-ra-deployment status to failure`,
         data: { repository, prNumber },
       });
-      await githubService.addRADeploymentCheck({ repository, prNumber, status: 'failure' });
+      await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber });
       return h.response().code(200);
     }
 
@@ -124,15 +124,7 @@ const scalingo = {
 
     const { repository, prNumber } = reviewApp;
 
-    const areAllDeployed = await reviewAppRepository.areAllDeployed({ repository, prNumber });
-    if (areAllDeployed) {
-      logger.info({
-        event,
-        message: `Changing check-ra-deployment status to success`,
-        data: { repository, prNumber },
-      });
-      await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
-    }
+    await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber });
 
     return h.response().code(200);
   },
