@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.133.1 (28/07/2025)
+
+
+### :rocket: Amélioration
+- [#611](https://github.com/1024pix/pix-bot/pull/611) [FEATURE] Gérer la réouverture d'une pull request flag Hera.
+
+### :building_construction: Tech
+- [#609](https://github.com/1024pix/pix-bot/pull/609) [TECH] Supprimer la colonne `review-apps.isDeployed`.
+
+### :bug: Correction
+- [#610](https://github.com/1024pix/pix-bot/pull/610) [BUGFIX] Gérer le check-ra-deployment correctement lors d’un synchronize.
+
 ## v1.133.0 (25/07/2025)
 
 
