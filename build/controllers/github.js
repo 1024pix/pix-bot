@@ -424,6 +424,7 @@ async function _handleHeraPullRequest(
   dependencies = {
     handleHeraPullRequestOpened,
     handleHeraPullRequestSynchronize,
+    handleHeraPullRequestReopened,
   },
 ) {
   if (request.payload.action === 'opened') {
@@ -431,6 +432,9 @@ async function _handleHeraPullRequest(
   }
   if (request.payload.action === 'synchronize') {
     return dependencies.handleHeraPullRequestSynchronize(request);
+  }
+  if (request.payload.action === 'reopened') {
+    return dependencies.handleHeraPullRequestReopened(request);
   }
   return `Action ${request.payload.action} not handled for Hera pull request`;
 }
@@ -479,6 +483,24 @@ async function handleHeraPullRequestSynchronize(
   return `Deployed on PR ${pullRequestNumber} in repository ${repository}`;
 }
 
+async function handleHeraPullRequestReopened(request, dependencies = { updateMessageToHeraPullRequest }) {
+  const pullRequestNumber = request.payload.number;
+  const repositoryName = request.payload.pull_request.head.repo.name;
+  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
+
+  await dependencies.updateMessageToHeraPullRequest({
+    repositoryName,
+    reviewApps,
+    pullRequestNumber,
+  });
+
+  logger.info({
+    event: 'review-app',
+    message: `Comment updated on reopened PR ${pullRequestNumber} in repository ${repositoryName}`,
+  });
+  return `Comment updated on reopened PR ${pullRequestNumber} in repository ${repositoryName}`;
+}
+
 async function addMessageToHeraPullRequest(
   { repositoryName, reviewApps, pullRequestNumber },
   dependencies = { githubService: commonGithubService },
@@ -489,6 +511,32 @@ async function addMessageToHeraPullRequest(
     repositoryName,
     pullRequestId: pullRequestNumber,
     comment: message,
+  });
+}
+
+async function updateMessageToHeraPullRequest(
+  { repositoryName, reviewApps, pullRequestNumber },
+  dependencies = { githubService: commonGithubService },
+) {
+  const comments = await dependencies.githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
+
+  const deploymentRAComment = comments.find((comment) => comment.user.login === 'pix-bot-github');
+  const template = getMessageTemplate(repositoryName, true);
+  const message = getMessage(repositoryName, pullRequestNumber, reviewApps, template);
+
+  if (!deploymentRAComment) {
+    await dependencies.githubService.commentPullRequest({
+      repositoryName,
+      pullRequestId: pullRequestNumber,
+      comment: message,
+    });
+    return;
+  }
+
+  await dependencies.githubService.editPullRequestComment({
+    repositoryName,
+    commentId: deploymentRAComment.id,
+    newComment: message,
   });
 }
 
@@ -624,7 +672,9 @@ export {
   _handleHeraPullRequest as handleHeraPullRequest,
   handleHeraPullRequestOpened,
   handleHeraPullRequestSynchronize,
+  handleHeraPullRequestReopened,
   addMessageToHeraPullRequest,
+  updateMessageToHeraPullRequest,
   _handleIssueComment as handleIssueComment,
   createReviewApp,
   removeReviewApp,

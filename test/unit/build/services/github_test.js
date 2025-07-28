@@ -969,4 +969,105 @@ describe('Unit | Build | github-test', function () {
       });
     });
   });
+
+  describe('#getPullRequestComments', function () {
+    describe('when everything is OK', function () {
+      it('should call GitHub API and return comments', async function () {
+        // given
+        const repositoryName = 'a-repository';
+        const pullRequestNumber = 0;
+        const response = [
+          {
+            id: 1,
+            body: 'Me too',
+          },
+        ];
+        const githubNock = nock('https://api.github.com')
+          .get(`/repos/github-owner/${repositoryName}/issues/${pullRequestNumber}/comments`)
+          .reply(200, response);
+
+        // when
+        const comments = await githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
+
+        // then
+        expect(comments).to.deep.equal([
+          {
+            id: 1,
+            body: 'Me too',
+          },
+        ]);
+        expect(githubNock.isDone()).to.be.true;
+      });
+    });
+
+    describe('when an error occurred', function () {
+      it('should return an error message', async function () {
+        // given
+        const repositoryName = 'a-repository';
+        const pullRequestNumber = 0;
+        nock('https://api.github.com')
+          .get(`/repos/github-owner/${repositoryName}/issues/${pullRequestNumber}/comments`)
+          .reply(StatusCodes.BAD_REQUEST);
+
+        // when
+        const result = await catchErr(githubService.getPullRequestComments)({ repositoryName, pullRequestNumber });
+
+        // then
+        expect(result).to.be.instanceOf(Error);
+        expect(result.message).to.equal('Comments not found for pull request #0 in repository a-repository');
+      });
+
+      it('should return 404 if no comment is found', async function () {
+        const repositoryName = 'a-repository';
+        const pullRequestNumber = 0;
+        nock('https://api.github.com')
+          .get(`/repos/github-owner/${repositoryName}/issues/${pullRequestNumber}/comments`)
+          .reply(StatusCodes.NOT_FOUND);
+
+        const comments = await githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
+
+        // then
+        expect(comments).to.deep.equal([]);
+      });
+    });
+  });
+
+  describe('#editPullRequestComment', function () {
+    describe('when everything is OK', function () {
+      it('should call GitHub API', async function () {
+        // given
+        const repositoryName = 'a-repository';
+        const commentId = 1;
+        const newComment = 'Long live Hera !';
+        const githubNock = nock('https://api.github.com')
+          .patch(`/repos/github-owner/${repositoryName}/issues/comments/${commentId}`)
+          .reply(200, {});
+
+        // when
+        await githubService.editPullRequestComment({ repositoryName, commentId, newComment });
+
+        // then
+        expect(githubNock.isDone()).to.be.true;
+      });
+    });
+
+    describe('when an error occurred', function () {
+      it('should return an error message', async function () {
+        // given
+        const repositoryName = 'a-repository';
+        const commentId = 1;
+        const newComment = 'Long live Hera !';
+        nock('https://api.github.com')
+          .patch(`/repos/github-owner/${repositoryName}/issues/comments/${commentId}`)
+          .reply(StatusCodes.NOT_FOUND);
+
+        // when
+        const result = await catchErr(githubService.editPullRequestComment)({ repositoryName, commentId, newComment });
+
+        // then
+        expect(result).to.be.instanceOf(Error);
+        expect(result.message).to.equal('The comment #1 has not been updated in repository a-repository');
+      });
+    });
+  });
 });
