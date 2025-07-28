@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.133.2 (28/07/2025)
+
+
+### :rocket: Amélioration
+- [#612](https://github.com/1024pix/pix-bot/pull/612) [FEATURE] Gestion du check-ra-deployment sur le label Hera.
+
 ## v1.133.1 (28/07/2025)
 
 
