@@ -440,7 +440,10 @@ async function _handleHeraPullRequest(
   return `Action ${request.payload.action} not handled for Hera pull request`;
 }
 
-async function handleHeraPullRequestOpened(request, dependencies = { addMessageToHeraPullRequest }) {
+async function handleHeraPullRequestOpened(
+  request,
+  dependencies = { addMessageToHeraPullRequest, githubService: commonGithubService },
+) {
   const pullRequestNumber = request.payload.number;
   const repository = request.payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
@@ -449,6 +452,12 @@ async function handleHeraPullRequestOpened(request, dependencies = { addMessageT
     repositoryName: repository,
     reviewApps,
     pullRequestNumber,
+  });
+
+  await dependencies.githubService.addRADeploymentCheck({
+    repository,
+    prNumber: pullRequestNumber,
+    status: 'success',
   });
 
   logger.info({
@@ -460,7 +469,7 @@ async function handleHeraPullRequestOpened(request, dependencies = { addMessageT
 
 async function handleHeraPullRequestSynchronize(
   request,
-  dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
+  dependencies = { scalingoClient: ScalingoClient, reviewAppRepo, githubService: commonGithubService },
 ) {
   const ref = request.payload.pull_request.head.ref;
   const pullRequestNumber = request.payload.number;
@@ -473,7 +482,16 @@ async function handleHeraPullRequestSynchronize(
   });
 
   for (const app of existingApps) {
+    await dependencies.reviewAppRepo.setStatus({ name: app.name, status: 'pending' });
     await client.deployUsingSCM(app.name, ref);
+  }
+
+  if (existingApps.length) {
+    await dependencies.githubService.addRADeploymentCheck({
+      repository,
+      prNumber: pullRequestNumber,
+      status: 'pending',
+    });
   }
 
   logger.info({
@@ -484,7 +502,10 @@ async function handleHeraPullRequestSynchronize(
   return `Deployed on PR ${pullRequestNumber} in repository ${repository}`;
 }
 
-async function handleHeraPullRequestReopened(request, dependencies = { updateMessageToHeraPullRequest }) {
+async function handleHeraPullRequestReopened(
+  request,
+  dependencies = { updateMessageToHeraPullRequest, githubService: commonGithubService },
+) {
   const pullRequestNumber = request.payload.number;
   const repositoryName = request.payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repositoryName];
@@ -493,6 +514,12 @@ async function handleHeraPullRequestReopened(request, dependencies = { updateMes
     repositoryName,
     reviewApps,
     pullRequestNumber,
+  });
+
+  await dependencies.githubService.addRADeploymentCheck({
+    repository: repositoryName,
+    prNumber: pullRequestNumber,
+    status: 'success',
   });
 
   logger.info({

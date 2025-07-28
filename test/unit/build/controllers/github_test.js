@@ -1170,15 +1170,23 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         },
       };
       const addMessageToHeraPullRequest = sinon.stub().resolves();
+      const githubService = {
+        addRADeploymentCheck: sinon.stub().resolves(),
+      };
 
       // when
-      await githubController.handleHeraPullRequestOpened(request, { addMessageToHeraPullRequest });
+      await githubController.handleHeraPullRequestOpened(request, { addMessageToHeraPullRequest, githubService });
 
       // then
       expect(addMessageToHeraPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
         reviewApps: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
         pullRequestNumber: 123,
+      });
+      expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+        repository: 'pix',
+        prNumber: 123,
+        status: 'success',
       });
     });
   });
@@ -1638,6 +1646,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         listForPullRequest: sinon
           .stub()
           .resolves([{ name: 'pix-api-review-pr123' }, { name: 'pix-api-maddo-review-pr123' }]),
+        setStatus: sinon.stub().resolves(),
       };
       const scalingoClientInstance = {
         deployUsingSCM: sinon.stub().resolves(),
@@ -1645,11 +1654,15 @@ Removed review apps: pix-api-maddo-review-pr123`);
       const scalingoClient = {
         getInstance: sinon.stub().resolves(scalingoClientInstance),
       };
+      const githubService = {
+        addRADeploymentCheck: sinon.stub().resolves(),
+      };
 
       // when
       const result = await githubController.handleHeraPullRequestSynchronize(request, {
         reviewAppRepo,
         scalingoClient,
+        githubService,
       });
 
       // then
@@ -1664,6 +1677,20 @@ Removed review apps: pix-api-maddo-review-pr123`);
         'pix-api-maddo-review-pr123',
         'la-branche',
       );
+      expect(reviewAppRepo.setStatus).to.have.been.calledTwice;
+      expect(reviewAppRepo.setStatus).to.have.been.calledWithExactly({
+        name: 'pix-api-review-pr123',
+        status: 'pending',
+      });
+      expect(reviewAppRepo.setStatus).to.have.been.calledWithExactly({
+        name: 'pix-api-maddo-review-pr123',
+        status: 'pending',
+      });
+      expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+        repository: 'pix',
+        prNumber: 123,
+        status: 'pending',
+      });
     });
   });
 
@@ -1683,15 +1710,23 @@ Removed review apps: pix-api-maddo-review-pr123`);
         },
       };
       const updateMessageToHeraPullRequest = sinon.stub().resolves();
+      const githubService = {
+        addRADeploymentCheck: sinon.stub().resolves(),
+      };
 
       // when
-      await githubController.handleHeraPullRequestReopened(request, { updateMessageToHeraPullRequest });
+      await githubController.handleHeraPullRequestReopened(request, { updateMessageToHeraPullRequest, githubService });
 
       // then
       expect(updateMessageToHeraPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
         reviewApps: ['pix-api-review', 'pix-api-maddo-review', 'pix-audit-logger-review', 'pix-front-review'],
         pullRequestNumber: 123,
+      });
+      expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+        repository: 'pix',
+        prNumber: 123,
+        status: 'success',
       });
     });
   });
