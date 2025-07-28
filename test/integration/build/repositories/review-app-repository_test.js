@@ -1,4 +1,4 @@
-import { catchErr, expect } from '../../../test-helper.js';
+import { expect } from '../../../test-helper.js';
 import * as reviewAppRepository from '../../../../build/repositories/review-app-repository.js';
 import { knex } from '../../../../db/knex-database-connection.js';
 
@@ -63,13 +63,14 @@ describe('Integration | Build | Repository | Review App', function () {
     });
   });
 
-  describe('markAsDeployed', function () {
-    it('should set isDeployed to true and return repository and prNumber', async function () {
+  describe('setStatus', function () {
+    it('sets status and return repository and prNumber', async function () {
       // given
       const name = 'pix-api-review-pr123';
       const repository = 'pix';
       const prNumber = 123;
       const parentApp = 'pix-api-review';
+      const status = 'success';
 
       await knex('review-apps').insert({
         name,
@@ -79,56 +80,24 @@ describe('Integration | Build | Repository | Review App', function () {
       });
 
       // when
-      const result = await reviewAppRepository.markAsDeployed({ name });
+      const result = await reviewAppRepository.setStatus({ name, status });
 
-      const updatedReviewApp = await knex('review-apps').where({ name }).first();
-      expect(updatedReviewApp.status).to.equal('success');
-      expect(result.repository).to.equal(repository);
-      expect(result.prNumber).to.equal(prNumber);
-    });
-
-    describe('when review app does not exist', function () {
-      it('should throw an Error', async function () {
-        // when
-        const name = 'does-not-exist';
-        const error = await catchErr(reviewAppRepository.markAsDeployed)({ name });
-
-        expect(error.message).to.equal(`${name} doesn't exist.`);
-      });
-    });
-  });
-
-  describe('markAsFailed', function () {
-    it('should set isDeployed to false and return repository and prNumber', async function () {
-      // given
-      const name = 'pix-api-review-pr123';
-      const repository = 'pix';
-      const prNumber = 123;
-      const parentApp = 'pix-api-review';
-
-      await knex('review-apps').insert({
-        name,
+      expect(result).to.deep.equal({
         repository,
         prNumber,
-        parentApp,
       });
-
-      // when
-      const result = await reviewAppRepository.markAsFailed({ name });
-
       const updatedReviewApp = await knex('review-apps').where({ name }).first();
-      expect(updatedReviewApp.status).to.equal('failure');
-      expect(result.repository).to.equal(repository);
-      expect(result.prNumber).to.equal(prNumber);
+      expect(updatedReviewApp).to.have.property('status', 'success');
     });
 
     describe('when review app does not exist', function () {
-      it('should throw an Error', async function () {
+      it('returns undefined', async function () {
         // when
         const name = 'does-not-exist';
-        const error = await catchErr(reviewAppRepository.markAsFailed)({ name });
+        const status = 'success';
+        const result = await reviewAppRepository.setStatus({ name, status });
 
-        expect(error.message).to.equal(`${name} doesn't exist.`);
+        expect(result).to.be.undefined;
       });
     });
   });

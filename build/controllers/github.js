@@ -190,6 +190,7 @@ async function deployPullRequest(
     try {
       const reviewAppExists = await client.reviewAppExists(reviewAppName);
       if (reviewAppExists) {
+        await reviewAppRepository.setStatus({ name: reviewAppName, status: 'pending' });
         await client.deployUsingSCM(reviewAppName, ref);
       } else {
         await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
