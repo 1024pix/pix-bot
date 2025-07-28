@@ -12,16 +12,6 @@ export async function setStatus({ name, status }) {
   return result;
 }
 
-export const areAllDeployed = async function ({ repository, prNumber }) {
-  const { count } = await knex('review-apps')
-    .count()
-    .where({ repository, prNumber })
-    .whereNot('status', 'success')
-    .whereNot('name', 'like', '%maddo%')
-    .first();
-  return count === 0;
-};
-
 export const remove = async function ({ name }) {
   return knex('review-apps').where({ name }).del();
 };

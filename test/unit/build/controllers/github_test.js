@@ -994,7 +994,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const deleteReviewAppStub = sinon.stub();
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
-          areAllDeployed: sinon.stub().resolves(false),
         };
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
@@ -1030,7 +1029,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const deleteReviewAppStub = sinon.stub();
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
-          areAllDeployed: sinon.stub().resolves(false),
         };
         scalingoClientStub.getInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
@@ -1068,7 +1066,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         const deleteReviewAppStub = sinon.stub();
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
-          areAllDeployed: sinon.stub().resolves(false),
         };
 
         scalingoClientStub.getInstance = sinon.stub().returns({
@@ -1109,7 +1106,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           const deleteReviewAppStub = sinon.stub();
           const reviewAppRepositoryStub = {
             remove: sinon.stub(),
-            areAllDeployed: sinon.stub().resolves(true),
           };
           const updateCheckRADeployment = sinon.stub().resolves();
 
