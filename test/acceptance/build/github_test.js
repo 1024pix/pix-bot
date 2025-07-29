@@ -32,7 +32,7 @@ describe('Acceptance | Build | Github', function () {
           };
         });
 
-        it('responds with 200, creates the RA on scalingo, disables autodeploy, pushes the git ref, comments the PR and add the deployment check', async function () {
+        it('responds with 200, creates the RA on scalingo, disables autodeploy, pushes the git ref and add the deployment check', async function () {
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
 
           const createApi = createReviewAppNock({ appName: 'pix-api-review', prNumber: 2 });
@@ -53,10 +53,6 @@ describe('Acceptance | Build | Github', function () {
             sha: 'my-sha',
             status: 'pending',
           });
-
-          const githubNock = nock('https://api.github.com')
-            .post('/repos/github-owner/pix/issues/2/comments')
-            .reply(StatusCodes.OK);
 
           const res = await server.inject({
             method: 'POST',
@@ -84,11 +80,41 @@ describe('Acceptance | Build | Github', function () {
           expect(deployApiMaddo.isDone()).to.be.true;
           expect(deployFront.isDone()).to.be.true;
           expect(deployAuditLogger.isDone()).to.be.true;
-          expect(githubNock.isDone()).to.be.true;
           expect(getPullRequest.isDone()).to.be.true;
           expect(addRADeploymentCheck.isDone()).to.be.true;
           expect(nock.isDone()).to.be.true;
         });
+
+        if (action === 'opened') {
+          it(`comments the PR`, async function () {
+            // given
+            nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+            disableAutoDeployNock({ reviewAppName: 'pix-api-review-pr2' });
+            createReviewAppNock({ appName: 'pix-api-review', prNumber: 2 });
+            deployReviewAppNock({ reviewAppName: 'pix-api-review-pr2' });
+            getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
+            addRADeploymentCheckNock({
+              repository: 'pix',
+              sha: 'my-sha',
+              status: 'pending',
+            });
+            const createComment = createPullRequestCommentNock({ repository: 'pix', prNumber: 2 });
+
+            // when
+            await server.inject({
+              method: 'POST',
+              url: '/github/webhook',
+              headers: {
+                ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+                'x-github-event': 'pull_request',
+              },
+              payload: body,
+            });
+
+            // then
+            expect(createComment.isDone()).to.be.true;
+          });
+        }
 
         it("responds with 200 and doesn't create the RA on scalingo when the PR is from a fork", async function () {
           body.pull_request.head.repo.fork = true;
