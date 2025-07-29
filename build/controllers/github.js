@@ -17,12 +17,36 @@ const repositoryToScalingoAppsReview = {
   'pix-db-replication': [{ appName: 'pix-datawarehouse-review' }],
   'pix-db-stats': [{ appName: 'pix-db-stats-review' }],
   'pix-editor': [{ appName: 'pix-lcms-review' }],
-  'pix-epreuves': [{ appName: 'pix-epreuves-review' }],
+  'pix-epreuves': [
+    {
+      appName: 'pix-epreuves-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'Viewer', href: `https://epreuves-viewer.pix.digital/pr${pullRequestNumber}/` },
+        {
+          label: 'Viewer de composants',
+          href: `https://epreuves-viewer.pix.digital/pr${pullRequestNumber}/components/`,
+        },
+        { label: 'Ancien viewer', href: `https://epreuves-pr${pullRequestNumber}.review.pix.fr/viewer.html` },
+      ],
+    },
+  ],
   'pix-exploit': [{ appName: 'pix-exploit-review' }],
   'pix-nina': [{ appName: 'pix-nina-review' }],
   'pix-site': [
-    { appName: 'pix-site-review', label: 'Pix Site' },
-    { appName: 'pix-pro-review', label: 'Pix Pro' },
+    {
+      appName: 'pix-site-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'Pix Site (.fr)', href: `https://site-pr${pullRequestNumber}.review.pix.fr` },
+        { label: 'Pix Site (.org)', href: `https://site-pr${pullRequestNumber}.review.pix.fr` },
+      ],
+    },
+    {
+      appName: 'pix-pro-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'Pix Pro (.fr)', href: `https://pro-pr${pullRequestNumber}.review.pix.fr` },
+        { label: 'Pix Pro (.org)', href: `https://pro-pr${pullRequestNumber}.review.pix.fr` },
+      ],
+    },
   ],
   'pix-tutos': [{ appName: 'pix-tutos-review' }],
   'pix-ui': [{ appName: 'pix-ui-review' }],
@@ -42,15 +66,59 @@ const repositoryToScalingoAppsReview = {
 const repositoryToScalingoAppsReviewHera = {
   ...repositoryToScalingoAppsReview,
   pix: [
-    { appName: 'pix-api-review', label: 'API' },
-    { appName: 'pix-front-review', label: 'Fronts', isHidden: true },
-    { appName: 'pix-app-review', label: 'App' },
-    { appName: 'pix-orga-review', label: 'Orga' },
-    { appName: 'pix-certif-review', label: 'Certif' },
-    { appName: 'pix-junior-review', label: 'Junior' },
-    { appName: 'pix-admin-review', label: 'Admin' },
-    { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-    { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
+    {
+      appName: 'pix-api-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'API', href: `https://api-pr${pullRequestNumber}.review.pix.fr/api/` },
+      ],
+    },
+    { appName: 'pix-front-review', isHidden: true },
+    {
+      appName: 'pix-app-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'App (.fr)', href: `https://app-pr${pullRequestNumber}.review.pix.fr` },
+        { label: 'App (.org)', href: `https://app-pr${pullRequestNumber}.review.pix.org` },
+      ],
+    },
+    {
+      appName: 'pix-orga-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'Orga (.fr)', href: `https://orga-pr${pullRequestNumber}.review.pix.fr` },
+        { label: 'Orga (.org)', href: `https://orga-pr${pullRequestNumber}.review.pix.org` },
+      ],
+    },
+    {
+      appName: 'pix-certif-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'Certif (.fr)', href: `https://certif-pr${pullRequestNumber}.review.pix.fr` },
+        { label: 'Certif (.org)', href: `https://certif-pr${pullRequestNumber}.review.pix.org` },
+      ],
+    },
+    {
+      appName: 'pix-junior-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'Junior', href: `https://junior-pr${pullRequestNumber}.review.pix.fr` },
+      ],
+    },
+    {
+      appName: 'pix-admin-review',
+      getLinks: (pullRequestNumber) => [{ label: 'Admin', href: `https://admin-pr${pullRequestNumber}.review.pix.fr` }],
+    },
+    {
+      appName: 'pix-api-maddo-review',
+      getLinks: (pullRequestNumber) => [
+        { label: 'API MaDDo', href: `https://pix-api-maddo-review-pr${pullRequestNumber}.osc-fr1.scalingo.io/api/` },
+      ],
+    },
+    {
+      appName: 'pix-audit-logger-review',
+      getLinks: (pullRequestNumber) => [
+        {
+          label: 'Audit Logger',
+          href: `https://pix-audit-logger-review-pr${pullRequestNumber}.osc-fr1.scalingo.io/api/`,
+        },
+      ],
+    },
   ],
 };
 
@@ -78,7 +146,20 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
   const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
   const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
     .filter(({ isHidden }) => !isHidden)
-    .map(({ appName, label }) => `- [ ] ${label ? label : appName.replace('-review', '')} <!-- ${appName} -->`)
+    .map(({ appName, label, getLinks }) => {
+      let links;
+      if (getLinks) {
+        links = getLinks(pullRequestId)
+          .map(({ label, href }) => `[${label}](${href})`)
+          .join(' – ');
+      } else {
+        links = `[${label ? label : appName.replace('-review', '')}](https://${appName}-pr${pullRequestId}.osc-fr1.scalingo.io/)`;
+      }
+
+      const scalingoDashboardLink = `[👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/${appName}-pr${pullRequestId}/environment)`;
+
+      return `- [ ] ${links} | ${scalingoDashboardLink} <!-- ${appName} -->`;
+    })
     .join('\n');
   const message = messageTemplate
     .replaceAll('{{pullRequestId}}', pullRequestId)
@@ -736,4 +817,5 @@ export {
   _handleIssueComment as handleIssueComment,
   createReviewApp,
   removeReviewApp,
+  repositoryToScalingoAppsReviewHera,
 };
