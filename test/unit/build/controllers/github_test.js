@@ -4,34 +4,17 @@ import url from 'node:url';
 
 const COMMENT = `Choisir les applications à déployer :
 
-- [ ] Fronts <!-- pix-front-review -->
-- [ ] API <!-- pix-api-review -->
-- [ ] API MaDDo <!-- pix-api-maddo-review -->
-- [ ] Audit Logger <!-- pix-audit-logger-review -->
+- [ ] [API](https://api-pr123.review.pix.fr/api/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-review-pr123/environment) <!-- pix-api-review -->
+- [ ] [App (.fr)](https://app-pr123.review.pix.fr) – [App (.org)](https://app-pr123.review.pix.org) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-app-review-pr123/environment) <!-- pix-app-review -->
+- [ ] [Orga (.fr)](https://orga-pr123.review.pix.fr) – [Orga (.org)](https://orga-pr123.review.pix.org) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-orga-review-pr123/environment) <!-- pix-orga-review -->
+- [ ] [Certif (.fr)](https://certif-pr123.review.pix.fr) – [Certif (.org)](https://certif-pr123.review.pix.org) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-certif-review-pr123/environment) <!-- pix-certif-review -->
+- [ ] [Junior](https://junior-pr123.review.pix.fr) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-junior-review-pr123/environment) <!-- pix-junior-review -->
+- [ ] [Admin](https://admin-pr123.review.pix.fr) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-admin-review-pr123/environment) <!-- pix-admin-review -->
+- [ ] [API MaDDo](https://pix-api-maddo-review-pr123.osc-fr1.scalingo.io/api/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-maddo-review-pr123/environment) <!-- pix-api-maddo-review -->
+- [ ] [Audit Logger](https://pix-audit-logger-review-pr123.osc-fr1.scalingo.io/api/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-audit-logger-review-pr123/environment) <!-- pix-audit-logger-review -->
 
 > [!IMPORTANT]
 > N'oubliez pas de déployer l'API pour pouvoir accéder aux fronts et/ou à l’API MaDDo.
-
-Une fois les applications déployées, elles seront accessibles via les liens suivants :
-
-- [App (.fr)](https://app-pr123.review.pix.fr)
-- [App (.org)](https://app-pr123.review.pix.org)
-- [Orga (.fr)](https://orga-pr123.review.pix.fr)
-- [Orga (.org)](https://orga-pr123.review.pix.org)
-- [Certif (.fr)](https://certif-pr123.review.pix.fr)
-- [Certif (.org)](https://certif-pr123.review.pix.org)
-- [Junior](https://junior-pr123.review.pix.fr)
-- [Admin](https://admin-pr123.review.pix.fr)
-- [API](https://api-pr123.review.pix.fr/api/)
-- [API MaDDo](https://pix-api-maddo-review-pr123.osc-fr1.scalingo.io/api/)
-- [Audit Logger](https://pix-audit-logger-review-pr123.osc-fr1.scalingo.io/api/)
-
-Les variables d'environnement seront accessibles via les liens suivants :
-
-- [scalingo front](https://dashboard.scalingo.com/apps/osc-fr1/pix-front-review-pr123/environment)
-- [scalingo api](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-review-pr123/environment)
-- [scalingo api-maddo](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-maddo-review-pr123/environment)
-- [scalingo audit-logger](https://dashboard.scalingo.com/apps/osc-fr1/pix-audit-logger-review-pr123/environment)
 `;
 
 import * as githubController from '../../../../build/controllers/github.js';
@@ -1211,17 +1194,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       // then
       expect(addMessageToHeraPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
-        reviewApps: [
-          { appName: 'pix-api-review', label: 'API' },
-          { appName: 'pix-front-review', label: 'Fronts', isHidden: true },
-          { appName: 'pix-app-review', label: 'App' },
-          { appName: 'pix-orga-review', label: 'Orga' },
-          { appName: 'pix-certif-review', label: 'Certif' },
-          { appName: 'pix-junior-review', label: 'Junior' },
-          { appName: 'pix-admin-review', label: 'Admin' },
-          { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-          { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-        ],
+        reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
         pullRequestNumber: 123,
       });
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
@@ -1246,12 +1219,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: [
-            { appName: 'pix-front-review', label: 'Fronts' },
-            { appName: 'pix-api-review', label: 'API' },
-            { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-            { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-          ],
+          reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
         },
         { githubService },
       );
@@ -1773,17 +1741,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
       // then
       expect(updateMessageToHeraPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
-        reviewApps: [
-          { appName: 'pix-api-review', label: 'API' },
-          { appName: 'pix-front-review', label: 'Fronts', isHidden: true },
-          { appName: 'pix-app-review', label: 'App' },
-          { appName: 'pix-orga-review', label: 'Orga' },
-          { appName: 'pix-certif-review', label: 'Certif' },
-          { appName: 'pix-junior-review', label: 'Junior' },
-          { appName: 'pix-admin-review', label: 'Admin' },
-          { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-          { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-        ],
+        reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
         pullRequestNumber: 123,
       });
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
@@ -1809,12 +1767,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: [
-            { appName: 'pix-front-review', label: 'Fronts' },
-            { appName: 'pix-api-review', label: 'API' },
-            { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-            { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-          ],
+          reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
         },
         { githubService },
       );
@@ -1845,12 +1798,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: [
-            { appName: 'pix-front-review', label: 'Fronts' },
-            { appName: 'pix-api-review', label: 'API' },
-            { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-            { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-          ],
+          reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
         },
         { githubService },
       );
