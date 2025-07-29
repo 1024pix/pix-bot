@@ -3,7 +3,7 @@ import commonGithubService from '../../common/services/github.js';
 import { logger } from '../../common/services/logger.js';
 
 export async function updateCheckRADeployment(
-  { repositoryName, pullRequestNumber },
+  { repositoryName, pullRequestNumber, sha },
   dependencies = { reviewAppRepo, githubService: commonGithubService },
 ) {
   const reviewApps = await dependencies.reviewAppRepo.listForPullRequest({
@@ -28,5 +28,6 @@ export async function updateCheckRADeployment(
     repository: repositoryName,
     prNumber: pullRequestNumber,
     status,
+    sha,
   });
 }

@@ -709,6 +709,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               name: 'pix',
               fork: false,
             },
+            sha: 'abc123',
           },
         },
       },
@@ -752,9 +753,12 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
           // then
           expect(response).to.equal('RA disabled for this PR');
-          expect(
-            githubServiceMock.addRADeploymentCheck.calledWith({ repository: 'pix', prNumber: 3, status: 'success' }),
-          ).to.be.true;
+          expect(githubServiceMock.addRADeploymentCheck).to.have.been.calledWith({
+            repository: 'pix',
+            prNumber: 3,
+            status: 'success',
+            sha: 'abc123',
+          });
         });
       });
 
@@ -947,6 +951,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
                 name: 'pix',
                 fork: false,
               },
+              sha: 'abc123',
             },
           },
         },
@@ -1008,6 +1013,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         expect(updateCheckRADeployment).to.have.been.calledWith({
           repositoryName: 'pix',
           pullRequestNumber: 3,
+          sha: 'abc123',
         });
       });
 
@@ -1043,6 +1049,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         expect(updateCheckRADeployment).to.have.been.calledWith({
           repositoryName: 'pix',
           pullRequestNumber: 3,
+          sha: 'abc123',
         });
       });
     });
@@ -1084,6 +1091,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         expect(updateCheckRADeployment).to.have.been.calledWith({
           repositoryName: 'pix',
           pullRequestNumber: 3,
+          sha: 'abc123',
         });
       });
 
@@ -1117,6 +1125,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           expect(updateCheckRADeployment).to.have.been.calledWith({
             repositoryName: 'pix',
             pullRequestNumber: 3,
+            sha: 'abc123',
           });
         });
       });
@@ -1179,6 +1188,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               repo: {
                 name: 'pix',
               },
+              sha: 'abc123',
             },
           },
         },
@@ -1201,6 +1211,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         repository: 'pix',
         prNumber: 123,
         status: 'success',
+        sha: 'abc123',
       });
     });
   });
@@ -1433,6 +1444,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
               fork: false,
             },
             ref: 'branche-a-deployer',
+            sha: 'abc123',
           },
           state: 'open',
           labels: [{ name: 'Hera' }],
@@ -1476,6 +1488,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         expect(updateCheckRADeployment).to.have.been.calledWithExactly({
           repositoryName: 'pix',
           pullRequestNumber: 123,
+          sha: 'abc123',
         });
         expect(result).equal(`Created review apps: pix-front-review-pr123
 Removed review apps: pix-api-maddo-review-pr123`);
@@ -1662,6 +1675,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
               repo: {
                 name: 'pix',
               },
+              sha: 'abc123',
             },
           },
         },
@@ -1711,6 +1725,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
       expect(updateCheckRADeployment).to.have.been.calledOnceWithExactly({
         repositoryName: 'pix',
         pullRequestNumber: 123,
+        sha: 'abc123',
       });
     });
   });
@@ -1726,6 +1741,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
               repo: {
                 name: 'pix',
               },
+              sha: 'abc123',
             },
           },
         },
@@ -1748,6 +1764,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         repository: 'pix',
         prNumber: 123,
         status: 'success',
+        sha: 'abc123',
       });
     });
   });

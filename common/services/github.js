@@ -359,14 +359,16 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
   return pullRequestsForCommitShaFilteredDetails;
 }
 
-async function createCommitStatus({ context, repo, pull_number, description, state, target_url }) {
+async function createCommitStatus({ context, repo, pull_number, description, state, target_url, sha }) {
   const owner = '1024pix';
   const octokit = _createOctokit();
 
-  let response = await octokit.pulls.get({ owner, repo, pull_number });
-  const sha = response.data.head.sha;
+  if (!sha) {
+    const pullRequest = await octokit.pulls.get({ owner, repo, pull_number });
+    sha = pullRequest.data.head.sha;
+  }
 
-  response = await octokit.repos.createCommitStatus({
+  const response = await octokit.repos.createCommitStatus({
     owner,
     context,
     description,
@@ -384,6 +386,13 @@ async function createCommitStatus({ context, repo, pull_number, description, sta
 
 async function setMergeQueueStatus({ repositoryFullName, prNumber, status, description }) {
   const repository = repositoryFullName.split('/')[1];
+  const owner = '1024pix';
+
+  const octokit = _createOctokit();
+
+  const response = await octokit.pulls.get({ owner, repo: repository, pull_number: prNumber });
+  const sha = response.data.head.sha;
+
   return createCommitStatus({
     context: 'merge-queue-status',
     repo: repository,
@@ -391,15 +400,17 @@ async function setMergeQueueStatus({ repositoryFullName, prNumber, status, descr
     state: status,
     description,
     target_url: 'https://github.com/1024pix/pix-actions/actions/workflows/auto-merge-dispatch.yml',
+    sha,
   });
 }
 
-async function addRADeploymentCheck({ repository, prNumber, status }) {
+async function addRADeploymentCheck({ repository, prNumber, status, sha }) {
   return createCommitStatus({
     context: 'check-ra-deployment',
     repo: repository,
     pull_number: prNumber,
     state: status,
+    sha,
   });
 }
 

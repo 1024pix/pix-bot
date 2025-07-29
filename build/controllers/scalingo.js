@@ -74,7 +74,7 @@ const scalingo = {
     const event = 'review-app-deploy';
     const appName = request.payload.app_name;
     const type = request.payload.type;
-    const { status, deployment_type: deploymentType } = request.payload.type_data;
+    const { status, deployment_type: deploymentType, git_ref: sha } = request.payload.type_data;
 
     logger.info({
       event,
@@ -111,7 +111,7 @@ const scalingo = {
         message: `Changing check-ra-deployment status to failure`,
         data: { repository, prNumber },
       });
-      await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber });
+      await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber, sha });
       return h.response().code(200);
     }
 
@@ -124,7 +124,7 @@ const scalingo = {
 
     const { repository, prNumber } = reviewApp;
 
-    await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber });
+    await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber, sha });
 
     return h.response().code(200);
   },
