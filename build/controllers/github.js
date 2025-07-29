@@ -200,6 +200,7 @@ async function _handleRA(
   }
 
   const prId = payload.number;
+  const action = payload.action;
   const ref = payload.pull_request.head.ref;
   const repository = payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
@@ -211,6 +212,7 @@ async function _handleRA(
     ref,
     repository,
     addMessageToPullRequest,
+    action,
     githubService,
     reviewAppRepository,
   );
@@ -287,6 +289,7 @@ async function deployPullRequest(
   ref,
   repository,
   addMessageToPullRequest,
+  action,
   githubService,
   reviewAppRepository,
 ) {
@@ -333,14 +336,16 @@ async function deployPullRequest(
   await githubService.addRADeploymentCheck({ repository, prNumber: prId, status: 'pending' });
 
   if (deployedRA.some(({ isCreated }) => isCreated)) {
-    await addMessageToPullRequest(
-      {
-        repositoryName: repository,
-        scalingoReviewApps: reviewApps,
-        pullRequestId: prId,
-      },
-      { githubService },
-    );
+    if (action !== 'reopened') {
+      await addMessageToPullRequest(
+        {
+          repositoryName: repository,
+          scalingoReviewApps: reviewApps,
+          pullRequestId: prId,
+        },
+        { githubService },
+      );
+    }
 
     logger.info({
       event: 'review-app',
