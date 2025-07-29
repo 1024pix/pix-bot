@@ -1,5 +1,13 @@
 # pix-bot Changelog
 
+## v1.134.0 (29/07/2025)
+
+
+### :rocket: Amélioration
+- [#614](https://github.com/1024pix/pix-bot/pull/614) [FEATURE] Générer les liens d’applis et de dashboards dans le commentaire Hera.
+- [#613](https://github.com/1024pix/pix-bot/pull/613) [FEATURE] Séparer les déploiements des fronts Pix.
+- [#604](https://github.com/1024pix/pix-bot/pull/604) [FEATURE] Générer les checkbox de déploiement des RA.
+
 ## v1.133.2 (28/07/2025)
 
 
