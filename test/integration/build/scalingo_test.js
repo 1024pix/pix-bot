@@ -296,14 +296,11 @@ describe('Integration | Build | Scalingo', function () {
           type_data: {
             status: 'success',
             deployment_type: 'deployment',
+            git_ref: 'abc123',
           },
           app_name: appName,
           type: 'deployment',
         };
-        const getPullRequestNock = nock('https://api.github.com')
-          .get(`/repos/1024pix/pix/pulls/123`)
-          .reply(200, { head: { sha: 'abc123' } });
-
         const addRADeploymentCheckNock = nock('https://api.github.com')
           .post(`/repos/1024pix/pix/statuses/abc123`, {
             context: 'check-ra-deployment',
@@ -322,7 +319,6 @@ describe('Integration | Build | Scalingo', function () {
         expect(response.statusCode).to.equal(200);
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
         expect(reviewApp.status).to.equal('success');
-        expect(getPullRequestNock.isDone()).to.be.true;
         expect(addRADeploymentCheckNock.isDone()).to.be.true;
       });
 
@@ -350,10 +346,6 @@ describe('Integration | Build | Scalingo', function () {
 
           const sha = 'a-commit-sha';
 
-          const getPullRequestNock = nock('https://api.github.com')
-            .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
-            .reply(200, { head: { sha } });
-
           const addRADeploymentCheckNock = nock('https://api.github.com')
             .post(`/repos/1024pix/${repository}/statuses/${sha}`, {
               context: 'check-ra-deployment',
@@ -365,6 +357,7 @@ describe('Integration | Build | Scalingo', function () {
             type_data: {
               status: 'success',
               deployment_type: 'deployment',
+              git_ref: sha,
             },
             app_name: appName,
             type: 'deployment',
@@ -379,7 +372,6 @@ describe('Integration | Build | Scalingo', function () {
 
           // then
           expect(response.statusCode).to.equal(200);
-          expect(getPullRequestNock.isDone()).to.be.true;
           expect(addRADeploymentCheckNock.isDone()).to.be.true;
         });
       });
@@ -405,9 +397,6 @@ describe('Integration | Build | Scalingo', function () {
         });
 
         const sha = 'a-commit-sha';
-        const getPullRequestNock = nock('https://api.github.com')
-          .get(`/repos/1024pix/${repository}/pulls/${prNumber}`)
-          .reply(200, { head: { sha } });
 
         const addRADeploymentCheckNock = nock('https://api.github.com')
           .post(`/repos/1024pix/${repository}/statuses/${sha}`, {
@@ -420,6 +409,7 @@ describe('Integration | Build | Scalingo', function () {
           type_data: {
             status: 'build-error',
             deployment_type: 'deployment',
+            git_ref: sha,
           },
           app_name: appName,
           type: 'deployment',
@@ -436,7 +426,6 @@ describe('Integration | Build | Scalingo', function () {
         expect(response.statusCode).to.equal(200);
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
         expect(reviewApp.status).to.equal('failure');
-        expect(getPullRequestNock.isDone()).to.be.true;
         expect(addRADeploymentCheckNock.isDone()).to.be.true;
       });
     });

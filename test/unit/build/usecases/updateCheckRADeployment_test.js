@@ -7,6 +7,7 @@ describe('Unit | Usecases | #updateCheckRADeployment', function () {
       // given
       const repositoryName = 'pix';
       const pullRequestNumber = 123;
+      const sha = 'abc123';
       const reviewAppRepo = {
         listForPullRequest: sinon
           .stub()
@@ -17,13 +18,14 @@ describe('Unit | Usecases | #updateCheckRADeployment', function () {
       };
 
       // when
-      await updateCheckRADeployment({ repositoryName, pullRequestNumber }, { reviewAppRepo, githubService });
+      await updateCheckRADeployment({ repositoryName, pullRequestNumber, sha }, { reviewAppRepo, githubService });
 
       // then
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
         repository: repositoryName,
         prNumber: pullRequestNumber,
         status: 'failure',
+        sha,
       });
     });
   });
@@ -33,6 +35,7 @@ describe('Unit | Usecases | #updateCheckRADeployment', function () {
       // given
       const repositoryName = 'pix';
       const pullRequestNumber = 123;
+      const sha = 'abc123';
       const reviewAppRepo = {
         listForPullRequest: sinon
           .stub()
@@ -43,13 +46,14 @@ describe('Unit | Usecases | #updateCheckRADeployment', function () {
       };
 
       // when
-      await updateCheckRADeployment({ repositoryName, pullRequestNumber }, { reviewAppRepo, githubService });
+      await updateCheckRADeployment({ repositoryName, pullRequestNumber, sha }, { reviewAppRepo, githubService });
 
       // then
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
         repository: repositoryName,
         prNumber: pullRequestNumber,
         status: 'pending',
+        sha,
       });
     });
   });
@@ -59,6 +63,7 @@ describe('Unit | Usecases | #updateCheckRADeployment', function () {
       // given
       const repositoryName = 'pix';
       const pullRequestNumber = 123;
+      const sha = 'abc123';
       const reviewAppRepo = {
         listForPullRequest: sinon
           .stub()
@@ -69,13 +74,14 @@ describe('Unit | Usecases | #updateCheckRADeployment', function () {
       };
 
       // when
-      await updateCheckRADeployment({ repositoryName, pullRequestNumber }, { reviewAppRepo, githubService });
+      await updateCheckRADeployment({ repositoryName, pullRequestNumber, sha }, { reviewAppRepo, githubService });
 
       // then
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
         repository: repositoryName,
         prNumber: pullRequestNumber,
         status: 'success',
+        sha,
       });
     });
   });

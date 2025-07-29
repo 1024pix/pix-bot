@@ -231,6 +231,8 @@ async function _handleCloseRA(
   const payload = request.payload;
   const prNumber = payload.number;
   const repository = payload.pull_request.head.repo.name;
+  const sha = payload.pull_request.head.sha;
+
   const reviewApps = isHera(payload.pull_request)
     ? repositoryToScalingoAppsReviewHera[repository]
     : repositoryToScalingoAppsReview[repository];
@@ -274,7 +276,7 @@ async function _handleCloseRA(
     }
   }
 
-  await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber });
+  await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber, sha });
 
   const result = closedRA.map((ra) =>
     ra.isAlreadyClosed ? `${ra.name}-pr${prNumber} (already closed)` : `${ra.name}-pr${prNumber}`,
@@ -511,6 +513,7 @@ async function _handleNoRACase(request, githubService) {
   const labelsList = payload.pull_request.labels;
   const state = payload.pull_request.state;
   const prNumber = payload.number;
+  const sha = payload.pull_request.head.sha;
 
   if (isFork) {
     return { message: 'No RA for a fork', shouldContinue: false };
@@ -523,7 +526,7 @@ async function _handleNoRACase(request, githubService) {
       event: 'review-app',
       message: `Changing check-ra-deployment status to success (no-review-app)`,
     });
-    await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success' });
+    await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success', sha });
     return { message: 'RA disabled for this PR', shouldContinue: false };
   }
   if (state !== 'open') {
@@ -563,6 +566,8 @@ async function handleHeraPullRequestOpened(
 ) {
   const pullRequestNumber = request.payload.number;
   const repository = request.payload.pull_request.head.repo.name;
+  const sha = request.payload.pull_request.head.sha;
+
   const reviewApps = repositoryToScalingoAppsReviewHera[repository];
 
   await dependencies.addMessageToHeraPullRequest({
@@ -575,6 +580,7 @@ async function handleHeraPullRequestOpened(
     repository,
     prNumber: pullRequestNumber,
     status: 'success',
+    sha,
   });
 
   logger.info({
@@ -595,6 +601,8 @@ async function handleHeraPullRequestSynchronize(
   const ref = request.payload.pull_request.head.ref;
   const pullRequestNumber = request.payload.number;
   const repository = request.payload.pull_request.head.repo.name;
+  const sha = request.payload.pull_request.head.sha;
+
   const client = await dependencies.scalingoClient.getInstance('reviewApps');
 
   const existingApps = await dependencies.reviewAppRepo.listForPullRequest({
@@ -607,7 +615,7 @@ async function handleHeraPullRequestSynchronize(
     await client.deployUsingSCM(app.name, ref);
   }
 
-  await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber });
+  await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber, sha });
 
   logger.info({
     event: 'review-app',
@@ -623,6 +631,8 @@ async function handleHeraPullRequestReopened(
 ) {
   const pullRequestNumber = request.payload.number;
   const repositoryName = request.payload.pull_request.head.repo.name;
+  const sha = request.payload.pull_request.head.sha;
+
   const reviewApps = repositoryToScalingoAppsReviewHera[repositoryName];
 
   await dependencies.updateMessageToHeraPullRequest({
@@ -635,6 +645,7 @@ async function handleHeraPullRequestReopened(
     repository: repositoryName,
     prNumber: pullRequestNumber,
     status: 'success',
+    sha,
   });
 
   logger.info({
@@ -688,6 +699,8 @@ async function _handleIssueComment(
   dependencies = { reviewAppRepo, createReviewApp, removeReviewApp, updateCheckRADeployment },
 ) {
   const repositoryName = pullRequest.head.repo.name;
+  const sha = pullRequest.head.sha;
+
   const reviewAppNames = repositoryToScalingoAppsReviewHera[repositoryName]?.map(({ appName }) => appName);
 
   const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, reviewAppNames);
@@ -743,7 +756,7 @@ async function _handleIssueComment(
   if (!messages.length) {
     return 'Nothing to do';
   }
-  await dependencies.updateCheckRADeployment({ repositoryName, pullRequestNumber });
+  await dependencies.updateCheckRADeployment({ repositoryName, pullRequestNumber, sha });
   return messages.join('\n');
 }
 
