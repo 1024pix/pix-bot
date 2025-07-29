@@ -1213,9 +1213,14 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         repositoryName: 'pix',
         reviewApps: [
           { appName: 'pix-api-review', label: 'API' },
+          { appName: 'pix-front-review', label: 'Fronts', isHidden: true },
+          { appName: 'pix-app-review', label: 'App' },
+          { appName: 'pix-orga-review', label: 'Orga' },
+          { appName: 'pix-certif-review', label: 'Certif' },
+          { appName: 'pix-junior-review', label: 'Junior' },
+          { appName: 'pix-admin-review', label: 'Admin' },
           { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
           { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-          { appName: 'pix-front-review', label: 'Fronts' },
         ],
         pullRequestNumber: 123,
       });
@@ -1770,9 +1775,14 @@ Removed review apps: pix-api-maddo-review-pr123`);
         repositoryName: 'pix',
         reviewApps: [
           { appName: 'pix-api-review', label: 'API' },
+          { appName: 'pix-front-review', label: 'Fronts', isHidden: true },
+          { appName: 'pix-app-review', label: 'App' },
+          { appName: 'pix-orga-review', label: 'Orga' },
+          { appName: 'pix-certif-review', label: 'Certif' },
+          { appName: 'pix-junior-review', label: 'Junior' },
+          { appName: 'pix-admin-review', label: 'Admin' },
           { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
           { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-          { appName: 'pix-front-review', label: 'Fronts' },
         ],
         pullRequestNumber: 123,
       });
