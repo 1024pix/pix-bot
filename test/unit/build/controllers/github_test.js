@@ -81,34 +81,6 @@ describe('Unit | Controller | Github', function () {
     });
   });
 
-  describe('#addMessageToPullRequest', function () {
-    it('should call gitHubService.commentPullRequest', async function () {
-      // given
-      const data = {
-        repositoryName: 'pix-bot',
-        pullRequestId: 25,
-        scalingoReviewApps: [{ appName: 'pix-bot-review' }],
-      };
-      const githubService = {
-        commentPullRequest: sinon.stub(),
-      };
-
-      // when
-      await githubController.addMessageToPullRequest(data, { githubService });
-
-      // then
-      const comment = `Une fois l'application déployée, elle sera accessible à cette adresse https://bot-pr25.review.pix.fr
-Les variables d'environnement seront accessibles sur scalingo https://dashboard.scalingo.com/apps/osc-fr1/pix-bot-review-pr25/environment
-`;
-
-      expect(githubService.commentPullRequest).to.have.been.calledOnceWithExactly({
-        repositoryName: 'pix-bot',
-        pullRequestId: 25,
-        comment,
-      });
-    });
-  });
-
   describe('#processWebhook', function () {
     describe('when pix-bot env is not defined', function () {
       describe('when pull-request has a pix-bot env label', function () {
@@ -120,7 +92,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
             payload: {
               pull_request: {
-                labels: [{ name: 'pix-bot-dummy' }, { name: 'Hera' }],
+                labels: [{ name: 'pix-bot-dummy' }],
               },
             },
           };
@@ -143,7 +115,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             payload: {
               action: 'nothing',
               pull_request: {
-                labels: [{ name: 'Hera' }],
+                labels: [],
               },
             },
           };
@@ -167,7 +139,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
             payload: {
               pull_request: {
-                labels: [{ name: 'pix-bot-review' }, { name: 'Hera' }],
+                labels: [{ name: 'pix-bot-review' }],
               },
             },
           };
@@ -191,7 +163,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             payload: {
               action: 'nothing',
               pull_request: {
-                labels: [{ name: 'Hera' }, { name: 'pix-bot-integration' }],
+                labels: [{ name: 'pix-bot-integration' }],
               },
             },
           };
@@ -252,17 +224,17 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
         };
 
         ['opened', 'reopened', 'synchronize'].forEach((action) => {
-          it(`should call handleRA() method on ${action} action`, async function () {
+          it(`should call handlePullRequest() method on ${action} action`, async function () {
             // given
             sinon.stub(request, 'payload').value({ action });
 
-            const handleRA = sinon.stub();
+            const handlePullRequest = sinon.stub();
 
             // when
-            await githubController.processWebhook(request, { handleRA });
+            await githubController.processWebhook(request, { handlePullRequest });
 
             // then
-            expect(handleRA.calledOnceWithExactly(request)).to.be.true;
+            expect(handlePullRequest.calledOnceWithExactly(request)).to.be.true;
           });
         });
 
@@ -696,245 +668,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
     });
   });
 
-  describe('#handleRA', function () {
-    const request = {
-      payload: {
-        number: 3,
-        pull_request: {
-          state: 'open',
-          labels: [],
-          head: {
-            ref: 'my-branch',
-            repo: {
-              name: 'pix',
-              fork: false,
-            },
-            sha: 'abc123',
-          },
-        },
-      },
-    };
-
-    describe('when the Review App creation conditions are not met', function () {
-      describe('when the project is a fork', function () {
-        it('should not create a Review App', async function () {
-          // given
-          sinon.stub(request.payload.pull_request.head.repo, 'fork').value(true);
-
-          // when
-          const response = await githubController.handleRA(request);
-
-          // then
-          expect(response).to.equal('No RA for a fork');
-        });
-      });
-
-      describe('when there is no RA configured for this repository', function () {
-        it('should not create a Review App', async function () {
-          // given
-          sinon.stub(request.payload.pull_request.head.repo, 'name').value('no-ra-app-repo-name');
-
-          // when
-          const response = await githubController.handleRA(request);
-
-          // then
-          expect(response).to.equal('No RA configured for this repository');
-        });
-      });
-
-      describe('when there is a no-review-app label on the PR', function () {
-        it('should not create a Review App and update check-ra-deployment check', async function () {
-          // given
-          sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'no-review-app' }]);
-          const githubServiceMock = { addRADeploymentCheck: sinon.stub() };
-
-          // when
-          const response = await githubController.handleRA(request, null, null, githubServiceMock);
-
-          // then
-          expect(response).to.equal('RA disabled for this PR');
-          expect(githubServiceMock.addRADeploymentCheck).to.have.been.calledWith({
-            repository: 'pix',
-            prNumber: 3,
-            status: 'success',
-            sha: 'abc123',
-          });
-        });
-      });
-
-      describe('when the PR is not opened', function () {
-        it('should not create a Review App', async function () {
-          // given
-          sinon.stub(request.payload.pull_request, 'state').value('closed');
-          // when
-          const response = await githubController.handleRA(request);
-
-          // then
-          expect(response).to.equal('No RA for closed PR');
-        });
-      });
-
-      describe('when the PR is labeled Hera', function () {
-        it('delegates handling RA to Hera', async function () {
-          // given
-          sinon.stub(request.payload.pull_request, 'labels').value([{ name: 'Hera' }]);
-          const handleHeraPullRequest = sinon.stub().resolves('Handled by Hera');
-
-          // when
-          const response = await githubController.handleRA(
-            request,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            handleHeraPullRequest,
-          );
-
-          // then
-          expect(response).to.equal('Handled by Hera');
-          expect(handleHeraPullRequest).to.have.been.calledWithExactly(request);
-        });
-      });
-    });
-
-    describe('when the Review App creation conditions are met', function () {
-      it('should call scalingo to deploy the corresponding applications', async function () {
-        // given
-        const scalingoClientStub = sinon.stub();
-        const deployUsingSCMStub = sinon.stub();
-        const deployReviewAppStub = sinon.stub();
-        const disableAutoDeployStub = sinon.stub();
-        const reviewAppExistsStub = sinon.stub().resolves(false);
-        const reviewAppRepositoryStub = {
-          create: sinon.stub(),
-        };
-        scalingoClientStub.getInstance = sinon.stub().returns({
-          deployUsingSCM: deployUsingSCMStub,
-          deployReviewApp: deployReviewAppStub,
-          disableAutoDeploy: disableAutoDeployStub,
-          reviewAppExists: reviewAppExistsStub,
-        });
-
-        const addMessageToPullRequestStub = sinon.stub();
-        const githubServiceStub = {
-          addRADeploymentCheck: sinon.stub(),
-        };
-
-        // when
-        await githubController.handleRA(
-          request,
-          scalingoClientStub,
-          addMessageToPullRequestStub,
-          githubServiceStub,
-          reviewAppRepositoryStub,
-        );
-
-        // then
-        expect(deployReviewAppStub.getCall(1).calledWith('pix-api-maddo-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.getCall(1).calledWith('pix-api-maddo-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.getCall(1).calledWith('pix-api-maddo-review-pr3', 'my-branch')).to.be.true;
-
-        expect(deployReviewAppStub.getCall(2).calledWith('pix-audit-logger-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.getCall(2).calledWith('pix-audit-logger-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.getCall(2).calledWith('pix-audit-logger-review-pr3', 'my-branch')).to.be.true;
-
-        expect(deployReviewAppStub.getCall(3).calledWith('pix-front-review', 3)).to.be.true;
-        expect(disableAutoDeployStub.getCall(3).calledWith('pix-front-review-pr3')).to.be.true;
-        expect(deployUsingSCMStub.getCall(3).calledWith('pix-front-review-pr3', 'my-branch')).to.be.true;
-
-        expect(addMessageToPullRequestStub).to.have.been.calledOnceWithExactly(
-          {
-            repositoryName: 'pix',
-            scalingoReviewApps: [
-              { appName: 'pix-api-review', label: 'API' },
-              { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-              { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-              { appName: 'pix-front-review', label: 'Fronts' },
-            ],
-            pullRequestId: 3,
-          },
-          { githubService: githubServiceStub },
-        );
-        expect(githubServiceStub.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
-          repository: 'pix',
-          prNumber: 3,
-          status: 'pending',
-        });
-      });
-
-      describe('when the review app does not exist', function () {
-        it('should call scalingo to create and deploy the corresponding applications', async function () {
-          // given
-          const scalingoClientStub = sinon.stub();
-          const deployUsingSCMStub = sinon.stub();
-          const reviewAppExistsStub = sinon.stub().resolves(true);
-          reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(false);
-          const deployReviewAppStub = sinon.stub();
-          const disableAutoDeployStub = sinon.stub();
-          const addMessageToPullRequestStub = sinon.stub();
-          const githubServiceStub = {
-            addRADeploymentCheck: sinon.stub(),
-          };
-          const reviewAppRepositoryStub = {
-            create: sinon.stub(),
-            setStatus: sinon.stub(),
-          };
-
-          scalingoClientStub.getInstance = sinon.stub().returns({
-            deployUsingSCM: deployUsingSCMStub,
-            reviewAppExists: reviewAppExistsStub,
-            deployReviewApp: deployReviewAppStub,
-            disableAutoDeploy: disableAutoDeployStub,
-          });
-
-          // when
-          const response = await githubController.handleRA(
-            request,
-            scalingoClientStub,
-            addMessageToPullRequestStub,
-            githubServiceStub,
-            reviewAppRepositoryStub,
-          );
-
-          // then
-          expect(deployReviewAppStub).to.have.been.calledOnceWithExactly('pix-api-review', 3);
-          expect(disableAutoDeployStub).to.have.been.calledOnceWithExactly('pix-api-review-pr3');
-          expect(reviewAppRepositoryStub.create).to.have.been.calledOnceWithExactly({
-            name: 'pix-api-review-pr3',
-            repository: 'pix',
-            prNumber: 3,
-            parentApp: 'pix-api-review',
-          });
-
-          expect(reviewAppRepositoryStub.setStatus.getCall(0)).to.have.been.calledWithExactly({
-            name: 'pix-api-maddo-review-pr3',
-            status: 'pending',
-          });
-          expect(reviewAppRepositoryStub.setStatus.getCall(1)).to.have.been.calledWithExactly({
-            name: 'pix-audit-logger-review-pr3',
-            status: 'pending',
-          });
-          expect(reviewAppRepositoryStub.setStatus.getCall(2)).to.have.been.calledWithExactly({
-            name: 'pix-front-review-pr3',
-            status: 'pending',
-          });
-
-          expect(deployUsingSCMStub.getCall(0)).to.have.been.calledWithExactly('pix-api-review-pr3', 'my-branch');
-          expect(deployUsingSCMStub.getCall(1)).to.have.been.calledWithExactly('pix-api-maddo-review-pr3', 'my-branch');
-          expect(deployUsingSCMStub.getCall(2)).to.have.been.calledWithExactly(
-            'pix-audit-logger-review-pr3',
-            'my-branch',
-          );
-          expect(deployUsingSCMStub.getCall(3)).to.have.been.calledWithExactly('pix-front-review-pr3', 'my-branch');
-
-          expect(response).to.equal(
-            'Triggered deployment of RA on app pix-api-review, pix-api-maddo-review, pix-audit-logger-review, pix-front-review with pr 3',
-          );
-        });
-      });
-    });
-  });
-
   describe('#handleCloseRA', function () {
     let request;
 
@@ -1008,7 +741,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         // then
         expect(response).to.equal(
-          'Closed RA for PR 3 : pix-api-review-pr3, pix-api-maddo-review-pr3 (already closed), pix-audit-logger-review-pr3 (already closed), pix-front-review-pr3.',
+          'Closed RA for PR 3 : pix-api-review-pr3, pix-front-review-pr3, pix-app-review-pr3 (already closed), pix-orga-review-pr3 (already closed), pix-certif-review-pr3 (already closed), pix-junior-review-pr3 (already closed), pix-admin-review-pr3 (already closed), pix-api-maddo-review-pr3 (already closed), pix-audit-logger-review-pr3 (already closed).',
         );
         expect(updateCheckRADeployment).to.have.been.calledWith({
           repositoryName: 'pix',
@@ -1132,52 +865,101 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
     });
   });
 
-  describe('#handleHeraPullRequest', function () {
-    describe('when action is opened', function () {
-      it('calls handleHeraPullRequestOpened', async function () {
-        // given
-        const handleHeraPullRequestOpened = sinon.stub().resolves('handleHeraPullRequestOpened');
-        const request = { payload: { action: 'opened' } };
+  describe('#handlePullRequest', function () {
+    describe('when conditions are not met', function () {
+      describe('when the project is a fork', function () {
+        it('should do nothing', async function () {
+          // given
+          const request = { payload: { pull_request: { head: { repo: { fork: true } } } } };
 
-        // when
-        const result = await githubController.handleHeraPullRequest(request, { handleHeraPullRequestOpened });
+          // when
+          const result = await githubController.handlePullRequest(request);
 
-        // then
-        expect(result).to.equal('handleHeraPullRequestOpened');
-        expect(handleHeraPullRequestOpened).to.have.been.calledWithExactly(request);
+          // then
+          expect(result).to.equal('No RA for a fork');
+        });
+      });
+
+      describe('when there is no RA configured for this repository', function () {
+        it('should do nothing', async function () {
+          // given
+          const request = { payload: { pull_request: { head: { repo: { name: 'no-ra-app-repo-name' } } } } };
+
+          // when
+          const result = await githubController.handlePullRequest(request);
+
+          // then
+          expect(result).to.equal('No RA configured for this repository');
+        });
+      });
+
+      describe('when the PR is not opened', function () {
+        it('should do nothing', async function () {
+          // given
+          const request = { payload: { pull_request: { state: 'closed', head: { repo: { name: 'pix' } } } } };
+
+          // when
+          const result = await githubController.handlePullRequest(request);
+
+          // then
+          expect(result).to.equal('No RA for closed PR');
+        });
       });
     });
 
-    describe('when action is synchronize', function () {
-      it('calls handleHeraPullRequestSynchronize', async function () {
-        // given
-        const handleHeraPullRequestSynchronize = sinon.stub().resolves('handleHeraSynchronize');
-        const request = { payload: { action: 'synchronize' } };
+    describe('when conditions are met', function () {
+      describe('when action is opened', function () {
+        it('calls handlePullRequestOpened', async function () {
+          // given
+          const handlePullRequestOpened = sinon.stub().resolves('handlePullRequestOpened');
+          const request = {
+            payload: { action: 'opened', pull_request: { state: 'open', head: { repo: { name: 'pix' } } } },
+          };
 
-        // when
-        const result = await githubController.handleHeraPullRequest(request, { handleHeraPullRequestSynchronize });
+          // when
+          const result = await githubController.handlePullRequest(request, { handlePullRequestOpened });
 
-        // then
-        expect(result).to.equal('handleHeraSynchronize');
-        expect(handleHeraPullRequestSynchronize).to.have.been.calledWithExactly(request);
+          // then
+          expect(result).to.equal('handlePullRequestOpened');
+          expect(handlePullRequestOpened).to.have.been.calledWithExactly(request);
+        });
       });
-    });
 
-    describe('when action is not handled for Hera Pull Request', function () {
-      it('does nothing and returns message', async function () {
-        // given
-        const request = { payload: { action: 'unhandled' } };
+      describe('when action is synchronize', function () {
+        it('calls handlePullRequestSynchronize', async function () {
+          // given
+          const handlePullRequestSynchronize = sinon.stub().resolves('handleHeraSynchronize');
+          const request = {
+            payload: { action: 'synchronize', pull_request: { state: 'open', head: { repo: { name: 'pix' } } } },
+          };
 
-        // when
-        const result = await githubController.handleHeraPullRequest(request);
+          // when
+          const result = await githubController.handlePullRequest(request, { handlePullRequestSynchronize });
 
-        // then
-        expect(result).to.equal('Action unhandled not handled for Hera pull request');
+          // then
+          expect(result).to.equal('handleHeraSynchronize');
+          expect(handlePullRequestSynchronize).to.have.been.calledWithExactly(request);
+        });
+      });
+
+      describe('when action is not handled', function () {
+        it('does nothing and returns message', async function () {
+          // given
+          const request = {
+            payload: { action: 'unhandled', pull_request: { state: 'open', head: { repo: { name: 'pix' } } } },
+          };
+
+          // when
+          const result = await githubController.handlePullRequest(request);
+
+          // then
+          expect(result).to.equal('Action unhandled not handled');
+        });
       });
     });
   });
 
-  describe('#handleHeraPullRequestOpened', function () {
+  describe('#handlePullRequestOpened', function () {
     it('adds a message on the pull request', async function () {
       // given
       const request = {
@@ -1193,18 +975,18 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
           },
         },
       };
-      const addMessageToHeraPullRequest = sinon.stub().resolves();
+      const addMessageToPullRequest = sinon.stub().resolves();
       const githubService = {
         addRADeploymentCheck: sinon.stub().resolves(),
       };
 
       // when
-      await githubController.handleHeraPullRequestOpened(request, { addMessageToHeraPullRequest, githubService });
+      await githubController.handlePullRequestOpened(request, { addMessageToPullRequest, githubService });
 
       // then
-      expect(addMessageToHeraPullRequest).to.have.been.calledWithExactly({
+      expect(addMessageToPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
-        reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
+        reviewApps: githubController.repositoryToScalingoAppsReview.pix,
         pullRequestNumber: 123,
       });
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
@@ -1216,7 +998,7 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
     });
   });
 
-  describe('#addMessageToHeraPullRequest', function () {
+  describe('#addMessageToPullRequest', function () {
     it('calls github API to comment pull request', async function () {
       // given
       const repositoryName = 'pix';
@@ -1226,11 +1008,11 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
       };
 
       // when
-      await githubController.addMessageToHeraPullRequest(
+      await githubController.addMessageToPullRequest(
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
         },
         { githubService },
       );
@@ -1255,7 +1037,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
           },
           state: 'open',
-          labels: [{ name: 'Hera' }],
         };
 
         const request = {
@@ -1290,7 +1071,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
           },
           state: 'open',
-          labels: [{ name: 'Hera' }],
         };
 
         const request = {
@@ -1325,7 +1105,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
           },
           state: 'open',
-          labels: [{ name: 'Hera' }],
         };
 
         const request = {
@@ -1360,7 +1139,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             },
           },
           state: 'closed',
-          labels: [{ name: 'Hera' }],
         };
 
         const request = {
@@ -1382,41 +1160,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
 
         const result = await githubController.handleIssueComment({ request, pullRequest });
         expect(result).equal(`No RA for closed PR`);
-      });
-    });
-
-    describe('when the pull request has no Hera label', function () {
-      it('should return appropriate message', async function () {
-        const pullRequest = {
-          head: {
-            repo: {
-              name: 'pix',
-              fork: false,
-            },
-          },
-          state: 'open',
-          labels: [],
-        };
-
-        const request = {
-          payload: {
-            repository: {
-              full_name: '@1024pix/pix',
-            },
-            issue: {
-              pull_request: {},
-              number: 123,
-            },
-            comment: {
-              user: {
-                login: 'pix-bot-github',
-              },
-            },
-          },
-        };
-
-        const result = await githubController.handleIssueComment({ request, pullRequest });
-        expect(result).equal(`issue_comment events only handled for Hera pull requests`);
       });
     });
 
@@ -1447,7 +1190,6 @@ Les variables d'environnement seront accessibles sur scalingo https://dashboard.
             sha: 'abc123',
           },
           state: 'open',
-          labels: [{ name: 'Hera' }],
         };
 
         const request = {
@@ -1518,7 +1260,6 @@ Removed review apps: pix-api-maddo-review-pr123`);
             },
           },
           state: 'open',
-          labels: [{ name: 'Hera' }],
         };
 
         const request = {
@@ -1663,7 +1404,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
     });
   });
 
-  describe('#handleHeraPullRequestSynchronize', function () {
+  describe('#handlePullRequestSynchronize', function () {
     it('triggers manual deployments for existing apps', async function () {
       // given
       const request = {
@@ -1695,7 +1436,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
       const updateCheckRADeployment = sinon.stub().resolves();
 
       // when
-      const result = await githubController.handleHeraPullRequestSynchronize(request, {
+      const result = await githubController.handlePullRequestSynchronize(request, {
         reviewAppRepo,
         scalingoClient,
         updateCheckRADeployment,
@@ -1730,7 +1471,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
     });
   });
 
-  describe('#handleHeraPullRequestReopened', function () {
+  describe('#handlePullRequestReopened', function () {
     it('edits the deployment message on the pull request', async function () {
       // given
       const request = {
@@ -1746,18 +1487,18 @@ Removed review apps: pix-api-maddo-review-pr123`);
           },
         },
       };
-      const updateMessageToHeraPullRequest = sinon.stub().resolves();
+      const updateMessageToPullRequest = sinon.stub().resolves();
       const githubService = {
         addRADeploymentCheck: sinon.stub().resolves(),
       };
 
       // when
-      await githubController.handleHeraPullRequestReopened(request, { updateMessageToHeraPullRequest, githubService });
+      await githubController.handlePullRequestReopened(request, { updateMessageToPullRequest, githubService });
 
       // then
-      expect(updateMessageToHeraPullRequest).to.have.been.calledWithExactly({
+      expect(updateMessageToPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
-        reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
+        reviewApps: githubController.repositoryToScalingoAppsReview.pix,
         pullRequestNumber: 123,
       });
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
@@ -1769,7 +1510,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
     });
   });
 
-  describe('#updateMessageToHeraPullRequest', function () {
+  describe('#updateMessageToPullRequest', function () {
     it('calls github API to edit comment on pull request', async function () {
       // given
       const repositoryName = 'pix';
@@ -1780,11 +1521,11 @@ Removed review apps: pix-api-maddo-review-pr123`);
       };
 
       // when
-      await githubController.updateMessageToHeraPullRequest(
+      await githubController.updateMessageToPullRequest(
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
         },
         { githubService },
       );
@@ -1811,11 +1552,11 @@ Removed review apps: pix-api-maddo-review-pr123`);
       };
 
       // when
-      await githubController.updateMessageToHeraPullRequest(
+      await githubController.updateMessageToPullRequest(
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: githubController.repositoryToScalingoAppsReviewHera.pix,
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
         },
         { githubService },
       );
