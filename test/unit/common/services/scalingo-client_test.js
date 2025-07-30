@@ -1149,4 +1149,74 @@ describe('Scalingo client', function () {
       expect(alert).to.deep.equal(expectedCreatedAlert);
     });
   });
+
+  describe('#removeAddon', function () {
+    let client;
+    let forStub;
+    let destroyStub;
+
+    beforeEach(async function () {
+      forStub = sinon.stub();
+      destroyStub = sinon.stub().resolves();
+      const clientStub = {
+        clientFromToken: sinon.stub().resolves({
+          Addons: {
+            for: forStub,
+            destroy: destroyStub,
+          },
+        }),
+      };
+      client = await ScalingoClient.getInstance('reviewApps', clientStub);
+    });
+
+    describe('when addon is provisionned', function () {
+      it('removes addon', async function () {
+        // given
+        const appName = 'pix-app-review-pr123';
+        const providerId = 'postgresql';
+        forStub.resolves([
+          {
+            id: 'addon-redis',
+            addon_provider: { id: 'redis' },
+          },
+          {
+            id: 'addon-postgres',
+            addon_provider: { id: 'postgresql' },
+          },
+        ]);
+
+        // when
+        await client.removeAddon(appName, providerId);
+
+        // then
+        expect(forStub).to.have.been.calledOnceWithExactly(appName);
+        expect(destroyStub).to.have.been.calledOnceWithExactly(appName, 'addon-postgres');
+      });
+    });
+
+    describe('when addon is not provisionned', function () {
+      it('does nothing', async function () {
+        // given
+        const appName = 'pix-app-review-pr123';
+        const providerId = 'postgresql';
+        forStub.resolves([
+          {
+            id: 'addon-redis',
+            addon_provider: { id: 'redis' },
+          },
+          {
+            id: 'addon-mongodb',
+            addon_provider: { id: 'mongodb' },
+          },
+        ]);
+
+        // when
+        await client.removeAddon(appName, providerId);
+
+        // then
+        expect(forStub).to.have.been.calledOnceWithExactly(appName);
+        expect(destroyStub).not.to.have.been.called;
+      });
+    });
+  });
 });

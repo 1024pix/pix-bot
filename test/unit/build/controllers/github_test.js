@@ -1175,7 +1175,7 @@ describe('Unit | Controller | Github', function () {
         const updateCheckRADeployment = sinon.stub().resolves();
         const comment = `Choisir les applications à déployer :
 
-- [X] Fronts <!-- pix-front-review -->
+- [X] App <!-- pix-app-review -->
 - [X] API <!-- pix-api-review -->
 - [ ] API MaDDo <!-- pix-api-maddo-review -->
 - [ ] Audit Logger <!-- pix-audit-logger-review -->
@@ -1218,11 +1218,12 @@ describe('Unit | Controller | Github', function () {
         );
 
         expect(createReviewApp).to.have.been.calledWithExactly({
-          reviewAppName: 'pix-front-review-pr123',
+          reviewAppName: 'pix-app-review-pr123',
           repositoryName: 'pix',
           pullRequestNumber: 123,
           ref: 'branche-a-deployer',
-          parentApp: 'pix-front-review',
+          parentApp: 'pix-app-review',
+          shouldRemovePostgresAddon: true,
         });
         expect(removeReviewApp).to.have.been.calledWithExactly({
           reviewAppName: 'pix-api-maddo-review-pr123',
@@ -1232,7 +1233,7 @@ describe('Unit | Controller | Github', function () {
           pullRequestNumber: 123,
           sha: 'abc123',
         });
-        expect(result).equal(`Created review apps: pix-front-review-pr123
+        expect(result).equal(`Created review apps: pix-app-review-pr123
 Removed review apps: pix-api-maddo-review-pr123`);
       });
     });
@@ -1297,6 +1298,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         const repositoryName = 'pix';
         const pullRequestNumber = 123;
         const ref = 'la-branche';
+        const shouldRemovePostgresAddon = false;
 
         const reviewAppRepo = {
           create: sinon.stub().resolves(),
@@ -1313,7 +1315,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
 
         // when
         await githubController.createReviewApp(
-          { pullRequestNumber, ref, repositoryName, reviewAppName, parentApp },
+          { pullRequestNumber, ref, repositoryName, reviewAppName, parentApp, shouldRemovePostgresAddon },
           { reviewAppRepo, scalingoClient },
         );
 
@@ -1328,6 +1330,51 @@ Removed review apps: pix-api-maddo-review-pr123`);
         expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
         expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
         expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
+      });
+
+      describe('when postgres addon should be removed', function () {
+        it('creates and deploys review app then removes postgres addon', async function () {
+          // given
+          const parentApp = 'pix-api-review';
+          const reviewAppName = 'pix-api-review-pr123';
+          const repositoryName = 'pix';
+          const pullRequestNumber = 123;
+          const ref = 'la-branche';
+          const shouldRemovePostgresAddon = true;
+
+          const reviewAppRepo = {
+            create: sinon.stub().resolves(),
+          };
+          const scalingoClientInstance = {
+            reviewAppExists: sinon.stub().resolves(false),
+            deployReviewApp: sinon.stub().resolves(),
+            disableAutoDeploy: sinon.stub().resolves(),
+            deployUsingSCM: sinon.stub().resolves(),
+            removeAddon: sinon.stub().resolves(),
+          };
+          const scalingoClient = {
+            getInstance: sinon.stub().resolves(scalingoClientInstance),
+          };
+
+          // when
+          await githubController.createReviewApp(
+            { pullRequestNumber, ref, repositoryName, reviewAppName, parentApp, shouldRemovePostgresAddon },
+            { reviewAppRepo, scalingoClient },
+          );
+
+          // then
+          expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
+          expect(reviewAppRepo.create).to.have.been.calledWithExactly({
+            name: reviewAppName,
+            repository: repositoryName,
+            prNumber: pullRequestNumber,
+            parentApp,
+          });
+          expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
+          expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
+          expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
+          expect(scalingoClientInstance.removeAddon).to.have.been.calledWithExactly(reviewAppName, 'postgresql');
+        });
       });
     });
 

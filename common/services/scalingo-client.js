@@ -278,6 +278,13 @@ class ScalingoClient {
     }
   }
 
+  async removeAddon(appName, providerId) {
+    const addons = await this.client.Addons.for(appName);
+    const addon = addons.find(({ addon_provider }) => addon_provider.id === providerId);
+    if (!addon) return;
+    await this.client.Addons.destroy(appName, addon.id);
+  }
+
   async #getNotifierId(notifierName) {
     let notifiers;
     try {

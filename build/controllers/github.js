@@ -54,7 +54,7 @@ const repositoryToScalingoAppsReview = {
     { appName: 'pix-4pix-front-review', label: 'Fronts' },
     { appName: 'pix-4pix-api-review', label: 'API' },
   ],
-  securix: [{ app: 'pix-securix-review' }],
+  securix: [{ appName: 'pix-securix-review' }],
   pix: [
     {
       appName: 'pix-api-review',
@@ -69,6 +69,7 @@ const repositoryToScalingoAppsReview = {
         { label: 'App (.fr)', href: `https://app-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'App (.org)', href: `https://app-pr${pullRequestNumber}.review.pix.org` },
       ],
+      shouldRemovePostgresAddon: true,
     },
     {
       appName: 'pix-orga-review',
@@ -76,6 +77,7 @@ const repositoryToScalingoAppsReview = {
         { label: 'Orga (.fr)', href: `https://orga-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'Orga (.org)', href: `https://orga-pr${pullRequestNumber}.review.pix.org` },
       ],
+      shouldRemovePostgresAddon: true,
     },
     {
       appName: 'pix-certif-review',
@@ -83,16 +85,19 @@ const repositoryToScalingoAppsReview = {
         { label: 'Certif (.fr)', href: `https://certif-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'Certif (.org)', href: `https://certif-pr${pullRequestNumber}.review.pix.org` },
       ],
+      shouldRemovePostgresAddon: true,
     },
     {
       appName: 'pix-junior-review',
       getLinks: (pullRequestNumber) => [
         { label: 'Junior', href: `https://junior-pr${pullRequestNumber}.review.pix.fr` },
       ],
+      shouldRemovePostgresAddon: true,
     },
     {
       appName: 'pix-admin-review',
       getLinks: (pullRequestNumber) => [{ label: 'Admin', href: `https://admin-pr${pullRequestNumber}.review.pix.fr` }],
+      shouldRemovePostgresAddon: true,
     },
     {
       appName: 'pix-api-maddo-review',
@@ -561,19 +566,23 @@ async function _handleIssueComment(
   const repositoryName = pullRequest.head.repo.name;
   const sha = pullRequest.head.sha;
 
-  const reviewAppNames = repositoryToScalingoAppsReview[repositoryName]?.map(({ appName }) => appName);
+  const allowedReviewApps = repositoryToScalingoAppsReview[repositoryName];
 
-  const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, reviewAppNames);
+  const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, allowedReviewApps);
   if (!shouldContinue) {
     return message;
   }
+
+  const allowedReviewAppsByName = Object.fromEntries(
+    allowedReviewApps.map((reviewApp) => [reviewApp.appName, reviewApp]),
+  );
 
   const body = request.payload.comment.body;
   const pullRequestNumber = request.payload.issue.number;
   let selectedApps = Array.from(body.matchAll(/^- \[[xX]\].+<!-- ([\w-]+) -->$/gm), ([, app]) => app);
 
   selectedApps = selectedApps.filter((app) => {
-    const isAllowed = reviewAppNames.includes(app);
+    const isAllowed = app in allowedReviewAppsByName;
     if (!isAllowed) {
       logger.warn({
         event: 'review-app',
@@ -599,7 +608,14 @@ async function _handleIssueComment(
   const ref = pullRequest.head.ref;
 
   for (const { reviewAppName, parentApp } of reviewAppsToCreate) {
-    await dependencies.createReviewApp({ reviewAppName, repositoryName, pullRequestNumber, ref, parentApp });
+    await dependencies.createReviewApp({
+      reviewAppName,
+      repositoryName,
+      pullRequestNumber,
+      ref,
+      parentApp,
+      shouldRemovePostgresAddon: !!allowedReviewAppsByName[parentApp].shouldRemovePostgresAddon,
+    });
   }
 
   for (const reviewAppName of reviewAppsToRemove) {
@@ -621,7 +637,7 @@ async function _handleIssueComment(
 }
 
 async function createReviewApp(
-  { reviewAppName, repositoryName, pullRequestNumber, ref, parentApp },
+  { reviewAppName, repositoryName, pullRequestNumber, ref, parentApp, shouldRemovePostgresAddon },
   dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
 ) {
   const client = await dependencies.scalingoClient.getInstance('reviewApps');
@@ -640,6 +656,9 @@ async function createReviewApp(
   await client.deployReviewApp(parentApp, pullRequestNumber);
   await client.disableAutoDeploy(reviewAppName);
   await client.deployUsingSCM(reviewAppName, ref);
+  if (shouldRemovePostgresAddon) {
+    await client.removeAddon(reviewAppName, 'postgresql');
+  }
 }
 
 async function removeReviewApp({ reviewAppName }, dependencies = { scalingoClient: ScalingoClient, reviewAppRepo }) {
