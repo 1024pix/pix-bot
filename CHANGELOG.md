@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v1.134.1 (30/07/2025)
+
+
+### :rocket: Amélioration
+- [#615](https://github.com/1024pix/pix-bot/pull/615) [FEATURE] Ne pas créer un nouveau commentaire lors d'une réouverture de PR (TECHDAYS-HERA).
+
+### :building_construction: Tech
+- [#616](https://github.com/1024pix/pix-bot/pull/616) [TECH] Refactorer createCommitStatus.
+
+### :arrow_up: Montée de version
+- [#589](https://github.com/1024pix/pix-bot/pull/589) [BUMP] Update Node.js to v22.17.1.
+
 ## v1.134.0 (29/07/2025)
 
 
