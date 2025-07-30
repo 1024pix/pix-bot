@@ -612,6 +612,7 @@ async function handleHeraPullRequestSynchronize(
 
   for (const app of existingApps) {
     await dependencies.reviewAppRepo.setStatus({ name: app.name, status: 'pending' });
+    if (app.autodeployEnabled) continue;
     await client.deployUsingSCM(app.name, ref);
   }
 
@@ -802,8 +803,6 @@ async function createReviewApp(
     parentApp,
   });
   await client.deployReviewApp(parentApp, pullRequestNumber);
-  await client.disableAutoDeploy(reviewAppName);
-  await client.deployUsingSCM(reviewAppName, ref);
 }
 
 async function removeReviewApp({ reviewAppName }, dependencies = { scalingoClient: ScalingoClient, reviewAppRepo }) {

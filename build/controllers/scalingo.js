@@ -96,15 +96,31 @@ const scalingo = {
       return h.response().code(200);
     }
 
-    if (status.includes('error')) {
-      const reviewApp = await reviewAppRepository.setStatus({ name: appName, status: 'failure' });
-      if (!reviewApp) {
-        logger.warn({ event, message: `Application ${appName} was not found` });
-        return h.response().code(200);
-      }
-      logger.info({ event, message: `Application ${appName} marked as failed.` });
+    const reviewApp = await reviewAppRepository.get(appName);
+    if (!reviewApp) {
+      logger.warn({ event, message: `Application ${appName} was not found` });
+      return h.response().code(200);
+    }
+    const { repository, prNumber } = reviewApp;
 
-      const { repository, prNumber } = reviewApp;
+    if (reviewApp.autoDeployEnabled) {
+      try {
+        const client = await dependencies.scalingoClient.getInstance('reviewApps');
+        client.disableAutoDeploy(appName);
+        await reviewAppRepository.setAutodeployEnabled({ name: appName, autodeployEnabled: false });
+      } catch (error) {
+        logger.error({
+          event,
+          stack: error.stack,
+          message: 'Disabling autodeploy for Review App failed',
+          data: { appName },
+        });
+      }
+    }
+
+    if (status.includes('error')) {
+      await reviewAppRepository.setStatus({ name: appName, status: 'failure' });
+      logger.info({ event, message: `Application ${appName} marked as failed.` });
 
       logger.info({
         event,
@@ -115,14 +131,8 @@ const scalingo = {
       return h.response().code(200);
     }
 
-    const reviewApp = await reviewAppRepository.setStatus({ name: appName, status: 'success' });
-    if (!reviewApp) {
-      logger.warn({ event, message: `Application ${appName} was not found` });
-      return h.response().code(200);
-    }
+    await reviewAppRepository.setStatus({ name: appName, status: 'success' });
     logger.info({ event, message: `Application ${appName} marked as deployed.` });
-
-    const { repository, prNumber } = reviewApp;
 
     await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber, sha });
 

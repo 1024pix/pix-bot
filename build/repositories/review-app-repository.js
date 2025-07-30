@@ -8,8 +8,7 @@ export const create = async function ({ name, repository, prNumber, parentApp })
 };
 
 export async function setStatus({ name, status }) {
-  const [result] = await knex('review-apps').update({ status }).where({ name }).returning(['repository', 'prNumber']);
-  return result;
+  await knex('review-apps').update({ status }).where({ name });
 }
 
 export const remove = async function ({ name }) {
@@ -18,8 +17,16 @@ export const remove = async function ({ name }) {
 
 export const listForPullRequest = async function ({ repository, prNumber }) {
   return knex
-    .select('name', 'parentApp', 'status')
+    .select('name', 'parentApp', 'status', 'autodeployEnabled')
     .from('review-apps')
     .where({ repository, prNumber })
     .orderBy('parentApp');
 };
+
+export async function get(name) {
+  return knex.select('repository', 'prNumber', 'autodeployEnabled').from('review-apps').where({ name }).first();
+}
+
+export async function setAutodeployEnabled({ name, autodeployEnabled }) {
+  await knex('review-apps').update({ autodeployEnabled }).where({ name });
+}

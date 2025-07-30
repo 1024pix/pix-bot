@@ -1563,8 +1563,6 @@ Removed review apps: pix-api-maddo-review-pr123`);
         const scalingoClientInstance = {
           reviewAppExists: sinon.stub().resolves(false),
           deployReviewApp: sinon.stub().resolves(),
-          disableAutoDeploy: sinon.stub().resolves(),
-          deployUsingSCM: sinon.stub().resolves(),
         };
         const scalingoClient = {
           getInstance: sinon.stub().resolves(scalingoClientInstance),
@@ -1585,8 +1583,6 @@ Removed review apps: pix-api-maddo-review-pr123`);
           parentApp,
         });
         expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
-        expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
-        expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
       });
     });
 
