@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v1.134.2 (30/07/2025)
+
+
+### :rocket: Amélioration
+- [#617](https://github.com/1024pix/pix-bot/pull/617) [FEATURE] Création de la colonne autodeployEnabled dans la table review-apps.
+
 ## v1.134.1 (30/07/2025)
 
 
