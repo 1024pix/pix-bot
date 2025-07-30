@@ -1,2 +1,3 @@
-Une fois l'application déployée, elle sera accessible à cette adresse {{webApplicationUrl}}
-Les variables d'environnement seront accessibles sur scalingo {{scalingoDashboardUrl}}
+Choisir les applications à déployer :
+
+{{checkboxesForReviewAppsToBeDeployed}}

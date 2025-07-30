@@ -50,21 +50,11 @@ const repositoryToScalingoAppsReview = {
   ],
   'pix-tutos': [{ appName: 'pix-tutos-review' }],
   'pix-ui': [{ appName: 'pix-ui-review' }],
-  pix: [
-    { appName: 'pix-api-review', label: 'API' },
-    { appName: 'pix-api-maddo-review', label: 'API MaDDo' },
-    { appName: 'pix-audit-logger-review', label: 'Audit Logger' },
-    { appName: 'pix-front-review', label: 'Fronts' },
-  ],
   pix4pix: [
     { appName: 'pix-4pix-front-review', label: 'Fronts' },
     { appName: 'pix-4pix-api-review', label: 'API' },
   ],
   securix: [{ app: 'pix-securix-review' }],
-};
-
-const repositoryToScalingoAppsReviewHera = {
-  ...repositoryToScalingoAppsReview,
   pix: [
     {
       appName: 'pix-api-review',
@@ -124,11 +114,8 @@ const repositoryToScalingoAppsReviewHera = {
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-function getMessageTemplate(repositoryName, isHera = false) {
-  let baseDir = path.join(__dirname, '..', 'templates', 'pull-request-messages');
-  if (isHera) {
-    baseDir = path.join(baseDir, 'hera');
-  }
+function getMessageTemplate(repositoryName) {
+  const baseDir = path.join(__dirname, '..', 'templates', 'pull-request-messages');
   let relativeFileName;
   if (fs.existsSync(path.join(baseDir, `${repositoryName}.md`))) {
     relativeFileName = `${repositoryName}.md`;
@@ -169,57 +156,6 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
   return message;
 }
 
-const _addMessageToPullRequest = async ({ repositoryName, pullRequestId, scalingoReviewApps }, { githubService }) => {
-  const messageTemplate = getMessageTemplate(repositoryName);
-  const message = getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate);
-
-  await githubService.commentPullRequest({
-    repositoryName,
-    pullRequestId,
-    comment: message,
-  });
-};
-
-async function _handleRA(
-  request,
-  scalingoClient = ScalingoClient,
-  addMessageToPullRequest = _addMessageToPullRequest,
-  githubService = commonGithubService,
-  reviewAppRepository = reviewAppRepo,
-  handleHeraPullRequest = _handleHeraPullRequest,
-) {
-  const payload = request.payload;
-
-  const { shouldContinue, message } = await _handleNoRACase(request, githubService);
-  if (!shouldContinue) {
-    return message;
-  }
-
-  if (isHera(payload.pull_request)) {
-    return handleHeraPullRequest(request);
-  }
-
-  const prId = payload.number;
-  const action = payload.action;
-  const ref = payload.pull_request.head.ref;
-  const repository = payload.pull_request.head.repo.name;
-  const reviewApps = repositoryToScalingoAppsReview[repository];
-
-  const deployedRA = await deployPullRequest(
-    scalingoClient,
-    reviewApps,
-    prId,
-    ref,
-    repository,
-    addMessageToPullRequest,
-    action,
-    githubService,
-    reviewAppRepository,
-  );
-
-  return `Triggered deployment of RA on app ${deployedRA.join(', ')} with pr ${prId}`;
-}
-
 async function _handleCloseRA(
   request,
   dependencies = {
@@ -233,9 +169,7 @@ async function _handleCloseRA(
   const repository = payload.pull_request.head.repo.name;
   const sha = payload.pull_request.head.sha;
 
-  const reviewApps = isHera(payload.pull_request)
-    ? repositoryToScalingoAppsReviewHera[repository]
-    : repositoryToScalingoAppsReview[repository];
+  const reviewApps = repositoryToScalingoAppsReview[repository];
 
   if (!reviewApps) {
     return `${repository} is not managed by Pix Bot.`;
@@ -282,88 +216,6 @@ async function _handleCloseRA(
     ra.isAlreadyClosed ? `${ra.name}-pr${prNumber} (already closed)` : `${ra.name}-pr${prNumber}`,
   );
   return `Closed RA for PR ${prNumber} : ${result.join(', ')}.`;
-}
-
-async function deployPullRequest(
-  scalingoClient,
-  reviewApps,
-  prId,
-  ref,
-  repository,
-  addMessageToPullRequest,
-  action,
-  githubService,
-  reviewAppRepository,
-) {
-  const deployedRA = [];
-  let client;
-  try {
-    client = await scalingoClient.getInstance('reviewApps');
-  } catch (error) {
-    throw new Error(`Scalingo auth APIError: ${error.message}`);
-  }
-  for (const { appName } of reviewApps) {
-    const reviewAppName = `${appName}-pr${prId}`;
-    try {
-      const reviewAppExists = await client.reviewAppExists(reviewAppName);
-      if (reviewAppExists) {
-        await reviewAppRepository.setStatus({ name: reviewAppName, status: 'pending' });
-        await client.deployUsingSCM(reviewAppName, ref);
-      } else {
-        await reviewAppRepository.create({ name: reviewAppName, repository, prNumber: prId, parentApp: appName });
-        await client.deployReviewApp(appName, prId);
-        await client.disableAutoDeploy(reviewAppName);
-        await client.deployUsingSCM(reviewAppName, ref);
-      }
-      deployedRA.push({ name: appName, isCreated: !reviewAppExists });
-    } catch (error) {
-      logger.error({
-        event: 'review-app',
-        stack: error.stack,
-        message: `Deployement for application ${reviewAppName} failed : ${error.message}`,
-        data: {
-          repository,
-          reviewApp: reviewAppName,
-          pr: prId,
-          ref,
-        },
-      });
-    }
-  }
-
-  logger.info({
-    event: 'review-app',
-    message: `Changing check-ra-deployment status to pending (deploy PR)`,
-  });
-  await githubService.addRADeploymentCheck({ repository, prNumber: prId, status: 'pending' });
-
-  if (deployedRA.some(({ isCreated }) => isCreated)) {
-    if (action !== 'reopened') {
-      await addMessageToPullRequest(
-        {
-          repositoryName: repository,
-          scalingoReviewApps: reviewApps,
-          pullRequestId: prId,
-        },
-        { githubService },
-      );
-    }
-
-    logger.info({
-      event: 'review-app',
-      message: `Created RA for repo ${repository} PR ${prId}`,
-    });
-  }
-
-  if (deployedRA.length !== reviewApps.length) {
-    throw new Error(`Some RA have not been deployed for repository ${repository} and pr${prId}`);
-  }
-
-  logger.info({
-    event: 'review-app',
-    message: `PR${prId} deployement triggered on RA for repo ${repository}`,
-  });
-  return deployedRA.map(({ name }) => name);
 }
 
 async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoClient) {
@@ -420,7 +272,7 @@ async function processWebhook(
   request,
   {
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
-    handleRA = _handleRA,
+    handlePullRequest = _handlePullRequest,
     handleCloseRA = _handleCloseRA,
     mergeQueue = _mergeQueue,
     githubService = commonGithubService,
@@ -439,7 +291,7 @@ async function processWebhook(
     return pushOnDefaultBranchWebhook(request);
   } else if (eventName === 'pull_request') {
     if (['opened', 'reopened', 'synchronize'].includes(request.payload.action)) {
-      return handleRA(request);
+      return handlePullRequest(request);
     }
     if (request.payload.action === 'closed') {
       const repositoryName = request.payload.repository.full_name;
@@ -447,9 +299,6 @@ async function processWebhook(
       const status = isMerged ? MERGE_STATUS.MERGED : MERGE_STATUS.ABORTED;
       await mergeQueue.unmanagePullRequest({ repositoryName, number: request.payload.number, status });
       return handleCloseRA(request);
-    }
-    if (request.payload.action === 'labeled' && request.payload.label.name === 'no-review-app') {
-      await handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
       const belongsToPix = await githubService.checkUserBelongsToPix(request.payload.sender.login);
@@ -505,29 +354,37 @@ async function processWebhook(
   }
 }
 
-async function _handleNoRACase(request, githubService) {
-  const payload = request.payload;
+function shouldHandleIssueComment(request, pullRequest, reviewApps) {
+  if (!reviewApps) {
+    return { shouldContinue: false, message: 'Repository is not managed by Pix Bot.' };
+  }
+
+  if (request.payload.comment.user.login !== 'pix-bot-github') {
+    return { shouldContinue: false, message: `Ignoring ${request.payload.comment.user.login} comment edition` };
+  }
+
+  if (pullRequest.head.repo.fork) {
+    return { message: 'No RA for a fork', shouldContinue: false };
+  }
+
+  if (pullRequest.state !== 'open') {
+    return { message: 'No RA for closed PR', shouldContinue: false };
+  }
+
+  return { shouldContinue: true };
+}
+
+async function _handleNoRACase(payload) {
   const repository = payload.pull_request.head.repo.name;
   const reviewApps = repositoryToScalingoAppsReview[repository];
   const isFork = payload.pull_request.head.repo.fork;
-  const labelsList = payload.pull_request.labels;
   const state = payload.pull_request.state;
-  const prNumber = payload.number;
-  const sha = payload.pull_request.head.sha;
 
   if (isFork) {
     return { message: 'No RA for a fork', shouldContinue: false };
   }
   if (!reviewApps) {
     return { message: 'No RA configured for this repository', shouldContinue: false };
-  }
-  if (labelsList.some((label) => label.name === 'no-review-app')) {
-    logger.info({
-      event: 'review-app',
-      message: `Changing check-ra-deployment status to success (no-review-app)`,
-    });
-    await githubService.addRADeploymentCheck({ repository, prNumber, status: 'success', sha });
-    return { message: 'RA disabled for this PR', shouldContinue: false };
   }
   if (state !== 'open') {
     return { message: 'No RA for closed PR', shouldContinue: false };
@@ -536,41 +393,44 @@ async function _handleNoRACase(request, githubService) {
   return { shouldContinue: true };
 }
 
-function isHera(pullRequest) {
-  return pullRequest.labels.some((label) => label.name === 'Hera');
-}
-
-async function _handleHeraPullRequest(
+async function _handlePullRequest(
   request,
   dependencies = {
-    handleHeraPullRequestOpened,
-    handleHeraPullRequestSynchronize,
-    handleHeraPullRequestReopened,
+    handlePullRequestOpened,
+    handlePullRequestSynchronize,
+    handlePullRequestReopened,
   },
 ) {
-  if (request.payload.action === 'opened') {
-    return dependencies.handleHeraPullRequestOpened(request);
+  const payload = request.payload;
+
+  const { shouldContinue, message } = await _handleNoRACase(payload);
+  if (!shouldContinue) {
+    return message;
   }
-  if (request.payload.action === 'synchronize') {
-    return dependencies.handleHeraPullRequestSynchronize(request);
+
+  if (payload.action === 'opened') {
+    return dependencies.handlePullRequestOpened(request);
   }
-  if (request.payload.action === 'reopened') {
-    return dependencies.handleHeraPullRequestReopened(request);
+  if (payload.action === 'synchronize') {
+    return dependencies.handlePullRequestSynchronize(request);
   }
-  return `Action ${request.payload.action} not handled for Hera pull request`;
+  if (payload.action === 'reopened') {
+    return dependencies.handlePullRequestReopened(request);
+  }
+  return `Action ${payload.action} not handled`;
 }
 
-async function handleHeraPullRequestOpened(
+async function handlePullRequestOpened(
   request,
-  dependencies = { addMessageToHeraPullRequest, githubService: commonGithubService },
+  dependencies = { addMessageToPullRequest, githubService: commonGithubService },
 ) {
   const pullRequestNumber = request.payload.number;
   const repository = request.payload.pull_request.head.repo.name;
   const sha = request.payload.pull_request.head.sha;
 
-  const reviewApps = repositoryToScalingoAppsReviewHera[repository];
+  const reviewApps = repositoryToScalingoAppsReview[repository];
 
-  await dependencies.addMessageToHeraPullRequest({
+  await dependencies.addMessageToPullRequest({
     repositoryName: repository,
     reviewApps,
     pullRequestNumber,
@@ -590,7 +450,7 @@ async function handleHeraPullRequestOpened(
   return `Commented on PR ${pullRequestNumber} in repository ${repository}`;
 }
 
-async function handleHeraPullRequestSynchronize(
+async function handlePullRequestSynchronize(
   request,
   dependencies = {
     scalingoClient: ScalingoClient,
@@ -625,17 +485,17 @@ async function handleHeraPullRequestSynchronize(
   return `Deployed on PR ${pullRequestNumber} in repository ${repository}`;
 }
 
-async function handleHeraPullRequestReopened(
+async function handlePullRequestReopened(
   request,
-  dependencies = { updateMessageToHeraPullRequest, githubService: commonGithubService },
+  dependencies = { updateMessageToPullRequest, githubService: commonGithubService },
 ) {
   const pullRequestNumber = request.payload.number;
   const repositoryName = request.payload.pull_request.head.repo.name;
   const sha = request.payload.pull_request.head.sha;
 
-  const reviewApps = repositoryToScalingoAppsReviewHera[repositoryName];
+  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
 
-  await dependencies.updateMessageToHeraPullRequest({
+  await dependencies.updateMessageToPullRequest({
     repositoryName,
     reviewApps,
     pullRequestNumber,
@@ -655,7 +515,7 @@ async function handleHeraPullRequestReopened(
   return `Comment updated on reopened PR ${pullRequestNumber} in repository ${repositoryName}`;
 }
 
-async function addMessageToHeraPullRequest(
+async function addMessageToPullRequest(
   { repositoryName, reviewApps, pullRequestNumber },
   dependencies = { githubService: commonGithubService },
 ) {
@@ -668,7 +528,7 @@ async function addMessageToHeraPullRequest(
   });
 }
 
-async function updateMessageToHeraPullRequest(
+async function updateMessageToPullRequest(
   { repositoryName, reviewApps, pullRequestNumber },
   dependencies = { githubService: commonGithubService },
 ) {
@@ -701,7 +561,7 @@ async function _handleIssueComment(
   const repositoryName = pullRequest.head.repo.name;
   const sha = pullRequest.head.sha;
 
-  const reviewAppNames = repositoryToScalingoAppsReviewHera[repositoryName]?.map(({ appName }) => appName);
+  const reviewAppNames = repositoryToScalingoAppsReview[repositoryName]?.map(({ appName }) => appName);
 
   const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, reviewAppNames);
   if (!shouldContinue) {
@@ -760,30 +620,6 @@ async function _handleIssueComment(
   return messages.join('\n');
 }
 
-function shouldHandleIssueComment(request, pullRequest, reviewApps) {
-  if (!reviewApps) {
-    return { shouldContinue: false, message: 'Repository is not managed by Pix Bot.' };
-  }
-
-  if (request.payload.comment.user.login !== 'pix-bot-github') {
-    return { shouldContinue: false, message: `Ignoring ${request.payload.comment.user.login} comment edition` };
-  }
-
-  if (pullRequest.head.repo.fork) {
-    return { message: 'No RA for a fork', shouldContinue: false };
-  }
-
-  if (pullRequest.state !== 'open') {
-    return { message: 'No RA for closed PR', shouldContinue: false };
-  }
-
-  if (!isHera(pullRequest)) {
-    return { shouldContinue: false, message: 'issue_comment events only handled for Hera pull requests' };
-  }
-
-  return { shouldContinue: true };
-}
-
 async function createReviewApp(
   { reviewAppName, repositoryName, pullRequestNumber, ref, parentApp },
   dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
@@ -819,21 +655,19 @@ async function removeReviewApp({ reviewAppName }, dependencies = { scalingoClien
 }
 
 export {
-  _addMessageToPullRequest as addMessageToPullRequest,
   getMessage,
   getMessageTemplate,
-  _handleRA as handleRA,
   processWebhook,
   _pushOnDefaultBranchWebhook as pushOnDefaultBranchWebhook,
   _handleCloseRA as handleCloseRA,
-  _handleHeraPullRequest as handleHeraPullRequest,
-  handleHeraPullRequestOpened,
-  handleHeraPullRequestSynchronize,
-  handleHeraPullRequestReopened,
-  addMessageToHeraPullRequest,
-  updateMessageToHeraPullRequest,
+  _handlePullRequest as handlePullRequest,
+  handlePullRequestOpened,
+  handlePullRequestSynchronize,
+  handlePullRequestReopened,
+  addMessageToPullRequest,
+  updateMessageToPullRequest,
   _handleIssueComment as handleIssueComment,
   createReviewApp,
   removeReviewApp,
-  repositoryToScalingoAppsReviewHera,
+  repositoryToScalingoAppsReview,
 };
