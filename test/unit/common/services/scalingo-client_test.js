@@ -564,7 +564,7 @@ describe('Scalingo client', function () {
       }
 
       // then
-      expect(actual.message).to.equal('Impossible to create pix-application-recette, foo');
+      expect(actual.message).to.equal('error while creating application');
     });
   });
 
@@ -800,9 +800,7 @@ describe('Scalingo client', function () {
         error = err;
       }
       //then
-      expect(error.message).to.equal(
-        'Impossible to get info for RA reviewApp. Scalingo API returned 500 : API unavailable',
-      );
+      expect(error.message).to.equal('Error while checking if review app exists');
     });
   });
 
