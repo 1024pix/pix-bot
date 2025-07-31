@@ -557,7 +557,11 @@ const github = {
       repositoryName = request.payload.repository.full_name;
       prNumber = request.payload.check_suite.pull_requests[0].number;
     } else if (eventName === 'issue_comment') {
-      if (!request.payload.issue.pull_request) {
+      if (
+        !request.payload.issue.pull_request ||
+        request.payload.comment.user.login !== 'pix-bot-github' ||
+        request.payload.action === 'created'
+      ) {
         return undefined;
       }
       repositoryName = request.payload.repository.full_name;
