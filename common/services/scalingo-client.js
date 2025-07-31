@@ -6,6 +6,7 @@ import { logger } from './logger.js';
 import { ScalingoAppName } from '../models/ScalingoAppName.js';
 
 const DEFAULT_OPTS = { withEnvSuffix: true };
+const event = 'scalingo-client';
 
 class ScalingoClient {
   constructor(client, environment) {
@@ -16,7 +17,7 @@ class ScalingoClient {
   static async getInstance(environment, injectedClient = scalingo) {
     const { token, apiUrl } = config.scalingo[environment];
     if (!token || !apiUrl) {
-      logger.error({ message: `Scalingo credentials missing for environment ${environment}` });
+      logger.error({ event, message: `Scalingo credentials missing for environment`, data: { environment } });
       throw new Error(`Scalingo credentials missing for environment ${environment}`);
     }
     const client = await injectedClient.clientFromToken(token, { apiUrl });
@@ -25,11 +26,11 @@ class ScalingoClient {
 
   async deployFromArchive(pixApp, releaseTag, repository = config.github.repository, options = DEFAULT_OPTS) {
     if (!pixApp) {
-      logger.error({ message: 'No application to deploy.' });
+      logger.error({ event, message: 'No application to deploy.' });
       throw new Error('No application to deploy.');
     }
     if (!releaseTag) {
-      logger.error({ message: 'No release tag to deploy.' });
+      logger.error({ event, message: 'No release tag to deploy.' });
       throw new Error('No release tag to deploy.');
     }
 
@@ -41,8 +42,8 @@ class ScalingoClient {
         source_url: `https://${config.github.token}@github.com/${config.github.owner}/${repository}/archive/${releaseTag}.tar.gz`,
       });
     } catch (e) {
-      logger.error({ event: 'scalingo', message: e });
-      throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
+      logger.error({ event, message: e, data: { scalingoApp, releaseTag } });
+      throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`, { cause: e });
     }
 
     return `${scalingoApp} ${releaseTag} has been deployed`;
@@ -52,11 +53,11 @@ class ScalingoClient {
     try {
       await this.client.SCMRepoLinks.manualDeploy(scalingoApp, releaseTag);
     } catch (e) {
-      logger.error({ event: 'scalingo', message: e });
-      throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`);
+      logger.error({ event, message: e, data: { scalingoApp, releaseTag } });
+      throw new Error(`Unable to deploy ${scalingoApp} ${releaseTag}`, { cause: e });
     }
 
-    logger.info({ message: `Deployment of ${scalingoApp} ${releaseTag} has been requested` });
+    logger.info({ event, message: `Deployment has been requested`, data: { scalingoApp, releaseTag } });
     return `Deployment of ${scalingoApp} ${releaseTag} has been requested`;
   }
 
@@ -77,21 +78,48 @@ class ScalingoClient {
         return false;
       }
       logger.error({
-        message: `Impossible to get info for RA ${reviewAppName}. Scalingo API returned ${err.status} : ${err.message}`,
+        event,
+        message: `Error while checking if review app exists`,
+        data: {
+          err,
+          reviewAppName,
+        },
       });
-      throw new Error(
-        `Impossible to get info for RA ${reviewAppName}. Scalingo API returned ${err.status} : ${err.message}`,
-      );
+      throw new Error(`Error while checking if review app exists`, { cause: err });
     }
   }
 
-  deployReviewApp(appName, prId) {
-    return this.client.SCMRepoLinks.manualReviewApp(appName, prId);
+  async deployReviewApp(appName, prId) {
+    try {
+      await this.client.SCMRepoLinks.manualReviewApp(appName, prId);
+    } catch (err) {
+      logger.error({
+        event,
+        message: `error while creating review app`,
+        data: {
+          err,
+          appName,
+        },
+      });
+      throw new Error(`error while creating review app`, { cause: err });
+    }
   }
 
-  disableAutoDeploy(appName) {
+  async disableAutoDeploy(appName) {
     const opts = { auto_deploy_enabled: false };
-    return this.client.SCMRepoLinks.update(appName, opts);
+    try {
+      await this.client.SCMRepoLinks.update(appName, opts);
+    } catch (err) {
+      logger.error({
+        event,
+        message: `error while disabling autodeploy on review app`,
+        data: {
+          err,
+          appName,
+        },
+      });
+      throw new Error(`error while disabling autodeploy on review app`, { cause: err });
+    }
   }
 
   async _getAllAppsInfo(environment) {
@@ -123,16 +151,21 @@ class ScalingoClient {
       if (err.status === 404) {
         throw new Error(`Impossible to get info for ${scalingoAppName}`);
       }
-      throw err;
+      logger.error({ event, message: 'error while fetching app information', data: { err, appName, environment } });
+      throw Error('error while fetching app information', { cause: err });
     }
   }
   async inviteCollaborator(applicationId, collaboratorEmail) {
     try {
       const { invitation_link } = await this.client.Collaborators.invite(applicationId, collaboratorEmail);
       return invitation_link;
-    } catch (e) {
-      logger.error({ event: 'scalingo', message: e });
-      throw new Error(`Impossible to invite ${collaboratorEmail} on ${applicationId}`);
+    } catch (err) {
+      logger.error({
+        event,
+        message: 'error while inviting collaboerator on app',
+        data: { err, applicationId, collaboratorEmail },
+      });
+      throw new Error('error while inviting collaboerator on app', { cause: err });
     }
   }
 
@@ -147,16 +180,22 @@ class ScalingoClient {
     try {
       const { id } = await this.client.Apps.create(app);
       await this.client.Apps.update(id, appSettings);
-      logger.info({ event: 'scalingo', message: `${app.name} created` });
+      logger.info({ event, message: `application created`, data: { name } });
       return id;
-    } catch (e) {
-      logger.error({ event: 'scalingo', message: e });
-      throw new Error(`Impossible to create ${app.name}, ${e.name}`);
+    } catch (err) {
+      logger.error({ event, message: 'error while creating application', data: { err, name } });
+      throw new Error(`error while creating application`, { cause: err });
     }
   }
 
   async updateAutoscaler(appname, updateParams) {
-    const autoscalers = await this.client.Autoscalers.for(appname);
+    let autoscalers;
+    try {
+      autoscalers = await this.client.Autoscalers.for(appname);
+    } catch (err) {
+      logger.error({ event, message: 'error while listing autoscalers for app', data: { err, appname } });
+      throw new Error(`error while listing autoscalers for app`, { cause: err });
+    }
 
     if (!Array.isArray(autoscalers) || !autoscalers.length) {
       throw new Error(`Aucun autoscaler trouvé pour l'application '${appname}'`);
@@ -164,7 +203,12 @@ class ScalingoClient {
 
     const [webAutoscaler] = autoscalers.filter((autoscaler) => autoscaler.container_type == 'web');
     if (webAutoscaler) {
-      await this.client.Autoscalers.update(appname, webAutoscaler.id, updateParams);
+      try {
+        await this.client.Autoscalers.update(appname, webAutoscaler.id, updateParams);
+      } catch (err) {
+        logger.error({ event, message: 'error while updating autoscaler for app', data: { err, appname } });
+        throw new Error(`error while updating autoscaler for app`, { cause: err });
+      }
     } else {
       throw new Error(`Aucun autoscaler web trouvé pour l'application '${appname}'`);
     }
@@ -178,7 +222,7 @@ class ScalingoClient {
     try {
       await this.client.Apps.destroy(appName, appName);
     } catch (err) {
-      logger.error(err);
+      logger.error({ event, message: 'error while deleting app', data: { err, appName } });
     }
   }
 
@@ -198,14 +242,14 @@ class ScalingoClient {
       });
 
       logger.info({
-        event: 'scalingo',
+        event,
         message: `Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`,
       });
 
       return notifier;
-    } catch (error) {
-      logger.error(error);
-      throw error;
+    } catch (err) {
+      logger.error({ event, message: 'error while creating slack notifier for app', data: { err, appName } });
+      throw new Error(`error while creating slack notifier for app`, { cause: err });
     }
   }
 
@@ -248,14 +292,14 @@ class ScalingoClient {
       });
 
       logger.info({
-        event: 'scalingo',
+        event,
         message: `Notifier ${notifier.name} of type ${notifier.type} added for application ${notifier.app}.`,
       });
 
       return notifier;
-    } catch (error) {
-      logger.error({ event: 'scalingo', message: error });
-      throw error;
+    } catch (err) {
+      logger.error({ event, message: 'error while creating slack notifier for app', data: { err, appName } });
+      throw new Error(`error while creating slack notifier for app`, { cause: err });
     }
   }
 
@@ -269,20 +313,25 @@ class ScalingoClient {
         notifiers: [notifierId],
       });
 
-      logger.info({ event: 'scalingo', message: `Alert on ${alert.metric} added for application ${appName}.` });
+      logger.info({ event, message: `Alert on ${alert.metric} added for application ${appName}.` });
 
       return alert;
-    } catch (error) {
-      logger.error({ event: 'scalingo', message: error });
-      throw error;
+    } catch (err) {
+      logger.error({ event, message: 'error while creating alert for app', data: { err, appName } });
+      throw new Error(`error while creating alert for app`, { cause: err });
     }
   }
 
   async removeAddon(appName, providerId) {
-    const addons = await this.client.Addons.for(appName);
-    const addon = addons.find(({ addon_provider }) => addon_provider.id === providerId);
-    if (!addon) return;
-    await this.client.Addons.destroy(appName, addon.id);
+    try {
+      const addons = await this.client.Addons.for(appName);
+      const addon = addons.find(({ addon_provider }) => addon_provider.id === providerId);
+      if (!addon) return;
+      await this.client.Addons.destroy(appName, addon.id);
+    } catch (err) {
+      logger.error({ event, message: 'error while removing addon for app', data: { err, appName } });
+      throw new Error(`error while removing addon for app`, { cause: err });
+    }
   }
 
   async #getNotifierId(notifierName) {
@@ -290,7 +339,8 @@ class ScalingoClient {
     try {
       notifiers = await this.client.NotificationPlatforms.list();
     } catch (err) {
-      logger.error({ event: 'scalingo', message: err });
+      logger.error({ event, message: 'error while listing notifiers', data: { err } });
+      throw new Error(`error while listing notifiers`, { cause: err });
     }
 
     const notifier = notifiers.find((notifier) => notifier.name === notifierName);
@@ -306,7 +356,8 @@ class ScalingoClient {
     try {
       events = await this.client.Events.listEventTypes();
     } catch (err) {
-      logger.error({ event: 'scalingo', message: err });
+      logger.error({ event, message: 'error while listing event types', data: { err } });
+      throw new Error(`error while listing event types`, { cause: err });
     }
 
     return eventNames.map((eventName) => {
