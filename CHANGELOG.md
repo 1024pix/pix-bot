@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.0.2 (31/07/2025)
+
+
+### :rocket: Amélioration
+- [#622](https://github.com/1024pix/pix-bot/pull/622) [FEATURE] Corriger erreur 500 quand un label est supprimé.
+
 ## v2.0.1 (31/07/2025)
 
 
