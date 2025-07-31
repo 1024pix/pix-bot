@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v2.1.0 (31/07/2025)
+
+
+### :rocket: Amélioration
+- [#624](https://github.com/1024pix/pix-bot/pull/624) [FEATURE] Éviter de récupérer les infos de la PR quand pas nécessaire.
+
+### :building_construction: Tech
+- [#623](https://github.com/1024pix/pix-bot/pull/623) [TECH] Amélioration de la gestion d’erreur dans le client Scalingo.
+
 ## v2.0.2 (31/07/2025)
 
 
