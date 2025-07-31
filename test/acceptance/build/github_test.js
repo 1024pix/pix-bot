@@ -1113,7 +1113,7 @@ function addRADeploymentCheckNock({ repository, sha, status }) {
 function deployReviewAppNock({ reviewAppName, branch = 'my-branch', returnCode = StatusCodes.OK }) {
   return nock('https://scalingo.reviewApps')
     .post(`/v1/apps/${reviewAppName}/scm_repo_link/manual_deploy`, { branch: branch })
-    .reply(returnCode);
+    .reply(returnCode, { deployment: { id: 'deployment-id' } });
 }
 
 function disableAutoDeployNock({ reviewAppName, returnCode = StatusCodes.CREATED }) {
