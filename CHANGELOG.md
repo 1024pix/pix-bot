@@ -1,5 +1,12 @@
 # pix-bot Changelog
 
+## v2.0.0 (31/07/2025)
+
+
+### :rocket: Amélioration
+- [#620](https://github.com/1024pix/pix-bot/pull/620) [FEATURE] Supprimer les addons postgres provisionnés sur les fronts (monorepo).
+- [#619](https://github.com/1024pix/pix-bot/pull/619) [FEATURE] Bye JP, welcome Hera !.
+
 ## v1.134.2 (30/07/2025)
 
 
