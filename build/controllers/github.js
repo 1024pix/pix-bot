@@ -316,7 +316,7 @@ async function processWebhook(
         await mergeQueue.managePullRequest({ repositoryName, number: request.payload.number });
       }
     }
-    if (request.payload.action === 'unlabeled' && request.payload.label.name === ':rocket: Ready to Merge') {
+    if (request.payload.action === 'unlabeled' && request.payload.label?.name === ':rocket: Ready to Merge') {
       const repositoryName = request.payload.repository.full_name;
       await mergeQueue.unmanagePullRequest({
         repositoryName,
