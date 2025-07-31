@@ -896,11 +896,17 @@ describe('Unit | Build | github-test', function () {
         it('returns undefined', async function () {
           // given
           const payload = {
+            action: 'edited',
             repository: {
               full_name: repositoryName,
             },
             issue: {
               number: prNumber,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
             },
           };
 
@@ -913,15 +919,75 @@ describe('Unit | Build | github-test', function () {
       });
 
       describe('when issue_comment is associated to a pull request', function () {
+        describe('when comment doesn’t belong to pix-bot', function () {
+          it('returns undefined', async function () {
+            // given
+            const payload = {
+              action: 'edited',
+              repository: {
+                full_name: repositoryName,
+              },
+              issue: {
+                pull_request: {},
+                number: prNumber,
+              },
+              comment: {
+                user: {
+                  login: 'Gudsfile',
+                },
+              },
+            };
+
+            // when
+            const result = await githubService.getPullRequestForEvent('issue_comment', { payload });
+
+            // then
+            expect(result).to.be.undefined;
+          });
+        });
+
+        describe('when action is created', function () {
+          it('returns undefined', async function () {
+            // given
+            const payload = {
+              action: 'created',
+              repository: {
+                full_name: repositoryName,
+              },
+              issue: {
+                pull_request: {},
+                number: prNumber,
+              },
+              comment: {
+                user: {
+                  login: 'pix-bot-github',
+                },
+              },
+            };
+
+            // when
+            const result = await githubService.getPullRequestForEvent('issue_comment', { payload });
+
+            // then
+            expect(result).to.be.undefined;
+          });
+        });
+
         it('returns data for given repository and PR number', async function () {
           // given
           const payload = {
+            action: 'edited',
             repository: {
               full_name: repositoryName,
             },
             issue: {
               pull_request: {},
               number: prNumber,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-github',
+              },
             },
           };
           const response = {
