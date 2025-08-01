@@ -359,7 +359,14 @@ async function processWebhook(
   }
 }
 
-function shouldHandleIssueComment(request, pullRequest, reviewApps) {
+function shouldHandleIssueComment(request, pullRequest) {
+  if (!pullRequest) {
+    return { shouldContinue: false, message: 'The conditions for editing an issue comment are not met.' };
+  }
+
+  const repositoryName = pullRequest.head.repo.name;
+  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
+
   if (!reviewApps) {
     return { shouldContinue: false, message: 'Repository is not managed by Pix Bot.' };
   }
@@ -563,15 +570,13 @@ async function _handleIssueComment(
   { request, pullRequest },
   dependencies = { reviewAppRepo, createReviewApp, removeReviewApp, updateCheckRADeployment },
 ) {
-  const repositoryName = pullRequest.head.repo.name;
-  const sha = pullRequest.head.sha;
-
-  const allowedReviewApps = repositoryToScalingoAppsReview[repositoryName];
-
-  const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest, allowedReviewApps);
+  const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest);
   if (!shouldContinue) {
     return message;
   }
+
+  const repositoryName = pullRequest.head.repo.name;
+  const allowedReviewApps = repositoryToScalingoAppsReview[repositoryName];
 
   const allowedReviewAppsByName = Object.fromEntries(
     allowedReviewApps.map((reviewApp) => [reviewApp.appName, reviewApp]),
@@ -632,6 +637,7 @@ async function _handleIssueComment(
   if (!messages.length) {
     return 'Nothing to do';
   }
+  const sha = pullRequest.head.sha;
   await dependencies.updateCheckRADeployment({ repositoryName, pullRequestNumber, sha });
   return messages.join('\n');
 }
