@@ -1,5 +1,18 @@
 # pix-bot Changelog
 
+## v2.2.0 (01/08/2025)
+
+
+### :rocket: Amélioration
+- [#626](https://github.com/1024pix/pix-bot/pull/626) [FEATURE] Amélioration du check-ra-deployment.
+
+### :building_construction: Tech
+- [#628](https://github.com/1024pix/pix-bot/pull/628) [TECH] Retirer les placeholders non utilisés.
+- [#629](https://github.com/1024pix/pix-bot/pull/629) [TECH] Suprimer les références à l'app pix-front-review dépréciée.
+
+### :bug: Correction
+- [#630](https://github.com/1024pix/pix-bot/pull/630) [BUGFIX] Gérer le cas où la pullRequest est undefined lors d'un event d'édition d'issue comment (TECHDAYS).
+
 ## v2.1.2 (01/08/2025)
 
 
