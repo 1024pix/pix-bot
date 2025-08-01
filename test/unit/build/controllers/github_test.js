@@ -1027,6 +1027,32 @@ describe('Unit | Controller | Github', function () {
   });
 
   describe('#handleIssueComment', function () {
+    describe('when comment doesn’t belong to Pix Bot', function () {
+      it('should return appropriate message', async function () {
+        const pullRequest = undefined;
+
+        const request = {
+          payload: {
+            repository: {
+              full_name: '@1024pix/pix',
+            },
+            issue: {
+              pull_request: {},
+              number: 123,
+            },
+            comment: {
+              user: {
+                login: 'pix-bot-dummy',
+              },
+            },
+          },
+        };
+
+        const result = await githubController.handleIssueComment({ request, pullRequest });
+        expect(result).equal('The conditions for editing an issue comment are not met.');
+      });
+    });
+
     describe('when review apps are not configured for repository', function () {
       it('should return message Repository is not managed by Pix Bot', async function () {
         const pullRequest = {
