@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.1.2 (01/08/2025)
+
+
+### :arrow_up: Montée de version
+- [#627](https://github.com/1024pix/pix-bot/pull/627) [BUMP] MàJ de @1024pix/scalingo-review-app-manager.
+
 ## v2.1.1 (01/08/2025)
 
 
