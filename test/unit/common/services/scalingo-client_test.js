@@ -176,7 +176,14 @@ describe('Scalingo client', function () {
     });
 
     it('should deploy an application for a given tag', async function () {
-      await scalingoClient.deployUsingSCM('pix-app-production', 'v1.0');
+      // given
+      manualDeployStub.resolves({ id: 'deployment-id' });
+
+      // when
+      const result = await scalingoClient.deployUsingSCM('pix-app-production', 'v1.0');
+
+      // then
+      expect(result).to.equal('deployment-id');
       expect(manualDeployStub).to.have.been.calledOnceWithExactly('pix-app-production', 'v1.0');
     });
 

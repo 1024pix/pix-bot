@@ -16,7 +16,7 @@ describe('Integration | Run | Services | Slack | Commands', function () {
 
       const nockCall = nock('https://scalingo.production')
         .post(`/v1/apps/pix-airflow-production/scm_repo_link/manual_deploy`, deploymentPayload)
-        .reply(200, {});
+        .reply(200, { deployment: { id: 'deployment-id' } });
 
       await commands.deployAirflow(commandPayload);
 
@@ -39,10 +39,10 @@ describe('Integration | Run | Services | Slack | Commands', function () {
 
       const nockCallA = nock('https://scalingo.production')
         .post(`/v1/apps/pix-dbt-production/scm_repo_link/manual_deploy`, deploymentPayload)
-        .reply(200, {});
+        .reply(200, { deployment: { id: 'deployment-id-a' } });
       const nockCallB = nock('https://scalingo.production')
         .post(`/v1/apps/pix-dbt-external-production/scm_repo_link/manual_deploy`, deploymentPayload)
-        .reply(200, {});
+        .reply(200, { deployment: { id: 'deployment-id-b' } });
 
       await commands.deployDBT(commandPayload);
 
@@ -66,7 +66,7 @@ describe('Integration | Run | Services | Slack | Commands', function () {
 
       const nockCall = nock('https://scalingo.production')
         .post(`/v1/apps/pix-api-to-pg-production/scm_repo_link/manual_deploy`, deploymentPayload)
-        .reply(200, {});
+        .reply(200, { deployment: { id: 'deployment-id' } });
 
       await commands.deployPixApiToPg(commandPayload);
 

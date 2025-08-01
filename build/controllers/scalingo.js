@@ -74,7 +74,12 @@ const scalingo = {
     const event = 'review-app-deploy';
     const appName = request.payload.app_name;
     const type = request.payload.type;
-    const { status, deployment_type: deploymentType, git_ref: sha } = request.payload.type_data;
+    const {
+      status,
+      deployment_type: deploymentType,
+      git_ref: sha,
+      deployment_uuid: deploymentId,
+    } = request.payload.type_data;
 
     logger.info({
       event,
@@ -96,15 +101,21 @@ const scalingo = {
       return h.response().code(200);
     }
 
-    if (status.includes('error')) {
-      const reviewApp = await reviewAppRepository.setStatus({ name: appName, status: 'failure' });
-      if (!reviewApp) {
-        logger.warn({ event, message: `Application ${appName} was not found` });
-        return h.response().code(200);
-      }
-      logger.info({ event, message: `Application ${appName} marked as failed.` });
+    const reviewApp = await reviewAppRepository.get(appName);
+    if (!reviewApp) {
+      logger.warn({ event, message: `Application ${appName} was not found` });
+      return h.response().code(200);
+    }
 
-      const { repository, prNumber } = reviewApp;
+    const { repository, prNumber, lastDeploymentId } = reviewApp;
+
+    if (lastDeploymentId != null && lastDeploymentId !== deploymentId) {
+      return h.response().code(200);
+    }
+
+    if (status.includes('error')) {
+      await reviewAppRepository.setStatusSettled({ name: appName, status: 'failure' });
+      logger.info({ event, message: `Application ${appName} marked as failed.` });
 
       logger.info({
         event,
@@ -115,14 +126,8 @@ const scalingo = {
       return h.response().code(200);
     }
 
-    const reviewApp = await reviewAppRepository.setStatus({ name: appName, status: 'success' });
-    if (!reviewApp) {
-      logger.warn({ event, message: `Application ${appName} was not found` });
-      return h.response().code(200);
-    }
+    await reviewAppRepository.setStatusSettled({ name: appName, status: 'success' });
     logger.info({ event, message: `Application ${appName} marked as deployed.` });
-
-    const { repository, prNumber } = reviewApp;
 
     await updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber, sha });
 

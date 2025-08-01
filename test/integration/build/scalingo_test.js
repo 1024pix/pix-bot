@@ -276,6 +276,44 @@ describe('Integration | Build | Scalingo', function () {
       });
     });
 
+    describe('when the deployment id is not the last deployment id', function () {
+      it('should not mark the review app as deployed', async function () {
+        // given
+        const appName = 'pix-api-review-pr123';
+        await knex('review-apps').insert({
+          name: appName,
+          repository: 'pix',
+          prNumber: 123,
+          parentApp: 'pix-api-review',
+          status: 'pending',
+          lastDeploymentId: 'deployment-id-456',
+        });
+        const payload = {
+          type_data: {
+            status: 'success',
+            deployment_type: 'deployment',
+            git_ref: 'abc123',
+            deployment_uuid: 'deployment-id-123',
+          },
+          app_name: appName,
+          type: 'deployment',
+        };
+
+        // when
+        const response = await server.inject({
+          method: 'POST',
+          url: '/build/scalingo/review-app-deploy-endpoint',
+          payload,
+        });
+
+        // then
+        expect(response.statusCode).to.equal(200);
+        const reviewApp = await knex('review-apps').where({ name: appName }).first();
+        expect(reviewApp).to.have.property('status', 'pending');
+        expect(reviewApp).to.have.property('lastDeploymentId', 'deployment-id-456');
+      });
+    });
+
     describe('when the deployment status is success', function () {
       it('should mark the review app as deployed', async function () {
         // given
@@ -285,18 +323,23 @@ describe('Integration | Build | Scalingo', function () {
           repository: 'pix',
           prNumber: 123,
           parentApp: 'pix-api-review',
+          status: 'pending',
+          lastDeploymentId: 'deployment-id-123',
         });
         await knex('review-apps').insert({
           name: 'pix-admin-review-pr123',
           repository: 'pix',
           prNumber: 123,
           parentApp: 'pix-api-review',
+          status: 'pending',
+          lastDeploymentId: 'deployment-id-456',
         });
         const payload = {
           type_data: {
             status: 'success',
             deployment_type: 'deployment',
             git_ref: 'abc123',
+            deployment_uuid: 'deployment-id-123',
           },
           app_name: appName,
           type: 'deployment',
@@ -318,7 +361,8 @@ describe('Integration | Build | Scalingo', function () {
         // then
         expect(response.statusCode).to.equal(200);
         const reviewApp = await knex('review-apps').where({ name: appName }).first();
-        expect(reviewApp.status).to.equal('success');
+        expect(reviewApp).to.have.property('status', 'success');
+        expect(reviewApp).to.have.property('lastDeploymentId', null);
         expect(addRADeploymentCheckNock.isDone()).to.be.true;
       });
 
@@ -328,7 +372,13 @@ describe('Integration | Build | Scalingo', function () {
           const appName = 'pix-api-review-pr123';
           const repository = 'pix';
           const prNumber = 123;
-          await knex('review-apps').insert({ name: appName, repository, prNumber, parentApp: 'pix-api-review' });
+          await knex('review-apps').insert({
+            name: appName,
+            repository,
+            prNumber,
+            parentApp: 'pix-api-review',
+            status: 'pending',
+          });
           await knex('review-apps').insert({
             name: 'pix-admin-review-pr123',
             repository,
