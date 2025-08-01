@@ -476,8 +476,8 @@ async function handlePullRequestSynchronize(
   });
 
   for (const app of existingApps) {
-    await dependencies.reviewAppRepo.setStatus({ name: app.name, status: 'pending' });
-    await client.deployUsingSCM(app.name, ref);
+    const deploymentId = await client.deployUsingSCM(app.name, ref);
+    await dependencies.reviewAppRepo.setStatusPending({ name: app.name, deploymentId });
   }
 
   await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber, sha });
@@ -646,15 +646,16 @@ async function createReviewApp(
     return;
   }
 
+  await client.deployReviewApp(parentApp, pullRequestNumber);
+  await client.disableAutoDeploy(reviewAppName);
+  const deploymentId = await client.deployUsingSCM(reviewAppName, ref);
   await dependencies.reviewAppRepo.create({
     name: reviewAppName,
     repository: repositoryName,
     prNumber: pullRequestNumber,
     parentApp,
+    deploymentId,
   });
-  await client.deployReviewApp(parentApp, pullRequestNumber);
-  await client.disableAutoDeploy(reviewAppName);
-  await client.deployUsingSCM(reviewAppName, ref);
   if (shouldRemovePostgresAddon) {
     await client.removeAddon(reviewAppName, 'postgresql');
   }

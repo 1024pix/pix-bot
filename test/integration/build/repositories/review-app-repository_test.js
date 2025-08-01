@@ -14,19 +14,21 @@ describe('Integration | Build | Repository | Review App', function () {
       const repository = 'pix';
       const prNumber = 123;
       const parentApp = 'pix-api-review';
+      const deploymentId = 'deployment-id-123';
 
       // when
-      await reviewAppRepository.create({ name, repository, prNumber, parentApp });
+      await reviewAppRepository.create({ name, repository, prNumber, parentApp, deploymentId });
 
       // then
       const reviewApp = await knex('review-apps').where({ name }).first();
 
       expect(reviewApp).not.to.be.null;
-      expect(reviewApp.name).to.equal(name);
-      expect(reviewApp.repository).to.equal(repository);
-      expect(reviewApp.prNumber).to.equal(prNumber);
-      expect(reviewApp.parentApp).to.equal(parentApp);
-      expect(reviewApp.status).to.equal('pending');
+      expect(reviewApp).to.have.property('name', name);
+      expect(reviewApp).to.have.property('repository', repository);
+      expect(reviewApp).to.have.property('prNumber', prNumber);
+      expect(reviewApp).to.have.property('parentApp', parentApp);
+      expect(reviewApp).to.have.property('status', 'pending');
+      expect(reviewApp).to.have.property('lastDeploymentId', deploymentId);
     });
 
     describe('when a review app already exists', function () {
@@ -36,6 +38,7 @@ describe('Integration | Build | Repository | Review App', function () {
         const repository = 'pix';
         const prNumber = 123;
         const parentApp = 'pix-api-review';
+        const deploymentId = 'deployment-id-456';
 
         const [initialReviewApp] = await knex('review-apps')
           .insert({
@@ -44,26 +47,101 @@ describe('Integration | Build | Repository | Review App', function () {
             prNumber,
             parentApp,
             status: 'success',
+            lastDeploymentId: 'deployment-id-123',
           })
           .returning('*');
 
         // when
-        await reviewAppRepository.create({ name, repository, prNumber, parentApp });
+        await reviewAppRepository.create({ name, repository, prNumber, parentApp, deploymentId });
 
         // then
         const mergedReviewApp = await knex('review-apps').where({ name }).first();
         expect(mergedReviewApp).not.to.be.null;
-        expect(mergedReviewApp.name).to.equal(initialReviewApp.name);
-        expect(mergedReviewApp.repository).to.equal(initialReviewApp.repository);
-        expect(mergedReviewApp.prNumber).to.equal(initialReviewApp.prNumber);
-        expect(mergedReviewApp.parentApp).to.equal(initialReviewApp.parentApp);
-        expect(mergedReviewApp.status).to.equal('pending');
-        expect(mergedReviewApp.createdAt).not.to.equal(initialReviewApp.createdAt);
+        expect(mergedReviewApp).to.have.property('name', initialReviewApp.name);
+        expect(mergedReviewApp).to.have.property('repository', initialReviewApp.repository);
+        expect(mergedReviewApp).to.have.property('prNumber', initialReviewApp.prNumber);
+        expect(mergedReviewApp).to.have.property('parentApp', initialReviewApp.parentApp);
+        expect(mergedReviewApp).to.have.property('status', 'pending');
+        expect(mergedReviewApp).to.have.property('lastDeploymentId', deploymentId);
+        expect(mergedReviewApp).to.have.property('createdAt').that.does.not.equal(initialReviewApp.createdAt);
       });
     });
   });
 
-  describe('setStatus', function () {
+  describe('get', function () {
+    it('returns review app information', async function () {
+      // given
+      const name = 'pix-api-review-pr123';
+      const repository = 'pix';
+      const prNumber = 123;
+      const parentApp = 'pix-api-review';
+      const status = 'pending';
+      const lastDeploymentId = 'deployment-id-123';
+
+      await knex('review-apps').insert({
+        name,
+        repository,
+        prNumber,
+        parentApp,
+        status,
+        lastDeploymentId,
+      });
+
+      // when
+      const reviewApp = await reviewAppRepository.get(name);
+
+      expect(reviewApp).to.deep.equal({
+        name,
+        repository,
+        prNumber,
+        status,
+        lastDeploymentId,
+      });
+    });
+  });
+
+  describe('setStatusPending', function () {
+    it('sets status to pending and lastDeploymentId to given value', async function () {
+      // given
+      const name = 'pix-api-review-pr123';
+      const repository = 'pix';
+      const prNumber = 123;
+      const parentApp = 'pix-api-review';
+      const deploymentId = 'deployment-id-123';
+
+      await knex('review-apps').insert({
+        name,
+        repository,
+        prNumber,
+        parentApp,
+        status: 'success',
+        lastDeploymentId: null,
+      });
+
+      // when
+      await reviewAppRepository.setStatusPending({ name, deploymentId });
+
+      // then
+      const updatedReviewApp = await knex('review-apps').where({ name }).first();
+      expect(updatedReviewApp).to.have.property('status', 'pending');
+      expect(updatedReviewApp).to.have.property('lastDeploymentId', deploymentId);
+    });
+
+    describe('when review app does not exist', function () {
+      it('does nothing', async function () {
+        // given
+        const name = 'does-not-exist';
+        const deploymentId = 'deployment-id-123';
+
+        // when
+        await reviewAppRepository.setStatusPending({ name, deploymentId });
+
+        // then
+      });
+    });
+  });
+
+  describe('setStatusSettled', function () {
     it('sets status and return repository and prNumber', async function () {
       // given
       const name = 'pix-api-review-pr123';
@@ -77,27 +155,28 @@ describe('Integration | Build | Repository | Review App', function () {
         repository,
         prNumber,
         parentApp,
+        status: 'pending',
+        lastDeploymentId: 'deployment-id-123',
       });
 
       // when
-      const result = await reviewAppRepository.setStatus({ name, status });
+      await reviewAppRepository.setStatusSettled({ name, status });
 
-      expect(result).to.deep.equal({
-        repository,
-        prNumber,
-      });
       const updatedReviewApp = await knex('review-apps').where({ name }).first();
       expect(updatedReviewApp).to.have.property('status', 'success');
+      expect(updatedReviewApp).to.have.property('lastDeploymentId', null);
     });
 
     describe('when review app does not exist', function () {
       it('returns undefined', async function () {
-        // when
+        // given
         const name = 'does-not-exist';
         const status = 'success';
-        const result = await reviewAppRepository.setStatus({ name, status });
 
-        expect(result).to.be.undefined;
+        // when
+        await reviewAppRepository.setStatusSettled({ name, status });
+
+        // then
       });
     });
   });

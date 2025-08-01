@@ -1324,6 +1324,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         const pullRequestNumber = 123;
         const ref = 'la-branche';
         const shouldRemovePostgresAddon = false;
+        const deploymentId = 'deployment-id-123';
 
         const reviewAppRepo = {
           create: sinon.stub().resolves(),
@@ -1332,7 +1333,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
           reviewAppExists: sinon.stub().resolves(false),
           deployReviewApp: sinon.stub().resolves(),
           disableAutoDeploy: sinon.stub().resolves(),
-          deployUsingSCM: sinon.stub().resolves(),
+          deployUsingSCM: sinon.stub().resolves(deploymentId),
         };
         const scalingoClient = {
           getInstance: sinon.stub().resolves(scalingoClientInstance),
@@ -1346,15 +1347,16 @@ Removed review apps: pix-api-maddo-review-pr123`);
 
         // then
         expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
+        expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
+        expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
+        expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
         expect(reviewAppRepo.create).to.have.been.calledWithExactly({
           name: reviewAppName,
           repository: repositoryName,
           prNumber: pullRequestNumber,
           parentApp,
+          deploymentId,
         });
-        expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
-        expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
-        expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
       });
 
       describe('when postgres addon should be removed', function () {
@@ -1366,6 +1368,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
           const pullRequestNumber = 123;
           const ref = 'la-branche';
           const shouldRemovePostgresAddon = true;
+          const deploymentId = 'deployment-id-123';
 
           const reviewAppRepo = {
             create: sinon.stub().resolves(),
@@ -1374,7 +1377,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
             reviewAppExists: sinon.stub().resolves(false),
             deployReviewApp: sinon.stub().resolves(),
             disableAutoDeploy: sinon.stub().resolves(),
-            deployUsingSCM: sinon.stub().resolves(),
+            deployUsingSCM: sinon.stub().resolves(deploymentId),
             removeAddon: sinon.stub().resolves(),
           };
           const scalingoClient = {
@@ -1389,15 +1392,16 @@ Removed review apps: pix-api-maddo-review-pr123`);
 
           // then
           expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
+          expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
+          expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
+          expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
           expect(reviewAppRepo.create).to.have.been.calledWithExactly({
             name: reviewAppName,
             repository: repositoryName,
             prNumber: pullRequestNumber,
             parentApp,
+            deploymentId,
           });
-          expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
-          expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
-          expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(reviewAppName, ref);
           expect(scalingoClientInstance.removeAddon).to.have.been.calledWithExactly(reviewAppName, 'postgresql');
         });
       });
@@ -1497,10 +1501,15 @@ Removed review apps: pix-api-maddo-review-pr123`);
         listForPullRequest: sinon
           .stub()
           .resolves([{ name: 'pix-api-review-pr123' }, { name: 'pix-api-maddo-review-pr123' }]),
-        setStatus: sinon.stub().resolves(),
+        setStatusPending: sinon.stub().resolves(),
       };
       const scalingoClientInstance = {
-        deployUsingSCM: sinon.stub().resolves(),
+        deployUsingSCM: sinon
+          .stub()
+          .onFirstCall()
+          .resolves('deployment-id-123')
+          .onSecondCall()
+          .resolves('deployment-id-456'),
       };
       const scalingoClient = {
         getInstance: sinon.stub().resolves(scalingoClientInstance),
@@ -1518,22 +1527,22 @@ Removed review apps: pix-api-maddo-review-pr123`);
       expect(result).to.equal('Deployed on PR 123 in repository pix');
       expect(reviewAppRepo.listForPullRequest).to.have.been.calledWithExactly({ repository: 'pix', prNumber: 123 });
       expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledTwice;
-      expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(
+      expect(scalingoClientInstance.deployUsingSCM.firstCall).to.have.been.calledWithExactly(
         'pix-api-review-pr123',
         'la-branche',
       );
-      expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledWithExactly(
+      expect(scalingoClientInstance.deployUsingSCM.secondCall).to.have.been.calledWithExactly(
         'pix-api-maddo-review-pr123',
         'la-branche',
       );
-      expect(reviewAppRepo.setStatus).to.have.been.calledTwice;
-      expect(reviewAppRepo.setStatus).to.have.been.calledWithExactly({
+      expect(reviewAppRepo.setStatusPending).to.have.been.calledTwice;
+      expect(reviewAppRepo.setStatusPending.firstCall).to.have.been.calledWithExactly({
         name: 'pix-api-review-pr123',
-        status: 'pending',
+        deploymentId: 'deployment-id-123',
       });
-      expect(reviewAppRepo.setStatus).to.have.been.calledWithExactly({
+      expect(reviewAppRepo.setStatusPending.secondCall).to.have.been.calledWithExactly({
         name: 'pix-api-maddo-review-pr123',
-        status: 'pending',
+        deploymentId: 'deployment-id-456',
       });
       expect(updateCheckRADeployment).to.have.been.calledOnceWithExactly({
         repositoryName: 'pix',
