@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.1.1 (01/08/2025)
+
+
+### :rocket: Amélioration
+- [#625](https://github.com/1024pix/pix-bot/pull/625) [FEATURE] Ajout de la colonne lastDeploymentId dans review-apps.
+
 ## v2.1.0 (31/07/2025)
 
 
