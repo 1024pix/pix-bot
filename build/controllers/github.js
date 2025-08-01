@@ -62,7 +62,6 @@ const repositoryToScalingoAppsReview = {
         { label: 'API', href: `https://api-pr${pullRequestNumber}.review.pix.fr/api/` },
       ],
     },
-    { appName: 'pix-front-review', isHidden: true },
     {
       appName: 'pix-app-review',
       getLinks: (pullRequestNumber) => [
@@ -137,7 +136,6 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
   const shortenedRepositoryName = repositoryName.replace('pix-', '');
   const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
   const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
-    .filter(({ isHidden }) => !isHidden)
     .map(({ appName, label, getLinks }) => {
       let links;
       if (getLinks) {

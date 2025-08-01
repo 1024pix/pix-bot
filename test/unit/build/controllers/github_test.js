@@ -729,7 +729,7 @@ describe('Unit | Controller | Github', function () {
         const updateCheckRADeployment = sinon.stub().resolves();
 
         reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
-        reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-admin-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
@@ -741,7 +741,7 @@ describe('Unit | Controller | Github', function () {
 
         // then
         expect(response).to.equal(
-          'Closed RA for PR 3 : pix-api-review-pr3, pix-front-review-pr3, pix-app-review-pr3 (already closed), pix-orga-review-pr3 (already closed), pix-certif-review-pr3 (already closed), pix-junior-review-pr3 (already closed), pix-admin-review-pr3 (already closed), pix-api-maddo-review-pr3 (already closed), pix-audit-logger-review-pr3 (already closed).',
+          'Closed RA for PR 3 : pix-api-review-pr3, pix-app-review-pr3 (already closed), pix-orga-review-pr3 (already closed), pix-certif-review-pr3 (already closed), pix-junior-review-pr3 (already closed), pix-admin-review-pr3, pix-api-maddo-review-pr3 (already closed), pix-audit-logger-review-pr3 (already closed).',
         );
         expect(updateCheckRADeployment).to.have.been.calledWith({
           repositoryName: 'pix',
@@ -765,7 +765,7 @@ describe('Unit | Controller | Github', function () {
         const updateCheckRADeployment = sinon.stub().resolves();
 
         reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
-        reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-admin-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
@@ -777,7 +777,7 @@ describe('Unit | Controller | Github', function () {
 
         // then
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-api-review-pr3' })).to.be.true;
-        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-front-review-pr3' })).to.be.true;
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-admin-review-pr3' })).to.be.true;
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-audit-logger-review-pr3' })).to.be.true;
         expect(updateCheckRADeployment).to.have.been.calledWith({
           repositoryName: 'pix',
@@ -804,7 +804,7 @@ describe('Unit | Controller | Github', function () {
         const updateCheckRADeployment = sinon.stub().resolves();
 
         reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
-        reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+        reviewAppExistsStub.withArgs('pix-admin-review-pr3').resolves(true);
         reviewAppExistsStub.withArgs('pix-audit-logger-review-pr3').resolves(false);
 
         // when
@@ -819,8 +819,8 @@ describe('Unit | Controller | Github', function () {
         expect(deleteReviewAppStub.calledWith('pix-api-review-pr3')).to.be.true;
         expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-audit-logger-review-pr3' })).to.be.true;
         expect(deleteReviewAppStub.calledWith('pix-audit-logger-review-pr3')).to.be.false;
-        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-front-review-pr3' })).to.be.true;
-        expect(deleteReviewAppStub.calledWith('pix-front-review-pr3')).to.be.true;
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-admin-review-pr3' })).to.be.true;
+        expect(deleteReviewAppStub.calledWith('pix-admin-review-pr3')).to.be.true;
         expect(updateCheckRADeployment).to.have.been.calledWith({
           repositoryName: 'pix',
           pullRequestNumber: 3,
@@ -845,7 +845,7 @@ describe('Unit | Controller | Github', function () {
           });
 
           reviewAppExistsStub.withArgs('pix-api-review-pr3').resolves(true);
-          reviewAppExistsStub.withArgs('pix-front-review-pr3').resolves(true);
+          reviewAppExistsStub.withArgs('pix-admin-review-pr3').resolves(true);
 
           // when
           await githubController.handleCloseRA(request, {
@@ -1274,7 +1274,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         };
         const comment = `Choisir les applications à déployer :
 
-- [] Fronts <!-- pix-front-review -->
+- [] Admin <!-- pix-admin-review -->
 - [X] API <!-- pix-api-review -->
 - [X] API MaDDo <!-- pix-api-maddo-review -->
 - [ ] Audit Logger <!-- pix-audit-logger-review -->

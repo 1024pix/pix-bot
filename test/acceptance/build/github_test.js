@@ -332,12 +332,12 @@ describe('Acceptance | Build | Github', function () {
           };
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
           await knex('review-apps').insert({
-            name: 'pix-front-review-pr2',
+            name: 'pix-admin-review-pr2',
             repository: 'pix',
             prNumber: 2,
-            parentApp: 'pix-front-review',
+            parentApp: 'pix-admin-review',
           });
-          const scalingoDeploy = deployReviewAppNock({ reviewAppName: 'pix-front-review-pr2' });
+          const scalingoDeploy = deployReviewAppNock({ reviewAppName: 'pix-admin-review-pr2' });
           const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha' });
           const addRADeploymentCheck = addRADeploymentCheckNock({
             repository: 'pix',
@@ -570,10 +570,8 @@ describe('Acceptance | Build | Github', function () {
           getAppNock({ reviewAppName: 'pix-api-review-pr123', returnCode: StatusCodes.OK });
           getAppNock({ reviewAppName: 'pix-api-maddo-review-pr123', returnCode: StatusCodes.OK });
           getAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
-          getAppNock({ reviewAppName: 'pix-front-review-pr123', returnCode: StatusCodes.OK });
           deleteReviewAppNock({ reviewAppName: 'pix-api-review-pr123' });
           deleteReviewAppNock({ reviewAppName: 'pix-api-maddo-review-pr123' });
-          deleteReviewAppNock({ reviewAppName: 'pix-front-review-pr123' });
 
           const body = {
             action: 'closed',
@@ -611,7 +609,7 @@ describe('Acceptance | Build | Github', function () {
           expect(nock.isDone()).to.be.true;
 
           expect(response.payload).to.equal(
-            'Closed RA for PR 123 : pix-api-review-pr123, pix-front-review-pr123, pix-app-review-pr123 (already closed), pix-orga-review-pr123 (already closed), pix-certif-review-pr123 (already closed), pix-junior-review-pr123 (already closed), pix-admin-review-pr123 (already closed), pix-api-maddo-review-pr123, pix-audit-logger-review-pr123 (already closed).',
+            'Closed RA for PR 123 : pix-api-review-pr123, pix-app-review-pr123 (already closed), pix-orga-review-pr123 (already closed), pix-certif-review-pr123 (already closed), pix-junior-review-pr123 (already closed), pix-admin-review-pr123 (already closed), pix-api-maddo-review-pr123, pix-audit-logger-review-pr123 (already closed).',
           );
         });
       });

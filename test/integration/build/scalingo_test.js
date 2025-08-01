@@ -287,7 +287,7 @@ describe('Integration | Build | Scalingo', function () {
           parentApp: 'pix-api-review',
         });
         await knex('review-apps').insert({
-          name: 'pix-front-review-pr123',
+          name: 'pix-admin-review-pr123',
           repository: 'pix',
           prNumber: 123,
           parentApp: 'pix-api-review',
@@ -330,7 +330,7 @@ describe('Integration | Build | Scalingo', function () {
           const prNumber = 123;
           await knex('review-apps').insert({ name: appName, repository, prNumber, parentApp: 'pix-api-review' });
           await knex('review-apps').insert({
-            name: 'pix-front-review-pr123',
+            name: 'pix-admin-review-pr123',
             repository,
             prNumber,
             parentApp: 'pix-api-review',
@@ -390,7 +390,7 @@ describe('Integration | Build | Scalingo', function () {
           parentApp: 'pix-api-review',
         });
         await knex('review-apps').insert({
-          name: 'pix-front-review-pr123',
+          name: 'pix-admin-review-pr123',
           repository,
           prNumber,
           parentApp: 'pix-api-review',
