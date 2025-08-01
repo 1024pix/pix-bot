@@ -131,10 +131,7 @@ function getMessageTemplate(repositoryName) {
   return messageTemplate;
 }
 
-function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate) {
-  const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoReviewApps[0].appName}-pr${pullRequestId}/environment`;
-  const shortenedRepositoryName = repositoryName.replace('pix-', '');
-  const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
+function getMessage(pullRequestId, scalingoReviewApps, messageTemplate) {
   const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
     .map(({ appName, label, getLinks }) => {
       let links;
@@ -153,8 +150,6 @@ function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTe
     .join('\n');
   const message = messageTemplate
     .replaceAll('{{pullRequestId}}', pullRequestId)
-    .replaceAll('{{webApplicationUrl}}', webApplicationUrl)
-    .replaceAll('{{scalingoDashboardUrl}}', scalingoDashboardUrl)
     .replaceAll('{{checkboxesForReviewAppsToBeDeployed}}', checkboxesForReviewAppsToBeDeployed);
   return message;
 }
@@ -530,7 +525,7 @@ async function addMessageToPullRequest(
   dependencies = { githubService: commonGithubService },
 ) {
   const template = getMessageTemplate(repositoryName, true);
-  const message = getMessage(repositoryName, pullRequestNumber, reviewApps, template);
+  const message = getMessage(pullRequestNumber, reviewApps, template);
   await dependencies.githubService.commentPullRequest({
     repositoryName,
     pullRequestId: pullRequestNumber,
@@ -546,7 +541,7 @@ async function updateMessageToPullRequest(
 
   const deploymentRAComment = comments.find((comment) => comment.user.login === 'pix-bot-github');
   const template = getMessageTemplate(repositoryName, true);
-  const message = getMessage(repositoryName, pullRequestNumber, reviewApps, template);
+  const message = getMessage(pullRequestNumber, reviewApps, template);
 
   if (!deploymentRAComment) {
     await dependencies.githubService.commentPullRequest({

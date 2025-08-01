@@ -67,17 +67,16 @@ describe('Unit | Controller | Github', function () {
 
   describe('#getMessage', function () {
     it('replace template placeholders with params', function () {
-      const template = 'Hello, url {{webApplicationUrl}}, {{pullRequestId}} and {{scalingoDashboardUrl}}';
-      expect(
-        githubController.getMessage('pix', '42', [{ appName: 'pix-review' }, { appName: 'pix-review2' }], template),
-      ).to.equal(
-        'Hello, url https://pix-pr42.review.pix.fr, 42 and https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment',
-      );
+      const template = 'Choisir les applications à déployer :\n{{checkboxesForReviewAppsToBeDeployed}}';
+      expect(githubController.getMessage('42', [{ appName: 'pix-review' }, { appName: 'pix-review2' }], template)).to
+        .equal(`Choisir les applications à déployer :
+- [ ] [pix](https://pix-review-pr42.osc-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment) <!-- pix-review -->
+- [ ] [pix2](https://pix-review2-pr42.osc-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-review2-pr42/environment) <!-- pix-review2 -->`);
     });
 
     it('replace multiple values', function () {
       const template = '{{pullRequestId}}, {{pullRequestId}}';
-      expect(githubController.getMessage('pix', '43', [{ appName: 'pix-review' }], template)).to.equal('43, 43');
+      expect(githubController.getMessage('43', [{ appName: 'pix-review' }], template)).to.equal('43, 43');
     });
   });
 
