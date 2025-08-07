@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v2.3.0 (07/08/2025)
+
+
+### :rocket: Amélioration
+- [#631](https://github.com/1024pix/pix-bot/pull/631) [FEATURE] Ajouter des astuces au message du dépôt pix-data.
+
+### :arrow_up: Montée de version
+- [#632](https://github.com/1024pix/pix-bot/pull/632) [BUMP] Update Node.js to v22.18.0.
+
 ## v2.2.0 (01/08/2025)
 
 
