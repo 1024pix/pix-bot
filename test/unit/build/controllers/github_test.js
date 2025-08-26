@@ -998,7 +998,7 @@ describe('Unit | Controller | Github', function () {
       // then
       expect(addMessageToPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
-        reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+        scalingoReviewApps: githubController.repositoryToScalingoAppsReview.pix,
         pullRequestNumber: 123,
       });
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
@@ -1024,7 +1024,7 @@ describe('Unit | Controller | Github', function () {
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          scalingoReviewApps: githubController.repositoryToScalingoAppsReview.pix,
         },
         { githubService },
       );
@@ -1557,7 +1557,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
       // then
       expect(updateMessageToPullRequest).to.have.been.calledWithExactly({
         repositoryName: 'pix',
-        reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+        scalingoReviewApps: githubController.repositoryToScalingoAppsReview.pix,
         pullRequestNumber: 123,
       });
       expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
@@ -1584,7 +1584,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          scalingoReviewApps: githubController.repositoryToScalingoAppsReview.pix,
         },
         { githubService },
       );
@@ -1615,7 +1615,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
         {
           repositoryName,
           pullRequestNumber,
-          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          scalingoReviewApps: githubController.repositoryToScalingoAppsReview.pix,
         },
         { githubService },
       );

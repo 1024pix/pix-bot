@@ -433,11 +433,11 @@ async function handlePullRequestOpened(
   const repository = request.payload.pull_request.head.repo.name;
   const sha = request.payload.pull_request.head.sha;
 
-  const reviewApps = repositoryToScalingoAppsReview[repository];
+  const scalingoReviewApps = repositoryToScalingoAppsReview[repository];
 
   await dependencies.addMessageToPullRequest({
     repositoryName: repository,
-    reviewApps,
+    scalingoReviewApps,
     pullRequestNumber,
   });
 
@@ -498,11 +498,11 @@ async function handlePullRequestReopened(
   const repositoryName = request.payload.pull_request.head.repo.name;
   const sha = request.payload.pull_request.head.sha;
 
-  const reviewApps = repositoryToScalingoAppsReview[repositoryName];
+  const scalingoReviewApps = repositoryToScalingoAppsReview[repositoryName];
 
   await dependencies.updateMessageToPullRequest({
     repositoryName,
-    reviewApps,
+    scalingoReviewApps,
     pullRequestNumber,
   });
 
@@ -521,11 +521,11 @@ async function handlePullRequestReopened(
 }
 
 async function addMessageToPullRequest(
-  { repositoryName, reviewApps, pullRequestNumber },
+  { repositoryName, scalingoReviewApps, pullRequestNumber },
   dependencies = { githubService: commonGithubService },
 ) {
   const messageTemplate = getMessageTemplate(repositoryName, true);
-  const message = getMessage({ repositoryName, pullRequestNumber, reviewApps, messageTemplate });
+  const message = getMessage({ repositoryName, pullRequestNumber, scalingoReviewApps, messageTemplate });
   await dependencies.githubService.commentPullRequest({
     repositoryName,
     pullRequestNumber,
@@ -534,14 +534,14 @@ async function addMessageToPullRequest(
 }
 
 async function updateMessageToPullRequest(
-  { repositoryName, reviewApps, pullRequestNumber },
+  { repositoryName, scalingoReviewApps, pullRequestNumber },
   dependencies = { githubService: commonGithubService },
 ) {
   const comments = await dependencies.githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
 
   const deploymentRAComment = comments.find((comment) => comment.user.login === 'pix-bot-github');
   const messageTemplate = getMessageTemplate(repositoryName, true);
-  const message = getMessage({ repositoryName, pullRequestNumber, reviewApps, messageTemplate });
+  const message = getMessage({ repositoryName, pullRequestNumber, scalingoReviewApps, messageTemplate });
 
   if (!deploymentRAComment) {
     await dependencies.githubService.commentPullRequest({
