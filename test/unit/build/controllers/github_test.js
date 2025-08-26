@@ -67,17 +67,29 @@ describe('Unit | Controller | Github', function () {
 
   describe('#getMessage', function () {
     it('replace template placeholders with params', function () {
-      const template = 'Hello, url {{webApplicationUrl}}, {{pullRequestId}} and {{scalingoDashboardUrl}}';
+      const messageTemplate = 'Hello, url {{webApplicationUrl}}, {{pullRequestNumber}} and {{scalingoDashboardUrl}}';
       expect(
-        githubController.getMessage('pix', '42', [{ appName: 'pix-review' }, { appName: 'pix-review2' }], template),
+        githubController.getMessage({
+          repositoryName: 'pix',
+          pullRequestNumber: '42',
+          scalingoReviewApps: [{ appName: 'pix-review' }, { appName: 'pix-review2' }],
+          messageTemplate,
+        }),
       ).to.equal(
         'Hello, url https://pix-pr42.review.pix.fr, 42 and https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment',
       );
     });
 
     it('replace multiple values', function () {
-      const template = '{{pullRequestId}}, {{pullRequestId}}';
-      expect(githubController.getMessage('pix', '43', [{ appName: 'pix-review' }], template)).to.equal('43, 43');
+      const messageTemplate = '{{pullRequestNumber}}, {{pullRequestNumber}}';
+      expect(
+        githubController.getMessage({
+          repositoryName: 'pix',
+          pullRequestNumber: '43',
+          scalingoReviewApps: [{ appName: 'pix-review' }],
+          messageTemplate,
+        }),
+      ).to.equal('43, 43');
     });
   });
 
@@ -1020,7 +1032,7 @@ describe('Unit | Controller | Github', function () {
       // then
       expect(githubService.commentPullRequest).to.have.been.calledWithExactly({
         repositoryName,
-        pullRequestId: pullRequestNumber,
+        pullRequestNumber: pullRequestNumber,
         comment: COMMENT,
       });
     });
@@ -1611,7 +1623,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
       //then
       expect(githubService.commentPullRequest).to.have.been.calledWithExactly({
         repositoryName,
-        pullRequestId: pullRequestNumber,
+        pullRequestNumber: pullRequestNumber,
         comment: COMMENT,
       });
     });

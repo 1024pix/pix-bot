@@ -309,13 +309,13 @@ function _buildOctokitSearchQueryString(params = []) {
   return params.map((p) => `${Object.keys(p)}:${Object.values(p)}`).join('+');
 }
 
-const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) => {
+const commentPullRequest = async ({ repositoryName, pullRequestNumber, comment }) => {
   const owner = config.github.owner;
   const octokit = _createOctokit();
   await octokit.issues.createComment({
     owner,
     repo: repositoryName,
-    issue_number: pullRequestId,
+    issue_number: pullRequestNumber,
     body: comment,
   });
 };

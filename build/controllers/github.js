@@ -132,29 +132,29 @@ function getMessageTemplate(repositoryName) {
   return messageTemplate;
 }
 
-function getMessage(repositoryName, pullRequestId, scalingoReviewApps, messageTemplate) {
-  const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoReviewApps[0].appName}-pr${pullRequestId}/environment`;
+function getMessage({ repositoryName, pullRequestNumber, scalingoReviewApps, messageTemplate }) {
+  const scalingoDashboardUrl = `https://dashboard.scalingo.com/apps/osc-fr1/${scalingoReviewApps[0].appName}-pr${pullRequestNumber}/environment`;
   const shortenedRepositoryName = repositoryName.replace('pix-', '');
-  const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestId}.review.pix.fr`;
+  const webApplicationUrl = `https://${shortenedRepositoryName}-pr${pullRequestNumber}.review.pix.fr`;
   const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
     .filter(({ isHidden }) => !isHidden)
     .map(({ appName, label, getLinks }) => {
       let links;
       if (getLinks) {
-        links = getLinks(pullRequestId)
+        links = getLinks(pullRequestNumber)
           .map(({ label, href }) => `[${label}](${href})`)
           .join(' – ');
       } else {
-        links = `[${label ? label : appName.replace('-review', '')}](https://${appName}-pr${pullRequestId}.osc-fr1.scalingo.io/)`;
+        links = `[${label ? label : appName.replace('-review', '')}](https://${appName}-pr${pullRequestNumber}.osc-fr1.scalingo.io/)`;
       }
 
-      const scalingoDashboardLink = `[👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/${appName}-pr${pullRequestId}/environment)`;
+      const scalingoDashboardLink = `[👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/${appName}-pr${pullRequestNumber}/environment)`;
 
       return `- [ ] ${links} | ${scalingoDashboardLink} <!-- ${appName} -->`;
     })
     .join('\n');
   const message = messageTemplate
-    .replaceAll('{{pullRequestId}}', pullRequestId)
+    .replaceAll('{{pullRequestNumber}}', pullRequestNumber)
     .replaceAll('{{webApplicationUrl}}', webApplicationUrl)
     .replaceAll('{{scalingoDashboardUrl}}', scalingoDashboardUrl)
     .replaceAll('{{checkboxesForReviewAppsToBeDeployed}}', checkboxesForReviewAppsToBeDeployed);
@@ -524,11 +524,11 @@ async function addMessageToPullRequest(
   { repositoryName, reviewApps, pullRequestNumber },
   dependencies = { githubService: commonGithubService },
 ) {
-  const template = getMessageTemplate(repositoryName, true);
-  const message = getMessage(repositoryName, pullRequestNumber, reviewApps, template);
+  const messageTemplate = getMessageTemplate(repositoryName, true);
+  const message = getMessage({ repositoryName, pullRequestNumber, reviewApps, messageTemplate });
   await dependencies.githubService.commentPullRequest({
     repositoryName,
-    pullRequestId: pullRequestNumber,
+    pullRequestNumber,
     comment: message,
   });
 }
@@ -540,13 +540,13 @@ async function updateMessageToPullRequest(
   const comments = await dependencies.githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
 
   const deploymentRAComment = comments.find((comment) => comment.user.login === 'pix-bot-github');
-  const template = getMessageTemplate(repositoryName, true);
-  const message = getMessage(repositoryName, pullRequestNumber, reviewApps, template);
+  const messageTemplate = getMessageTemplate(repositoryName, true);
+  const message = getMessage({ repositoryName, pullRequestNumber, reviewApps, messageTemplate });
 
   if (!deploymentRAComment) {
     await dependencies.githubService.commentPullRequest({
       repositoryName,
-      pullRequestId: pullRequestNumber,
+      pullRequestNumber,
       comment: message,
     });
     return;

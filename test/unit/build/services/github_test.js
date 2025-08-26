@@ -592,11 +592,11 @@ describe('Unit | Build | github-test', function () {
           .post('/repos/github-owner/a-repository/issues/0/comments', { body })
           .reply(200);
         const repositoryName = 'a-repository';
-        const pullRequestId = 0;
+        const pullRequestNumber = 0;
         const comment = '# Test \n **awesome comment**';
 
         // when
-        await githubService.commentPullRequest({ repositoryName, pullRequestId, comment });
+        await githubService.commentPullRequest({ repositoryName, pullRequestNumber, comment });
 
         // then
         expect(commentNock.isDone()).to.be.true;
