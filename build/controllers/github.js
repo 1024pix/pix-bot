@@ -561,7 +561,7 @@ async function updateMessageToPullRequest(
 
 async function _handleIssueComment(
   { request, pullRequest },
-  dependencies = { reviewAppRepo, createReviewApp, removeReviewApp, updateCheckRADeployment },
+  dependencies = { createReviewApp, removeReviewApp, updateCheckRADeployment },
 ) {
   const { shouldContinue, message } = shouldHandleIssueComment(request, pullRequest);
   if (!shouldContinue) {
@@ -575,33 +575,21 @@ async function _handleIssueComment(
     allowedReviewApps.map((reviewApp) => [reviewApp.appName, reviewApp]),
   );
 
-  const body = request.payload.comment.body;
+  const fromSelectedApps = extractSelectedAppsFromBody(request.payload.changes.body.from, allowedReviewAppsByName);
+  const toSelectedApps = extractSelectedAppsFromBody(request.payload.comment.body, allowedReviewAppsByName);
+
   const pullRequestNumber = request.payload.issue.number;
-  let selectedApps = Array.from(body.matchAll(/^- \[[xX]\].+<!-- ([\w-]+) -->$/gm), ([, app]) => app);
 
-  selectedApps = selectedApps.filter((app) => {
-    const isAllowed = app in allowedReviewAppsByName;
-    if (!isAllowed) {
-      logger.warn({
-        event: 'review-app',
-        message: `selected app ${app} unknown for repository ${repositoryName}`,
-      });
-    }
-    return isAllowed;
-  });
-
-  const existingApps = await dependencies.reviewAppRepo.listForPullRequest({
-    repository: repositoryName,
-    prNumber: pullRequestNumber,
-  });
-
-  const reviewAppsToCreate = selectedApps
-    .filter((parentApp) => !existingApps.some((app) => app.parentApp === parentApp))
+  const reviewAppsToCreate = toSelectedApps
+    .filter((app) => !fromSelectedApps.includes(app))
     .map((parentApp) => ({
       parentApp,
       reviewAppName: `${parentApp}-pr${pullRequestNumber}`,
     }));
-  const reviewAppsToRemove = existingApps.filter((app) => !selectedApps.includes(app.parentApp)).map((app) => app.name);
+
+  const reviewAppsToRemove = fromSelectedApps
+    .filter((app) => !toSelectedApps.includes(app))
+    .map((parentApp) => `${parentApp}-pr${pullRequestNumber}`);
 
   const ref = pullRequest.head.ref;
 
@@ -633,6 +621,19 @@ async function _handleIssueComment(
   const sha = pullRequest.head.sha;
   await dependencies.updateCheckRADeployment({ repositoryName, pullRequestNumber, sha });
   return messages.join('\n');
+}
+
+function extractSelectedAppsFromBody(body, allowedReviewAppsByName) {
+  return Array.from(body.matchAll(/^- \[[xX]\].+<!-- ([\w-]+) -->$/gm), ([, app]) => app).filter((app) => {
+    const isAllowed = app in allowedReviewAppsByName;
+    if (!isAllowed) {
+      logger.warn({
+        event: 'review-app',
+        message: `selected app ${app} unknown for repository ${repositoryName}`,
+      });
+    }
+    return isAllowed;
+  });
 }
 
 async function createReviewApp(

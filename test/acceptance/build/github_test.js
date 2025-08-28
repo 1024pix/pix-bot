@@ -3,21 +3,6 @@ import server from '../../../server.js';
 import { createGithubWebhookSignatureHeader, expect, nock, sinon, StatusCodes } from '../../test-helper.js';
 import { knex } from '../../../db/knex-database-connection.js';
 
-const COMMENT = `Choisir les applications à déployer :
-
-- [X] [API](https://api-pr123.review.pix.fr/api/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-review-pr123/environment) <!-- pix-api-review -->
-- [ ] [App (.fr)](https://app-pr123.review.pix.fr) – [App (.org)](https://app-pr123.review.pix.org) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-app-review-pr123/environment) <!-- pix-app-review -->
-- [ ] [Orga (.fr)](https://orga-pr123.review.pix.fr) – [Orga (.org)](https://orga-pr123.review.pix.org) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-orga-review-pr123/environment) <!-- pix-orga-review -->
-- [ ] [Certif (.fr)](https://certif-pr123.review.pix.fr) – [Certif (.org)](https://certif-pr123.review.pix.org) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-certif-review-pr123/environment) <!-- pix-certif-review -->
-- [ ] [Junior](https://junior-pr123.review.pix.fr) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-junior-review-pr123/environment) <!-- pix-junior-review -->
-- [ ] [Admin](https://admin-pr123.review.pix.fr) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-admin-review-pr123/environment) <!-- pix-admin-review -->
-- [ ] [API MaDDo](https://pix-api-maddo-review-pr123.osc-fr1.scalingo.io/api/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-api-maddo-review-pr123/environment) <!-- pix-api-maddo-review -->
-- [ ] [Audit Logger](https://pix-audit-logger-review-pr123.osc-fr1.scalingo.io/api/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-audit-logger-review-pr123/environment) <!-- pix-audit-logger-review -->
-
-> [!IMPORTANT]
-> N'oubliez pas de déployer l'API pour pouvoir accéder aux fronts et/ou à l’API MaDDo.
-`;
-
 describe('Acceptance | Build | Github', function () {
   beforeEach(async function () {
     await knex('review-apps').truncate();
@@ -418,9 +403,27 @@ describe('Acceptance | Build | Github', function () {
         describe(`when no review apps exists`, function () {
           it('responds with 200, create and deploy pull request review apps, add deployment check and disabled Scalingo deploy auto', async function () {
             // given
-            const bodyComment = COMMENT;
+            const fromComment = `Choisir les applications à déployer :
+
+- [ ] App <!-- pix-app-review -->
+- [ ] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+`;
+            const toComment = `Choisir les applications à déployer :
+
+- [ ] App <!-- pix-app-review -->
+- [X] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+`;
             const body = {
               action: 'edited',
+              changes: {
+                body: {
+                  from: fromComment,
+                },
+              },
               head: {
                 ref: 'my-branch',
               },
@@ -442,7 +445,7 @@ describe('Acceptance | Build | Github', function () {
                 },
               },
               comment: {
-                body: bodyComment,
+                body: toComment,
                 user: {
                   login: 'pix-bot-github',
                 },
@@ -485,9 +488,29 @@ describe('Acceptance | Build | Github', function () {
         describe(`when an existing review app is unchecked`, function () {
           it('responds with 200, remove pull request review apps, add deployment check', async function () {
             // given
-            const bodyComment = COMMENT;
+            const fromComment = `Choisir les applications à déployer :
+
+- [ ] App <!-- pix-app-review -->
+- [X] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+- [X] Certif <!-- pix-certif-review -->
+`;
+            const toComment = `Choisir les applications à déployer :
+
+- [ ] App <!-- pix-app-review -->
+- [X] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+- [ ] Certif <!-- pix-certif-review -->
+`;
             const body = {
               action: 'edited',
+              changes: {
+                body: {
+                  from: fromComment,
+                },
+              },
               head: {
                 ref: 'my-branch',
               },
@@ -509,7 +532,7 @@ describe('Acceptance | Build | Github', function () {
                 },
               },
               comment: {
-                body: bodyComment,
+                body: toComment,
                 user: {
                   login: 'pix-bot-github',
                 },

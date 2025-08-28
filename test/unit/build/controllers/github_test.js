@@ -1026,7 +1026,7 @@ describe('Unit | Controller | Github', function () {
   });
 
   describe('#handleIssueComment', function () {
-    describe('when comment doesn’t belong to Pix Bot', function () {
+    describe('when comment doesn’t belong to a pull request', function () {
       it('should return appropriate message', async function () {
         const pullRequest = undefined;
 
@@ -1190,21 +1190,6 @@ describe('Unit | Controller | Github', function () {
 
     describe('when review apps are created or removed', function () {
       it('creates and removes review apps and returns a summary message', async function () {
-        const reviewAppRepositoryStub = {
-          listForPullRequest: sinon.stub().resolves([
-            { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
-            { name: 'pix-api-maddo-review-pr123', parentApp: 'pix-api-maddo-review' },
-          ]),
-        };
-
-        const updateCheckRADeployment = sinon.stub().resolves();
-        const comment = `Choisir les applications à déployer :
-
-- [X] App <!-- pix-app-review -->
-- [X] API <!-- pix-api-review -->
-- [ ] API MaDDo <!-- pix-api-maddo-review -->
-- [ ] Audit Logger <!-- pix-audit-logger-review -->
-`;
         const pullRequest = {
           head: {
             repo: {
@@ -1217,8 +1202,28 @@ describe('Unit | Controller | Github', function () {
           state: 'open',
         };
 
+        const fromComment = `Choisir les applications à déployer :
+
+- [ ] App <!-- pix-app-review -->
+- [X] API <!-- pix-api-review -->
+- [X] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+`;
+        const toComment = `Choisir les applications à déployer :
+
+- [X] App <!-- pix-app-review -->
+- [X] API <!-- pix-api-review -->
+- [ ] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+`;
+
         const request = {
           payload: {
+            changes: {
+              body: {
+                from: fromComment,
+              },
+            },
             repository: {
               full_name: '@1024pix/pix',
             },
@@ -1230,16 +1235,18 @@ describe('Unit | Controller | Github', function () {
               user: {
                 login: 'pix-bot-github',
               },
-              body: comment,
+              body: toComment,
             },
           },
         };
+
+        const updateCheckRADeployment = sinon.stub().resolves();
         const createReviewApp = sinon.stub().resolves();
         const removeReviewApp = sinon.stub().resolves();
 
         const result = await githubController.handleIssueComment(
           { request, pullRequest },
-          { reviewAppRepo: reviewAppRepositoryStub, createReviewApp, removeReviewApp, updateCheckRADeployment },
+          { createReviewApp, removeReviewApp, updateCheckRADeployment },
         );
 
         expect(createReviewApp).to.have.been.calledWithExactly({
@@ -1265,19 +1272,6 @@ Removed review apps: pix-api-maddo-review-pr123`);
 
     describe('when no review app is created nor removed', function () {
       it('should return "Nothing to do" message', async function () {
-        const reviewAppRepositoryStub = {
-          listForPullRequest: sinon.stub().resolves([
-            { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
-            { name: 'pix-api-maddo-review-pr123', parentApp: 'pix-api-maddo-review' },
-          ]),
-        };
-        const comment = `Choisir les applications à déployer :
-
-- [] Admin <!-- pix-admin-review -->
-- [X] API <!-- pix-api-review -->
-- [X] API MaDDo <!-- pix-api-maddo-review -->
-- [ ] Audit Logger <!-- pix-audit-logger-review -->
-`;
         const pullRequest = {
           head: {
             repo: {
@@ -1288,8 +1282,21 @@ Removed review apps: pix-api-maddo-review-pr123`);
           state: 'open',
         };
 
+        const comment = `Choisir les applications à déployer :
+
+- [] Admin <!-- pix-admin-review -->
+- [X] API <!-- pix-api-review -->
+- [X] API MaDDo <!-- pix-api-maddo-review -->
+- [ ] Audit Logger <!-- pix-audit-logger-review -->
+`;
+
         const request = {
           payload: {
+            changes: {
+              body: {
+                from: comment,
+              },
+            },
             repository: {
               full_name: '@1024pix/pix',
             },
@@ -1305,10 +1312,9 @@ Removed review apps: pix-api-maddo-review-pr123`);
             },
           },
         };
-        const result = await githubController.handleIssueComment(
-          { request, pullRequest },
-          { reviewAppRepo: reviewAppRepositoryStub },
-        );
+
+        const result = await githubController.handleIssueComment({ request, pullRequest }, {});
+
         expect(result).equal('Nothing to do');
       });
     });
