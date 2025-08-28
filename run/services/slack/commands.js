@@ -7,7 +7,6 @@ import slackPostMessageService from '../../../common/services/slack/surfaces/mes
 import { config } from '../../../config.js';
 import { deploy } from '../deploy.js';
 import { updateStatus } from '../../../common/repositories/release-settings.repository.js';
-import github from '../../../common/services/github.js';
 
 function sendResponse(responseUrl, text) {
   axios.post(
@@ -180,13 +179,14 @@ async function createAndDeployPixDatawarehouse(payload) {
   );
 }
 
-async function createAndDeployPixBotRelease(payload) {
-  await _publishAndDeployReleaseWithAppsByEnvironment(
-    config.PIX_BOT_REPO_NAME,
-    config.PIX_BOT_APPS,
-    payload.text,
-    payload.response_url,
-  );
+async function createAndDeployPixBotRelease() {
+  await githubServices.triggerWorkflow({
+    workflow: {
+      id: 'release.yml',
+      repositoryName: config.PIX_BOT_REPO_NAME,
+      ref: 'main',
+    },
+  });
 }
 
 async function getAndDeployLastVersion({ appName }) {

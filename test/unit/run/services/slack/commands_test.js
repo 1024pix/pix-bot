@@ -7,7 +7,6 @@ import ScalingoClient from '../../../../../common/services/scalingo-client.js';
 import {
   createAndDeployDbStats,
   createAndDeployEmberTestingLibrary,
-  createAndDeployPixBotRelease,
   createAndDeployPixDatawarehouse,
   createAndDeployPixLCMS,
   createAndDeployPixSiteRelease,
@@ -175,34 +174,6 @@ describe('Unit | Run | Services | Slack | Commands', function () {
     it('should deploy the release on minimal', function () {
       // then
       sinon.assert.calledWith(client.deployFromArchive, 'pix-lcms-minimal-production', 'v1.0.0');
-    });
-  });
-
-  describe('#createAndDeployPixBotRelease', function () {
-    let client;
-
-    beforeEach(async function () {
-      // given
-      client = { deployFromArchive: sinon.spy() };
-      sinon.stub(ScalingoClient, 'getInstance').resolves(client);
-      const payload = { text: 'minor' };
-      // when
-      await createAndDeployPixBotRelease(payload);
-    });
-
-    it('should publish a new release', function () {
-      // then
-      sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-bot', 'minor');
-    });
-
-    it('should deploy the release for pix-bot-build', function () {
-      // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-build-production', 'v1.0.0');
-    });
-
-    it('should deploy the release for pix-bot-run', function () {
-      // then
-      sinon.assert.calledWith(client.deployFromArchive, 'pix-bot-run-production', 'v1.0.0');
     });
   });
 
