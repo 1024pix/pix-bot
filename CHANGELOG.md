@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.3.1 (28/08/2025)
+
+
+### :bug: Correction
+- [#634](https://github.com/1024pix/pix-bot/pull/634) [BUGFIX] Éviter les race conditions d’édition de commentaire.
+
 ## v2.3.0 (07/08/2025)
 
 
