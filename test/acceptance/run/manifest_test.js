@@ -49,13 +49,6 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
             },
             {
-              command: '/publish-pix-ui',
-              url: `http://${hostname}/slack/commands/create-and-deploy-pix-ui-release`,
-              description: 'Crée une release de Pix-UI et la déploie sur les Github pages !',
-              usage_hint: '[patch, minor, major]',
-              should_escape: false,
-            },
-            {
               command: '/deploy-ember-testing-library',
               url: `http://${hostname}/slack/commands/create-and-deploy-ember-testing-library-release`,
               description: 'Crée une release de Ember-testing-library',
