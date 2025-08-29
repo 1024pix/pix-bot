@@ -41,22 +41,6 @@ function _isReleaseTypeInvalid(releaseType) {
   return !['major', 'minor', 'patch'].includes(releaseType);
 }
 
-async function _publishPixUI(repoName, releaseType, responseUrl) {
-  if (_isReleaseTypeInvalid(releaseType)) {
-    releaseType = 'minor';
-  }
-  const releaseTagBeforeRelease = await githubServices.getLatestReleaseTag(repoName);
-  const releaseTagAfterRelease = await releasesService.publishPixRepo(repoName, releaseType);
-
-  if (releaseTagBeforeRelease === releaseTagAfterRelease) {
-    sendResponse(responseUrl, getErrorReleaseMessage(releaseTagAfterRelease, repoName));
-  } else {
-    const message = `[PIX-UI] App deployed (${releaseTagAfterRelease})`;
-    slackPostMessageService.postMessage({ message });
-    sendResponse(responseUrl, getSuccessMessage(releaseTagAfterRelease, repoName));
-  }
-}
-
 async function _publishAndDeployEmberTestingLibrary(repoName, releaseType, responseUrl) {
   if (_isReleaseTypeInvalid(releaseType)) {
     releaseType = 'minor';
@@ -155,10 +139,6 @@ async function createAndDeployPixLCMS(payload) {
   );
 }
 
-async function createAndDeployPixUI(payload) {
-  await _publishPixUI(config.PIX_UI_REPO_NAME, payload.text, payload.response_url);
-}
-
 async function createAndDeployEmberTestingLibrary(payload) {
   await _publishAndDeployEmberTestingLibrary(
     config.PIX_EMBER_TESTING_LIBRARY_REPO_NAME,
@@ -247,7 +227,6 @@ export {
   createAndDeployPixSiteRelease,
   createAndDeployPixTutosRelease,
   createAndDeployPixSecurixRelease,
-  createAndDeployPixUI,
   deployAirflow,
   deployDBT,
   deployPixExploitRelease,
