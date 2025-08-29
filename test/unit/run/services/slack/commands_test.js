@@ -13,7 +13,6 @@ import {
   createAndDeployPixSiteRelease,
   createAndDeployPixTutosRelease,
   createAndDeployPixSecurixRelease,
-  createAndDeployPixUI,
   getAndDeployLastVersion,
 } from '../../../../../run/services/slack/commands.js';
 import { catchErr, sinon } from '../../../../test-helper.js';
@@ -77,41 +76,6 @@ describe('Unit | Run | Services | Slack | Commands', function () {
           text: 'Erreur lors du déploiement de pix-site, pix-pro en production.',
         });
       });
-    });
-  });
-
-  describe('#createAndDeployPixUI', function () {
-    it('should publish a new release', async function () {
-      // given
-      const payload = { text: 'minor' };
-
-      // when
-      await createAndDeployPixUI(payload);
-
-      // then
-      sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-ui', 'minor');
-    });
-
-    it('should retrieve the last release tag from GitHub', async function () {
-      // given
-      const payload = { text: 'minor' };
-
-      // when
-      await createAndDeployPixUI(payload);
-
-      // then
-      sinon.assert.calledOnceWithExactly(githubServices.getLatestReleaseTag, 'pix-ui');
-    });
-
-    it('should create a minor version if no version is given', async function () {
-      // given
-      const payload = { text: '' };
-
-      // when
-      await createAndDeployPixUI(payload);
-
-      // then
-      sinon.assert.calledWith(releasesService.publishPixRepo, 'pix-ui', 'minor');
     });
   });
 
