@@ -38,6 +38,7 @@ export default [
       'mocha/no-hooks-for-single-case': ['off'],
       'mocha/no-top-level-hooks': ['error'],
       'mocha/no-global-tests': ['off'],
+      'mocha/consistent-spacing-between-blocks': 'off',
     },
   },
 ];
