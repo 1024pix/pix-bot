@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v2.4.0 (02/09/2025)
+
+
+### :rocket: Amélioration
+- [#635](https://github.com/1024pix/pix-bot/pull/635) [FEATURE] Suppression de la commande slack `/publish-pix-ui`.
+
+### :arrow_up: Montée de version
+- [#637](https://github.com/1024pix/pix-bot/pull/637) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.26 (dossier racine).
+- [#633](https://github.com/1024pix/pix-bot/pull/633) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.23 (dossier racine).
+
 ## v2.3.1 (28/08/2025)
 
 
