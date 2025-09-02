@@ -48,15 +48,6 @@ const slack = {
     };
   },
 
-  createAndDeployPixUIRelease(request) {
-    const payload = request.pre.payload;
-    commands.createAndDeployPixUI(payload);
-
-    return {
-      text: _getDeployStartedMessage(payload.text, 'PIX UI'),
-    };
-  },
-
   createAndDeployPixLCMSRelease(request) {
     const payload = request.pre.payload;
     commands.createAndDeployPixLCMS(payload);

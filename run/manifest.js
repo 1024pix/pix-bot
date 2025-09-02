@@ -13,15 +13,6 @@ manifest.registerSlashCommand({
 });
 
 manifest.registerSlashCommand({
-  command: '/publish-pix-ui',
-  path: '/slack/commands/create-and-deploy-pix-ui-release',
-  description: 'Crée une release de Pix-UI et la déploie sur les Github pages !',
-  usage_hint: '[patch, minor, major]',
-  should_escape: false,
-  handler: slackbotController.createAndDeployPixUIRelease,
-});
-
-manifest.registerSlashCommand({
   command: '/deploy-ember-testing-library',
   path: '/slack/commands/create-and-deploy-ember-testing-library-release',
   description: 'Crée une release de Ember-testing-library',
