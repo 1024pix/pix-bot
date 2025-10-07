@@ -28,6 +28,7 @@ const repositoryToScalingoAppsReview = {
         },
         { label: 'Ancien viewer', href: `https://epreuves-pr${pullRequestNumber}.review.pix.fr/viewer.html` },
       ],
+      shouldRemovePostgresAddon: true,
     },
   ],
   'pix-exploit': [{ appName: 'pix-exploit-review' }],
