@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v2.4.1 (07/10/2025)
+
+
+### :building_construction: Tech
+- [#643](https://github.com/1024pix/pix-bot/pull/643) [TECH] Éviter les doubles déploiements sur pix-epreuves.
+
+### :arrow_up: Montée de version
+- [#641](https://github.com/1024pix/pix-bot/pull/641) [BUMP] Update dependency axios to v1.12.0 [SECURITY].
+- [#639](https://github.com/1024pix/pix-bot/pull/639) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to ^2.1.27 (dossier racine).
+
 ## v2.4.0 (02/09/2025)
 
 
