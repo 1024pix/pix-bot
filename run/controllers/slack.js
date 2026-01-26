@@ -66,12 +66,11 @@ const slack = {
     };
   },
 
-  createAndDeployPixBotRelease(request) {
-    const payload = request.pre.payload;
-    commands.createAndDeployPixBotRelease(payload);
+  createAndDeployPixBotRelease() {
+    commands.createAndDeployPixBotRelease();
 
     return {
-      text: _getDeployStartedMessage(payload.text, 'PIX Bot'),
+      text: 'Commande de déploiement de Pix-bot bien reçu.',
     };
   },
 
