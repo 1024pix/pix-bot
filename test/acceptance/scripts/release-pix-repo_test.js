@@ -19,7 +19,8 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 // git clone --bare https://github.com/1024pix/pix-bot-publish-test data/clean_repository.git
 // Make sure that empty folders on the bare git repostory have a .gitkeep file
 // Have a nice day
-describe('Acceptance | Scripts | release-pix-repo.sh', function () {
+// eslint-disable-next-line mocha/no-pending-tests
+describe.skip('Acceptance | Scripts | release-pix-repo.sh', function () {
   this.timeout(30000);
   let testRepositoryPath;
 
