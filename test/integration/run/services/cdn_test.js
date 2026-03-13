@@ -2,31 +2,15 @@ import { config } from '../../../../config.js';
 import cdnService from '../../../../run/services/cdn.js';
 import { catchErr, expect, nock } from '../../../test-helper.js';
 
-function _stubAccountDetails(namespace) {
-  return nock('https://console.baleen.cloud/api', {
+function _stubInvalidationCache() {
+  return nock('https://my.imperva.com/api/prov/v2', {
     reqheaders: {
-      'X-Api-Key': config.cdn.pat,
+      'x-API-Id': config.cdn.apiId,
+      'x-API-Key': config.cdn.apiKey,
       'Content-type': 'application/json',
     },
   })
-    .get('/account')
-    .reply(200, {
-      namespaces: {
-        'namespace-key2': 'Test2',
-        'namespace-key1': namespace,
-      },
-    });
-}
-
-function _stubInvalidationCachePost(namespaceKey) {
-  return nock('https://console.baleen.cloud/api', {
-    reqheaders: {
-      'X-Api-Key': config.cdn.pat,
-      'Content-type': 'application/json',
-      Cookie: `baleen-namespace=${namespaceKey}`,
-    },
-  })
-    .post('/cache/invalidations', { patterns: ['.'] })
+    .delete(`/sites/1234/cache`)
     .reply(200);
 }
 
@@ -46,174 +30,109 @@ describe('Integration | CDN', function () {
   });
 
   describe('#invalidateCdnCache', function () {
-    it('should call Baleen cache invalidation API', async function () {
+    it('should call Imperva cache invalidation API', async function () {
       // given
-      const applicationName = 'Pix_Test';
-      const namespace = 'Pix_Namespace';
-      const namespaceKey = 'namespace-key1';
-
-      _stubAccountDetails(namespace);
-
-      const postInvalidationCache = _stubInvalidationCachePost(namespaceKey);
+      const postInvalidationCache = _stubInvalidationCache();
 
       // when
-      const result = await cdnService.invalidateCdnCache(applicationName);
+      const result = await cdnService.invalidateCdnCache('pix-test');
 
       // then
       postInvalidationCache.done();
-      expect(result).to.equal(`Cache CDN invalidé pour l‘application ${applicationName}.`);
-    });
-
-    it('should use namespace-key of application to create cookie', async function () {
-      // given
-      const applicationName = 'Pix_Test';
-      const namespace = 'Pix_Namespace';
-      const namespaceKey = 'namespace-key1';
-
-      const getAccountDetails = _stubAccountDetails(namespace);
-      _stubInvalidationCachePost(namespaceKey);
-
-      // when
-      await cdnService.invalidateCdnCache(applicationName);
-
-      // then
-      getAccountDetails.done();
+      expect(result).to.equal(`Cache CDN invalidé pour l‘application pix-test.`);
     });
 
     context('when cache invalidation fails', function () {
-      context('when namespace does not exist', function () {
-        it('should throw an NamespaceNotFoundError error ', async function () {
-          // given
-          const applicationName = 'Not_existing_application';
-
-          const namespace = 'Pix_Namespace';
-          const namespaceKey = 'namespace-key1';
-
-          _stubAccountDetails(namespace);
-          _stubInvalidationCachePost(namespaceKey);
-
-          // when
-          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
-
-          // then
-          expect(result).to.be.instanceOf(cdnService.NamespaceNotFoundError);
-          expect(result.message).to.be.equal('A namespace could not been found.');
-        });
-      });
-
       context('when API returns an error', function () {
         it('should retry request 3 times on 500', async function () {
           // given
-          const applicationName = 'Pix_Test';
-          const namespace = 'Pix_Namespace';
-          const namespaceKey = 'namespace-key1';
           let called = 0;
           const expectedCallCount = 1 + config.cdn.CDNInvalidationRetryCount;
 
-          _stubAccountDetails(namespace);
-
-          nock('https://console.baleen.cloud/api', {
+          nock('https://my.imperva.com/api/prov/v2', {
             reqheaders: {
-              'X-Api-Key': config.cdn.pat,
+              'x-API-Id': config.cdn.apiId,
+              'x-API-Key': config.cdn.apiKey,
               'Content-type': 'application/json',
-              Cookie: `baleen-namespace=${namespaceKey}`,
             },
           })
-            .post('/cache/invalidations', { patterns: ['.'] })
+            .delete(`/sites/1234/cache`)
             .times(4)
             .reply(500, function () {
               called++;
               return {
-                type: 'https://www.jhipster.tech/problem/problem-with-message',
                 title: 'SERVER_ERROR',
                 status: 500,
                 detail: 'The server could not invalidate the resources',
-                path: '/api/cache/invalidations',
-                message: 'error.http.500',
               };
             });
 
           // when
-          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
+          const result = await catchErr(cdnService.invalidateCdnCache)('pix-test');
 
           // then
           const expected =
-            'Request failed with status code 500 and message {"type":"https://www.jhipster.tech/problem/problem-with-message","title":"SERVER_ERROR","status":500,"detail":"The server could not invalidate the resources","path":"/api/cache/invalidations","message":"error.http.500"}';
+            'Request failed with status code 500 and message {"title":"SERVER_ERROR","status":500,"detail":"The server could not invalidate the resources"}';
           expect(result.message).to.be.equal(expected);
           expect(called).equal(expectedCallCount);
         });
 
         it('should not retry request on status code different than 500', async function () {
           // given
-          const applicationName = 'Pix_Test';
-          const namespace = 'Pix_Namespace';
-          const namespaceKey = 'namespace-key1';
           let called = 0;
           const expectedCallCount = 1;
 
-          _stubAccountDetails(namespace);
-
-          nock('https://console.baleen.cloud/api', {
+          nock('https://my.imperva.com/api/prov/v2', {
             reqheaders: {
-              'X-Api-Key': config.cdn.pat,
+              'x-API-Id': config.cdn.apiId,
+              'x-API-Key': config.cdn.apiKey,
               'Content-type': 'application/json',
-              Cookie: `baleen-namespace=${namespaceKey}`,
             },
           })
-            .post('/cache/invalidations', { patterns: ['.'] })
+            .delete(`/sites/1234/cache`)
             .reply(400, function () {
               called++;
               return {
-                type: 'https://www.jhipster.tech/problem/problem-with-message',
                 title: 'Bad Request',
                 status: 400,
                 detail: 'JSON parse error: Unexpected character',
-                path: '/api/cache/invalidations',
-                message: 'error.http.400',
               };
             });
 
           // when
-          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
+          const result = await catchErr(cdnService.invalidateCdnCache)('pix-test');
 
           // then
           const expected =
-            'Request failed with status code 400 and message {"type":"https://www.jhipster.tech/problem/problem-with-message","title":"Bad Request","status":400,"detail":"JSON parse error: Unexpected character","path":"/api/cache/invalidations","message":"error.http.400"}';
+            'Request failed with status code 400 and message {"title":"Bad Request","status":400,"detail":"JSON parse error: Unexpected character"}';
           expect(result.message).to.be.equal(expected);
           expect(called).equal(expectedCallCount);
         });
 
         it('should throw an error with statusCode and message', async function () {
           // given
-          const applicationName = 'Pix_Test';
-          const namespace = 'Pix_Namespace';
-          const namespaceKey = 'namespace-key1';
-
-          _stubAccountDetails(namespace);
-
-          nock('https://console.baleen.cloud/api', {
+          nock('https://my.imperva.com/api/prov/v2', {
             reqheaders: {
-              'X-Api-Key': config.cdn.pat,
+              'x-API-Id': config.cdn.apiId,
+              'x-API-Key': config.cdn.apiKey,
               'Content-type': 'application/json',
-              Cookie: `baleen-namespace=${namespaceKey}`,
             },
           })
-            .post('/cache/invalidations', { patterns: ['.'] })
-            .reply(400, {
-              type: 'https://www.jhipster.tech/problem/problem-with-message',
-              title: 'Bad Request',
-              status: 400,
-              detail: 'JSON parse error: Unexpected character',
-              path: '/api/cache/invalidations',
-              message: 'error.http.400',
+            .delete(`/sites/1234/cache`)
+            .reply(400, function () {
+              return {
+                title: 'Bad Request',
+                status: 400,
+                detail: 'JSON parse error: Unexpected character',
+              };
             });
 
           // when
-          const result = await catchErr(cdnService.invalidateCdnCache)(applicationName);
+          const result = await catchErr(cdnService.invalidateCdnCache)('pix-test');
 
           // then
           const expected =
-            'Request failed with status code 400 and message {"type":"https://www.jhipster.tech/problem/problem-with-message","title":"Bad Request","status":400,"detail":"JSON parse error: Unexpected character","path":"/api/cache/invalidations","message":"error.http.400"}';
+            'Request failed with status code 400 and message {"title":"Bad Request","status":400,"detail":"JSON parse error: Unexpected character"}';
           expect(result.message).to.be.equal(expected);
         });
       });

@@ -1,47 +1,22 @@
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import _ from 'lodash';
 
 import { logger } from '../../common/services/logger.js';
 import { config } from '../../config.js';
 
-const CDN_URL = 'https://console.baleen.cloud/api';
+const CDN_URL = 'https://my.imperva.com/api/prov/v2';
 
-class NamespaceNotFoundError extends Error {
-  constructor() {
-    const message = `A namespace could not been found.`;
-    super(message);
+function _getSiteId(application) {
+  const siteId = JSON.parse(config.cdn.siteIds)[application];
+  if (!siteId) {
+    throw new Error(`Cache invalidation not implemented for ${application}.`);
   }
-}
-
-async function _getNamespaceKey(applications) {
-  const urlForAccountDetails = `${CDN_URL}/account`;
-  const accountDetails = await axios.get(urlForAccountDetails, {
-    headers: {
-      'X-Api-Key': config.cdn.pat,
-      'Content-type': 'application/json',
-    },
-  });
-
-  const namespaces = applications.map((app) => config.cdn.appNamespaces[app]);
-  const namespaceKeys = namespaces
-    .map((namespace) => {
-      return _.findKey(accountDetails.data.namespaces, (v) => {
-        return v === namespace;
-      });
-    })
-    .filter((n) => Boolean(n));
-
-  if (namespaceKeys.length !== applications.length) {
-    throw new NamespaceNotFoundError();
-  }
-
-  return namespaceKeys;
+  return siteId;
 }
 
 async function invalidateCdnCache(application) {
-  const namespaceKey = await _getNamespaceKey([application]);
-  const urlForInvalidate = `${CDN_URL}/cache/invalidations`;
+  const siteId = _getSiteId(application);
+  const urlForInvalidate = `${CDN_URL}/sites/${siteId}/cache`;
 
   axiosRetry(axios, {
     retries: config.cdn.CDNInvalidationRetryCount,
@@ -59,19 +34,13 @@ async function invalidateCdnCache(application) {
   });
 
   try {
-    await axios.post(
-      urlForInvalidate,
-      {
-        patterns: ['.'],
+    await axios.delete(urlForInvalidate, {
+      headers: {
+        'x-API-Id': config.cdn.apiId,
+        'x-API-Key': config.cdn.apiKey,
+        'Content-type': 'application/json',
       },
-      {
-        headers: {
-          'X-Api-Key': config.cdn.pat,
-          'Content-type': 'application/json',
-          Cookie: `baleen-namespace=${namespaceKey}`,
-        },
-      },
-    );
+    });
   } catch (error) {
     const cdnResponseMessage = JSON.stringify(error.response.data);
     const message = `Request failed with status code ${error.response.status} and message ${cdnResponseMessage}`;
@@ -81,4 +50,4 @@ async function invalidateCdnCache(application) {
   return `Cache CDN invalidé pour l‘application ${application}.`;
 }
 
-export default { invalidateCdnCache, NamespaceNotFoundError };
+export default { invalidateCdnCache };
