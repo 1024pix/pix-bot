@@ -28,7 +28,7 @@ describe('Acceptance | Run | Security', function () {
 
       nock('https://console.baleen.cloud/api', {
         reqheaders: {
-          'X-Api-Key': config.baleen.pat,
+          'X-Api-Key': config.cdn.pat,
           'Content-type': 'application/json',
         },
       })
@@ -42,7 +42,7 @@ describe('Acceptance | Run | Security', function () {
 
       nock('https://console.baleen.cloud/api', {
         reqheaders: {
-          'X-Api-Key': config.baleen.pat,
+          'X-Api-Key': config.cdn.pat,
           'Content-type': 'application/json',
           Cookie: `baleen-namespace=${namespaceKey}`,
         },

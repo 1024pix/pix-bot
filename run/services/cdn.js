@@ -18,12 +18,12 @@ async function _getNamespaceKey(applications) {
   const urlForAccountDetails = `${CDN_URL}/account`;
   const accountDetails = await axios.get(urlForAccountDetails, {
     headers: {
-      'X-Api-Key': config.baleen.pat,
+      'X-Api-Key': config.cdn.pat,
       'Content-type': 'application/json',
     },
   });
 
-  const namespaces = applications.map((app) => config.baleen.appNamespaces[app]);
+  const namespaces = applications.map((app) => config.cdn.appNamespaces[app]);
   const namespaceKeys = namespaces
     .map((namespace) => {
       return _.findKey(accountDetails.data.namespaces, (v) => {
@@ -44,14 +44,14 @@ async function invalidateCdnCache(application) {
   const urlForInvalidate = `${CDN_URL}/cache/invalidations`;
 
   axiosRetry(axios, {
-    retries: config.baleen.CDNInvalidationRetryCount,
+    retries: config.cdn.CDNInvalidationRetryCount,
     retryDelay: (retryCount) => {
       logger.info({
         event: 'cdn',
         message: `Cache invalidation retry for application ${application}: ${retryCount}`,
       });
 
-      return retryCount * config.baleen.CDNInvalidationRetryDelay;
+      return retryCount * config.cdn.CDNInvalidationRetryDelay;
     },
     retryCondition: (error) => {
       return error.response.status === 500;
@@ -66,7 +66,7 @@ async function invalidateCdnCache(application) {
       },
       {
         headers: {
-          'X-Api-Key': config.baleen.pat,
+          'X-Api-Key': config.cdn.pat,
           'Content-type': 'application/json',
           Cookie: `baleen-namespace=${namespaceKey}`,
         },
@@ -90,7 +90,7 @@ async function blockAccess({ ip, ja3, monitorId }) {
     throw new Error('ja3 cannot be empty.');
   }
 
-  const namespaceKeys = await _getNamespaceKey(config.baleen.protectedFrontApps);
+  const namespaceKeys = await _getNamespaceKey(config.cdn.protectedFrontApps);
 
   const addedRules = [];
   for (const namespaceKey of namespaceKeys) {
@@ -112,7 +112,7 @@ async function blockAccess({ ip, ja3, monitorId }) {
         },
         {
           headers: {
-            'X-Api-Key': config.baleen.pat,
+            'X-Api-Key': config.cdn.pat,
             'Content-type': 'application/json',
             Cookie: `baleen-namespace=${namespaceKey}`,
           },
@@ -145,7 +145,7 @@ async function disableRule({ namespaceKey, ruleId }) {
       { enabled: false },
       {
         headers: {
-          'X-Api-Key': config.baleen.pat,
+          'X-Api-Key': config.cdn.pat,
           'Content-type': 'application/json',
           Cookie: `baleen-namespace=${namespaceKey}`,
         },

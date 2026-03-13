@@ -5,7 +5,7 @@ import { catchErr, expect, nock } from '../../../test-helper.js';
 function _stubAccountDetails(namespace) {
   return nock('https://console.baleen.cloud/api', {
     reqheaders: {
-      'X-Api-Key': config.baleen.pat,
+      'X-Api-Key': config.cdn.pat,
       'Content-type': 'application/json',
     },
   })
@@ -21,7 +21,7 @@ function _stubAccountDetails(namespace) {
 function _stubInvalidationCachePost(namespaceKey) {
   return nock('https://console.baleen.cloud/api', {
     reqheaders: {
-      'X-Api-Key': config.baleen.pat,
+      'X-Api-Key': config.cdn.pat,
       'Content-type': 'application/json',
       Cookie: `baleen-namespace=${namespaceKey}`,
     },
@@ -58,15 +58,15 @@ describe('Integration | CDN', function () {
   let defaultRetryCount, defaultRetryDelay;
 
   before(function () {
-    defaultRetryCount = config.baleen.CDNInvalidationRetryCount;
-    defaultRetryDelay = config.baleen.CDNInvalidationRetryDelay;
-    config.baleen.CDNInvalidationRetryCount = 3;
-    config.baleen.CDNInvalidationRetryDelay = 1;
+    defaultRetryCount = config.cdn.CDNInvalidationRetryCount;
+    defaultRetryDelay = config.cdn.CDNInvalidationRetryDelay;
+    config.cdn.CDNInvalidationRetryCount = 3;
+    config.cdn.CDNInvalidationRetryDelay = 1;
   });
 
   after(function () {
-    config.baleen.CDNInvalidationRetryCount = defaultRetryCount;
-    config.baleen.CDNInvalidationRetryDelay = defaultRetryDelay;
+    config.cdn.CDNInvalidationRetryCount = defaultRetryCount;
+    config.cdn.CDNInvalidationRetryDelay = defaultRetryDelay;
   });
 
   describe('#invalidateCdnCache', function () {
@@ -132,13 +132,13 @@ describe('Integration | CDN', function () {
           const namespace = 'Pix_Namespace';
           const namespaceKey = 'namespace-key1';
           let called = 0;
-          const expectedCallCount = 1 + config.baleen.CDNInvalidationRetryCount;
+          const expectedCallCount = 1 + config.cdn.CDNInvalidationRetryCount;
 
           _stubAccountDetails(namespace);
 
           nock('https://console.baleen.cloud/api', {
             reqheaders: {
-              'X-Api-Key': config.baleen.pat,
+              'X-Api-Key': config.cdn.pat,
               'Content-type': 'application/json',
               Cookie: `baleen-namespace=${namespaceKey}`,
             },
@@ -179,7 +179,7 @@ describe('Integration | CDN', function () {
 
           nock('https://console.baleen.cloud/api', {
             reqheaders: {
-              'X-Api-Key': config.baleen.pat,
+              'X-Api-Key': config.cdn.pat,
               'Content-type': 'application/json',
               Cookie: `baleen-namespace=${namespaceKey}`,
             },
@@ -217,7 +217,7 @@ describe('Integration | CDN', function () {
 
           nock('https://console.baleen.cloud/api', {
             reqheaders: {
-              'X-Api-Key': config.baleen.pat,
+              'X-Api-Key': config.cdn.pat,
               'Content-type': 'application/json',
               Cookie: `baleen-namespace=${namespaceKey}`,
             },
@@ -241,134 +241,6 @@ describe('Integration | CDN', function () {
           expect(result.message).to.be.equal(expected);
         });
       });
-    });
-  });
-
-  describe('#blockAccess', function () {
-    describe('when ip is not defined', function () {
-      it('should throw an error', async function () {
-        // given
-        const ja3 = 'ja3';
-        const monitorId = 'monitorId';
-
-        // when
-        const error = await catchErr(cdnService.blockAccess)({ ja3, monitorId });
-
-        // then
-        expect(error.message).to.equal('ip cannot be empty.');
-      });
-    });
-
-    describe('when ip is empty', function () {
-      it('should throw an error', async function () {
-        // given
-        const ip = '';
-        const ja3 = 'ja3';
-        const monitorId = 'monitorId';
-
-        // when
-        const error = await catchErr(cdnService.blockAccess)({ ip, ja3, monitorId });
-
-        // then
-        expect(error.message).to.equal('ip cannot be empty.');
-      });
-    });
-
-    describe('when ja3 is not defined', function () {
-      it('should throw an error', async function () {
-        // given
-        const ip = 'ip';
-        const monitorId = 'monitorId';
-
-        // when
-        const error = await catchErr(cdnService.blockAccess)({ ip, monitorId });
-
-        // then
-        expect(error.message).to.equal('ja3 cannot be empty.');
-      });
-    });
-
-    describe('when ja3 is empty', function () {
-      it('should throw an error', async function () {
-        // given
-        const ip = 'ip';
-        const ja3 = '';
-        const monitorId = 'monitorId';
-
-        // when
-        const error = await catchErr(cdnService.blockAccess)({ ip, ja3, monitorId });
-
-        // then
-        expect(error.message).to.equal('ja3 cannot be empty.');
-      });
-    });
-
-    it('should call Baleen custom static rules API', async function () {
-      // given
-      const namespace = 'Pix_Namespace';
-      const namespaceKey = 'namespace-key1';
-      const monitorId = '1234';
-      const ip = '127.0.0.1';
-      const ja3 = '9709730930';
-
-      _stubAccountDetails(namespace);
-
-      const postCustomStaticRules = _stubCustomStaticRulePost(namespaceKey, monitorId, ip, ja3);
-
-      // when
-      const result = await cdnService.blockAccess({ ip, ja3, monitorId });
-
-      // then
-      postCustomStaticRules.done();
-      expect(result).to.deep.equal([{ namespaceKey: 'namespace-key1', ruleId: '1234' }]);
-    });
-
-    it('should throw an error with statusCode and message', async function () {
-      // given
-      const namespace = 'Pix_Namespace';
-      const namespaceKey = 'namespace-key1';
-      const monitorId = '1234';
-      const ip = '127.0.0.1';
-      const ja3 = '9709730930';
-
-      _stubAccountDetails(namespace);
-
-      nock('https://console.baleen.cloud/api', {
-        reqheaders: {
-          'X-Api-Key': config.baleen.pat,
-          'Content-type': 'application/json',
-          Cookie: `baleen-namespace=${namespaceKey}`,
-        },
-      })
-        .post('/configs/custom-static-rules', {
-          category: 'block',
-          name: `Blocage ip: ${ip} ja3: ${ja3}`,
-          description: `Blocage automatique depuis le monitor Datadog ${monitorId}`,
-          enabled: true,
-          labels: ['automatic-rule'],
-          conditions: [
-            [
-              { type: 'ip', operator: 'match', value: ip },
-              { type: 'ja3', operator: 'equals', value: ja3 },
-            ],
-          ],
-        })
-        .reply(400, {
-          type: 'https://www.jhipster.tech/problem/problem-with-message',
-          title: 'Bad Request',
-          status: 400,
-          detail: 'JSON parse error: Unexpected character',
-          path: '/configs/custom-static-rules',
-          message: 'error.http.400',
-        });
-
-      // when
-      const result = await catchErr(cdnService.blockAccess)({ monitorId, ip, ja3 });
-
-      // then
-      const expected =
-        'Request failed with status code 400 and message {"type":"https://www.jhipster.tech/problem/problem-with-message","title":"Bad Request","status":400,"detail":"JSON parse error: Unexpected character","path":"/configs/custom-static-rules","message":"error.http.400"}';
-      expect(result.message).to.be.equal(expected);
     });
   });
 });
