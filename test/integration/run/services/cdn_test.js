@@ -30,30 +30,6 @@ function _stubInvalidationCachePost(namespaceKey) {
     .reply(200);
 }
 
-function _stubCustomStaticRulePost(namespaceKey, monitorId, ip, ja3) {
-  return nock('https://console.baleen.cloud/api', {
-    reqheaders: {
-      'X-Api-Key': config.baleen.pat,
-      'Content-type': 'application/json',
-      Cookie: `baleen-namespace=${namespaceKey}`,
-    },
-  })
-    .post('/configs/custom-static-rules', {
-      category: 'block',
-      name: `Blocage ip: ${ip} ja3: ${ja3}`,
-      description: `Blocage automatique depuis le monitor Datadog ${monitorId}`,
-      enabled: true,
-      labels: ['automatic-rule'],
-      conditions: [
-        [
-          { type: 'ip', operator: 'match', value: ip },
-          { type: 'ja3', operator: 'equals', value: ja3 },
-        ],
-      ],
-    })
-    .reply(200, { id: '1234' });
-}
-
 describe('Integration | CDN', function () {
   let defaultRetryCount, defaultRetryDelay;
 
