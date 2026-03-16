@@ -37,12 +37,12 @@ const configuration = (function () {
       pollMaxAttempts: process.env.REVIEW_APP_ECO_MODE_POLL_MAX_ATTEMPTS || 50,
     },
 
-    baleen: {
-      pat: process.env.BALEEN_PERSONAL_ACCESS_TOKEN,
-      appNamespaces: _getJSON(process.env.BALEEN_APP_NAMESPACES),
+    cdn: {
+      apiId: process.env.IMPERVA_API_ID,
+      apiKey: process.env.IMPERVA_API_KEY,
+      siteIds: process.env.IMPERVA_PIX_SITE_IDS,
       CDNInvalidationRetryCount: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_COUNT, 3),
       CDNInvalidationRetryDelay: _getNumber(process.env.BALEEN_CDN_INVALIDATION_RETRY_DELAY, 2000),
-      protectedFrontApps: _getJSON(process.env.BALEEN_PROTECTED_FRONT_APPS),
     },
 
     scalingo: {
@@ -221,9 +221,9 @@ const configuration = (function () {
   if (process.env.NODE_ENV === 'test') {
     config.port = 0;
 
-    config.baleen.pat = 'baleen-pat';
-    config.baleen.appNamespaces = _getJSON('{"Pix_Test":"Pix_Namespace","Pix_Test_2":"Pix Namespace 2"}');
-    config.baleen.protectedFrontApps = ['Pix_Test'];
+    config.cdn.apiId = 'api-id';
+    config.cdn.apiKey = 'api-key';
+    config.cdn.siteIds = '{"pix-test":1234}';
 
     config.slack.blockedAccessesChannelId = 'C08700JG7QU';
     config.slack.botToken = 'fakeToken';

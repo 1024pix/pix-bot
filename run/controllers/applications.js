@@ -12,9 +12,6 @@ const applications = {
     try {
       return await cdnService.invalidateCdnCache(request.params.name);
     } catch (error) {
-      if (error instanceof cdnService.NamespaceNotFoundError) {
-        return Boom.badRequest();
-      }
       return error;
     }
   },
