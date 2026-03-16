@@ -1,5 +1,18 @@
 # pix-bot Changelog
 
+## v2.5.0 (16/03/2026)
+
+
+### :building_construction: Tech
+- [#650](https://github.com/1024pix/pix-bot/pull/650) [TECH] Implémenter l'invalidation de cache d'Imperva.
+
+### :arrow_up: Montée de version
+- [#648](https://github.com/1024pix/pix-bot/pull/648) [BUMP] Update dependency axios to v1.13.5 [SECURITY].
+- [#636](https://github.com/1024pix/pix-bot/pull/636) [BUMP] Update dependency chai to v6 (dossier racine).
+- [#646](https://github.com/1024pix/pix-bot/pull/646) [BUMP] Update dependency lodash to v4.17.23 [SECURITY].
+- [#645](https://github.com/1024pix/pix-bot/pull/645) [BUMP] Update dependency scalingo to ^0.16.0 (dossier racine).
+- [#642](https://github.com/1024pix/pix-bot/pull/642) [BUMP] Update dependency scalingo to ^0.15.0 (dossier racine).
+
 ## v2.4.1 (07/10/2025)
 
 
