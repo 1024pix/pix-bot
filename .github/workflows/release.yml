@@ -1,0 +1,28 @@
+name: release
+
+on:
+  repository_dispatch:
+    types: [ 'deploy' ]
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: 'package.json'
+
+      - uses: 1024pix/pix-actions/release@main
+        id: semantic
+        with:
+          changelogTitle: "# Pix Bot Changelog"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PIX_SERVICE_RELEASE_ACTION_TOKEN }}
