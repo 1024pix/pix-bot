@@ -41,6 +41,8 @@ function _logRequest(message) {
   });
 }
 
+const octokit = _createOctokit();
+
 function _createOctokit() {
   const authCredentials = {};
   if (config.github.token) {
@@ -73,7 +75,6 @@ async function _getPullReviewsFromGithub(label) {
   const owner = config.github.owner;
 
   label = label.replace(/ /g, '%20');
-  const octokit = _createOctokit();
 
   const params = [{ is: 'pr' }, { is: 'open' }, { archived: false }, { draft: false }, { user: owner }, { label }];
   const response = await octokit.search.issuesAndPullRequests({
@@ -91,7 +92,6 @@ async function _getPullReviewsFromGithub(label) {
 async function _getReviewsFromGithub(pull_number) {
   const owner = config.github.owner;
   const repo = config.github.repository;
-  const octokit = _createOctokit();
   const { data } = await octokit.pulls.listReviews({
     owner,
     repo,
@@ -180,7 +180,6 @@ async function getLastCommitUrl({ branchName, tagName, owner, repo }) {
 }
 
 async function _getBranchLastCommitUrl({ owner, repo, branch }) {
-  const octokit = _createOctokit();
   const { data } = await octokit.repos.getBranch({
     owner,
     repo,
@@ -213,7 +212,7 @@ async function getSecondToLastRelease(repoOwner, repoName) {
 }
 
 async function _getTags(repoOwner, repoName) {
-  const { repos } = _createOctokit();
+  const { repos } = octokit;
   const { data } = await repos.listTags({
     owner: repoOwner,
     repo: repoName,
@@ -222,7 +221,7 @@ async function _getTags(repoOwner, repoName) {
 }
 
 async function _getDefaultBranch(repoOwner, repoName) {
-  const { repos } = _createOctokit();
+  const { repos } = octokit;
   const { data } = await repos.get({
     owner: repoOwner,
     repo: repoName,
@@ -232,7 +231,7 @@ async function _getDefaultBranch(repoOwner, repoName) {
 
 async function _getMergedPullRequestsSortedByDescendingDate(repoOwner, repoName, branchName) {
   const baseBranch = branchName || (await _getDefaultBranch(repoOwner, repoName));
-  const { pulls } = _createOctokit();
+  const { pulls } = octokit;
   const { data } = await pulls.list({
     owner: repoOwner,
     repo: repoName,
@@ -261,7 +260,7 @@ async function _getLatestReleaseTagName(repoOwner, repoName) {
 }
 
 async function _getCommitAtURL(commitUrl) {
-  const { request } = _createOctokit();
+  const { request } = octokit;
   const { data } = await request(commitUrl);
   return data.commit;
 }
@@ -280,7 +279,7 @@ async function _getSecondToLastReleaseDate(repoOwner, repoName) {
 }
 
 async function _getCommitsWhereConfigFileHasChangedBetweenDate(repoOwner, repoName, sinceDate, untilDate) {
-  const { repos } = _createOctokit();
+  const { repos } = octokit;
   const { data } = await repos.listCommits({
     owner: repoOwner,
     repo: repoName,
@@ -311,7 +310,6 @@ function _buildOctokitSearchQueryString(params = []) {
 
 const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) => {
   const owner = config.github.owner;
-  const octokit = _createOctokit();
   await octokit.issues.createComment({
     owner,
     repo: repositoryName,
@@ -321,7 +319,7 @@ const commentPullRequest = async ({ repositoryName, pullRequestId, comment }) =>
 };
 
 async function _getPullRequestsFromCommitShaFromGithub({ repoOwner, repoName, commitSha }) {
-  const { repos } = _createOctokit();
+  const { repos } = octokit;
   const { data } = await repos.listPullRequestsAssociatedWithCommit({
     owner: repoOwner,
     repo: repoName,
@@ -361,7 +359,6 @@ async function _getPullRequestsDetailsByCommitShas({ repoOwner, repoName, commit
 
 async function createCommitStatus({ context, repo, pull_number, description, state, target_url, sha }) {
   const owner = '1024pix';
-  const octokit = _createOctokit();
 
   if (!sha) {
     const pullRequest = await octokit.pulls.get({ owner, repo, pull_number });
@@ -387,8 +384,6 @@ async function createCommitStatus({ context, repo, pull_number, description, sta
 async function setMergeQueueStatus({ repositoryFullName, prNumber, status, description }) {
   const repository = repositoryFullName.split('/')[1];
   const owner = '1024pix';
-
-  const octokit = _createOctokit();
 
   const response = await octokit.pulls.get({ owner, repo: repository, pull_number: prNumber });
   const sha = response.data.head.sha;
@@ -452,7 +447,6 @@ const github = {
     const { owner, repository: repo } = config.github;
     const commitUrl = await getLastCommitUrl({ branchName, tagName, owner, repo });
     const commitStatusUrl = commitUrl + '/check-runs';
-    const octokit = _createOctokit();
     const { data } = await octokit.request(commitStatusUrl);
     const runs = data.check_runs;
     const ciRuns = runs.filter((run) => run.name === githubCICheckName);
@@ -516,7 +510,6 @@ const github = {
   setMergeQueueStatus,
 
   async checkUserBelongsToPix(username) {
-    const octokit = _createOctokit();
     const response = await octokit.request('GET /orgs/{org}/members/{username}', {
       org: '1024pix',
       username,
@@ -525,7 +518,6 @@ const github = {
   },
 
   async triggerWorkflow({ workflow, inputs }) {
-    const octokit = _createOctokit();
     await octokit.request(`POST /repos/${workflow.repositoryName}/actions/workflows/${workflow.id}/dispatches`, {
       ref: workflow.ref,
       inputs,
@@ -533,7 +525,6 @@ const github = {
   },
 
   async isPrLabelledWith({ number, repositoryName, label }) {
-    const octokit = _createOctokit();
     const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
     return data.labels.some((ghLabel) => ghLabel.name === label);
   },
@@ -570,7 +561,6 @@ const github = {
       return undefined;
     }
 
-    const octokit = _createOctokit();
     const { data, status } = await octokit.request(`GET /repos/${repositoryName}/pulls/${prNumber}`);
     if (status !== 200) {
       throw new Error(`Pull request #${prNumber} not found in repository ${repositoryName}`);
@@ -580,7 +570,6 @@ const github = {
 
   async getPullRequestComments({ repositoryName, pullRequestNumber }) {
     const owner = config.github.owner;
-    const octokit = _createOctokit();
 
     const { data, status } = await octokit.issues.listComments({
       owner,
@@ -600,7 +589,6 @@ const github = {
 
   async editPullRequestComment({ repositoryName, commentId, newComment }) {
     const owner = config.github.owner;
-    const octokit = _createOctokit();
 
     const { status } = await octokit.issues.updateComment({
       owner,
