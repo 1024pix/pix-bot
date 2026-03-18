@@ -308,7 +308,9 @@ async function processWebhook(
       const isAllowedRepository = config.github.automerge.allowedRepositories.includes(repositoryName);
       if (isAllowedRepository) {
         await mergeQueue.managePullRequest({ repositoryName, number: request.payload.number });
+        return `PR ${request.payload.number} in repository ${repositoryName} has been send to merge queue`;
       }
+      return 'Ignoring Ready to Merge label action as repository is not allowed';
     }
     if (request.payload.action === 'unlabeled' && request.payload.label?.name === ':rocket: Ready to Merge') {
       const repositoryName = request.payload.repository.full_name;
