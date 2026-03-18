@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v2.6.0 (18/03/2026)
+
+
+### :building_construction: Tech
+- [#652](https://github.com/1024pix/pix-bot/pull/652) [TECH] Améliore la performance de réponse au webook Github.
+
+### :arrow_up: Montée de version
+- [#651](https://github.com/1024pix/pix-bot/pull/651) [BUMP] Update dependency simple-git to v3.32.3 [SECURITY].
+
 ## v2.5.0 (16/03/2026)
 
 
