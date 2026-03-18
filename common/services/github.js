@@ -43,8 +43,22 @@ function _logRequest(message) {
 
 const octokit = _createOctokit();
 
+function _getCacheKey(options) {
+  const _replacePlaceholdersInUrl = (options) => {
+    // options.url might contain placeholders, like '/api/orgs/{org}/repos'
+    // => need to replace them with their actual values to not get colliding keys
+    return options.url.replace(/{([^}]+)}/g, (_, key) => {
+      // Replace with actual value, or leave unchanged if not found
+      return options[key] ?? `{${key}}`;
+    });
+  };
+  return `${options.method}--${_replacePlaceholdersInUrl(options)}`;
+}
+
 function _createOctokit() {
   const authCredentials = {};
+  const responseCache = new Map();
+
   if (config.github.token) {
     authCredentials.auth = config.github.token;
   }
@@ -60,7 +74,30 @@ function _createOctokit() {
       error: console.error,
     },
   });
-  octokit.hook.error('request', async (error) => {
+  octokit.hook.before('request', async (options) => {
+    // Use ETag from in-memory cache if available
+    const cacheKey = _getCacheKey(options);
+    const existingEtag = responseCache.get(cacheKey)?.etag;
+    if (existingEtag) {
+      options.headers['If-None-Match'] = existingEtag;
+    } else {
+      logger.info(`cache miss for key "${cacheKey}"`);
+    }
+  });
+  octokit.hook.after('request', async (response, options) => {
+    // A successful response means that the resource has changed
+    // => so update the in-memory cache
+    const cacheKey = _getCacheKey(options);
+    responseCache.set(cacheKey, {
+      etag: response.headers.etag,
+      ...response,
+    });
+  });
+
+  octokit.hook.error('request', async (error, options) => {
+    if (error?.status === 304) {
+      return responseCache.get(_getCacheKey(options));
+    }
     logger.error({
       event: 'github',
       message: error.response?.data,
