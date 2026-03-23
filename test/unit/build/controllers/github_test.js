@@ -238,34 +238,6 @@ describe('Unit | Controller | Github', function () {
         });
 
         describe('when action is `labeled`', function () {
-          describe('when user is not allowed to trigger an action from a label', function () {
-            it('should do nothing', async function () {
-              sinon.stub(config.github, 'automerge').value({
-                allowedRepositories: ['1024pix/pix-sample-repo'],
-              });
-              sinon.stub(request, 'payload').value({
-                action: 'labeled',
-                number: 123,
-                label: { name: ':rocket: Ready to Merge' },
-                repository: { full_name: '1024pix/pix-sample-repo' },
-                sender: {
-                  login: 'bob',
-                },
-              });
-              const mergeQueue = sinon.stub();
-              const githubService = { checkUserBelongsToPix: sinon.stub(), getPullRequestForEvent: sinon.stub() };
-              githubService.checkUserBelongsToPix.resolves(false);
-              const pullRequestRepository = { save: sinon.stub() };
-
-              // when
-              await githubController.processWebhook(request, { mergeQueue, pullRequestRepository, githubService });
-
-              // then
-              expect(pullRequestRepository.save).to.have.not.been.called;
-              expect(mergeQueue).to.have.not.be.called;
-            });
-          });
-
           describe('when label is Ready-to-merge', function () {
             describe('when repo is allowed', function () {
               it('should call pullRequestRepository.save() method', async function () {
@@ -285,8 +257,7 @@ describe('Unit | Controller | Github', function () {
                 });
 
                 const mergeQueue = { managePullRequest: sinon.stub() };
-                const githubService = { checkUserBelongsToPix: sinon.stub(), getPullRequestForEvent: sinon.stub() };
-                githubService.checkUserBelongsToPix.resolves(true);
+                const githubService = { getPullRequestForEvent: sinon.stub() };
 
                 // when
                 await githubController.processWebhook(request, { githubService, mergeQueue });
@@ -317,8 +288,7 @@ describe('Unit | Controller | Github', function () {
 
                 const mergeQueue = sinon.stub();
                 const pullRequestRepository = { save: sinon.stub() };
-                const githubService = { checkUserBelongsToPix: sinon.stub(), getPullRequestForEvent: sinon.stub() };
-                githubService.checkUserBelongsToPix.resolves(true);
+                const githubService = { getPullRequestForEvent: sinon.stub() };
                 // when
                 await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
 
