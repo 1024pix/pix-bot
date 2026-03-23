@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.7.0 (23/03/2026)
+
+
+### :building_construction: Tech
+- [#653](https://github.com/1024pix/pix-bot/pull/653) [TECH] Supprime la vérification de l'utilisateur lors de l'ajout d'un label sur une PR.
+
 ## v2.6.0 (18/03/2026)
 
 
