@@ -509,14 +509,6 @@ const github = {
   addRADeploymentCheck,
   setMergeQueueStatus,
 
-  async checkUserBelongsToPix(username) {
-    const response = await octokit.request('GET /orgs/{org}/members/{username}', {
-      org: '1024pix',
-      username,
-    });
-    return response.status === 204;
-  },
-
   async triggerWorkflow({ workflow, inputs }) {
     await octokit.request(`POST /repos/${workflow.repositoryName}/actions/workflows/${workflow.id}/dispatches`, {
       ref: workflow.ref,

@@ -671,10 +671,6 @@ describe('Acceptance | Build | Github', function () {
 
             sinon.stub(config.github.automerge, 'allowedRepositories').value(['1024pix/pix']);
 
-            const checkUserBelongsToPixNock = nock('https://api.github.com')
-              .get(`/orgs/1024pix/members/${body.sender.login}`)
-              .reply(204);
-
             const callGitHubAction = nock('https://api.github.com/')
               .post(`/repos/${workflowRepoName}/actions/workflows/${workflowId}/dispatches`, {
                 ref: workflowRef,
@@ -696,7 +692,6 @@ describe('Acceptance | Build | Github', function () {
             });
 
             // then
-            expect(checkUserBelongsToPixNock.isDone()).to.be.true;
             expect(callGitHubAction.isDone()).to.be.true;
             expect(mergeCheckNock.isDone()).to.be.true;
             expect(nock.isDone()).to.be.true;
@@ -735,11 +730,6 @@ describe('Acceptance | Build | Github', function () {
 
             sinon.stub(config.github.automerge, 'allowedRepositories').value(['1024pix/pix']);
 
-            const checkUserBelongsToPixNock = nock('https://api.github.com')
-              .get(`/orgs/1024pix/members/${body.sender.login}`)
-              .reply(204)
-              .persist();
-
             const callGitHubAction = nock('https://api.github.com/')
               .post(`/repos/${workflowRepoName}/actions/workflows/${workflowId}/dispatches`, {
                 ref: workflowRef,
@@ -777,7 +767,6 @@ describe('Acceptance | Build | Github', function () {
             });
 
             // then
-            expect(checkUserBelongsToPixNock.isDone()).to.be.true;
             expect(callGitHubAction.isDone()).to.be.true;
 
             // when

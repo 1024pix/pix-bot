@@ -300,10 +300,6 @@ async function processWebhook(
       return handleCloseRA(request);
     }
     if (request.payload.action === 'labeled' && request.payload.label.name === ':rocket: Ready to Merge') {
-      const belongsToPix = await githubService.checkUserBelongsToPix(request.payload.sender.login);
-      if (!belongsToPix) {
-        return `Ignoring ${request.payload.sender.login} label action`;
-      }
       const repositoryName = request.payload.repository.full_name;
       const isAllowedRepository = config.github.automerge.allowedRepositories.includes(repositoryName);
       if (isAllowedRepository) {
