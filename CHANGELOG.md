@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.8.0 (24/03/2026)
+
+
+### :building_construction: Tech
+- [#654](https://github.com/1024pix/pix-bot/pull/654) [TECH] Build: route github-webhook en asynchrone.
+
 ## v2.7.0 (23/03/2026)
 
 
