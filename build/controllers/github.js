@@ -183,31 +183,40 @@ async function _handleCloseRA(
     throw new Error(`Scalingo auth APIError: ${error.message}`);
   }
 
-  for (const { appName } of reviewApps) {
-    const reviewAppName = `${appName}-pr${prNumber}`;
-    try {
-      const reviewAppExists = await client.reviewAppExists(reviewAppName);
-      // we remove the review app in any case
-      await dependencies.reviewAppRepo.remove({ name: reviewAppName });
-      if (reviewAppExists) {
-        await client.deleteReviewApp(reviewAppName);
-        closedRA.push({ name: appName, isClosed: true, isAlreadyClosed: false });
-      } else {
-        closedRA.push({ name: appName, isClosed: false, isAlreadyClosed: true });
+  const deletionResults = await Promise.allSettled(
+    reviewApps.map(async ({ appName }) => {
+      const reviewAppName = `${appName}-pr${prNumber}`;
+      try {
+        const reviewAppExists = await client.reviewAppExists(reviewAppName);
+        // we remove the review app in any case
+        await dependencies.reviewAppRepo.remove({ name: reviewAppName });
+        if (reviewAppExists) {
+          await client.deleteReviewApp(reviewAppName);
+          return { name: appName, isClosed: true, isAlreadyClosed: false };
+        } else {
+          return { name: appName, isClosed: false, isAlreadyClosed: true };
+        }
+      } catch (error) {
+        logger.error({
+          event: 'review-app',
+          stack: error.stack,
+          message: `Deletion of application ${reviewAppName} failed : ${error.message}`,
+          data: {
+            repository,
+            reviewApp: reviewAppName,
+            pr: prNumber,
+          },
+        });
+        return { name: appName, isClosed: false, isAlreadyClosed: false, error: error.message };
       }
-    } catch (error) {
-      logger.error({
-        event: 'review-app',
-        stack: error.stack,
-        message: `Deletion of application ${reviewAppName} failed : ${error.message}`,
-        data: {
-          repository,
-          reviewApp: reviewAppName,
-          pr: prNumber,
-        },
-      });
+    }),
+  );
+
+  deletionResults.forEach((result) => {
+    if (result.status === 'fulfilled' && result.value) {
+      closedRA.push(result.value);
     }
-  }
+  });
 
   await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber, sha });
 
@@ -267,7 +276,7 @@ function isHandledByThisEnv(pullRequest) {
   return { shouldContinue: true };
 }
 
-async function processWebhook(
+async function _processWebhookAsync(
   request,
   {
     pushOnDefaultBranchWebhook = _pushOnDefaultBranchWebhook,
@@ -280,6 +289,7 @@ async function processWebhook(
 ) {
   const eventName = request.headers['x-github-event'];
   const pullRequest = await githubService.getPullRequestForEvent(eventName, request);
+  logger.info({ event: 'github-webhook', message: `Started webhook for ${eventName} (PR #${pullRequest?.number})` });
 
   const { shouldContinue, message } = isHandledByThisEnv(pullRequest);
   if (!shouldContinue) {
@@ -349,6 +359,55 @@ async function processWebhook(
   } else {
     return `Ignoring ${eventName} event`;
   }
+}
+
+function processWebhook(request, h, dependencies) {
+  const isTestMode = request.headers['x-test-mode'] === 'true';
+
+  if (isTestMode) {
+    // Synchronous mode for tests
+    return _processWebhookAsync(request, dependencies)
+      .then((result) => h.response(result).code(200))
+      .catch((error) => {
+        logger.error({
+          event: 'github-webhook-processing-error',
+          message: `Failed to process webhook: ${error.message}`,
+          stack: error.stack,
+          data: {
+            eventName: request.headers['x-github-event'],
+            action: request.payload?.action,
+            repository: request.payload?.repository?.full_name,
+            prNumber: request.payload?.number || request.payload?.pull_request?.number,
+          },
+        });
+        throw error;
+      });
+  }
+
+  // Production mode: async fire-and-forget
+  _processWebhookAsync(request, dependencies)
+    .then((result) => {
+      const eventName = request.headers['x-github-event'];
+      const prNumber = request.payload?.number || request.payload?.pull_request?.number;
+      logger.info({
+        event: 'github-webhook',
+        message: `Finished webhook for ${eventName} (PR #${prNumber}): ${result}`,
+      });
+    })
+    .catch((error) => {
+      logger.error({
+        event: 'github-webhook-processing-error',
+        message: `Failed to process webhook: ${error.message}`,
+        stack: error.stack,
+        data: {
+          eventName: request.headers['x-github-event'],
+          action: request.payload?.action,
+          repository: request.payload?.repository?.full_name,
+          prNumber: request.payload?.number || request.payload?.pull_request?.number,
+        },
+      });
+    });
+  return h.response({ message: 'Webhook accepted and processing asynchronously' }).code(202);
 }
 
 function shouldHandleIssueComment(request, pullRequest) {
@@ -474,10 +533,12 @@ async function handlePullRequestSynchronize(
     prNumber: pullRequestNumber,
   });
 
-  for (const app of existingApps) {
-    const deploymentId = await client.deployUsingSCM(app.name, ref);
-    await dependencies.reviewAppRepo.setStatusPending({ name: app.name, deploymentId });
-  }
+  await Promise.all(
+    existingApps.map(async (app) => {
+      const deploymentId = await client.deployUsingSCM(app.name, ref);
+      await dependencies.reviewAppRepo.setStatusPending({ name: app.name, deploymentId });
+    }),
+  );
 
   await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber, sha });
 
@@ -592,20 +653,19 @@ async function _handleIssueComment(
 
   const ref = pullRequest.head.ref;
 
-  for (const { reviewAppName, parentApp } of reviewAppsToCreate) {
-    await dependencies.createReviewApp({
-      reviewAppName,
-      repositoryName,
-      pullRequestNumber,
-      ref,
-      parentApp,
-      shouldRemovePostgresAddon: !!allowedReviewAppsByName[parentApp].shouldRemovePostgresAddon,
-    });
-  }
-
-  for (const reviewAppName of reviewAppsToRemove) {
-    await dependencies.removeReviewApp({ reviewAppName });
-  }
+  await Promise.all([
+    ...reviewAppsToCreate.map(({ reviewAppName, parentApp }) =>
+      dependencies.createReviewApp({
+        reviewAppName,
+        repositoryName,
+        pullRequestNumber,
+        ref,
+        parentApp,
+        shouldRemovePostgresAddon: !!allowedReviewAppsByName[parentApp].shouldRemovePostgresAddon,
+      }),
+    ),
+    ...reviewAppsToRemove.map((reviewAppName) => dependencies.removeReviewApp({ reviewAppName })),
+  ]);
 
   const messages = [];
   if (reviewAppsToCreate.length) {
@@ -677,6 +737,7 @@ export {
   getMessage,
   getMessageTemplate,
   processWebhook,
+  _processWebhookAsync,
   _pushOnDefaultBranchWebhook as pushOnDefaultBranchWebhook,
   _handleCloseRA as handleCloseRA,
   _handlePullRequest as handlePullRequest,

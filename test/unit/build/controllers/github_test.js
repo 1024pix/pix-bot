@@ -80,7 +80,7 @@ describe('Unit | Controller | Github', function () {
     });
   });
 
-  describe('#processWebhook', function () {
+  describe('#_processWebhookAsync', function () {
     describe('when pix-bot env is not defined', function () {
       describe('when pull-request has a pix-bot env label', function () {
         it('should ignore the event', async function () {
@@ -97,7 +97,7 @@ describe('Unit | Controller | Github', function () {
           };
 
           // when
-          const result = await githubController.processWebhook(request);
+          const result = await githubController._processWebhookAsync(request);
 
           // then
           expect(result).to.equal('Ignoring because pull request is labelled with a pix-bot-xxx label');
@@ -120,7 +120,7 @@ describe('Unit | Controller | Github', function () {
           };
 
           // when
-          const result = await githubController.processWebhook(request);
+          const result = await githubController._processWebhookAsync(request);
 
           // then
           expect(result).to.equal('Ignoring nothing action');
@@ -145,7 +145,7 @@ describe('Unit | Controller | Github', function () {
           sinon.stub(config.github, 'pixBotEnvLabel').value('pix-bot-integration');
 
           // when
-          const result = await githubController.processWebhook(request);
+          const result = await githubController._processWebhookAsync(request);
 
           // then
           expect(result).to.equal(`Ignoring because pull request should have the pix-bot-integration label`);
@@ -169,7 +169,7 @@ describe('Unit | Controller | Github', function () {
           sinon.stub(config.github, 'pixBotEnvLabel').value('pix-bot-integration');
 
           // when
-          const result = await githubController.processWebhook(request);
+          const result = await githubController._processWebhookAsync(request);
 
           // then
           expect(result).to.equal('Ignoring nothing action');
@@ -187,7 +187,7 @@ describe('Unit | Controller | Github', function () {
         };
 
         // when
-        const result = await githubController.processWebhook(request);
+        const result = await githubController._processWebhookAsync(request);
 
         // then
         expect(result).to.equal('Ignoring unhandled-event event');
@@ -207,7 +207,7 @@ describe('Unit | Controller | Github', function () {
           const pushOnDefaultBranchWebhook = sinon.stub();
 
           // when
-          await githubController.processWebhook(request, { pushOnDefaultBranchWebhook });
+          await githubController._processWebhookAsync(request, { pushOnDefaultBranchWebhook });
 
           // then
           expect(pushOnDefaultBranchWebhook.calledOnceWithExactly(request)).to.be.true;
@@ -230,7 +230,7 @@ describe('Unit | Controller | Github', function () {
             const handlePullRequest = sinon.stub();
 
             // when
-            await githubController.processWebhook(request, { handlePullRequest });
+            await githubController._processWebhookAsync(request, { handlePullRequest });
 
             // then
             expect(handlePullRequest.calledOnceWithExactly(request)).to.be.true;
@@ -260,7 +260,7 @@ describe('Unit | Controller | Github', function () {
                 const githubService = { getPullRequestForEvent: sinon.stub() };
 
                 // when
-                await githubController.processWebhook(request, { githubService, mergeQueue });
+                await githubController._processWebhookAsync(request, { githubService, mergeQueue });
 
                 // then
                 expect(mergeQueue.managePullRequest).to.be.calledOnceWithExactly({
@@ -290,7 +290,11 @@ describe('Unit | Controller | Github', function () {
                 const pullRequestRepository = { save: sinon.stub() };
                 const githubService = { getPullRequestForEvent: sinon.stub() };
                 // when
-                await githubController.processWebhook(request, { githubService, pullRequestRepository, mergeQueue });
+                await githubController._processWebhookAsync(request, {
+                  githubService,
+                  pullRequestRepository,
+                  mergeQueue,
+                });
 
                 // then
                 expect(pullRequestRepository.save).to.have.not.been.called;
@@ -315,7 +319,7 @@ describe('Unit | Controller | Github', function () {
               const mergeQueue = { unmanagePullRequest: sinon.stub() };
 
               // when
-              await githubController.processWebhook(request, { mergeQueue });
+              await githubController._processWebhookAsync(request, { mergeQueue });
 
               // then
               expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
@@ -345,7 +349,7 @@ describe('Unit | Controller | Github', function () {
             const githubService = { getPullRequestForEvent: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { githubService, handleCloseRA, mergeQueue });
+            await githubController._processWebhookAsync(request, { githubService, handleCloseRA, mergeQueue });
 
             // then
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
@@ -375,7 +379,7 @@ describe('Unit | Controller | Github', function () {
             const githubService = { getPullRequestForEvent: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { githubService, handleCloseRA, mergeQueue });
+            await githubController._processWebhookAsync(request, { githubService, handleCloseRA, mergeQueue });
 
             // then
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
@@ -392,7 +396,7 @@ describe('Unit | Controller | Github', function () {
           sinon.stub(request, 'payload').value({ action: 'unhandled-action' });
 
           // when
-          const result = await githubController.processWebhook(request);
+          const result = await githubController._processWebhookAsync(request);
 
           // then
           expect(result).to.equal('Ignoring unhandled-action action');
@@ -418,7 +422,7 @@ describe('Unit | Controller | Github', function () {
             const githubService = { getPullRequestForEvent: sinon.stub() };
 
             // when
-            await githubController.processWebhook(request, { githubService, mergeQueue });
+            await githubController._processWebhookAsync(request, { githubService, mergeQueue });
 
             // then
             expect(mergeQueue.unmanagePullRequest).to.be.calledOnceWithExactly({
@@ -442,7 +446,7 @@ describe('Unit | Controller | Github', function () {
               },
             };
 
-            const result = await githubController.processWebhook(request, {});
+            const result = await githubController._processWebhookAsync(request, {});
 
             expect(result).to.equal('check_suite is not related to any pull_request');
           });
@@ -473,7 +477,7 @@ describe('Unit | Controller | Github', function () {
               })
               .resolves(true);
             // when
-            await githubController.processWebhook(request, { githubService, mergeQueue });
+            await githubController._processWebhookAsync(request, { githubService, mergeQueue });
 
             // then
             expect(mergeQueue.managePullRequest).to.be.calledOnceWithExactly({
@@ -499,7 +503,7 @@ describe('Unit | Controller | Github', function () {
             const handleIssueComment = sinon.stub().resolves('Handle issue comment');
 
             // when
-            const result = await githubController.processWebhook(request, { githubService, handleIssueComment });
+            const result = await githubController._processWebhookAsync(request, { githubService, handleIssueComment });
 
             // then
             expect(result).to.equal('Handle issue comment');
@@ -519,7 +523,7 @@ describe('Unit | Controller | Github', function () {
             };
 
             // when
-            const result = await githubController.processWebhook(request, { githubService });
+            const result = await githubController._processWebhookAsync(request, { githubService });
 
             // then
             expect(result).to.equal('Ignoring issue comment deleted');

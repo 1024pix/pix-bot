@@ -37,6 +37,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -73,6 +74,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -109,6 +111,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -145,6 +148,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -181,6 +185,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'deployment',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -200,6 +205,7 @@ describe('Acceptance | Build | Github', function () {
           headers: {
             'x-hub-signature-256': 'sha256=test',
             'x-github-event': 'pull_request',
+            'x-test-mode': 'true',
           },
           payload: {},
         });
@@ -239,6 +245,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -284,6 +291,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -337,6 +345,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -385,6 +394,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -469,6 +479,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'issue_comment',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -569,6 +580,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'issue_comment',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -625,6 +637,7 @@ describe('Acceptance | Build | Github', function () {
             headers: {
               ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
               'x-github-event': 'pull_request',
+              'x-test-mode': 'true',
             },
             payload: body,
           });
@@ -687,6 +700,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'pull_request',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -762,6 +776,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'pull_request',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -777,6 +792,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'pull_request',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -840,6 +856,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'push',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -904,6 +921,7 @@ describe('Acceptance | Build | Github', function () {
                 headers: {
                   ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                   'x-github-event': 'push',
+                  'x-test-mode': 'true',
                 },
                 payload: body,
               });
@@ -947,6 +965,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'push',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -989,6 +1008,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'push',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -1022,6 +1042,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'check_suite',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -1069,6 +1090,7 @@ describe('Acceptance | Build | Github', function () {
               headers: {
                 ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
                 'x-github-event': 'check_suite',
+                'x-test-mode': 'true',
               },
               payload: body,
             });
@@ -1078,6 +1100,42 @@ describe('Acceptance | Build | Github', function () {
             expect(response.statusCode).equal(200);
             expect(response.payload).equal('check_suite event handle');
           });
+        });
+      });
+
+      describe('Production behavior (without test mode)', function () {
+        it('responds with 202 for async processing', async function () {
+          // given
+          const body = {
+            action: 'opened',
+            number: 2,
+            pull_request: {
+              state: 'open',
+              labels: [],
+              head: {
+                ref: 'my-branch',
+                repo: {
+                  name: 'pix',
+                  fork: false,
+                },
+              },
+            },
+          };
+
+          // when
+          const response = await server.inject({
+            method: 'POST',
+            url: '/github/webhook',
+            headers: {
+              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              'x-github-event': 'pull_request',
+            },
+            payload: body,
+          });
+
+          // then
+          expect(response.statusCode).to.equal(StatusCodes.ACCEPTED);
+          expect(response.result.message).to.include('processing asynchronously');
         });
       });
     });
