@@ -74,7 +74,6 @@ describe('Acceptance | Run | Manifest', function () {
               command: '/deploy-pix-bot',
               url: `http://${hostname}/slack/commands/create-and-deploy-pix-bot-release`,
               description: 'Releaser et déployer pix-bot-run et pix-bot-build',
-              usage_hint: '[patch, minor, major]',
               should_escape: false,
             },
             {
