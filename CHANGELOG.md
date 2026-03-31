@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.9.0 (31/03/2026)
+
+
+### :coffee: Autre
+- [#655](https://github.com/1024pix/pix-bot/pull/655) fix: fix axios version to avoid the corrupted 1.14.
+
 ## v2.8.0 (24/03/2026)
 
 
