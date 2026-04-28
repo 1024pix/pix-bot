@@ -51,7 +51,7 @@
     "@hapi/boom": "^10.0.0",
     "@hapi/hapi": "^21.1.0",
     "@octokit/rest": "^22.0.0",
-    "axios": "1.15.1",
+    "axios": "1.15.2",
     "axios-retry": "4.5.0",
     "cron": "^4.0.0",
     "dayjs": "^1.11.7",
