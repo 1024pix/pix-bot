@@ -133,6 +133,12 @@ describe('Acceptance | Run | Manifest', function () {
               should_escape: false,
             },
             {
+              command: '/deploy-pix-jobs-dashboard',
+              url: `http://${hostname}/slack/commands/deploy-pix-jobs-dashboard-release`,
+              description: 'Déploie la dernière release de pix-jobs-dashboard en production',
+              should_escape: false,
+            },
+            {
               command: '/deploy-pix-api-to-pg',
               description: 'Déploie la version précisée de pix-api-to-pg en production',
               should_escape: false,

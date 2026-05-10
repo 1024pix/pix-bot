@@ -210,6 +210,11 @@ async function deployPixExploitRelease() {
   await deployTagUsingSCM([config.PIX_EXPLOIT_APP_NAME], releaseTag);
 }
 
+export async function deployPixJobsDashboardRelease() {
+  const releaseTag = await github.getLatestReleaseTag(config.PIX_JOBS_DASHBOARD_REPO_NAME);
+  await deployTagUsingSCM([config.PIX_JOBS_DASHBOARD_APP_NAME], releaseTag);
+}
+
 async function unlockRelease(payload) {
   await updateStatus({ repositoryName: 'pix', environment: 'production', authorizeDeployment: true });
   const message = `La mise en production a été débloquée par <@${payload.user_id}> 😅 il est de nouveau possible de la lancer.`;
