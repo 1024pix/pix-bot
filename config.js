@@ -215,6 +215,9 @@ const configuration = (function () {
     PIX_EXPLOIT_REPO_NAME: 'pix-exploit',
     PIX_EXPLOIT_APP_NAME: 'pix-exploit-production',
 
+    PIX_JOBS_DASHBOARD_REPO_NAME: 'pix-jobs-dashboard',
+    PIX_JOBS_DASHBOARD_APP_NAME: 'pix-jobs-dashboard-production',
+
     repoAppNames: _getJSON(process.env.REPO_APP_NAMES_MAPPING) || {},
   };
 

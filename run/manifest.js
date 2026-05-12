@@ -120,6 +120,13 @@ manifest.registerSlashCommand({
   handler: slackbotController.deployPixExploitRelease,
 });
 
+manifest.registerSlashCommand({
+  command: '/deploy-pix-jobs-dashboard',
+  path: '/slack/commands/deploy-pix-jobs-dashboard-release',
+  description: 'Déploie la dernière release de pix-jobs-dashboard en production',
+  should_escape: false,
+  handler: slackbotController.deployPixJobsDashboardRelease,
+});
 manifest.registerShortcut({
   name: 'MEP/Déployer une version',
   type: 'global',
