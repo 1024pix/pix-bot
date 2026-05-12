@@ -1,5 +1,19 @@
 # pix-bot Changelog
 
+## v2.10.0 (12/05/2026)
+
+
+### :rocket: Amélioration
+- [#662](https://github.com/1024pix/pix-bot/pull/662) [FEATURE] Ajoute la commande de déploiement de Pix Jobs Dashboard.
+
+### :arrow_up: Montée de version
+- [#663](https://github.com/1024pix/pix-bot/pull/663) [BUMP] Update dependency axios to v1.16.0 (dossier racine).
+- [#661](https://github.com/1024pix/pix-bot/pull/661) [BUMP] Update dependency simple-git to v3.36.0 [SECURITY].
+- [#660](https://github.com/1024pix/pix-bot/pull/660) [BUMP] Update dependency axios to v1.15.2 (dossier racine).
+- [#659](https://github.com/1024pix/pix-bot/pull/659) [BUMP] Update dependency lodash to v4.18.1 [SECURITY].
+- [#658](https://github.com/1024pix/pix-bot/pull/658) [BUMP] Update dependency axios to v1.15.1 (dossier racine).
+- [#657](https://github.com/1024pix/pix-bot/pull/657) [BUMP] Update dependency axios-retry to v4.5.0 (dossier racine).
+
 ## v2.9.0 (31/03/2026)
 
 
