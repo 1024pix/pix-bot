@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v2.10.1 (13/05/2026)
+
+
+### :bug: Correction
+- [#664](https://github.com/1024pix/pix-bot/pull/664) [BUGFIX] Corrige le nom de repo utilisé pour l'application `pix-jobs-dashboard`.
+
+### :arrow_up: Montée de version
+- [#665](https://github.com/1024pix/pix-bot/pull/665) [BUMP] Update dependency sinon to v22 (dossier racine).
+
 ## v2.10.0 (12/05/2026)
 
 
