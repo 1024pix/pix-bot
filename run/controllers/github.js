@@ -1,5 +1,6 @@
 import ScalingoClient from '../../common/services/scalingo-client.js';
 import { config } from '../../config.js';
+import { logger } from '../../common/services/logger.js';
 
 async function processWebhook(request, { injectedReleaseWebhook = releaseWebhook } = {}) {
   const eventName = request.headers['x-github-event'];
@@ -26,6 +27,10 @@ async function releaseWebhook(request, repoAppMapping = config.repoAppNames, inj
 }
 
 async function deployFromArchive(appNames, tag, repository, scalingoClient) {
+  logger.info({
+    event: 'deployFromArchive',
+    message: `Starting ${appNames} deployment of ${tag} from ${repository}.`,
+  });
   return Promise.all(
     appNames.map(async (appName) => {
       const appNameFragment = appName.split('-');
