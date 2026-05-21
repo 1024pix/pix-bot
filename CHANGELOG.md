@@ -1,5 +1,15 @@
 # pix-bot Changelog
 
+## v2.10.2 (21/05/2026)
+
+
+### :building_construction: Tech
+- [#668](https://github.com/1024pix/pix-bot/pull/668) [TECH] Add deployment log.
+
+### :arrow_up: Montée de version
+- [#667](https://github.com/1024pix/pix-bot/pull/667) [BUMP] Update dependency axios to v1.16.1 (dossier racine).
+- [#666](https://github.com/1024pix/pix-bot/pull/666) [BUMP] Update dependency lint-staged to v17 (dossier racine).
+
 ## v2.10.1 (13/05/2026)
 
 
