@@ -342,7 +342,7 @@ async function _processWebhookAsync(
       }
 
       const prNumber = request.payload.check_suite.pull_requests[0].number;
-      if (request.payload.check_suite.conclusion !== 'success') {
+      if (['failure', 'startup_failure', 'cancelled', 'timed_out'].includes(request.payload.check_suite.conclusion)) {
         await mergeQueue.unmanagePullRequest({ repositoryName, number: prNumber, status: MERGE_STATUS.ABORTED });
       } else {
         const hasReadyToMergeLabel = await githubService.isPrLabelledWith({
