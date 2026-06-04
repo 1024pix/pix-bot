@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.11.1 (04/06/2026)
+
+
+### :bug: Correction
+- [#670](https://github.com/1024pix/pix-bot/pull/670) [BUGFIX] Ne pas annuler un merge en cours si la check suite n'est pas failed.
+
 ## v2.11.0 (04/06/2026)
 
 
