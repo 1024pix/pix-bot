@@ -289,7 +289,13 @@ async function _processWebhookAsync(
 ) {
   const eventName = request.headers['x-github-event'];
   const pullRequest = await githubService.getPullRequestForEvent(eventName, request);
-  logger.info({ event: 'github-webhook', message: `Started webhook for ${eventName} (PR #${pullRequest?.number})` });
+  logger.info({
+    event: 'github-webhook',
+    message: `Started webhook for ${eventName} (PR #${pullRequest?.number})`,
+    data: {
+      deliveryId: request.headers['x-github-delivery'],
+    },
+  });
 
   const { shouldContinue, message } = isHandledByThisEnv(pullRequest);
   if (!shouldContinue) {
@@ -363,21 +369,26 @@ async function _processWebhookAsync(
 
 function processWebhook(request, h, dependencies) {
   const isTestMode = request.headers['x-test-mode'] === 'true';
+  const eventName = request.headers['x-github-event'];
+  const deliveryId = request.headers['x-github-delivery'];
 
   if (isTestMode) {
     // Synchronous mode for tests
     return _processWebhookAsync(request, dependencies)
       .then((result) => h.response(result).code(200))
-      .catch((error) => {
+      .catch(async (error) => {
+        const pullRequest = await commonGithubService.getPullRequestForEvent(eventName, request);
+
         logger.error({
           event: 'github-webhook-processing-error',
           message: `Failed to process webhook: ${error.message}`,
           stack: error.stack,
           data: {
-            eventName: request.headers['x-github-event'],
+            deliveryId,
+            eventName,
             action: request.payload?.action,
             repository: request.payload?.repository?.full_name,
-            prNumber: request.payload?.number || request.payload?.pull_request?.number,
+            prNumber: pullRequest?.number,
           },
         });
         throw error;
@@ -386,24 +397,34 @@ function processWebhook(request, h, dependencies) {
 
   // Production mode: async fire-and-forget
   _processWebhookAsync(request, dependencies)
-    .then((result) => {
+    .then(async (result) => {
       const eventName = request.headers['x-github-event'];
-      const prNumber = request.payload?.number || request.payload?.pull_request?.number;
+      const pullRequest = await commonGithubService.getPullRequestForEvent(eventName, request);
+
       logger.info({
         event: 'github-webhook',
-        message: `Finished webhook for ${eventName} (PR #${prNumber}): ${result}`,
+        message: `Finished webhook for ${eventName} (PR #${pullRequest?.number}): ${result}`,
+        data: {
+          eventName,
+          deliveryId,
+          action: request.payload?.action,
+        },
       });
     })
-    .catch((error) => {
+    .catch(async (error) => {
+      const eventName = request.headers['x-github-event'];
+      const pullRequest = await commonGithubService.getPullRequestForEvent(eventName, request);
+
       logger.error({
         event: 'github-webhook-processing-error',
         message: `Failed to process webhook: ${error.message}`,
         stack: error.stack,
         data: {
-          eventName: request.headers['x-github-event'],
+          eventName,
+          deliveryId,
           action: request.payload?.action,
           repository: request.payload?.repository?.full_name,
-          prNumber: request.payload?.number || request.payload?.pull_request?.number,
+          prNumber: pullRequest?.number,
         },
       });
     });
