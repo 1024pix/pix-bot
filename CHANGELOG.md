@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.11.0 (04/06/2026)
+
+
+### :building_construction: Tech
+- [#669](https://github.com/1024pix/pix-bot/pull/669) [TECH] Améliore les logs lors du traitement du webhook Github.
+
 ## v2.10.2 (21/05/2026)
 
 
