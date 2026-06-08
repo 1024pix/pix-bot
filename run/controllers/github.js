@@ -20,10 +20,10 @@ async function releaseWebhook(request, repoAppMapping = config.repoAppNames, inj
   const tag = request.payload.release.tag_name;
 
   if (!appNames) {
-      logger.info({
-        event: 'release',
-        message: `Github repository ${repository} has been released, but any deployement is configured . To enable deployment, please configure repo in REPO_APP_NAMES_MAPPING env var.`,
-      });
+    logger.info({
+      event: 'release',
+      message: `Github repository ${repository} has been released, but any deployement is configured . To enable deployment, please configure repo in REPO_APP_NAMES_MAPPING env var.`,
+    });
     return 'No Scalingo app configured for this repository';
   }
 
@@ -37,7 +37,7 @@ async function deployFromArchive(appNames, tag, repository, scalingoClient) {
   });
   return Promise.all(
     appNames.map(async (appName) => {
-      try{
+      try {
         const appNameFragment = appName.split('-');
         const instance = appNameFragment[appNameFragment.length - 1];
         const client = await scalingoClient.getInstance(instance);
@@ -46,7 +46,7 @@ async function deployFromArchive(appNames, tag, repository, scalingoClient) {
         logger.error({
           event: 'release',
           stack: error.stack,
-          message: `${appName} deployment failed : ${error.message}. Please create the github release again to reload deployment.`,        
+          message: `${appName} deployment failed : ${error.message}. Please create the github release again to reload deployment.`,
           data: {
             repository,
             tag,
