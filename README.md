@@ -7,12 +7,14 @@ It offers the following services:
 - create a Review App;
 - shut down and restart Review Apps, at the time you want, every day of the week;
 - deploy a specific release into production via a secured API;
-- deploy a specific release into production via a Slack command or shortcut;
+- deploy a specific release into production via a Slack command or shortcut (deprecated);
 - call external service after a deployment (CDN invalidation).
 
 Pix Bot is deployed into two apps:
 - Pix Bot Build: contains the commands for the development tools
 - Pix Bot Run: contains the commands related to the releases
+
+[More details about deployment functionnality](https://1024pix.atlassian.net/wiki/spaces/TC1/blog/6097108994/D+ploiements+d+application+sur+Scalingo+avec+Pix+Bot)
 
 ## Run locally
 
@@ -106,6 +108,7 @@ Create a webhook on Github organization (or repository) :
 - Which events would you like to trigger this webhook? send me everything
 
 Perform some action on Github and check
+
 - ngrok receive Github request
 - pix-bot API process them
 
