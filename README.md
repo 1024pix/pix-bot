@@ -11,6 +11,7 @@ It offers the following services:
 - deploy a specific release into production via a secured API;
 - deploy a specific release into production via a Slack command or shortcut (deprecated);
 - call external service after a deployment (CDN invalidation).
+- handle merge queue for configured repositories.
 
 Pix Bot is deployed into two apps:
 
