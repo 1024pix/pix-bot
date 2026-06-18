@@ -1,4 +1,4 @@
-# Pix Bot
+# Pix Bot - Fork powered
 
 ## Goals
 Pix Bot helps developers and teams who host their applications on [Scalingo](https://scalingo.com) to manage them pragmatically and economically.
