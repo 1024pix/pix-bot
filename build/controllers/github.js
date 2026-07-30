@@ -38,14 +38,14 @@ const repositoryToScalingoAppsReview = {
       appName: 'pix-site-review',
       getLinks: (pullRequestNumber) => [
         { label: 'Pix Site (.fr)', href: `https://site-pr${pullRequestNumber}.review.pix.fr` },
-        { label: 'Pix Site (.org)', href: `https://site-pr${pullRequestNumber}.review.pix.fr` },
+        { label: 'Pix Site (.org)', href: `https://site-pr${pullRequestNumber}.review.pix.org` },
       ],
     },
     {
       appName: 'pix-pro-review',
       getLinks: (pullRequestNumber) => [
         { label: 'Pix Pro (.fr)', href: `https://pro-pr${pullRequestNumber}.review.pix.fr` },
-        { label: 'Pix Pro (.org)', href: `https://pro-pr${pullRequestNumber}.review.pix.fr` },
+        { label: 'Pix Pro (.org)', href: `https://pro-pr${pullRequestNumber}.review.pix.org` },
       ],
     },
   ],
