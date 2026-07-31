@@ -1,5 +1,23 @@
 # pix-bot Changelog
 
+## v2.13.0 (31/07/2026)
+
+
+### :building_construction: Tech
+- [#673](https://github.com/1024pix/pix-bot/pull/673) [TECH] Supprime la partie license du README.
+
+### :bug: Correction
+- [#682](https://github.com/1024pix/pix-bot/pull/682) [BUGFIX] Correction des URL des RA pour pix-site et pix-pro sur le TLD .org.
+
+### :arrow_up: Montée de version
+- [#680](https://github.com/1024pix/pix-bot/pull/680) [BUMP] Update dependency axios to v1.18.1 (dossier racine).
+- [#678](https://github.com/1024pix/pix-bot/pull/678) [BUMP] Update dependency axios to v1.18.0 (dossier racine).
+- [#672](https://github.com/1024pix/pix-bot/pull/672) [BUMP] Update dependency axios to v1.17.0 (dossier racine).
+
+### :coffee: Autre
+- [#674](https://github.com/1024pix/pix-bot/pull/674) Revert "[TECH] Supprime la partie license du README.".
+- [#671](https://github.com/1024pix/pix-bot/pull/671) Add deployment auto logs.
+
 ## v2.11.1 (04/06/2026)
 
 
