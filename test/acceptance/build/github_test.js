@@ -274,6 +274,7 @@ describe('Acceptance | Build | Github', function () {
                   fork: false,
                 },
               },
+              user: { login: 'user' },
             },
           };
           const createComment = createPullRequestCommentNock({ repository: 'pix', prNumber: 2 });

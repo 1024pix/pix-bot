@@ -10,6 +10,7 @@ import * as reviewAppRepo from '../repositories/review-app-repository.js';
 import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue.js';
 import { updateCheckRADeployment } from '../usecases/updateCheckRADeployment.js';
 
+const userPixBot = 'pix-bot-github';
 const repositoryToScalingoAppsReview = {
   'pix-bot': [{ appName: 'pix-bot-review' }],
   'pix-data': [{ appName: 'pix-airflow-review', label: 'Airflow' }],
@@ -59,12 +60,14 @@ const repositoryToScalingoAppsReview = {
   pix: [
     {
       appName: 'pix-api-review',
+      folderName: 'api',
       getLinks: (pullRequestNumber) => [
         { label: 'API', href: `https://api-pr${pullRequestNumber}.review.pix.fr/api/` },
       ],
     },
     {
       appName: 'pix-app-review',
+      folderName: 'mon-pix',
       getLinks: (pullRequestNumber) => [
         { label: 'App (.fr)', href: `https://app-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'App (.org)', href: `https://app-pr${pullRequestNumber}.review.pix.org` },
@@ -73,6 +76,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-orga-review',
+      folderName: 'orga',
       getLinks: (pullRequestNumber) => [
         { label: 'Orga (.fr)', href: `https://orga-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'Orga (.org)', href: `https://orga-pr${pullRequestNumber}.review.pix.org` },
@@ -81,6 +85,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-certif-review',
+      folderName: 'certif',
       getLinks: (pullRequestNumber) => [
         { label: 'Certif (.fr)', href: `https://certif-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'Certif (.org)', href: `https://certif-pr${pullRequestNumber}.review.pix.org` },
@@ -89,6 +94,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-junior-review',
+      folderName: 'junior',
       getLinks: (pullRequestNumber) => [
         { label: 'Junior', href: `https://junior-pr${pullRequestNumber}.review.pix.fr` },
       ],
@@ -96,17 +102,20 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-admin-review',
+      folderName: 'admin',
       getLinks: (pullRequestNumber) => [{ label: 'Admin', href: `https://admin-pr${pullRequestNumber}.review.pix.fr` }],
       shouldRemovePostgresAddon: true,
     },
     {
       appName: 'pix-api-maddo-review',
+      folderName: 'api',
       getLinks: (pullRequestNumber) => [
         { label: 'API MaDDo', href: `https://pix-api-maddo-review-pr${pullRequestNumber}.osc-fr1.scalingo.io/api/` },
       ],
     },
     {
       appName: 'pix-audit-logger-review',
+      folderName: 'audit-logger',
       getLinks: (pullRequestNumber) => [
         {
           label: 'Audit Logger',
@@ -132,7 +141,7 @@ function getMessageTemplate(repositoryName) {
   return messageTemplate;
 }
 
-function getMessage(pullRequestId, scalingoReviewApps, messageTemplate) {
+function getMessage(pullRequestId, scalingoReviewApps, messageTemplate, reviewAppsToDeploy) {
   const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
     .map(({ appName, label, getLinks }) => {
       let links;
@@ -146,7 +155,7 @@ function getMessage(pullRequestId, scalingoReviewApps, messageTemplate) {
 
       const scalingoDashboardLink = `[👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/${appName}-pr${pullRequestId}/environment)`;
 
-      return `- [ ] ${links} | ${scalingoDashboardLink} <!-- ${appName} -->`;
+      return `- [${reviewAppsToDeploy?.includes(appName) ? 'x' : ' '}] ${links} | ${scalingoDashboardLink} <!-- ${appName} -->`;
     })
     .join('\n');
   const message = messageTemplate
@@ -443,7 +452,7 @@ function shouldHandleIssueComment(request, pullRequest) {
     return { shouldContinue: false, message: 'Repository is not managed by Pix Bot.' };
   }
 
-  if (request.payload.comment.user.login !== 'pix-bot-github') {
+  if (request.payload.comment.user.login !== userPixBot) {
     return { shouldContinue: false, message: `Ignoring ${request.payload.comment.user.login} comment edition` };
   }
 
@@ -504,13 +513,71 @@ async function _handlePullRequest(
   return `Action ${payload.action} not handled`;
 }
 
+async function findDeploymentComment({ repositoryName, pullRequestNumber, githubService }) {
+  const comments = await githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
+
+  return comments.find((comment) => comment.user.login === userPixBot);
+}
+
+async function autoDeployReviewAppsFromTitle({ prTitle, reviewApps, pullRequestNumber, repository, githubService }) {
+  const appFromTitle = prTitle.match(/\(([^)]+)\)/)?.[1];
+
+  if (!appFromTitle) {
+    logger.info({
+      event: 'review-app',
+      message: `No folder name found in title of PR ${pullRequestNumber} in repository ${repository}, no review app to deploy`,
+    });
+    return;
+  }
+
+  const reviewAppsToDeploy = reviewApps
+    .filter(({ folderName }) => folderName === appFromTitle)
+    .map(({ appName }) => appName);
+
+  if (reviewAppsToDeploy.length === 0) {
+    logger.info({
+      event: 'review-app',
+      message: `No review app found for folder ${appFromTitle} in PR ${pullRequestNumber} in repository ${repository}, no review app to deploy`,
+    });
+    return;
+  }
+
+  const messageWithRAtoDeploy = getMessage(
+    pullRequestNumber,
+    reviewApps,
+    getMessageTemplate(repository),
+    reviewAppsToDeploy,
+  );
+  const deploymentRAComment = await findDeploymentComment({
+    repositoryName: repository,
+    pullRequestNumber,
+    githubService,
+  });
+
+  if (!deploymentRAComment) {
+    logger.info({
+      event: 'review-app',
+      message: `No deployment comment found on PR ${pullRequestNumber} in repository ${repository}, no review app to deploy`,
+    });
+    return;
+  }
+
+  await githubService.editPullRequestComment({
+    repositoryName: repository,
+    commentId: deploymentRAComment.id,
+    newComment: messageWithRAtoDeploy,
+  });
+}
+
 async function handlePullRequestOpened(
   request,
-  dependencies = { addMessageToPullRequest, githubService: commonGithubService },
+  dependencies = { addMessageToPullRequest, githubService: commonGithubService, autoDeployReviewAppsFromTitle },
 ) {
   const pullRequestNumber = request.payload.number;
   const repository = request.payload.pull_request.head.repo.name;
   const sha = request.payload.pull_request.head.sha;
+  const creator = request.payload.pull_request.user.login;
+  const prTitle = request.payload.pull_request.title;
 
   const reviewApps = repositoryToScalingoAppsReview[repository];
 
@@ -526,6 +593,24 @@ async function handlePullRequestOpened(
     status: 'success',
     sha,
   });
+
+  if (creator === 'renovate[bot]') {
+    try {
+      await dependencies.autoDeployReviewAppsFromTitle({
+        prTitle,
+        reviewApps,
+        pullRequestNumber,
+        repository,
+        githubService: dependencies.githubService,
+      });
+    } catch (error) {
+      logger.error({
+        event: 'review-app',
+        message: `Auto deploy of review apps failed on PR ${pullRequestNumber} in repository ${repository} : ${error.message}`,
+        stack: error.stack,
+      });
+    }
+  }
 
   logger.info({
     event: 'review-app',
@@ -618,9 +703,11 @@ async function updateMessageToPullRequest(
   { repositoryName, reviewApps, pullRequestNumber },
   dependencies = { githubService: commonGithubService },
 ) {
-  const comments = await dependencies.githubService.getPullRequestComments({ repositoryName, pullRequestNumber });
-
-  const deploymentRAComment = comments.find((comment) => comment.user.login === 'pix-bot-github');
+  const deploymentRAComment = await findDeploymentComment({
+    repositoryName,
+    pullRequestNumber,
+    githubService: dependencies.githubService,
+  });
   const template = getMessageTemplate(repositoryName, true);
   const message = getMessage(pullRequestNumber, reviewApps, template);
 
@@ -758,6 +845,7 @@ export {
   getMessage,
   getMessageTemplate,
   processWebhook,
+  autoDeployReviewAppsFromTitle,
   _processWebhookAsync,
   _pushOnDefaultBranchWebhook as pushOnDefaultBranchWebhook,
   _handleCloseRA as handleCloseRA,

@@ -68,9 +68,12 @@ describe('Unit | Controller | Github', function () {
   describe('#getMessage', function () {
     it('replace template placeholders with params', function () {
       const template = 'Choisir les applications à déployer :\n{{checkboxesForReviewAppsToBeDeployed}}';
-      expect(githubController.getMessage('42', [{ appName: 'pix-review' }, { appName: 'pix-review2' }], template)).to
-        .equal(`Choisir les applications à déployer :
-- [ ] [pix](https://pix-review-pr42.osc-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment) <!-- pix-review -->
+      expect(
+        githubController.getMessage('42', [{ appName: 'pix-review' }, { appName: 'pix-review2' }], template, [
+          'pix-review',
+        ]),
+      ).to.equal(`Choisir les applications à déployer :
+- [x] [pix](https://pix-review-pr42.osc-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment) <!-- pix-review -->
 - [ ] [pix2](https://pix-review2-pr42.osc-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-review2-pr42/environment) <!-- pix-review2 -->`);
     });
 
@@ -945,6 +948,8 @@ describe('Unit | Controller | Github', function () {
               },
               sha: 'abc123',
             },
+            title: 'PR title',
+            user: { login: 'user' },
           },
         },
       };
@@ -967,6 +972,98 @@ describe('Unit | Controller | Github', function () {
         prNumber: 123,
         status: 'success',
         sha: 'abc123',
+      });
+    });
+
+    describe('when user is renovate[bot]', function () {
+      it('should call _autoDeployReviewAppsFromTitle method', async function () {
+        // given
+        const request = {
+          payload: {
+            number: 123,
+            pull_request: {
+              head: {
+                repo: {
+                  name: 'pix',
+                },
+                sha: 'abc123',
+              },
+              title: 'PR title',
+              user: { login: 'renovate[bot]' },
+            },
+          },
+        };
+        const addMessageToPullRequest = sinon.stub().resolves();
+        const autoDeployReviewAppsFromTitle = sinon.stub().resolves();
+        const githubService = {
+          addRADeploymentCheck: sinon.stub().resolves(),
+          editPullRequestComment: sinon.stub().resolves(),
+        };
+
+        // when
+        await githubController.handlePullRequestOpened(request, {
+          addMessageToPullRequest,
+          githubService,
+          autoDeployReviewAppsFromTitle,
+        });
+
+        // then
+        expect(addMessageToPullRequest).to.have.been.calledWithExactly({
+          repositoryName: 'pix',
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          pullRequestNumber: 123,
+        });
+        expect(githubService.addRADeploymentCheck).to.have.been.calledOnceWithExactly({
+          repository: 'pix',
+          prNumber: 123,
+          status: 'success',
+          sha: 'abc123',
+        });
+        expect(autoDeployReviewAppsFromTitle).to.have.been.calledOnceWithExactly({
+          prTitle: 'PR title',
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          pullRequestNumber: 123,
+          repository: 'pix',
+          githubService,
+        });
+      });
+
+      describe('when the auto deploy fails', function () {
+        it('should not fail the whole pull request handling', async function () {
+          // given
+          const request = {
+            payload: {
+              number: 123,
+              pull_request: {
+                head: {
+                  repo: {
+                    name: 'pix',
+                  },
+                  sha: 'abc123',
+                },
+                title: 'PR title',
+                user: { login: 'renovate[bot]' },
+              },
+            },
+          };
+          const addMessageToPullRequest = sinon.stub().resolves();
+          const autoDeployReviewAppsFromTitle = sinon.stub().rejects(new Error('Github API error'));
+          const githubService = {
+            addRADeploymentCheck: sinon.stub().resolves(),
+            editPullRequestComment: sinon.stub().resolves(),
+          };
+
+          // when
+          const result = await githubController.handlePullRequestOpened(request, {
+            addMessageToPullRequest,
+            githubService,
+            autoDeployReviewAppsFromTitle,
+          });
+
+          // then
+          expect(autoDeployReviewAppsFromTitle).to.have.been.calledOnce;
+          expect(result).to.equal('Commented on PR 123 in repository pix');
+        });
       });
     });
   });
@@ -1627,6 +1724,157 @@ Removed review apps: pix-api-maddo-review-pr123`);
         repositoryName,
         pullRequestId: pullRequestNumber,
         comment: COMMENT,
+      });
+    });
+  });
+
+  describe('#autoDeployReviewAppsFromTitle', function () {
+    function getCheckedAppNames(comment) {
+      return [...comment.matchAll(/^- \[x\] .*<!-- (.+) -->$/gm)].map(([, appName]) => appName);
+    }
+
+    it('should check the review apps whose folder name is the one given in the pull request title', async function () {
+      // given
+      const githubService = {
+        getPullRequestComments: sinon.stub().resolves([{ user: { login: 'pix-bot-github' }, id: 2 }]),
+        editPullRequestComment: sinon.stub().resolves(),
+      };
+
+      // when
+      await githubController.autoDeployReviewAppsFromTitle({
+        prTitle: '[BUMP] Update dependency axios to v1.19.0 (api)',
+        reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+        pullRequestNumber: 123,
+        repository: 'pix',
+        githubService,
+      });
+
+      // then
+      expect(githubService.getPullRequestComments).to.have.been.calledOnceWithExactly({
+        repositoryName: 'pix',
+        pullRequestNumber: 123,
+      });
+      expect(githubService.editPullRequestComment).to.have.been.calledOnce;
+      const { repositoryName, commentId, newComment } = githubService.editPullRequestComment.firstCall.args[0];
+      expect({ repositoryName, commentId }).to.deep.equal({ repositoryName: 'pix', commentId: 2 });
+      expect(getCheckedAppNames(newComment)).to.deep.equal(['pix-api-review', 'pix-api-maddo-review']);
+    });
+
+    it('should edit the pix-bot-github comment only', async function () {
+      // given
+      const githubService = {
+        getPullRequestComments: sinon.stub().resolves([
+          { user: { login: 'renovate[bot]' }, id: 1 },
+          { user: { login: 'pix-bot-github' }, id: 42 },
+          { user: { login: 'a-reviewer' }, id: 3 },
+        ]),
+        editPullRequestComment: sinon.stub().resolves(),
+      };
+
+      // when
+      await githubController.autoDeployReviewAppsFromTitle({
+        prTitle: '[BUMP] Update dependency axios to v1.19.0 (junior)',
+        reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+        pullRequestNumber: 123,
+        repository: 'pix',
+        githubService,
+      });
+
+      // then
+      expect(githubService.editPullRequestComment).to.have.been.calledOnce;
+      expect(githubService.editPullRequestComment.firstCall.args[0].commentId).to.equal(42);
+    });
+
+    describe('when the pull request title has several parentheses', function () {
+      it('should only use the first parentheses to find the folder name', async function () {
+        // given
+        // renovate can append the update type after the folder name, e.g. "(api) (major)"
+        const githubService = {
+          getPullRequestComments: sinon.stub().resolves([{ user: { login: 'pix-bot-github' }, id: 2 }]),
+          editPullRequestComment: sinon.stub().resolves(),
+        };
+
+        // when
+        await githubController.autoDeployReviewAppsFromTitle({
+          prTitle: '[BUMP] Update dependency axios to v2.0.0 (api) (major)',
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          pullRequestNumber: 123,
+          repository: 'pix',
+          githubService,
+        });
+
+        // then
+        expect(githubService.editPullRequestComment).to.have.been.calledOnce;
+        const { newComment } = githubService.editPullRequestComment.firstCall.args[0];
+        expect(getCheckedAppNames(newComment)).to.deep.equal(['pix-api-review', 'pix-api-maddo-review']);
+      });
+    });
+
+    describe('when the pull request title has no folder name', function () {
+      it('should not edit any comment', async function () {
+        // given
+        const githubService = {
+          getPullRequestComments: sinon.stub().resolves([{ user: { login: 'pix-bot-github' }, id: 2 }]),
+          editPullRequestComment: sinon.stub().resolves(),
+        };
+
+        // when
+        await githubController.autoDeployReviewAppsFromTitle({
+          prTitle: '[BUMP] Update dependency axios to v1.19.0',
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          pullRequestNumber: 123,
+          repository: 'pix',
+          githubService,
+        });
+
+        // then
+        expect(githubService.getPullRequestComments).to.not.have.been.called;
+        expect(githubService.editPullRequestComment).to.not.have.been.called;
+      });
+    });
+
+    describe('when no review app matches the folder name of the pull request title', function () {
+      it('should not fetch nor edit any comment', async function () {
+        // given
+        const githubService = {
+          getPullRequestComments: sinon.stub().resolves([{ user: { login: 'pix-bot-github' }, id: 2 }]),
+          editPullRequestComment: sinon.stub().resolves(),
+        };
+
+        // when
+        await githubController.autoDeployReviewAppsFromTitle({
+          prTitle: '[BUMP] Update dependency axios to v1.19.0 (dossier racine)',
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          pullRequestNumber: 123,
+          repository: 'pix',
+          githubService,
+        });
+
+        // then
+        expect(githubService.getPullRequestComments).to.not.have.been.called;
+        expect(githubService.editPullRequestComment).to.not.have.been.called;
+      });
+    });
+
+    describe('when the pull request has no deployment comment', function () {
+      it('should not edit any comment', async function () {
+        // given
+        const githubService = {
+          getPullRequestComments: sinon.stub().resolves([{ user: { login: 'a-reviewer' }, id: 1 }]),
+          editPullRequestComment: sinon.stub().resolves(),
+        };
+
+        // when
+        await githubController.autoDeployReviewAppsFromTitle({
+          prTitle: '[BUMP] Update dependency axios to v1.19.0 (api)',
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          pullRequestNumber: 123,
+          repository: 'pix',
+          githubService,
+        });
+
+        // then
+        expect(githubService.editPullRequestComment).to.not.have.been.called;
       });
     });
   });
