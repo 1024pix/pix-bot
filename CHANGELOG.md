@@ -1,5 +1,14 @@
 # pix-bot Changelog
 
+## v2.14.0 (21/08/2026)
+
+
+### :rocket: Amélioration
+- [#685](https://github.com/1024pix/pix-bot/pull/685) [FEATURE] Ajouter le deploiement auto des reviews app basé sur le titre de la PR pour renovate.
+
+### :arrow_up: Montée de version
+- [#684](https://github.com/1024pix/pix-bot/pull/684) [BUMP] Update dependency axios to v1.19.0 (dossier racine).
+
 ## v2.13.0 (31/07/2026)
 
 
