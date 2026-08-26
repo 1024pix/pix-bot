@@ -5,7 +5,7 @@ jobs:
     parameters:
       node-version:
         # renovate datasource=node-version depName=node
-        default: 22.18.0
+        default: 22.23.2
         type: string
     docker:
       - image: cimg/node:<<parameters.node-version>>
