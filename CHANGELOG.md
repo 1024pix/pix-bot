@@ -1,5 +1,17 @@
 # pix-bot Changelog
 
+## v2.14.1 (26/08/2026)
+
+
+### :building_construction: Tech
+- [#686](https://github.com/1024pix/pix-bot/pull/686) [TECH] Passer sur la configuration par défaut de Renovate config.
+
+### :bug: Correction
+- [#693](https://github.com/1024pix/pix-bot/pull/693) [BUGFIX] Renommer pix-data-api-pix en pix-api-to-pg.
+
+### :arrow_up: Montée de version
+- [#687](https://github.com/1024pix/pix-bot/pull/687) [BUMP] Pin xt0rted/block-autosquash-commits-action action to 79880c3.
+
 ## v2.14.0 (21/08/2026)
 
 
