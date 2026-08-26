@@ -14,7 +14,7 @@ const userPixBot = 'pix-bot-github';
 const repositoryToScalingoAppsReview = {
   'pix-bot': [{ appName: 'pix-bot-review' }],
   'pix-data': [{ appName: 'pix-airflow-review', label: 'Airflow' }],
-  'pix-api-to-pg': [{ appName: 'pix-data-api-pix-integration' }],
+  'pix-api-to-pg': [{ appName: 'pix-api-to-pg-integration' }],
   'pix-db-replication': [{ appName: 'pix-datawarehouse-review' }],
   'pix-db-stats': [{ appName: 'pix-db-stats-review' }],
   'pix-editor': [{ appName: 'pix-lcms-review' }],
