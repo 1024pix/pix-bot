@@ -1,5 +1,13 @@
 # pix-bot Changelog
 
+## v2.15.0 (03/09/2026)
+
+
+### :building_construction: Tech
+- [#700](https://github.com/1024pix/pix-bot/pull/700) [TECH] Supprime le déploiement de PrivateBin.
+- [#699](https://github.com/1024pix/pix-bot/pull/699) [TECH] Supprimer la surcharge du schedule.
+- [#694](https://github.com/1024pix/pix-bot/pull/694) [TECH] Use js-project renovate config and lower schedule.
+
 ## v2.14.1 (26/08/2026)
 
 
