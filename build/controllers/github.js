@@ -197,12 +197,14 @@ async function _handleCloseRA(
       const reviewAppName = `${appName}-pr${prNumber}`;
       try {
         const reviewAppExists = await client.reviewAppExists(reviewAppName);
-        // we remove the review app in any case
-        await dependencies.reviewAppRepo.remove({ name: reviewAppName });
         if (reviewAppExists) {
+          // the review app is forgotten only once Scalingo confirmed its deletion, so that a
+          // failed deletion keeps being tracked instead of silently leaking a running app
           await client.deleteReviewApp(reviewAppName);
+          await dependencies.reviewAppRepo.remove({ name: reviewAppName });
           return { name: appName, isClosed: true, isAlreadyClosed: false };
         } else {
+          await dependencies.reviewAppRepo.remove({ name: reviewAppName });
           return { name: appName, isClosed: false, isAlreadyClosed: true };
         }
       } catch (error) {
@@ -229,9 +231,10 @@ async function _handleCloseRA(
 
   await dependencies.updateCheckRADeployment({ repositoryName: repository, pullRequestNumber: prNumber, sha });
 
-  const result = closedRA.map((ra) =>
-    ra.isAlreadyClosed ? `${ra.name}-pr${prNumber} (already closed)` : `${ra.name}-pr${prNumber}`,
-  );
+  const result = closedRA.map((ra) => {
+    if (ra.error) return `${ra.name}-pr${prNumber} (deletion failed)`;
+    return ra.isAlreadyClosed ? `${ra.name}-pr${prNumber} (already closed)` : `${ra.name}-pr${prNumber}`;
+  });
   return `Closed RA for PR ${prNumber} : ${result.join(', ')}.`;
 }
 

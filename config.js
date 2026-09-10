@@ -37,6 +37,12 @@ const configuration = (function () {
       pollMaxAttempts: process.env.REVIEW_APP_ECO_MODE_POLL_MAX_ATTEMPTS || 50,
     },
 
+    orphanReviewApps: {
+      schedule: process.env.ORPHAN_REVIEW_APPS_SCHEDULE,
+      dryRun: isFeatureEnabled(process.env.ORPHAN_REVIEW_APPS_DRY_RUN),
+      maxDeletionsPerRun: _getNumber(process.env.ORPHAN_REVIEW_APPS_MAX_DELETIONS_PER_RUN, 10),
+    },
+
     cdn: {
       apiId: process.env.IMPERVA_API_ID,
       apiKey: process.env.IMPERVA_API_KEY,

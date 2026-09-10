@@ -850,6 +850,66 @@ describe('Scalingo client', function () {
         expect(clientAppsDestroy).to.have.been.calledWithExactly(appName, appName);
       });
     });
+
+    describe('When the deletion fails', function () {
+      it('should throw an error instead of silently leaving the review app running', async function () {
+        // given
+        const scalingoError = new Error('Scalingo is down');
+        clientAppsDestroy.rejects(scalingoError);
+
+        // when
+        const result = await catchErr(client.deleteReviewApp, client)('pix-api-review-pr1');
+
+        // then
+        expect(result).to.be.instanceOf(Error);
+        expect(result.message).to.equal('Unable to delete review app pix-api-review-pr1');
+        expect(result.cause).to.equal(scalingoError);
+      });
+    });
+  });
+
+  describe('#Scalingo.getReviewAppsList', function () {
+    let clientAppsAll;
+    let client;
+
+    beforeEach(async function () {
+      clientAppsAll = sinon.stub();
+      const clientStub = {
+        clientFromToken: async function () {
+          return {
+            Apps: { all: clientAppsAll },
+          };
+        },
+      };
+      client = await ScalingoClient.getInstance('reviewApps', clientStub);
+    });
+
+    it('should return the names of the review apps only', async function () {
+      // given
+      clientAppsAll.resolves([
+        { name: 'pix-api-review-pr123' },
+        { name: 'pix-api-production' },
+        { name: 'pix-app-review-pr456' },
+      ]);
+
+      // when
+      const result = await client.getReviewAppsList();
+
+      // then
+      expect(result).to.deep.equal(['pix-api-review-pr123', 'pix-app-review-pr456']);
+    });
+
+    it('should throw an error when the applications cannot be listed', async function () {
+      // given
+      clientAppsAll.rejects(new Error('Scalingo is down'));
+
+      // when
+      const result = await catchErr(client.getReviewAppsList, client)();
+
+      // then
+      expect(result).to.be.instanceOf(Error);
+      expect(result.message).to.equal('Unable to list review apps');
+    });
   });
 
   describe('#Scalingo.addDeploymentNotificationOnSlack', function () {

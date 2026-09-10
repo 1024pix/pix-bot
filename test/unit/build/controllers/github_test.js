@@ -839,6 +839,38 @@ describe('Unit | Controller | Github', function () {
         });
       });
     });
+
+    describe('when the deletion of a Review App fails', function () {
+      it('should keep the entry in DB so that the review app is not silently leaked', async function () {
+        // given
+        const scalingoClientStub = sinon.stub();
+        const reviewAppExistsStub = sinon.stub().resolves(true);
+        const deleteReviewAppStub = sinon.stub().resolves();
+        const reviewAppRepositoryStub = {
+          remove: sinon.stub(),
+        };
+        const updateCheckRADeployment = sinon.stub().resolves();
+
+        scalingoClientStub.getInstance = sinon.stub().returns({
+          reviewAppExists: reviewAppExistsStub,
+          deleteReviewApp: deleteReviewAppStub,
+        });
+
+        deleteReviewAppStub.withArgs('pix-api-review-pr3').rejects(new Error('Scalingo is down'));
+
+        // when
+        const response = await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+          reviewAppRepo: reviewAppRepositoryStub,
+          updateCheckRADeployment,
+        });
+
+        // then
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-api-review-pr3' })).to.be.false;
+        expect(reviewAppRepositoryStub.remove.calledWith({ name: 'pix-admin-review-pr3' })).to.be.true;
+        expect(response).to.contain('pix-api-review-pr3 (deletion failed)');
+      });
+    });
   });
 
   describe('#handlePullRequest', function () {

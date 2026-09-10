@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import ecoModeService from './build/services/eco-mode-service.js';
+import { deleteOrphanReviewApps } from './build/usecases/deleteOrphanReviewApps.js';
 import { createCronJob } from './common/services/cron-job.js';
 import github from './common/services/github.js';
 import { logger } from './common/services/logger.js';
@@ -13,6 +14,8 @@ import server from './server.js';
 
 const init = async () => {
   await ecoModeService.start();
+
+  createCronJob('Delete orphan review apps', deleteOrphanReviewApps, config.orphanReviewApps.schedule);
 
   createCronJob(
     'Deploy Pix site',
