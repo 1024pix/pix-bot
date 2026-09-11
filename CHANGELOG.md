@@ -1,5 +1,11 @@
 # pix-bot Changelog
 
+## v2.16.0 (11/09/2026)
+
+
+### :building_construction: Tech
+- [#701](https://github.com/1024pix/pix-bot/pull/701) [TECH] Supprime les review apps orphelines dont la PR est fermée.
+
 ## v2.15.0 (03/09/2026)
 
 
