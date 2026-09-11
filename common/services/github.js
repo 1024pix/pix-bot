@@ -516,6 +516,26 @@ const github = {
     });
   },
 
+  /**
+   * Returns the state of a pull request, or null when it cannot be found.
+   * A null result means "unknown", it must never be read as "closed".
+   */
+  async getPullRequestState({ repositoryName, pullRequestNumber, repositoryOwner = config.github.owner }) {
+    try {
+      const { data } = await octokit.request('GET /repos/{owner}/{repo}/pulls/{pull_number}', {
+        owner: repositoryOwner,
+        repo: repositoryName,
+        pull_number: pullRequestNumber,
+      });
+      return { state: data.state, isMerged: Boolean(data.merged) };
+    } catch (error) {
+      if (error.status === 404) {
+        return null;
+      }
+      throw error;
+    }
+  },
+
   async isPrLabelledWith({ number, repositoryName, label }) {
     const { data } = await octokit.request(`GET /repos/${repositoryName}/pulls/${number}`);
     return data.labels.some((ghLabel) => ghLabel.name === label);

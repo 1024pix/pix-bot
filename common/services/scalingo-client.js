@@ -70,6 +70,16 @@ class ScalingoClient {
     return [await this._getSingleAppInfo(target)];
   }
 
+  async getReviewAppsList() {
+    try {
+      const apps = await this.client.Apps.all();
+      return apps.map(({ name }) => name).filter((name) => ScalingoAppName.isReviewApp(name));
+    } catch (err) {
+      logger.error({ event, message: 'Error while listing review apps', data: { err } });
+      throw new Error('Unable to list review apps', { cause: err });
+    }
+  }
+
   async reviewAppExists(reviewAppName) {
     try {
       const { name } = await this.client.Apps.find(reviewAppName);
@@ -224,6 +234,7 @@ class ScalingoClient {
       await this.client.Apps.destroy(appName, appName);
     } catch (err) {
       logger.error({ event, message: 'error while deleting app', data: { err, appName } });
+      throw new Error(`Unable to delete review app ${appName}`, { cause: err });
     }
   }
 
