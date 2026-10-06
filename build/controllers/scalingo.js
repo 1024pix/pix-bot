@@ -7,6 +7,7 @@ import { config } from '../../config.js';
 import * as reviewAppRepository from '../repositories/review-app-repository.js';
 import { ScalingoAppName } from '../../common/models/ScalingoAppName.js';
 import { updateCheckRADeployment } from '../usecases/updateCheckRADeployment.js';
+import Boom from '@hapi/boom';
 
 function getSlackMessageAttachments(payload) {
   const appName = payload.app_name;
@@ -44,6 +45,11 @@ function getSlackMessageAttachments(payload) {
 
 const scalingo = {
   async deployEndpoint(request) {
+    const token = request.query?.token;
+    if (token !== config.scalingo.notifierToken) {
+      throw Boom.unauthorized('Token is missing or is incorrect');
+    }
+
     logger.info({
       event: 'scalingo',
       message: 'Scalingo request received',
@@ -71,6 +77,11 @@ const scalingo = {
   },
 
   async reviewAppDeployEndpoint(request, h) {
+    const token = request.query?.token;
+    if (token !== config.scalingo.notifierToken) {
+      throw Boom.unauthorized('Token is missing or is incorrect');
+    }
+
     const event = 'review-app-deploy';
     const appName = request.payload.app_name;
     const type = request.payload.type;

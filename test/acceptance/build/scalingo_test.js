@@ -4,62 +4,80 @@ import { expect, nock, sinon, StatusCodes } from '../../test-helper.js';
 
 describe('Acceptance | Build | Scalingo', function () {
   describe('POST build/scalingo/deploy-endpoint', function () {
-    describe('when the build has failed', function () {
-      it('should post a message on slack and log a message', async function () {
-        // given
-        const payload = { app_name: 'application', type_data: { status: 'build-error' } };
-        const messageNock = nock('https://slack.com').post('/api/chat.postMessage').reply(StatusCodes.OK, { ok: true });
-        const loggerInfoStub = sinon.stub(logger, 'info');
-        const loggerWarnStub = sinon.stub(logger, 'warn');
+    describe('when the route is called without a valid token', function () {
+      it('responds with 401', async function () {
+        const body = { pullRequest: '1024pix/pix-test/1' };
 
-        // when
-        const response = await server.inject({
+        const res = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/deploy-endpoint',
-          payload,
+          url: '/build/scalingo/deploy-endpoint?token=invalid-token',
+          payload: body,
         });
 
-        // then
-        expect(messageNock).to.have.been.requested;
-        expect(response.statusCode).to.equal(StatusCodes.OK);
-        expect(response.payload).to.equal('Slack error notification sent');
-        expect(loggerInfoStub.calledOnce).to.be.true;
-        expect(loggerInfoStub.firstCall.args[0]).to.deep.equal({
-          event: 'scalingo',
-          message: 'Scalingo request received',
-        });
-        expect(loggerWarnStub.calledTwice).to.be.true;
-        expect(loggerWarnStub.firstCall.args[0]).to.deep.equal({
-          event: 'scalingo',
-          message: 'Failed deployment on the application app',
-        });
-        expect(loggerWarnStub.secondCall.args[0]).to.deep.equal({
-          event: 'scalingo',
-          message: 'Slack error notification sent',
-        });
+        expect(res.statusCode).to.equal(401);
       });
     });
 
-    describe('when the build has succeeded', function () {
-      it('should return OK (200) and log a message', async function () {
-        // given
-        const payload = { type_data: { status: 'succeeded' } };
-        const loggerInfoStub = sinon.stub(logger, 'info');
+    describe('when the route is called with a valid token', function () {
+      describe('when the build has failed', function () {
+        it('should post a message on slack and log a message', async function () {
+          // given
+          const payload = { app_name: 'application', type_data: { status: 'build-error' } };
+          const messageNock = nock('https://slack.com')
+            .post('/api/chat.postMessage')
+            .reply(StatusCodes.OK, { ok: true });
+          const loggerInfoStub = sinon.stub(logger, 'info');
+          const loggerWarnStub = sinon.stub(logger, 'warn');
 
-        // when
-        const response = await server.inject({
-          method: 'POST',
-          url: '/build/scalingo/deploy-endpoint',
-          payload,
+          // when
+          const response = await server.inject({
+            method: 'POST',
+            url: '/build/scalingo/deploy-endpoint?token=a-valid-notifier-token',
+            payload,
+          });
+
+          // then
+          expect(messageNock).to.have.been.requested;
+          expect(response.statusCode).to.equal(StatusCodes.OK);
+          expect(response.payload).to.equal('Slack error notification sent');
+          expect(loggerInfoStub.calledOnce).to.be.true;
+          expect(loggerInfoStub.firstCall.args[0]).to.deep.equal({
+            event: 'scalingo',
+            message: 'Scalingo request received',
+          });
+          expect(loggerWarnStub.calledTwice).to.be.true;
+          expect(loggerWarnStub.firstCall.args[0]).to.deep.equal({
+            event: 'scalingo',
+            message: 'Failed deployment on the application app',
+          });
+          expect(loggerWarnStub.secondCall.args[0]).to.deep.equal({
+            event: 'scalingo',
+            message: 'Slack error notification sent',
+          });
         });
+      });
 
-        // then
-        expect(response.statusCode).to.equal(StatusCodes.OK);
-        expect(response.payload).to.equal('Slack error notification not sent');
-        expect(loggerInfoStub.calledOnce).to.be.true;
-        expect(loggerInfoStub.firstCall.args[0]).to.deep.equal({
-          event: 'scalingo',
-          message: 'Scalingo request received',
+      describe('when the build has succeeded', function () {
+        it('should return OK (200) and log a message', async function () {
+          // given
+          const payload = { type_data: { status: 'succeeded' } };
+          const loggerInfoStub = sinon.stub(logger, 'info');
+
+          // when
+          const response = await server.inject({
+            method: 'POST',
+            url: '/build/scalingo/deploy-endpoint?token=a-valid-notifier-token',
+            payload,
+          });
+
+          // then
+          expect(response.statusCode).to.equal(StatusCodes.OK);
+          expect(response.payload).to.equal('Slack error notification not sent');
+          expect(loggerInfoStub.calledOnce).to.be.true;
+          expect(loggerInfoStub.firstCall.args[0]).to.deep.equal({
+            event: 'scalingo',
+            message: 'Scalingo request received',
+          });
         });
       });
     });
