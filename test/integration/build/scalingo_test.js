@@ -4,6 +4,7 @@ import { expect, nock, sinon } from '../../test-helper.js';
 
 import { knex } from '../../../db/knex-database-connection.js';
 import { logger } from '../../../common/services/logger.js';
+import { config } from '../../../config.js';
 
 describe('Integration | Build | Scalingo', function () {
   describe('POST /build/scalingo/deploy-endpoint', function () {
@@ -28,7 +29,7 @@ describe('Integration | Build | Scalingo', function () {
         // When
         const res = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/deploy-endpoint',
+          url: '/build/scalingo/deploy-endpoint?token=a-valid-notifier-token',
           payload: body,
         });
 
@@ -104,7 +105,7 @@ describe('Integration | Build | Scalingo', function () {
         // When
         const res = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/deploy-endpoint',
+          url: '/build/scalingo/deploy-endpoint?token=a-valid-notifier-token',
           payload: body,
         });
 
@@ -144,7 +145,7 @@ describe('Integration | Build | Scalingo', function () {
         // when
         const response = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/review-app-deploy-endpoint',
+          url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
           payload,
         });
 
@@ -181,7 +182,7 @@ describe('Integration | Build | Scalingo', function () {
         // when
         const response = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/review-app-deploy-endpoint',
+          url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
           payload,
         });
 
@@ -218,7 +219,7 @@ describe('Integration | Build | Scalingo', function () {
         // when
         const response = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/review-app-deploy-endpoint',
+          url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
           payload,
         });
 
@@ -259,7 +260,7 @@ describe('Integration | Build | Scalingo', function () {
         // when
         const response = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/review-app-deploy-endpoint',
+          url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
           payload,
         });
 
@@ -302,8 +303,11 @@ describe('Integration | Build | Scalingo', function () {
         // when
         const response = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/review-app-deploy-endpoint',
+          url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
           payload,
+          headers: {
+            Authorization: `Bearer ${config.authorizationToken}`,
+          },
         });
 
         // then
@@ -354,7 +358,7 @@ describe('Integration | Build | Scalingo', function () {
         // when
         const response = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/review-app-deploy-endpoint',
+          url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
           payload,
         });
 
@@ -416,7 +420,7 @@ describe('Integration | Build | Scalingo', function () {
           // when
           const response = await server.inject({
             method: 'POST',
-            url: '/build/scalingo/review-app-deploy-endpoint',
+            url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
             payload,
           });
 
@@ -468,7 +472,7 @@ describe('Integration | Build | Scalingo', function () {
         // when
         const response = await server.inject({
           method: 'POST',
-          url: '/build/scalingo/review-app-deploy-endpoint',
+          url: '/build/scalingo/review-app-deploy-endpoint?token=a-valid-notifier-token',
           payload,
         });
 

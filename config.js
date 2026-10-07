@@ -83,6 +83,7 @@ const configuration = (function () {
       validAppNbCharMax: 46,
       validAppNbCharMin: 6,
       maxLogLength: process.env.MAX_LOG_LENGTH || 1000,
+      notifierToken: process.env.SCALINGO_NOTIFIER_TOKEN,
       repositoryToScalingoIntegration: {
         pix: [
           'pix-api-integration',
@@ -259,6 +260,7 @@ const configuration = (function () {
     config.scalingo.recette.apiUrl = 'https://scalingo.recette';
     config.scalingo.production.token = 'tk-us-scalingo-token-production';
     config.scalingo.production.apiUrl = 'https://scalingo.production';
+    config.scalingo.notifierToken = 'a-valid-notifier-token';
 
     config.prismic.secret = 'prismic-secret';
 
