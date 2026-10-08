@@ -1,5 +1,21 @@
 # pix-bot Changelog
 
+## v2.17.0 (08/10/2026)
+
+
+### :rocket: Amélioration
+- [#711](https://github.com/1024pix/pix-bot/pull/711) [FEATURE] Ajouter une sécurité aux routes de déploiement (PIX-23248).
+
+### :arrow_up: Montée de version
+- [#703](https://github.com/1024pix/pix-bot/pull/703) [BUMP] Update dependency nodemon to ^3.1.14 (dossier racine).
+- [#706](https://github.com/1024pix/pix-bot/pull/706) [BUMP] Update dependency @babel/eslint-parser to ^7.29.7 (dossier racine).
+- [#704](https://github.com/1024pix/pix-bot/pull/704) [BUMP] Update dependency simple-git to ^3.36.0 (dossier racine).
+- [#705](https://github.com/1024pix/pix-bot/pull/705) [BUMP] Update eslint.
+- [#702](https://github.com/1024pix/pix-bot/pull/702) [BUMP] Update dependency nock to ^14.0.17.
+- [#697](https://github.com/1024pix/pix-bot/pull/697) [BUMP] Update dependency husky to ^9.1.7 (dossier racine).
+- [#696](https://github.com/1024pix/pix-bot/pull/696) [BUMP] Update dependency http-status-codes to ^2.3.0 (dossier racine).
+- [#695](https://github.com/1024pix/pix-bot/pull/695) [BUMP] Update dependency depcheck to ^1.4.7 (dossier racine) - autoclosed.
+
 ## v2.16.0 (11/09/2026)
 
 
