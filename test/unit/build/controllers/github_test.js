@@ -120,6 +120,17 @@ describe('Unit | Controller | Github', function () {
     });
   });
 
+  describe('#repositoryToScalingoAppsReview', function () {
+    it('does not declare the same review app name twice', function () {
+      const appNames = Object.values(githubController.repositoryToScalingoAppsReview)
+        .flat()
+        .map(({ appName }) => appName);
+      const duplicates = [...new Set(appNames.filter((appName, index) => appNames.indexOf(appName) !== index))];
+
+      expect(duplicates, `Duplicate review app names: ${duplicates.join(', ')}`).to.be.empty;
+    });
+  });
+
   describe('#_processWebhookAsync', function () {
     describe('when pix-bot env is not defined', function () {
       describe('when pull-request has a pix-bot env label', function () {
