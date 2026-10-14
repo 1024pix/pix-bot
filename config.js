@@ -216,7 +216,7 @@ const configuration = (function () {
     PIX_TUTOS_REPO_NAME: 'pix-tutos',
     PIX_TUTOS_APP_NAME: 'pix-tutos',
     PIX_AIRFLOW_APP_NAME: 'pix-airflow-production',
-    PIX_DBT_APPS_NAME: ['pix-dbt-production'],
+    PIX_DBT_APP_NAME: 'pix-dbt-production',
     PIX_API_TO_PG_APPS_NAME: ['pix-api-to-pg-production'],
 
     PIX_EXPLOIT_REPO_NAME: 'pix-exploit',

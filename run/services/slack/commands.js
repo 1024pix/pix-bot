@@ -127,7 +127,7 @@ async function deployAirflow(payload) {
 
 async function deployDBT(payload) {
   const version = payload.text;
-  await deployTagUsingSCM(config.PIX_DBT_APPS_NAME, version);
+  await deployTagUsingSCM([config.PIX_DBT_APP_NAME], version);
 }
 
 async function createAndDeployPixLCMS(payload) {
