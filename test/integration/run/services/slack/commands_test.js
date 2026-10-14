@@ -37,18 +37,14 @@ describe('Integration | Run | Services | Slack | Commands', function () {
         text: dbtVersion,
       };
 
-      const nockCallA = nock('https://scalingo.production')
+      const nockCall = nock('https://scalingo.production')
         .post(`/v1/apps/pix-dbt-production/scm_repo_link/manual_deploy`, deploymentPayload)
-        .reply(200, { deployment: { id: 'deployment-id-a' } });
-      const nockCallB = nock('https://scalingo.production')
-        .post(`/v1/apps/pix-dbt-external-production/scm_repo_link/manual_deploy`, deploymentPayload)
-        .reply(200, { deployment: { id: 'deployment-id-b' } });
+        .reply(200, { deployment: { id: 'deployment-id' } });
 
       await commands.deployDBT(commandPayload);
 
       expect(scalingoTokenNock.isDone()).to.be.true;
-      expect(nockCallA.isDone()).to.be.true;
-      expect(nockCallB.isDone()).to.be.true;
+      expect(nockCall.isDone()).to.be.true;
     });
   });
 
