@@ -35,7 +35,9 @@ function _buildParentAppToRepository(repositoryToApps) {
  * Any doubt (unknown parent app, unreachable pull request, GitHub error) leaves the app alone.
  *
  * Review apps are listed on every Scalingo region hosting review apps, and each orphan is deleted
- * with the client of the region it was listed on.
+ * with the client of the region it was listed on. A region that cannot be listed is logged and
+ * skipped, so an outage of one region does not prevent cleaning the others. If no region can be
+ * listed at all, the last error is rethrown.
  */
 async function deleteOrphanReviewApps(
   { dryRun = config.orphanReviewApps.dryRun, maxDeletions = config.orphanReviewApps.maxDeletionsPerRun } = {},
@@ -48,10 +50,25 @@ async function deleteOrphanReviewApps(
 ) {
   const parentAppToRepository = _buildParentAppToRepository(dependencies.repositoryToScalingoAppsReview);
   const reviewApps = [];
+  let lastListingError;
+  let failedEnvironments = 0;
   for (const environment of REVIEW_APPS_SCALINGO_ENVIRONMENTS) {
-    const client = await dependencies.scalingoClient.getInstance(environment);
-    const reviewAppNames = await client.getReviewAppsList();
-    reviewApps.push(...reviewAppNames.map((reviewAppName) => ({ reviewAppName, client })));
+    try {
+      const client = await dependencies.scalingoClient.getInstance(environment);
+      const reviewAppNames = await client.getReviewAppsList();
+      reviewApps.push(...reviewAppNames.map((reviewAppName) => ({ reviewAppName, client })));
+    } catch (err) {
+      failedEnvironments++;
+      lastListingError = err;
+      logger.error({
+        event,
+        message: `Could not list the review apps of Scalingo environment ${environment}, skipping it: ${err.message}`,
+        data: { environment, err },
+      });
+    }
+  }
+  if (failedEnvironments === REVIEW_APPS_SCALINGO_ENVIRONMENTS.length) {
+    throw lastListingError;
   }
 
   const orphans = [];
