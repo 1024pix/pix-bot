@@ -69,12 +69,31 @@ describe('Unit | Controller | Github', function () {
     it('replace template placeholders with params', function () {
       const template = 'Choisir les applications à déployer :\n{{checkboxesForReviewAppsToBeDeployed}}';
       expect(
-        githubController.getMessage('42', [{ appName: 'pix-review' }, { appName: 'pix-review2' }], template, [
-          'pix-review',
-        ]),
+        githubController.getMessage(
+          '42',
+          [
+            { appName: 'pix-review', region: 'osc-fr1' },
+            { appName: 'pix-review2', region: 'osc-fr1' },
+          ],
+          template,
+          ['pix-review'],
+        ),
       ).to.equal(`Choisir les applications à déployer :
 - [x] [pix](https://pix-review-pr42.osc-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-review-pr42/environment) <!-- pix-review -->
 - [ ] [pix2](https://pix-review2-pr42.osc-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/pix-review2-pr42/environment) <!-- pix-review2 -->`);
+    });
+
+    it('links review apps to the Scalingo region hosting them', function () {
+      const template = '{{checkboxesForReviewAppsToBeDeployed}}';
+      expect(
+        githubController.getMessage(
+          '42',
+          [{ appName: 'pix-dbt-review', region: 'osc-secnum-fr1', label: 'dbt' }],
+          template,
+        ),
+      ).to.equal(
+        '- [ ] [dbt](https://pix-dbt-review-pr42.osc-secnum-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-secnum-fr1/pix-dbt-review-pr42/environment) <!-- pix-dbt-review -->',
+      );
     });
 
     it('replace multiple values', function () {
@@ -673,7 +692,7 @@ describe('Unit | Controller | Github', function () {
         const scalingoClientStub = sinon.stub();
         const reviewAppExistsStub = sinon.stub();
         const deleteReviewAppStub = sinon.stub();
-        scalingoClientStub.getInstance = sinon.stub().returns({
+        scalingoClientStub.getReviewAppsInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
@@ -689,6 +708,33 @@ describe('Unit | Controller | Github', function () {
       });
     });
 
+    describe('when the review apps are hosted in the osc-secnum-fr1 region', function () {
+      it('should close them with the client of this region', async function () {
+        // given
+        const deleteReviewAppStub = sinon.stub().resolves();
+        const scalingoClientStub = {
+          getReviewAppsInstance: sinon.stub().resolves({
+            reviewAppExists: sinon.stub().resolves(true),
+            deleteReviewApp: deleteReviewAppStub,
+          }),
+        };
+        const reviewAppRepositoryStub = { remove: sinon.stub().resolves() };
+        request.payload.pull_request.head.repo.name = 'pix-data-build-tool';
+
+        // when
+        const response = await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+          reviewAppRepo: reviewAppRepositoryStub,
+          updateCheckRADeployment: sinon.stub().resolves(),
+        });
+
+        // then
+        expect(scalingoClientStub.getReviewAppsInstance).to.have.been.calledOnceWithExactly('osc-secnum-fr1');
+        expect(deleteReviewAppStub).to.have.been.calledOnceWithExactly('pix-dbt-review-pr3');
+        expect(response).to.equal('Closed RA for PR 3 : pix-dbt-review-pr3.');
+      });
+    });
+
     describe('when a Review App is already closed', function () {
       it('should inform that this Review App is already closed', async function () {
         // given
@@ -698,7 +744,7 @@ describe('Unit | Controller | Github', function () {
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
         };
-        scalingoClientStub.getInstance = sinon.stub().returns({
+        scalingoClientStub.getReviewAppsInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
@@ -734,7 +780,7 @@ describe('Unit | Controller | Github', function () {
         const reviewAppRepositoryStub = {
           remove: sinon.stub(),
         };
-        scalingoClientStub.getInstance = sinon.stub().returns({
+        scalingoClientStub.getReviewAppsInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
@@ -773,7 +819,7 @@ describe('Unit | Controller | Github', function () {
           remove: sinon.stub(),
         };
 
-        scalingoClientStub.getInstance = sinon.stub().returns({
+        scalingoClientStub.getReviewAppsInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
@@ -815,7 +861,7 @@ describe('Unit | Controller | Github', function () {
           };
           const updateCheckRADeployment = sinon.stub().resolves();
 
-          scalingoClientStub.getInstance = sinon.stub().returns({
+          scalingoClientStub.getReviewAppsInstance = sinon.stub().returns({
             reviewAppExists: reviewAppExistsStub,
             deleteReviewApp: deleteReviewAppStub,
           });
@@ -851,7 +897,7 @@ describe('Unit | Controller | Github', function () {
         };
         const updateCheckRADeployment = sinon.stub().resolves();
 
-        scalingoClientStub.getInstance = sinon.stub().returns({
+        scalingoClientStub.getReviewAppsInstance = sinon.stub().returns({
           reviewAppExists: reviewAppExistsStub,
           deleteReviewApp: deleteReviewAppStub,
         });
@@ -1359,9 +1405,11 @@ describe('Unit | Controller | Github', function () {
           ref: 'branche-a-deployer',
           parentApp: 'pix-app-review',
           shouldRemovePostgresAddon: true,
+          region: 'osc-fr1',
         });
         expect(removeReviewApp).to.have.been.calledWithExactly({
           reviewAppName: 'pix-api-maddo-review-pr123',
+          region: 'osc-fr1',
         });
         expect(updateCheckRADeployment).to.have.been.calledWithExactly({
           repositoryName: 'pix',
@@ -1423,6 +1471,28 @@ Removed review apps: pix-api-maddo-review-pr123`);
     });
   });
 
+  describe('#repositoryToScalingoAppsReview', function () {
+    it('declares, for every review app, a Scalingo region with configured credentials', function () {
+      const reviewApps = Object.values(githubController.repositoryToScalingoAppsReview).flat();
+      for (const { appName, region } of reviewApps) {
+        expect(config.scalingo.reviewApps, `region of ${appName}`).to.have.property(region);
+      }
+    });
+
+    it('hosts the pix-dbt-review app in the osc-secnum-fr1 region', function () {
+      expect(githubController.repositoryToScalingoAppsReview['pix-data-build-tool']).to.deep.equal([
+        { appName: 'pix-dbt-review', region: 'osc-secnum-fr1', label: 'dbt' },
+      ]);
+    });
+  });
+
+  describe('#getReviewAppRegion', function () {
+    it('returns the Scalingo region of the review app', function () {
+      expect(githubController.getReviewAppRegion('pix-api-review')).to.equal('osc-fr1');
+      expect(githubController.getReviewAppRegion('pix-dbt-review')).to.equal('osc-secnum-fr1');
+    });
+  });
+
   describe('#createReviewApp', function () {
     describe('when review app does not exist on Scalingo', function () {
       it('creates and deploys review app', async function () {
@@ -1445,16 +1515,25 @@ Removed review apps: pix-api-maddo-review-pr123`);
           deployUsingSCM: sinon.stub().resolves(deploymentId),
         };
         const scalingoClient = {
-          getInstance: sinon.stub().resolves(scalingoClientInstance),
+          getReviewAppsInstance: sinon.stub().resolves(scalingoClientInstance),
         };
 
         // when
         await githubController.createReviewApp(
-          { pullRequestNumber, ref, repositoryName, reviewAppName, parentApp, shouldRemovePostgresAddon },
+          {
+            pullRequestNumber,
+            ref,
+            repositoryName,
+            reviewAppName,
+            parentApp,
+            shouldRemovePostgresAddon,
+            region: 'osc-fr1',
+          },
           { reviewAppRepo, scalingoClient },
         );
 
         // then
+        expect(scalingoClient.getReviewAppsInstance).to.have.been.calledOnceWithExactly('osc-fr1');
         expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
         expect(scalingoClientInstance.deployReviewApp).to.have.been.calledWithExactly(parentApp, pullRequestNumber);
         expect(scalingoClientInstance.disableAutoDeploy).to.have.been.calledWithExactly(reviewAppName);
@@ -1490,7 +1569,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
             removeAddon: sinon.stub().resolves(),
           };
           const scalingoClient = {
-            getInstance: sinon.stub().resolves(scalingoClientInstance),
+            getReviewAppsInstance: sinon.stub().resolves(scalingoClientInstance),
           };
 
           // when
@@ -1525,7 +1604,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
           reviewAppExists: sinon.stub().resolves(true),
         };
         const scalingoClient = {
-          getInstance: sinon.stub().resolves(scalingoClientInstance),
+          getReviewAppsInstance: sinon.stub().resolves(scalingoClientInstance),
         };
 
         // when
@@ -1551,13 +1630,17 @@ Removed review apps: pix-api-maddo-review-pr123`);
           deleteReviewApp: sinon.stub().resolves(),
         };
         const scalingoClient = {
-          getInstance: sinon.stub().resolves(scalingoClientInstance),
+          getReviewAppsInstance: sinon.stub().resolves(scalingoClientInstance),
         };
 
         // when
-        await githubController.removeReviewApp({ reviewAppName }, { reviewAppRepo, scalingoClient });
+        await githubController.removeReviewApp(
+          { reviewAppName, region: 'osc-secnum-fr1' },
+          { reviewAppRepo, scalingoClient },
+        );
 
         // then
+        expect(scalingoClient.getReviewAppsInstance).to.have.been.calledOnceWithExactly('osc-secnum-fr1');
         expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
         expect(reviewAppRepo.remove).to.have.been.calledWithExactly({ name: reviewAppName });
         expect(scalingoClientInstance.deleteReviewApp).to.have.been.calledWithExactly(reviewAppName);
@@ -1576,7 +1659,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
           reviewAppExists: sinon.stub().resolves(false),
         };
         const scalingoClient = {
-          getInstance: sinon.stub().resolves(scalingoClientInstance),
+          getReviewAppsInstance: sinon.stub().resolves(scalingoClientInstance),
         };
 
         // when
@@ -1607,9 +1690,10 @@ Removed review apps: pix-api-maddo-review-pr123`);
         },
       };
       const reviewAppRepo = {
-        listForPullRequest: sinon
-          .stub()
-          .resolves([{ name: 'pix-api-review-pr123' }, { name: 'pix-api-maddo-review-pr123' }]),
+        listForPullRequest: sinon.stub().resolves([
+          { name: 'pix-api-review-pr123', parentApp: 'pix-api-review' },
+          { name: 'pix-api-maddo-review-pr123', parentApp: 'pix-api-maddo-review' },
+        ]),
         setStatusPending: sinon.stub().resolves(),
       };
       const scalingoClientInstance = {
@@ -1621,7 +1705,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
           .resolves('deployment-id-456'),
       };
       const scalingoClient = {
-        getInstance: sinon.stub().resolves(scalingoClientInstance),
+        getReviewAppsInstance: sinon.stub().resolves(scalingoClientInstance),
       };
       const updateCheckRADeployment = sinon.stub().resolves();
 
@@ -1634,6 +1718,7 @@ Removed review apps: pix-api-maddo-review-pr123`);
 
       // then
       expect(result).to.equal('Deployed on PR 123 in repository pix');
+      expect(scalingoClient.getReviewAppsInstance).to.have.been.calledOnceWithExactly('osc-fr1');
       expect(reviewAppRepo.listForPullRequest).to.have.been.calledWithExactly({ repository: 'pix', prNumber: 123 });
       expect(scalingoClientInstance.deployUsingSCM).to.have.been.calledTwice;
       expect(scalingoClientInstance.deployUsingSCM.firstCall).to.have.been.calledWithExactly(
