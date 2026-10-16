@@ -81,6 +81,54 @@ describe('Unit | Controller | Github', function () {
       const template = '{{pullRequestId}}, {{pullRequestId}}';
       expect(githubController.getMessage('43', [{ appName: 'pix-review' }], template)).to.equal('43, 43');
     });
+
+    it('uses the osc-secnum-fr1 links for a SecNum review app', function () {
+      const template = '{{checkboxesForReviewAppsToBeDeployed}}';
+      expect(
+        githubController.getMessage('42', [{ appName: 'pix-dbt-review', label: 'dbt', isSecNum: true }], template),
+      ).to.equal(
+        '- [ ] [dbt](https://pix-dbt-review-pr42.osc-secnum-fr1.scalingo.io/) | [👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-secnum-fr1/pix-dbt-review-pr42/environment) <!-- pix-dbt-review -->',
+      );
+    });
+  });
+
+  describe('#isSecNumReviewApp', function () {
+    it('returns true when the parent application is declared as SecNum', function () {
+      expect(githubController.isSecNumReviewApp('pix-dbt-review')).to.be.true;
+    });
+
+    it('returns false when the parent application is not declared as SecNum', function () {
+      expect(githubController.isSecNumReviewApp('pix-api-review')).to.be.false;
+    });
+
+    it('returns false when the parent application is unknown', function () {
+      expect(githubController.isSecNumReviewApp('unknown-app')).to.be.false;
+    });
+  });
+
+  describe('#getReviewAppsScalingoEnvironment', function () {
+    it('returns reviewAppsSecNum for a SecNum review app', function () {
+      expect(githubController.getReviewAppsScalingoEnvironment(true)).to.equal('reviewAppsSecNum');
+    });
+
+    it('returns reviewApps for a non SecNum review app', function () {
+      expect(githubController.getReviewAppsScalingoEnvironment(false)).to.equal('reviewApps');
+    });
+
+    it('returns reviewApps when isSecNum is not given', function () {
+      expect(githubController.getReviewAppsScalingoEnvironment()).to.equal('reviewApps');
+    });
+  });
+
+  describe('#repositoryToScalingoAppsReview', function () {
+    it('does not declare the same review app name twice', function () {
+      const appNames = Object.values(githubController.repositoryToScalingoAppsReview)
+        .flat()
+        .map(({ appName }) => appName);
+      const duplicates = [...new Set(appNames.filter((appName, index) => appNames.indexOf(appName) !== index))];
+
+      expect(duplicates, `Duplicate review app names: ${duplicates.join(', ')}`).to.be.empty;
+    });
   });
 
   describe('#_processWebhookAsync', function () {
@@ -871,6 +919,56 @@ describe('Unit | Controller | Github', function () {
         expect(response).to.contain('pix-api-review-pr3 (deletion failed)');
       });
     });
+
+    describe('when the review apps of the repository are in osc-fr1', function () {
+      it('should only use the osc-fr1 Scalingo client', async function () {
+        // given
+        const scalingoClientStub = {
+          getInstance: sinon.stub().resolves({
+            reviewAppExists: sinon.stub().resolves(false),
+            deleteReviewApp: sinon.stub(),
+          }),
+        };
+
+        // when
+        await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+          reviewAppRepo: { remove: sinon.stub() },
+          updateCheckRADeployment: sinon.stub().resolves(),
+        });
+
+        // then
+        expect(scalingoClientStub.getInstance).to.have.been.calledOnceWithExactly('reviewApps');
+      });
+    });
+
+    describe('when the review app is in osc-secnum-fr1', function () {
+      it('should close the review app with the osc-secnum-fr1 Scalingo client', async function () {
+        // given
+        request.payload.pull_request.head.repo.name = 'pix-data-build-tool';
+        const secNumClient = {
+          reviewAppExists: sinon.stub().resolves(true),
+          deleteReviewApp: sinon.stub().resolves(),
+        };
+        const scalingoClientStub = { getInstance: sinon.stub() };
+        scalingoClientStub.getInstance.withArgs('reviewAppsSecNum').resolves(secNumClient);
+        const reviewAppRepositoryStub = { remove: sinon.stub() };
+
+        // when
+        const response = await githubController.handleCloseRA(request, {
+          scalingoClient: scalingoClientStub,
+          reviewAppRepo: reviewAppRepositoryStub,
+          updateCheckRADeployment: sinon.stub().resolves(),
+        });
+
+        // then
+        expect(scalingoClientStub.getInstance).to.have.been.calledOnceWithExactly('reviewAppsSecNum');
+        expect(secNumClient.reviewAppExists).to.have.been.calledOnceWithExactly('pix-dbt-review-pr3');
+        expect(secNumClient.deleteReviewApp).to.have.been.calledOnceWithExactly('pix-dbt-review-pr3');
+        expect(reviewAppRepositoryStub.remove).to.have.been.calledOnceWithExactly({ name: 'pix-dbt-review-pr3' });
+        expect(response).to.equal('Closed RA for PR 3 : pix-dbt-review-pr3.');
+      });
+    });
   });
 
   describe('#handlePullRequest', function () {
@@ -1359,9 +1457,11 @@ describe('Unit | Controller | Github', function () {
           ref: 'branche-a-deployer',
           parentApp: 'pix-app-review',
           shouldRemovePostgresAddon: true,
+          isSecNum: false,
         });
         expect(removeReviewApp).to.have.been.calledWithExactly({
           reviewAppName: 'pix-api-maddo-review-pr123',
+          isSecNum: false,
         });
         expect(updateCheckRADeployment).to.have.been.calledWithExactly({
           repositoryName: 'pix',
@@ -1370,6 +1470,60 @@ describe('Unit | Controller | Github', function () {
         });
         expect(result).equal(`Created review apps: pix-app-review-pr123
 Removed review apps: pix-api-maddo-review-pr123`);
+      });
+
+      it('passes isSecNum when the review app is a SecNum one', async function () {
+        const pullRequest = {
+          head: {
+            repo: {
+              name: 'pix-data-build-tool',
+              fork: false,
+            },
+            ref: 'branche-a-deployer',
+            sha: 'abc123',
+          },
+          state: 'open',
+        };
+
+        const uncheckedComment = `- [ ] dbt <!-- pix-dbt-review -->`;
+        const checkedComment = `- [X] dbt <!-- pix-dbt-review -->`;
+        const buildRequest = (from, to) => ({
+          payload: {
+            changes: { body: { from } },
+            repository: { full_name: '@1024pix/pix-data-build-tool' },
+            issue: { pull_request: {}, number: 123 },
+            comment: { user: { login: 'pix-bot-github' }, body: to },
+          },
+        });
+
+        const dependencies = {
+          createReviewApp: sinon.stub().resolves(),
+          removeReviewApp: sinon.stub().resolves(),
+          updateCheckRADeployment: sinon.stub().resolves(),
+        };
+
+        await githubController.handleIssueComment(
+          { request: buildRequest(uncheckedComment, checkedComment), pullRequest },
+          dependencies,
+        );
+        await githubController.handleIssueComment(
+          { request: buildRequest(checkedComment, uncheckedComment), pullRequest },
+          dependencies,
+        );
+
+        expect(dependencies.createReviewApp).to.have.been.calledOnceWithExactly({
+          reviewAppName: 'pix-dbt-review-pr123',
+          repositoryName: 'pix-data-build-tool',
+          pullRequestNumber: 123,
+          ref: 'branche-a-deployer',
+          parentApp: 'pix-dbt-review',
+          shouldRemovePostgresAddon: false,
+          isSecNum: true,
+        });
+        expect(dependencies.removeReviewApp).to.have.been.calledOnceWithExactly({
+          reviewAppName: 'pix-dbt-review-pr123',
+          isSecNum: true,
+        });
       });
     });
 
@@ -1535,6 +1689,35 @@ Removed review apps: pix-api-maddo-review-pr123`);
         expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
       });
     });
+
+    describe('Scalingo client selection', function () {
+      let scalingoClient;
+
+      beforeEach(function () {
+        scalingoClient = {
+          getInstance: sinon.stub().resolves({ reviewAppExists: sinon.stub().resolves(true) }),
+        };
+      });
+
+      it('uses the reviewApps client by default', async function () {
+        // when
+        await githubController.createReviewApp({ reviewAppName: 'pix-api-review-pr123' }, { scalingoClient });
+
+        // then
+        expect(scalingoClient.getInstance).to.have.been.calledOnceWithExactly('reviewApps');
+      });
+
+      it('uses the reviewAppsSecNum client for a SecNum review app', async function () {
+        // when
+        await githubController.createReviewApp(
+          { reviewAppName: 'pix-dbt-review-pr123', isSecNum: true },
+          { scalingoClient },
+        );
+
+        // then
+        expect(scalingoClient.getInstance).to.have.been.calledOnceWithExactly('reviewAppsSecNum');
+      });
+    });
   });
 
   describe('#removeReviewApp', function () {
@@ -1585,6 +1768,40 @@ Removed review apps: pix-api-maddo-review-pr123`);
         // then
         expect(scalingoClientInstance.reviewAppExists).to.have.been.calledWithExactly(reviewAppName);
         expect(reviewAppRepo.remove).to.have.been.calledWithExactly({ name: reviewAppName });
+      });
+    });
+
+    describe('Scalingo client selection', function () {
+      let scalingoClient;
+      let reviewAppRepo;
+
+      beforeEach(function () {
+        scalingoClient = {
+          getInstance: sinon.stub().resolves({ reviewAppExists: sinon.stub().resolves(false) }),
+        };
+        reviewAppRepo = { remove: sinon.stub().resolves() };
+      });
+
+      it('uses the reviewApps client by default', async function () {
+        // when
+        await githubController.removeReviewApp(
+          { reviewAppName: 'pix-api-review-pr123' },
+          { scalingoClient, reviewAppRepo },
+        );
+
+        // then
+        expect(scalingoClient.getInstance).to.have.been.calledOnceWithExactly('reviewApps');
+      });
+
+      it('uses the reviewAppsSecNum client for a SecNum review app', async function () {
+        // when
+        await githubController.removeReviewApp(
+          { reviewAppName: 'pix-dbt-review-pr123', isSecNum: true },
+          { scalingoClient, reviewAppRepo },
+        );
+
+        // then
+        expect(scalingoClient.getInstance).to.have.been.calledOnceWithExactly('reviewAppsSecNum');
       });
     });
   });
@@ -1657,6 +1874,46 @@ Removed review apps: pix-api-maddo-review-pr123`);
         repositoryName: 'pix',
         pullRequestNumber: 123,
         sha: 'abc123',
+      });
+    });
+
+    it('deploys the review apps in osc-secnum-fr1 with the osc-secnum-fr1 Scalingo client', async function () {
+      // given
+      const request = {
+        payload: {
+          number: 123,
+          pull_request: {
+            head: {
+              ref: 'la-branche',
+              repo: {
+                name: 'pix-data-build-tool',
+              },
+              sha: 'abc123',
+            },
+          },
+        },
+      };
+      const reviewAppRepo = {
+        listForPullRequest: sinon.stub().resolves([{ name: 'pix-dbt-review-pr123', parentApp: 'pix-dbt-review' }]),
+        setStatusPending: sinon.stub().resolves(),
+      };
+      const secNumClient = { deployUsingSCM: sinon.stub().resolves('deployment-id-123') };
+      const scalingoClient = { getInstance: sinon.stub() };
+      scalingoClient.getInstance.withArgs('reviewAppsSecNum').resolves(secNumClient);
+
+      // when
+      await githubController.handlePullRequestSynchronize(request, {
+        reviewAppRepo,
+        scalingoClient,
+        updateCheckRADeployment: sinon.stub().resolves(),
+      });
+
+      // then
+      expect(scalingoClient.getInstance).to.have.been.calledOnceWithExactly('reviewAppsSecNum');
+      expect(secNumClient.deployUsingSCM).to.have.been.calledOnceWithExactly('pix-dbt-review-pr123', 'la-branche');
+      expect(reviewAppRepo.setStatusPending).to.have.been.calledOnceWithExactly({
+        name: 'pix-dbt-review-pr123',
+        deploymentId: 'deployment-id-123',
       });
     });
   });
