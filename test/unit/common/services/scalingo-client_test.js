@@ -14,6 +14,45 @@ describe('Scalingo client', function () {
     config.github.token = null;
   });
 
+  describe('#ScalingoClient.getReviewAppsInstance', function () {
+    it('should authenticate with the token and the API of the review apps region', async function () {
+      // given
+      const clientStub = { clientFromToken: sinon.stub().resolves(sinon.stub()) };
+
+      // when
+      const scalingoClient = await ScalingoClient.getReviewAppsInstance('osc-secnum-fr1', clientStub);
+
+      // then
+      expect(clientStub.clientFromToken).to.have.been.calledOnceWithExactly('tk-us-scalingo-token-reviewApps-secnum', {
+        apiUrl: 'https://scalingo.reviewAppsSecnum',
+      });
+      expect(scalingoClient).to.be.an.instanceof(ScalingoClient);
+      expect(scalingoClient.environment).to.equal('reviewApps');
+    });
+
+    it('should throw an error when the region is unknown', async function () {
+      // when
+      const error = await catchErr(ScalingoClient.getReviewAppsInstance)('osc-unknown');
+
+      // then
+      expect(error.message).to.equal('Scalingo credentials missing for review apps region osc-unknown');
+    });
+
+    it('should throw an error when no token is configured for the region', async function () {
+      // given
+      sinon.stub(config.scalingo.reviewApps, 'osc-secnum-fr1').value({
+        token: undefined,
+        apiUrl: 'https://api.osc-secnum-fr1.scalingo.com',
+      });
+
+      // when
+      const error = await catchErr(ScalingoClient.getReviewAppsInstance)('osc-secnum-fr1');
+
+      // then
+      expect(error.message).to.equal('Scalingo credentials missing for review apps region osc-secnum-fr1');
+    });
+  });
+
   describe('#ScalingoClient.getInstance', function () {
     it('should return the Scalingo client instance for recette', async function () {
       // given
@@ -438,7 +477,7 @@ describe('Scalingo client', function () {
         },
       };
 
-      scalingoClient = await ScalingoClient.getInstance('reviewApps', clientStub);
+      scalingoClient = await ScalingoClient.getReviewAppsInstance('osc-fr1', clientStub);
     });
 
     it('should call manualReviewApp', async function () {
@@ -469,7 +508,7 @@ describe('Scalingo client', function () {
         },
       };
 
-      scalingoClient = await ScalingoClient.getInstance('reviewApps', clientStub);
+      scalingoClient = await ScalingoClient.getReviewAppsInstance('osc-fr1', clientStub);
     });
 
     it('should call update', async function () {
@@ -824,7 +863,7 @@ describe('Scalingo client', function () {
           };
         },
       };
-      client = await ScalingoClient.getInstance('reviewApps', clientStub);
+      client = await ScalingoClient.getReviewAppsInstance('osc-fr1', clientStub);
     });
 
     describe('When it is not a review app', function () {
@@ -881,7 +920,7 @@ describe('Scalingo client', function () {
           };
         },
       };
-      client = await ScalingoClient.getInstance('reviewApps', clientStub);
+      client = await ScalingoClient.getReviewAppsInstance('osc-fr1', clientStub);
     });
 
     it('should return the names of the review apps only', async function () {
@@ -1231,7 +1270,7 @@ describe('Scalingo client', function () {
           },
         }),
       };
-      client = await ScalingoClient.getInstance('reviewApps', clientStub);
+      client = await ScalingoClient.getReviewAppsInstance('osc-fr1', clientStub);
     });
 
     describe('when addon is provisionned', function () {
