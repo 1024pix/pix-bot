@@ -55,7 +55,7 @@
     "axios-retry": "4.5.0",
     "cron": "4.4.0",
     "dayjs": "1.11.23",
-    "dotenv": "17.4.2",
+    "dotenv": "18.0.8",
     "knex": "3.3.0",
     "lodash": "4.18.1",
     "node-fetch": "3.3.2",
