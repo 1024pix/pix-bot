@@ -57,6 +57,10 @@ const configuration = (function () {
         token: process.env.SCALINGO_TOKEN_REVIEW_APPS,
         apiUrl: process.env.SCALINGO_API_URL_REVIEW_APPS || 'https://api.osc-fr1.scalingo.com',
       },
+      reviewAppsSecNum: {
+        token: process.env.SCALINGO_TOKEN_REVIEW_APPS,
+        apiUrl: process.env.SCALINGO_API_URL_SECNUM_REVIEW_APPS || 'https://api.osc-secnum-fr1.scalingo.com',
+      },
       integration: {
         token: process.env.SCALINGO_TOKEN_INTEGRATION,
         apiUrl: process.env.SCALINGO_API_URL_INTEGRATION || 'https://api.osc-fr1.scalingo.com',
@@ -254,6 +258,8 @@ const configuration = (function () {
 
     config.scalingo.reviewApps.token = 'tk-us-scalingo-token-reviewApps';
     config.scalingo.reviewApps.apiUrl = 'https://scalingo.reviewApps';
+    config.scalingo.reviewAppsSecNum.token = 'tk-us-scalingo-token-reviewApps';
+    config.scalingo.reviewAppsSecNum.apiUrl = 'https://scalingo.reviewAppsSecNum';
     config.scalingo.integration.token = 'tk-us-scalingo-token-integration';
     config.scalingo.integration.apiUrl = 'https://scalingo.integration';
     config.scalingo.recette.token = 'tk-us-scalingo-token-recette';

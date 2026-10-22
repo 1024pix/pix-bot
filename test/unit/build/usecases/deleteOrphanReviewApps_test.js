@@ -1,8 +1,9 @@
 import { deleteOrphanReviewApps } from '../../../../build/usecases/deleteOrphanReviewApps.js';
-import { expect, sinon } from '../../../test-helper.js';
+import { catchErr, expect, sinon } from '../../../test-helper.js';
 
 describe('Unit | Build | Usecases | Delete orphan review apps', function () {
   let client;
+  let secNumClient;
   let dependencies;
 
   beforeEach(function () {
@@ -10,15 +11,88 @@ describe('Unit | Build | Usecases | Delete orphan review apps', function () {
       getReviewAppsList: sinon.stub().resolves([]),
       deleteReviewApp: sinon.stub().resolves(),
     };
+    secNumClient = {
+      getReviewAppsList: sinon.stub().resolves([]),
+      deleteReviewApp: sinon.stub().resolves(),
+    };
+    const getInstance = sinon.stub();
+    getInstance.withArgs('reviewApps').resolves(client);
+    getInstance.withArgs('reviewAppsSecNum').resolves(secNumClient);
     dependencies = {
-      scalingoClient: { getInstance: sinon.stub().resolves(client) },
+      scalingoClient: { getInstance },
       github: { getPullRequestState: sinon.stub() },
       reviewAppRepo: { remove: sinon.stub().resolves() },
       repositoryToScalingoAppsReview: {
         pix: [{ appName: 'pix-api-review' }, { appName: 'pix-app-review' }],
         'pix-editor': [{ appName: 'pix-lcms-review' }],
+        'pix-data-build-tool': [{ appName: 'pix-dbt-review', isSecNum: true }],
       },
     };
+  });
+
+  it('should delete the orphan review apps of every Scalingo region with the client of their region', async function () {
+    // given
+    client.getReviewAppsList.resolves(['pix-api-review-pr123']);
+    secNumClient.getReviewAppsList.resolves(['pix-dbt-review-pr45']);
+    dependencies.github.getPullRequestState.resolves({ state: 'closed', isMerged: true });
+
+    // when
+    const result = await deleteOrphanReviewApps({}, dependencies);
+
+    // then
+    expect(client.deleteReviewApp).to.have.been.calledOnceWithExactly('pix-api-review-pr123');
+    expect(secNumClient.deleteReviewApp).to.have.been.calledOnceWithExactly('pix-dbt-review-pr45');
+    expect(dependencies.github.getPullRequestState).to.have.been.calledWithExactly({
+      repositoryName: 'pix-data-build-tool',
+      pullRequestNumber: 45,
+    });
+    expect(result.reviewed).to.equal(2);
+    expect(result.deleted).to.deep.equal(['pix-api-review-pr123', 'pix-dbt-review-pr45']);
+  });
+
+  it('should keep deleting the orphan review apps of the other Scalingo regions when one region fails', async function () {
+    // given
+    client.getReviewAppsList.resolves(['pix-api-review-pr123']);
+    secNumClient.getReviewAppsList.rejects(new Error('Scalingo osc-secnum-fr1 is down'));
+    dependencies.github.getPullRequestState.resolves({ state: 'closed', isMerged: true });
+
+    // when
+    const result = await deleteOrphanReviewApps({}, dependencies);
+
+    // then
+    expect(client.deleteReviewApp).to.have.been.calledOnceWithExactly('pix-api-review-pr123');
+    expect(result.reviewed).to.equal(1);
+    expect(result.deleted).to.deep.equal(['pix-api-review-pr123']);
+  });
+
+  it('should reject when every Scalingo region fails', async function () {
+    // given
+    const error = new Error('Scalingo osc-secnum-fr1 is down');
+    dependencies.scalingoClient.getInstance.withArgs('reviewApps').rejects(new Error('Scalingo osc-fr1 is down'));
+    secNumClient.getReviewAppsList.rejects(error);
+
+    // when
+    const result = await catchErr(deleteOrphanReviewApps)({}, dependencies);
+
+    // then
+    expect(result).to.equal(error);
+    expect(client.deleteReviewApp).to.not.have.been.called;
+    expect(secNumClient.deleteReviewApp).to.not.have.been.called;
+  });
+
+  it('should apply the maximum number of deletions across all Scalingo regions', async function () {
+    // given
+    client.getReviewAppsList.resolves(['pix-api-review-pr1']);
+    secNumClient.getReviewAppsList.resolves(['pix-dbt-review-pr2']);
+    dependencies.github.getPullRequestState.resolves({ state: 'closed', isMerged: true });
+
+    // when
+    const result = await deleteOrphanReviewApps({ maxDeletions: 1 }, dependencies);
+
+    // then
+    expect(result.orphans).to.have.lengthOf(2);
+    expect(result.deleted).to.deep.equal(['pix-api-review-pr1']);
+    expect(secNumClient.deleteReviewApp).to.not.have.been.called;
   });
 
   it('should delete the review apps whose pull request is closed', async function () {
