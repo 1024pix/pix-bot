@@ -1,5 +1,4 @@
 import pkg from '../../../package.json' with { type: 'json' };
-const { version } = pkg;
 
 import server from '../../../server.js';
 import { expect, StatusCodes, sinon } from '../../test-helper.js';
@@ -48,7 +47,7 @@ describe('Acceptance | Common | Index', function () {
       expect(res.statusCode).to.equal(200);
       expect(JSON.parse(res.payload)).to.deep.equal({
         name: 'pix-bot',
-        version,
+        version: pkg.version,
         description: 'Automating development actions',
       });
     });

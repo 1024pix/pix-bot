@@ -21,9 +21,9 @@ export class MergeQueue {
   #pullRequestRepository;
   #githubService;
 
-  constructor({ pullRequestRepository, githubService }) {
-    this.#pullRequestRepository = pullRequestRepository;
-    this.#githubService = githubService;
+  constructor(dependencies) {
+    this.#pullRequestRepository = dependencies.pullRequestRepository;
+    this.#githubService = dependencies.githubService;
   }
 
   async manage({ repositoryName }) {

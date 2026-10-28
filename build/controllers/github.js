@@ -147,7 +147,7 @@ function getMessage(pullRequestId, scalingoReviewApps, messageTemplate, reviewAp
       let links;
       if (getLinks) {
         links = getLinks(pullRequestId)
-          .map(({ label, href }) => `[${label}](${href})`)
+          .map((link) => `[${link.label}](${link.href})`)
           .join(' – ');
       } else {
         links = `[${label ? label : appName.replace('-review', '')}](https://${appName}-pr${pullRequestId}.osc-fr1.scalingo.io/)`;
@@ -410,7 +410,6 @@ function processWebhook(request, h, dependencies) {
   // Production mode: async fire-and-forget
   _processWebhookAsync(request, dependencies)
     .then(async (result) => {
-      const eventName = request.headers['x-github-event'];
       const pullRequest = await commonGithubService.getPullRequestForEvent(eventName, request);
 
       logger.info({
@@ -424,7 +423,6 @@ function processWebhook(request, h, dependencies) {
       });
     })
     .catch(async (error) => {
-      const eventName = request.headers['x-github-event'];
       const pullRequest = await commonGithubService.getPullRequestForEvent(eventName, request);
 
       logger.error({

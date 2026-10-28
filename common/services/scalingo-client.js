@@ -355,7 +355,7 @@ class ScalingoClient {
       throw new Error(`error while listing notifiers`, { cause: err });
     }
 
-    const notifier = notifiers.find((notifier) => notifier.name === notifierName);
+    const notifier = notifiers.find(({ name }) => name === notifierName);
     if (!notifier) {
       throw new Error(`Notifier ${notifierName} not found.`);
     }
@@ -373,11 +373,11 @@ class ScalingoClient {
     }
 
     return eventNames.map((eventName) => {
-      const event = events.find((event) => event.name === eventName);
-      if (!event) {
+      const eventType = events.find(({ name }) => name === eventName);
+      if (!eventType) {
         throw new Error(`Event ${eventName} not found.`);
       }
-      return event.id;
+      return eventType.id;
     });
   }
 }
