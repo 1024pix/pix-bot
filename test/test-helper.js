@@ -105,8 +105,8 @@ function nockGithubWithNoConfigChanges() {
   const nocks = { tags, commit1234, commit456, commits };
 
   const checkAllNocksHaveBeenCalled = () => {
-    _.values(nocks).map((nock) => {
-      expect(nock).to.have.been.requested;
+    _.values(nocks).map((scope) => {
+      expect(scope).to.have.been.requested;
     });
   };
 

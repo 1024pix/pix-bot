@@ -14,7 +14,7 @@ describe('Acceptance | Run | Github', function () {
           const tag = 'v0.1.0';
           const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
 
-          const body = {
+          const releasePayload = {
             action: 'released',
             release: {
               tag_name: tag,
@@ -28,10 +28,10 @@ describe('Acceptance | Run | Github', function () {
             method: 'POST',
             url: '/run/github/webhook',
             headers: {
-              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              ...createGithubWebhookSignatureHeader(JSON.stringify(releasePayload)),
               'x-github-event': 'release',
             },
-            payload: body,
+            payload: releasePayload,
           });
           expect(res.statusCode).to.equal(StatusCodes.OK);
           expect(res.result).to.equal('No Scalingo app configured for this repository');
@@ -58,7 +58,7 @@ describe('Acceptance | Run | Github', function () {
             .post(`/v1/apps/pix-test-app-production/deployments`, scalingoDeploymentPayload)
             .reply(200, {});
 
-          const body = {
+          const releasePayload = {
             action: 'released',
             release: {
               tag_name: tag,
@@ -72,10 +72,10 @@ describe('Acceptance | Run | Github', function () {
             method: 'POST',
             url: '/run/github/webhook',
             headers: {
-              ...createGithubWebhookSignatureHeader(JSON.stringify(body)),
+              ...createGithubWebhookSignatureHeader(JSON.stringify(releasePayload)),
               'x-github-event': 'release',
             },
-            payload: body,
+            payload: releasePayload,
           });
           expect(res.statusCode).to.equal(StatusCodes.OK);
           expect(res.result).to.deep.equal(['pix-test-app-production v0.1.0 has been deployed']);

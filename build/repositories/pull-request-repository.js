@@ -7,11 +7,11 @@ async function save({ number, repositoryName }) {
 }
 
 async function isAtLeastOneMergeInProgress(repositoryName) {
-  const isAtLeastOneMergeInProgress = await knex('pull_requests')
+  const mergingPullRequest = await knex('pull_requests')
     .select('isMerging')
     .where({ isMerging: true, repositoryName })
     .first();
-  return Boolean(isAtLeastOneMergeInProgress);
+  return Boolean(mergingPullRequest);
 }
 
 async function findNotMerged(repositoryName) {

@@ -44,7 +44,7 @@ async function invalidateCdnCache(application) {
   } catch (error) {
     const cdnResponseMessage = JSON.stringify(error.response.data);
     const message = `Request failed with status code ${error.response.status} and message ${cdnResponseMessage}`;
-    throw new Error(message);
+    throw new Error(message, { cause: error });
   }
 
   return `Cache CDN invalidé pour l‘application ${application}.`;

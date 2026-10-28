@@ -48,7 +48,7 @@ function _createOctokit() {
   if (config.github.token) {
     authCredentials.auth = config.github.token;
   }
-  const octokit = new Octokit({
+  const octokitClient = new Octokit({
     ...authCredentials,
     request: { fetch },
     log: {
@@ -60,7 +60,7 @@ function _createOctokit() {
       error: console.error,
     },
   });
-  octokit.hook.error('request', async (error) => {
+  octokitClient.hook.error('request', async (error) => {
     logger.error({
       event: 'github',
       message: error.response?.data,
@@ -68,7 +68,7 @@ function _createOctokit() {
 
     return error;
   });
-  return octokit;
+  return octokitClient;
 }
 
 async function _getPullReviewsFromGithub(label) {
@@ -151,7 +151,7 @@ function _createResponseForSlack(data, label) {
         fields: [{ value: message, short: false }],
       };
     })
-    .sort(_sortWithInProgressLast);
+    .toSorted(_sortWithInProgressLast);
 
   return {
     response_type: 'in_channel',
@@ -190,7 +190,7 @@ async function _getBranchLastCommitUrl({ owner, repo, branch }) {
 
 async function _getTagCommitUrl({ owner, repo, tagName }) {
   const tags = await _getTags(owner, repo);
-  const tag = tags.find((tag) => tag.name === tagName);
+  const tag = tags.find(({ name }) => name === tagName);
   if (!tag) {
     logger.error({ message: `Could not find the tag ${tagName} on ${owner}/${repo}` });
     throw new Error(`Could not find the tag ${tagName} on ${owner}/${repo}`);

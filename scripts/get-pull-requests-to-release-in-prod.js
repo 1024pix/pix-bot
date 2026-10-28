@@ -1,4 +1,4 @@
-/* eslint no-console: off */
+/* eslint-disable no-console */
 
 import fs from 'fs';
 

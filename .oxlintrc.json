@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["eslint", "oxc", "unicorn", "import", "node", "promise"],
+  "jsPlugins": ["eslint-plugin-mocha"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error"
+  },
+  "env": {
+    "node": true,
+    "es2024": true
+  },
+  "rules": {
+    "no-console": "error",
+    "no-var": "error",
+    "prefer-const": "error",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
+    "no-underscore-dangle": "off",
+    "promise/always-return": ["error", { "ignoreLastCallback": true }],
+    "unicorn/require-post-message-target-origin": "off"
+  },
+  "overrides": [
+    {
+      "files": ["test/**"],
+      "env": {
+        "mocha": true
+      },
+      "rules": {
+        "no-unused-expressions": "off",
+        "unicorn/consistent-function-scoping": "off",
+        "mocha/handle-done-callback": "error",
+        "mocha/max-top-level-suites": ["error", { "limit": 1 }],
+        "mocha/no-async-suite": "error",
+        "mocha/no-exclusive-tests": "error",
+        "mocha/no-exports": "error",
+        "mocha/no-identical-title": "error",
+        "mocha/no-mocha-arrows": "error",
+        "mocha/no-nested-tests": "error",
+        "mocha/no-pending-tests": "error",
+        "mocha/no-return-and-callback": "error",
+        "mocha/no-sibling-hooks": "error",
+        "mocha/no-top-level-hooks": "error",
+        "mocha/no-empty-title": "error"
+      }
+    }
+  ]
+}

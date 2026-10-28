@@ -3,6 +3,11 @@ import releases from '../../../common/services/releases.js';
 import slackPostMessageService from '../../../common/services/slack/surfaces/messages/post-message.js';
 import releasePublicationConfirmationModal from './surfaces/modals/publish-release/release-publication-confirmation.js';
 
+async function _publishAndDeploy({ releaseType, environment }) {
+  const latestReleaseTag = await releases.publish(releaseType);
+  return releases.deploy(environment, latestReleaseTag);
+}
+
 const viewSubmissions = {
   async submitReleaseTypeSelection(payload) {
     const releaseType = payload.view.state.values['publish-release-type']['release-type-option'].selected_option.value;
@@ -35,11 +40,6 @@ const viewSubmissions = {
 
   submitReleasePublicationConfirmation(payload) {
     const releaseType = payload.view.private_metadata;
-
-    async function _publishAndDeploy({ releaseType, environment }) {
-      const latestReleaseTag = await releases.publish(releaseType);
-      return releases.deploy(environment, latestReleaseTag);
-    }
 
     _publishAndDeploy({ releaseType, environment: releases.environments.recette });
     return {

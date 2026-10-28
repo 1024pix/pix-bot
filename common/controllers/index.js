@@ -31,8 +31,8 @@ const controllers = {
       { name: 'lock-release-view', view: lockReleaseDeployment.sampleView() },
     ];
     return views
-      .map(({ name, view }) => {
-        return `<a href="${view.getPreviewUrl()}">View ${name}</a>`;
+      .map(({ name: viewName, view }) => {
+        return `<a href="${view.getPreviewUrl()}">View ${viewName}</a>`;
       })
       .join('<br>');
   },
@@ -43,14 +43,14 @@ const controllers = {
     }
     const environment = request.query.environment;
     const app = request.payload.app_name;
-    const version = request.payload.type_data.git_ref;
+    const deployedVersion = request.payload.type_data.git_ref;
     if (!applicationsDeploymentService.isPixApplication({ applicationName: app, environment })) {
       return h.response().code(422);
     } else if (request.payload.type_data.status !== 'success') {
       return h.response().code(200);
     }
-    await applicationsDeploymentService.addNewVersion({ environment, version });
-    await applicationsDeploymentService.markAppHasDeployed({ version, environment, app });
+    await applicationsDeploymentService.addNewVersion({ environment, version: deployedVersion });
+    await applicationsDeploymentService.markAppHasDeployed({ version: deployedVersion, environment, app });
     return h.response().code(200);
   },
 };

@@ -147,7 +147,7 @@ function getMessage(pullRequestId, scalingoReviewApps, messageTemplate, reviewAp
       let links;
       if (getLinks) {
         links = getLinks(pullRequestId)
-          .map(({ label, href }) => `[${label}](${href})`)
+          .map((link) => `[${link.label}](${link.href})`)
           .join(' – ');
       } else {
         links = `[${label ? label : appName.replace('-review', '')}](https://${appName}-pr${pullRequestId}.osc-fr1.scalingo.io/)`;
@@ -189,7 +189,7 @@ async function _handleCloseRA(
   try {
     client = await dependencies.scalingoClient.getInstance('reviewApps');
   } catch (error) {
-    throw new Error(`Scalingo auth APIError: ${error.message}`);
+    throw new Error(`Scalingo auth APIError: ${error.message}`, { cause: error });
   }
 
   const deletionResults = await Promise.allSettled(
@@ -255,7 +255,9 @@ async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoCli
     try {
       await client.deployFromArchive(applicationName, branchName, repositoryName, { withEnvSuffix: false });
     } catch (error) {
-      throw new Error(`Error during Scalingo deployment of application ${applicationName} : ${error.message}`);
+      throw new Error(`Error during Scalingo deployment of application ${applicationName} : ${error.message}`, {
+        cause: error,
+      });
     }
   }
 
@@ -410,7 +412,6 @@ function processWebhook(request, h, dependencies) {
   // Production mode: async fire-and-forget
   _processWebhookAsync(request, dependencies)
     .then(async (result) => {
-      const eventName = request.headers['x-github-event'];
       const pullRequest = await commonGithubService.getPullRequestForEvent(eventName, request);
 
       logger.info({
@@ -424,7 +425,6 @@ function processWebhook(request, h, dependencies) {
       });
     })
     .catch(async (error) => {
-      const eventName = request.headers['x-github-event'];
       const pullRequest = await commonGithubService.getPullRequestForEvent(eventName, request);
 
       logger.error({

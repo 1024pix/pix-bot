@@ -55,7 +55,7 @@ async function _checkIfAllApplicationsHasDeployed({ version, environment }) {
 export async function _handleJira(version) {
   try {
     const versions = await getVersionList();
-    const jiraVersion = versions.find((jiraVersion) => jiraVersion.name === version);
+    const jiraVersion = versions.find(({ name }) => name === version);
     if (jiraVersion) {
       await finalize(jiraVersion.id);
       return;
