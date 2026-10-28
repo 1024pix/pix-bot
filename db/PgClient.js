@@ -1,7 +1,5 @@
-import pg from 'pg';
+import { Client } from 'pg';
 import { logger } from '../common/services/logger.js';
-
-const { Client } = pg;
 
 export class PgClient {
   constructor(databaseUrl) {

@@ -1,11 +1,9 @@
 import Knex from 'knex';
 import _ from 'lodash';
-import pg from 'pg';
+import { types } from 'pg';
 
 import { config } from '../config.js';
 import * as knexConfigs from './knexfile.js';
-
-const types = pg.types;
 
 /*
 By default, node-postgres casts a DATE value (PostgreSQL type) as a Date Object (JS type).
