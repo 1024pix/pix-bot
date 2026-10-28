@@ -160,7 +160,7 @@ class ScalingoClient {
       };
     } catch (err) {
       if (err.status === 404) {
-        throw new Error(`Impossible to get info for ${scalingoAppName}`);
+        throw new Error(`Impossible to get info for ${scalingoAppName}`, { cause: err });
       }
       logger.error({ event, message: 'error while fetching app information', data: { err, appName, environment } });
       throw Error('error while fetching app information', { cause: err });

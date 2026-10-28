@@ -14,7 +14,7 @@ async function run({ applicationName, region, autoScalingParameters }, injectedS
       message: `${applicationName} has been austocaled with sucess to min: ${autoScalingParameters.min} and max: ${autoScalingParameters.max}`,
     });
   } catch (error) {
-    throw new Error(`Scalingo APIError: ${error.message}`);
+    throw new Error(`Scalingo APIError: ${error.message}`, { cause: error });
   }
 }
 

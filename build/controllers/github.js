@@ -189,7 +189,7 @@ async function _handleCloseRA(
   try {
     client = await dependencies.scalingoClient.getInstance('reviewApps');
   } catch (error) {
-    throw new Error(`Scalingo auth APIError: ${error.message}`);
+    throw new Error(`Scalingo auth APIError: ${error.message}`, { cause: error });
   }
 
   const deletionResults = await Promise.allSettled(
@@ -255,7 +255,9 @@ async function _pushOnDefaultBranchWebhook(request, scalingoClient = ScalingoCli
     try {
       await client.deployFromArchive(applicationName, branchName, repositoryName, { withEnvSuffix: false });
     } catch (error) {
-      throw new Error(`Error during Scalingo deployment of application ${applicationName} : ${error.message}`);
+      throw new Error(`Error during Scalingo deployment of application ${applicationName} : ${error.message}`, {
+        cause: error,
+      });
     }
   }
 
