@@ -14,9 +14,9 @@ function createCronJob(jobName, jobFunction, jobSchedule) {
     return;
   }
   try {
-    new CronJob(
-      jobSchedule,
-      async () => {
+    CronJob.from({
+      cronTime: jobSchedule,
+      onTick: async () => {
         logger.info({
           event: 'cron',
           message: `Start job '${jobName}'`,
@@ -31,10 +31,10 @@ function createCronJob(jobName, jobFunction, jobSchedule) {
           });
         }
       },
-      null,
-      true,
-      parisTimezone,
-    );
+      onComplete: null,
+      start: true,
+      timeZone: parisTimezone,
+    });
   } catch (e) {
     logger.info({
       event: 'cron',
