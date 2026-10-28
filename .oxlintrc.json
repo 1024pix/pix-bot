@@ -16,6 +16,7 @@
     "prefer-const": "error",
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }],
     "no-underscore-dangle": "off",
+    "promise/always-return": ["error", { "ignoreLastCallback": true }],
     "unicorn/require-post-message-target-origin": "off"
   },
   "overrides": [
