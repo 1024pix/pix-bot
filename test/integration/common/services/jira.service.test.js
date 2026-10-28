@@ -87,7 +87,7 @@ describe('Integration | Common | Services | Jira', function () {
       // given
       nock('https://test-jira.atlassian.net')
         .get('/rest/api/3/project/PIX/versions')
-        .replyWithError({ code: 'ETIMEDOUT', message: 'Request timeout' });
+        .replyWithError(Object.assign(new Error('Request timeout'), { code: 'ETIMEDOUT' }));
 
       // when
       await catchErr(getVersionList)();
@@ -128,8 +128,8 @@ describe('Integration | Common | Services | Jira', function () {
 
       nock('https://test-jira.atlassian.net')
         .put('/rest/api/3/version/10000')
-        .reply(200, function (uri, requestBody) {
-          const body = typeof requestBody === 'string' ? JSON.parse(requestBody) : requestBody;
+        .reply(200, async function (request) {
+          const body = await request.json();
           expect(body).to.deep.equal({
             released: true,
             releaseDate: testDate.toISOString(),
@@ -202,7 +202,7 @@ describe('Integration | Common | Services | Jira', function () {
 
       nock('https://test-jira.atlassian.net')
         .put('/rest/api/3/version/10000')
-        .replyWithError({ code: 'ECONNREFUSED', message: 'Connection refused' });
+        .replyWithError(Object.assign(new Error('Connection refused'), { code: 'ECONNREFUSED' }));
 
       // when
       await catchErr(finalize)(versionId);

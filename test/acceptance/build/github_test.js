@@ -464,6 +464,7 @@ describe('Acceptance | Build | Github', function () {
             };
             const getPullRequest = getPullRequestNock({ repository: 'pix', prNumber: 2, sha: 'my-sha', state: 'open' });
             const scalingoAuth = nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
+            getAppNock({ reviewAppName: 'pix-api-review-pr2', returnCode: StatusCodes.NOT_FOUND });
             const createApi = createReviewAppNock({ appName: 'pix-api-review', prNumber: 2 });
             const disableAutoDeployApi = disableAutoDeployNock({ reviewAppName: 'pix-api-review-pr2' });
             const deployApi = deployReviewAppNock({ reviewAppName: 'pix-api-review-pr2' });
@@ -604,6 +605,11 @@ describe('Acceptance | Build | Github', function () {
           // given
           nock('https://auth.scalingo.com').post('/v1/tokens/exchange').reply(StatusCodes.OK);
           getAppNock({ reviewAppName: 'pix-api-review-pr123', returnCode: StatusCodes.OK });
+          getAppNock({ reviewAppName: 'pix-app-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+          getAppNock({ reviewAppName: 'pix-orga-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+          getAppNock({ reviewAppName: 'pix-certif-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+          getAppNock({ reviewAppName: 'pix-junior-review-pr123', returnCode: StatusCodes.NOT_FOUND });
+          getAppNock({ reviewAppName: 'pix-admin-review-pr123', returnCode: StatusCodes.NOT_FOUND });
           getAppNock({ reviewAppName: 'pix-api-maddo-review-pr123', returnCode: StatusCodes.OK });
           getAppNock({ reviewAppName: 'pix-audit-logger-review-pr123', returnCode: StatusCodes.NOT_FOUND });
           deleteReviewAppNock({ reviewAppName: 'pix-api-review-pr123' });
