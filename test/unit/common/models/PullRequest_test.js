@@ -46,10 +46,11 @@ describe('Unit | Common | Models | PullRequest', function () {
       };
 
       // when
-      new PullRequest(properties);
+      const pullRequest = new PullRequest(properties);
 
       // then
       expect(Tags.getTagByTitle).to.have.calledWith(properties.title);
+      expect(pullRequest.tag).to.equal(Tags.getTagByTitle.firstCall.returnValue);
     });
 
     it('should have a tag property', function () {
