@@ -1,3 +1,4 @@
 {
-  "*.{js,yml, yaml}": "eslint --fix"
+  "*.js": "oxlint --fix",
+  "*": "oxfmt --no-error-on-unmatched-pattern"
 }
