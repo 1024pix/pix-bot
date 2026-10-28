@@ -1,7 +1,10 @@
 ignores: [
   "lint-staged",
-  "mocha-junit-reporter"
+  "mocha-junit-reporter",
+  "eslint-plugin-mocha"
  ]
+
+# "eslint-plugin-mocha" is used as jsPlugin in .oxlintrc.json
 
 # "lint-staged" is used in npm task local:trigger-lint-on-commit
 
