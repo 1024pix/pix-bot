@@ -14,12 +14,12 @@ import { config } from '../config.js';
 chai.use(sinonChai);
 chai.use(chaiNock);
 
-// eslint-disable-next-line mocha/no-top-level-hooks
+// eslint-disable-next-line mocha/no-root-hooks
 beforeEach(function () {
   nock.disableNetConnect();
 });
 
-// eslint-disable-next-line mocha/no-top-level-hooks
+// eslint-disable-next-line mocha/no-root-hooks
 afterEach(async function () {
   sinon.restore();
   nock.cleanAll();
