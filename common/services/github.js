@@ -151,7 +151,7 @@ function _createResponseForSlack(data, label) {
         fields: [{ value: message, short: false }],
       };
     })
-    .sort(_sortWithInProgressLast);
+    .toSorted(_sortWithInProgressLast);
 
   return {
     response_type: 'in_channel',
