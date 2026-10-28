@@ -1,3 +1,4 @@
+// oxlint-disable-next-line import/no-unassigned-import -- loads environment variables
 import 'dotenv/config';
 
 function _getNumber(numberAsString, defaultIntNumber) {

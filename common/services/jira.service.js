@@ -12,6 +12,7 @@ const createJiraFetcher = (host, email, apiToken) => {
         accept: 'application/json',
       },
       method,
+      // oxlint-disable-next-line unicorn/no-invalid-fetch-options -- body is never set for GET requests
       body,
     });
   };
