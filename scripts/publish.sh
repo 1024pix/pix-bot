@@ -83,15 +83,6 @@ function create_a_release_commit() {
   echo "Created the release commit"
 }
 
-function publish_release_on_sentry() {
-  npx --yes --package @sentry/cli@2.0.2 sentry-cli releases -o pix new -p pix-api "v${NEW_PACKAGE_VERSION}"
-  npx --yes --package @sentry/cli@2.0.2 sentry-cli releases -o pix new -p pix-app "v${NEW_PACKAGE_VERSION}"
-  npx --yes --package @sentry/cli@2.0.2 sentry-cli releases -o pix set-commits --commit "${GITHUB_OWNER}/${GITHUB_REPOSITORY}@v${NEW_PACKAGE_VERSION}" "v${NEW_PACKAGE_VERSION}"
-  npx --yes --package @sentry/cli@2.0.2 sentry-cli releases -o pix finalize "v${NEW_PACKAGE_VERSION}"
-
-  echo "Published release on Sentry"
-}
-
 echo -e "Preparing a new release.\n"
 
 echo "== Clone and move into Pix repository =="
@@ -108,12 +99,6 @@ configure_git_user_information
 create_a_release_commit
 tag_release_commit
 push_commit_and_tag_to_remote
-if [ "${NODE_ENV}" != "test" ];
-then
-    publish_release_on_sentry
-else
-    echo "Ignoring sentry in tests."
-fi
 
 echo -e "Release publication ${GREEN}succeeded${RESET_COLOR}."
 echo "v${NEW_PACKAGE_VERSION}"

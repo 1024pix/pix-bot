@@ -81,7 +81,6 @@ describe.skip('Acceptance | Scripts | publish.sh', function () {
       'Created the release commit',
       'Created annotated tag',
       'Pushed release commit to the origin',
-      'Ignoring sentry in tests.',
       'Release publication \u001b[1;32msucceeded\u001b[0m.',
       'v0.2.0',
       '',
