@@ -54,9 +54,16 @@ const configuration = (function () {
 
     scalingo: {
       oscFr1Url: 'https://dashboard.scalingo.com/apps/osc-fr1',
+      // credentials of each Scalingo region hosting review apps, keyed by region
       reviewApps: {
-        token: process.env.SCALINGO_TOKEN_REVIEW_APPS,
-        apiUrl: process.env.SCALINGO_API_URL_REVIEW_APPS || 'https://api.osc-fr1.scalingo.com',
+        'osc-fr1': {
+          token: process.env.SCALINGO_TOKEN_REVIEW_APPS,
+          apiUrl: process.env.SCALINGO_API_URL_REVIEW_APPS || 'https://api.osc-fr1.scalingo.com',
+        },
+        'osc-secnum-fr1': {
+          token: process.env.SCALINGO_TOKEN_REVIEW_APPS_OSC_SECNUM_FR1,
+          apiUrl: process.env.SCALINGO_API_URL_REVIEW_APPS_OSC_SECNUM_FR1 || 'https://api.osc-secnum-fr1.scalingo.com',
+        },
       },
       integration: {
         token: process.env.SCALINGO_TOKEN_INTEGRATION,
@@ -253,8 +260,10 @@ const configuration = (function () {
 
     config.openApi.authorizationToken = 'open-api-token';
 
-    config.scalingo.reviewApps.token = 'tk-us-scalingo-token-reviewApps';
-    config.scalingo.reviewApps.apiUrl = 'https://scalingo.reviewApps';
+    config.scalingo.reviewApps['osc-fr1'].token = 'tk-us-scalingo-token-reviewApps';
+    config.scalingo.reviewApps['osc-fr1'].apiUrl = 'https://scalingo.reviewApps';
+    config.scalingo.reviewApps['osc-secnum-fr1'].token = 'tk-us-scalingo-token-reviewApps-secnum';
+    config.scalingo.reviewApps['osc-secnum-fr1'].apiUrl = 'https://scalingo.reviewAppsSecnum';
     config.scalingo.integration.token = 'tk-us-scalingo-token-integration';
     config.scalingo.integration.apiUrl = 'https://scalingo.integration';
     config.scalingo.recette.token = 'tk-us-scalingo-token-recette';

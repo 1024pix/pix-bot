@@ -24,6 +24,16 @@ class ScalingoClient {
     return new ScalingoClient(client, environment);
   }
 
+  static async getReviewAppsInstance(region, injectedClient = scalingo) {
+    const { token, apiUrl } = config.scalingo.reviewApps[region] ?? {};
+    if (!token || !apiUrl) {
+      logger.error({ event, message: `Scalingo credentials missing for review apps region`, data: { region } });
+      throw new Error(`Scalingo credentials missing for review apps region ${region}`);
+    }
+    const client = await injectedClient.clientFromToken(token, { apiUrl });
+    return new ScalingoClient(client, 'reviewApps');
+  }
+
   async deployFromArchive(pixApp, releaseTag, repository = config.github.repository, options = DEFAULT_OPTS) {
     if (!pixApp) {
       logger.error({ event, message: 'No application to deploy.' });

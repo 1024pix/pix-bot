@@ -11,16 +11,19 @@ import { MERGE_STATUS, mergeQueue as _mergeQueue } from '../services/merge-queue
 import { updateCheckRADeployment } from '../usecases/updateCheckRADeployment.js';
 
 const userPixBot = 'pix-bot-github';
+// Each review app declares the Scalingo region hosting it; config.scalingo.reviewApps holds the credentials of each region.
 const repositoryToScalingoAppsReview = {
-  'pix-bot': [{ appName: 'pix-bot-review' }],
-  'pix-data': [{ appName: 'pix-airflow-review', label: 'Airflow' }],
-  'pix-api-to-pg': [{ appName: 'pix-api-to-pg-integration' }],
-  'pix-db-replication': [{ appName: 'pix-datawarehouse-review' }],
-  'pix-db-stats': [{ appName: 'pix-db-stats-review' }],
-  'pix-editor': [{ appName: 'pix-lcms-review' }],
+  'pix-bot': [{ appName: 'pix-bot-review', region: 'osc-fr1' }],
+  'pix-data': [{ appName: 'pix-airflow-review', region: 'osc-fr1', label: 'Airflow' }],
+  'pix-data-build-tool': [{ appName: 'pix-dbt-review', region: 'osc-secnum-fr1', label: 'dbt' }],
+  'pix-api-to-pg': [{ appName: 'pix-api-to-pg-integration', region: 'osc-fr1' }],
+  'pix-db-replication': [{ appName: 'pix-datawarehouse-review', region: 'osc-fr1' }],
+  'pix-db-stats': [{ appName: 'pix-db-stats-review', region: 'osc-fr1' }],
+  'pix-editor': [{ appName: 'pix-lcms-review', region: 'osc-fr1' }],
   'pix-epreuves': [
     {
       appName: 'pix-epreuves-review',
+      region: 'osc-fr1',
       getLinks: (pullRequestNumber) => [
         { label: 'Viewer', href: `https://epreuves-viewer.pix.digital/pr${pullRequestNumber}/` },
         {
@@ -32,11 +35,12 @@ const repositoryToScalingoAppsReview = {
       shouldRemovePostgresAddon: true,
     },
   ],
-  'pix-exploit': [{ appName: 'pix-exploit-review' }],
-  'pix-nina': [{ appName: 'pix-nina-review' }],
+  'pix-exploit': [{ appName: 'pix-exploit-review', region: 'osc-fr1' }],
+  'pix-nina': [{ appName: 'pix-nina-review', region: 'osc-fr1' }],
   'pix-site': [
     {
       appName: 'pix-site-review',
+      region: 'osc-fr1',
       getLinks: (pullRequestNumber) => [
         { label: 'Pix Site (.fr)', href: `https://site-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'Pix Site (.org)', href: `https://site-pr${pullRequestNumber}.review.pix.org` },
@@ -44,22 +48,24 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-pro-review',
+      region: 'osc-fr1',
       getLinks: (pullRequestNumber) => [
         { label: 'Pix Pro (.fr)', href: `https://pro-pr${pullRequestNumber}.review.pix.fr` },
         { label: 'Pix Pro (.org)', href: `https://pro-pr${pullRequestNumber}.review.pix.org` },
       ],
     },
   ],
-  'pix-tutos': [{ appName: 'pix-tutos-review' }],
-  'pix-ui': [{ appName: 'pix-ui-review' }],
+  'pix-tutos': [{ appName: 'pix-tutos-review', region: 'osc-fr1' }],
+  'pix-ui': [{ appName: 'pix-ui-review', region: 'osc-fr1' }],
   pix4pix: [
-    { appName: 'pix-4pix-front-review', label: 'Fronts' },
-    { appName: 'pix-4pix-api-review', label: 'API' },
+    { appName: 'pix-4pix-front-review', region: 'osc-fr1', label: 'Fronts' },
+    { appName: 'pix-4pix-api-review', region: 'osc-fr1', label: 'API' },
   ],
-  securix: [{ appName: 'pix-securix-review' }],
+  securix: [{ appName: 'pix-securix-review', region: 'osc-fr1' }],
   pix: [
     {
       appName: 'pix-api-review',
+      region: 'osc-fr1',
       folderName: 'api',
       getLinks: (pullRequestNumber) => [
         { label: 'API', href: `https://api-pr${pullRequestNumber}.review.pix.fr/api/` },
@@ -67,6 +73,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-app-review',
+      region: 'osc-fr1',
       folderName: 'mon-pix',
       getLinks: (pullRequestNumber) => [
         { label: 'App (.fr)', href: `https://app-pr${pullRequestNumber}.review.pix.fr` },
@@ -76,6 +83,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-orga-review',
+      region: 'osc-fr1',
       folderName: 'orga',
       getLinks: (pullRequestNumber) => [
         { label: 'Orga (.fr)', href: `https://orga-pr${pullRequestNumber}.review.pix.fr` },
@@ -85,6 +93,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-certif-review',
+      region: 'osc-fr1',
       folderName: 'certif',
       getLinks: (pullRequestNumber) => [
         { label: 'Certif (.fr)', href: `https://certif-pr${pullRequestNumber}.review.pix.fr` },
@@ -94,6 +103,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-junior-review',
+      region: 'osc-fr1',
       folderName: 'junior',
       getLinks: (pullRequestNumber) => [
         { label: 'Junior', href: `https://junior-pr${pullRequestNumber}.review.pix.fr` },
@@ -102,12 +112,14 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-admin-review',
+      region: 'osc-fr1',
       folderName: 'admin',
       getLinks: (pullRequestNumber) => [{ label: 'Admin', href: `https://admin-pr${pullRequestNumber}.review.pix.fr` }],
       shouldRemovePostgresAddon: true,
     },
     {
       appName: 'pix-api-maddo-review',
+      region: 'osc-fr1',
       folderName: 'api',
       getLinks: (pullRequestNumber) => [
         { label: 'API MaDDo', href: `https://pix-api-maddo-review-pr${pullRequestNumber}.osc-fr1.scalingo.io/api/` },
@@ -115,6 +127,7 @@ const repositoryToScalingoAppsReview = {
     },
     {
       appName: 'pix-audit-logger-review',
+      region: 'osc-fr1',
       folderName: 'audit-logger',
       getLinks: (pullRequestNumber) => [
         {
@@ -125,6 +138,18 @@ const repositoryToScalingoAppsReview = {
     },
   ],
 };
+
+function getReviewAppRegion(appName) {
+  return Object.values(repositoryToScalingoAppsReview)
+    .flat()
+    .find((reviewApp) => reviewApp.appName === appName)?.region;
+}
+
+async function _getReviewAppsClients(scalingoClient, regions) {
+  const uniqueRegions = [...new Set(regions)];
+  const clients = await Promise.all(uniqueRegions.map((region) => scalingoClient.getReviewAppsInstance(region)));
+  return Object.fromEntries(uniqueRegions.map((region, index) => [region, clients[index]]));
+}
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -143,17 +168,17 @@ function getMessageTemplate(repositoryName) {
 
 function getMessage(pullRequestId, scalingoReviewApps, messageTemplate, reviewAppsToDeploy) {
   const checkboxesForReviewAppsToBeDeployed = scalingoReviewApps
-    .map(({ appName, label, getLinks }) => {
+    .map(({ appName, label, getLinks, region }) => {
       let links;
       if (getLinks) {
         links = getLinks(pullRequestId)
           .map((link) => `[${link.label}](${link.href})`)
           .join(' – ');
       } else {
-        links = `[${label ? label : appName.replace('-review', '')}](https://${appName}-pr${pullRequestId}.osc-fr1.scalingo.io/)`;
+        links = `[${label ? label : appName.replace('-review', '')}](https://${appName}-pr${pullRequestId}.${region}.scalingo.io/)`;
       }
 
-      const scalingoDashboardLink = `[👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/osc-fr1/${appName}-pr${pullRequestId}/environment)`;
+      const scalingoDashboardLink = `[👩‍💻 Dashboard Scalingo](https://dashboard.scalingo.com/apps/${region}/${appName}-pr${pullRequestId}/environment)`;
 
       return `- [${reviewAppsToDeploy?.includes(appName) ? 'x' : ' '}] ${links} | ${scalingoDashboardLink} <!-- ${appName} -->`;
     })
@@ -183,18 +208,22 @@ async function _handleCloseRA(
     return `${repository} is not managed by Pix Bot.`;
   }
 
-  let client;
+  let clients;
   const closedRA = [];
 
   try {
-    client = await dependencies.scalingoClient.getInstance('reviewApps');
+    clients = await _getReviewAppsClients(
+      dependencies.scalingoClient,
+      reviewApps.map(({ region }) => region),
+    );
   } catch (error) {
     throw new Error(`Scalingo auth APIError: ${error.message}`, { cause: error });
   }
 
   const deletionResults = await Promise.allSettled(
-    reviewApps.map(async ({ appName }) => {
+    reviewApps.map(async ({ appName, region }) => {
       const reviewAppName = `${appName}-pr${prNumber}`;
+      const client = clients[region];
       try {
         const reviewAppExists = await client.reviewAppExists(reviewAppName);
         if (reviewAppExists) {
@@ -635,15 +664,19 @@ async function handlePullRequestSynchronize(
   const repository = request.payload.pull_request.head.repo.name;
   const sha = request.payload.pull_request.head.sha;
 
-  const client = await dependencies.scalingoClient.getInstance('reviewApps');
-
   const existingApps = await dependencies.reviewAppRepo.listForPullRequest({
     repository,
     prNumber: pullRequestNumber,
   });
 
+  const clients = await _getReviewAppsClients(
+    dependencies.scalingoClient,
+    existingApps.map(({ parentApp }) => getReviewAppRegion(parentApp)),
+  );
+
   await Promise.all(
     existingApps.map(async (app) => {
+      const client = clients[getReviewAppRegion(app.parentApp)];
       const deploymentId = await client.deployUsingSCM(app.name, ref);
       await dependencies.reviewAppRepo.setStatusPending({ name: app.name, deploymentId });
     }),
@@ -760,7 +793,10 @@ async function _handleIssueComment(
 
   const reviewAppsToRemove = fromSelectedApps
     .filter((app) => !toSelectedApps.includes(app))
-    .map((parentApp) => `${parentApp}-pr${pullRequestNumber}`);
+    .map((parentApp) => ({
+      reviewAppName: `${parentApp}-pr${pullRequestNumber}`,
+      region: allowedReviewAppsByName[parentApp].region,
+    }));
 
   const ref = pullRequest.head.ref;
 
@@ -773,9 +809,10 @@ async function _handleIssueComment(
         ref,
         parentApp,
         shouldRemovePostgresAddon: !!allowedReviewAppsByName[parentApp].shouldRemovePostgresAddon,
+        region: allowedReviewAppsByName[parentApp].region,
       }),
     ),
-    ...reviewAppsToRemove.map((reviewAppName) => dependencies.removeReviewApp({ reviewAppName })),
+    ...reviewAppsToRemove.map(({ reviewAppName, region }) => dependencies.removeReviewApp({ reviewAppName, region })),
   ]);
 
   const messages = [];
@@ -783,7 +820,7 @@ async function _handleIssueComment(
     messages.push(`Created review apps: ${reviewAppsToCreate.map(({ reviewAppName }) => reviewAppName).join(', ')}`);
   }
   if (reviewAppsToRemove.length) {
-    messages.push(`Removed review apps: ${reviewAppsToRemove.join(', ')}`);
+    messages.push(`Removed review apps: ${reviewAppsToRemove.map(({ reviewAppName }) => reviewAppName).join(', ')}`);
   }
   if (!messages.length) {
     return 'Nothing to do';
@@ -807,10 +844,10 @@ function extractSelectedAppsFromBody(body, allowedReviewAppsByName) {
 }
 
 async function createReviewApp(
-  { reviewAppName, repositoryName, pullRequestNumber, ref, parentApp, shouldRemovePostgresAddon },
+  { reviewAppName, repositoryName, pullRequestNumber, ref, parentApp, shouldRemovePostgresAddon, region },
   dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
 ) {
-  const client = await dependencies.scalingoClient.getInstance('reviewApps');
+  const client = await dependencies.scalingoClient.getReviewAppsInstance(region);
 
   const reviewAppExists = await client.reviewAppExists(reviewAppName);
   if (reviewAppExists) {
@@ -832,8 +869,11 @@ async function createReviewApp(
   }
 }
 
-async function removeReviewApp({ reviewAppName }, dependencies = { scalingoClient: ScalingoClient, reviewAppRepo }) {
-  const client = await dependencies.scalingoClient.getInstance('reviewApps');
+async function removeReviewApp(
+  { reviewAppName, region },
+  dependencies = { scalingoClient: ScalingoClient, reviewAppRepo },
+) {
+  const client = await dependencies.scalingoClient.getReviewAppsInstance(region);
 
   const reviewAppExists = await client.reviewAppExists(reviewAppName);
 
@@ -847,6 +887,7 @@ async function removeReviewApp({ reviewAppName }, dependencies = { scalingoClien
 export {
   getMessage,
   getMessageTemplate,
+  getReviewAppRegion,
   processWebhook,
   autoDeployReviewAppsFromTitle,
   _processWebhookAsync,
