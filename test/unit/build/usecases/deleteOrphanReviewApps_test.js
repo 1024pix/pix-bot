@@ -11,7 +11,8 @@ describe('Unit | Build | Usecases | Delete orphan review apps', function () {
       deleteReviewApp: sinon.stub().resolves(),
     };
     dependencies = {
-      scalingoClient: { getInstance: sinon.stub().resolves(client) },
+      scalingoClient: { getReviewAppsInstance: sinon.stub().resolves(client) },
+      reviewAppsRegions: ['osc-fr1'],
       github: { getPullRequestState: sinon.stub() },
       reviewAppRepo: { remove: sinon.stub().resolves() },
       repositoryToScalingoAppsReview: {
@@ -133,5 +134,67 @@ describe('Unit | Build | Usecases | Delete orphan review apps', function () {
     // then
     expect(result.deleted).to.deep.equal(['pix-app-review-pr2']);
     expect(dependencies.reviewAppRepo.remove).to.have.been.calledOnceWithExactly({ name: 'pix-app-review-pr2' });
+  });
+
+  describe('when review apps are hosted in several Scalingo regions', function () {
+    let secnumClient;
+
+    beforeEach(function () {
+      secnumClient = {
+        getReviewAppsList: sinon.stub().resolves([]),
+        deleteReviewApp: sinon.stub().resolves(),
+      };
+      dependencies.reviewAppsRegions = ['osc-fr1', 'osc-secnum-fr1'];
+      dependencies.scalingoClient.getReviewAppsInstance = sinon.stub();
+      dependencies.scalingoClient.getReviewAppsInstance.withArgs('osc-fr1').resolves(client);
+      dependencies.scalingoClient.getReviewAppsInstance.withArgs('osc-secnum-fr1').resolves(secnumClient);
+      dependencies.repositoryToScalingoAppsReview['pix-data-build-tool'] = [{ appName: 'pix-dbt-review' }];
+      dependencies.github.getPullRequestState.resolves({ state: 'closed', isMerged: true });
+    });
+
+    it('should delete each orphan with the client of its region', async function () {
+      // given
+      client.getReviewAppsList.resolves(['pix-api-review-pr123']);
+      secnumClient.getReviewAppsList.resolves(['pix-dbt-review-pr7']);
+
+      // when
+      const result = await deleteOrphanReviewApps({}, dependencies);
+
+      // then
+      expect(client.deleteReviewApp).to.have.been.calledOnceWithExactly('pix-api-review-pr123');
+      expect(secnumClient.deleteReviewApp).to.have.been.calledOnceWithExactly('pix-dbt-review-pr7');
+      expect(result).to.deep.equal({
+        reviewed: 2,
+        orphans: ['pix-api-review-pr123', 'pix-dbt-review-pr7'],
+        deleted: ['pix-api-review-pr123', 'pix-dbt-review-pr7'],
+      });
+    });
+
+    it('should keep cleaning the other regions when one region cannot be listed', async function () {
+      // given
+      client.getReviewAppsList.rejects(new Error('Scalingo is down'));
+      secnumClient.getReviewAppsList.resolves(['pix-dbt-review-pr7']);
+
+      // when
+      const result = await deleteOrphanReviewApps({}, dependencies);
+
+      // then
+      expect(secnumClient.deleteReviewApp).to.have.been.calledOnceWithExactly('pix-dbt-review-pr7');
+      expect(result.deleted).to.deep.equal(['pix-dbt-review-pr7']);
+    });
+
+    it('should fail when no region can be listed', async function () {
+      // given
+      client.getReviewAppsList.rejects(new Error('osc-fr1 is down'));
+      dependencies.scalingoClient.getReviewAppsInstance
+        .withArgs('osc-secnum-fr1')
+        .rejects(new Error('Scalingo credentials missing'));
+
+      // when
+      const error = await deleteOrphanReviewApps({}, dependencies).catch((error) => error);
+
+      // then
+      expect(error.message).to.equal('Scalingo credentials missing');
+    });
   });
 });

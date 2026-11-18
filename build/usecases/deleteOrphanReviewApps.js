@@ -32,6 +32,11 @@ function _buildParentAppToRepository(repositoryToApps) {
  * - GitHub answers, and answers that the pull request is closed.
  *
  * Any doubt (unknown parent app, unreachable pull request, GitHub error) leaves the app alone.
+ *
+ * Review apps are listed on every Scalingo region hosting review apps, and each orphan is deleted
+ * with the client of its region. A region that cannot be listed is logged and skipped, so that an
+ * outage of one region does not prevent cleaning the others. If no region can be listed at all,
+ * the last error is rethrown.
  */
 async function deleteOrphanReviewApps(
   { dryRun = config.orphanReviewApps.dryRun, maxDeletions = config.orphanReviewApps.maxDeletionsPerRun } = {},
@@ -40,14 +45,33 @@ async function deleteOrphanReviewApps(
     github: commonGithubService,
     reviewAppRepo,
     repositoryToScalingoAppsReview,
+    reviewAppsRegions: Object.keys(config.scalingo.reviewApps),
   },
 ) {
   const parentAppToRepository = _buildParentAppToRepository(dependencies.repositoryToScalingoAppsReview);
-  const client = await dependencies.scalingoClient.getInstance('reviewApps');
-  const reviewAppNames = await client.getReviewAppsList();
+  const reviewApps = [];
+  let lastListingError;
+  let failedRegions = 0;
+  for (const region of dependencies.reviewAppsRegions) {
+    try {
+      const client = await dependencies.scalingoClient.getReviewAppsInstance(region);
+      const reviewAppNames = await client.getReviewAppsList();
+      reviewApps.push(...reviewAppNames.map((reviewAppName) => ({ reviewAppName, client })));
+    } catch (error) {
+      failedRegions++;
+      lastListingError = error;
+      logger.error({
+        event,
+        message: `Could not list the review apps of Scalingo region ${region}, skipping it: ${error.message}`,
+      });
+    }
+  }
+  if (failedRegions === dependencies.reviewAppsRegions.length) {
+    throw lastListingError;
+  }
 
   const orphans = [];
-  for (const reviewAppName of reviewAppNames) {
+  for (const { reviewAppName, client } of reviewApps) {
     const groups = REVIEW_APP_NAME.exec(reviewAppName)?.groups;
     if (!groups) continue;
 
@@ -73,7 +97,7 @@ async function deleteOrphanReviewApps(
     }
 
     if (!pullRequest || pullRequest.state !== 'closed') continue;
-    orphans.push({ reviewAppName, repository, pullRequestNumber, isMerged: pullRequest.isMerged });
+    orphans.push({ reviewAppName, client, repository, pullRequestNumber, isMerged: pullRequest.isMerged });
   }
 
   const toDelete = orphans.slice(0, maxDeletions);
@@ -85,7 +109,7 @@ async function deleteOrphanReviewApps(
   }
 
   const deleted = [];
-  for (const { reviewAppName, repository, pullRequestNumber, isMerged } of toDelete) {
+  for (const { reviewAppName, client, repository, pullRequestNumber, isMerged } of toDelete) {
     const closedAs = isMerged ? 'merged' : 'closed';
     if (dryRun) {
       logger.info({
@@ -113,10 +137,10 @@ async function deleteOrphanReviewApps(
 
   logger.info({
     event,
-    message: `Reviewed ${reviewAppNames.length} review apps, found ${orphans.length} orphan(s), deleted ${deleted.length}.`,
+    message: `Reviewed ${reviewApps.length} review apps, found ${orphans.length} orphan(s), deleted ${deleted.length}.`,
   });
 
-  return { reviewed: reviewAppNames.length, orphans: orphans.map(({ reviewAppName }) => reviewAppName), deleted };
+  return { reviewed: reviewApps.length, orphans: orphans.map(({ reviewAppName }) => reviewAppName), deleted };
 }
 
 export { deleteOrphanReviewApps };
