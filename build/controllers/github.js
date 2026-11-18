@@ -534,7 +534,7 @@ async function autoDeployReviewAppsFromTitle({ prTitle, reviewApps, pullRequestN
   }
 
   const reviewAppsToDeploy = reviewApps
-    .filter(({ folderName }) => folderName === appFromTitle)
+    .filter(({ folderName }) => appFromTitle.includes(folderName))
     .map(({ appName }) => appName);
 
   if (reviewAppsToDeploy.length === 0) {

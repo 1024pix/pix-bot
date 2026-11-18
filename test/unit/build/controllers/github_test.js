@@ -1792,6 +1792,39 @@ Removed review apps: pix-api-maddo-review-pr123`);
       expect(getCheckedAppNames(newComment)).to.deep.equal(['pix-api-review', 'pix-api-maddo-review']);
     });
 
+    context('when several applications are in PR title', function () {
+      it('should check the review apps whose folder name is the among given app in the pull request title', async function () {
+        // given
+        const githubService = {
+          getPullRequestComments: sinon.stub().resolves([{ user: { login: 'pix-bot-github' }, id: 2 }]),
+          editPullRequestComment: sinon.stub().resolves(),
+        };
+
+        // when
+        await githubController.autoDeployReviewAppsFromTitle({
+          prTitle: '[BUMP] Update dependency axios to v1.19.0 (api,junior)',
+          reviewApps: githubController.repositoryToScalingoAppsReview.pix,
+          pullRequestNumber: 123,
+          repository: 'pix',
+          githubService,
+        });
+
+        // then
+        expect(githubService.getPullRequestComments).to.have.been.calledOnceWithExactly({
+          repositoryName: 'pix',
+          pullRequestNumber: 123,
+        });
+        expect(githubService.editPullRequestComment).to.have.been.calledOnce;
+        const { repositoryName, commentId, newComment } = githubService.editPullRequestComment.firstCall.args[0];
+        expect({ repositoryName, commentId }).to.deep.equal({ repositoryName: 'pix', commentId: 2 });
+        expect(getCheckedAppNames(newComment)).to.have.members([
+          'pix-api-review',
+          'pix-api-maddo-review',
+          'pix-junior-review',
+        ]);
+      });
+    });
+
     it('should edit the pix-bot-github comment only', async function () {
       // given
       const githubService = {
