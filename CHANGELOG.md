@@ -1,5 +1,61 @@
 # pix-bot Changelog
 
+## v2.17.1 (19/11/2026)
+
+
+### :rocket: Amélioration
+- [#763](https://github.com/1024pix/pix-bot/pull/763) [FEATURE] Déploie plusieurs applications si la PR concerne plusieurs répertoires.
+
+### :building_construction: Tech
+- [#744](https://github.com/1024pix/pix-bot/pull/744) [TECH] Migrer vers oxlint et oxfmt.
+- [#743](https://github.com/1024pix/pix-bot/pull/743) [TECH] Enlever Sentry.
+- [#716](https://github.com/1024pix/pix-bot/pull/716) [TECH] Update Renovate configuration to use local extends.
+
+### :arrow_up: Montée de version
+- [#762](https://github.com/1024pix/pix-bot/pull/762) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to v2.2.9 (dossier racine).
+- [#761](https://github.com/1024pix/pix-bot/pull/761) [BUMP] Update dependency nock to v15.0.6 (dossier racine).
+- [#760](https://github.com/1024pix/pix-bot/pull/760) [BUMP] Update dependency @hapi/hapi to v21.4.13 (dossier racine).
+- [#758](https://github.com/1024pix/pix-bot/pull/758) [BUMP] Update dependency @hapi/hapi to v21.4.12 (dossier racine).
+- [#755](https://github.com/1024pix/pix-bot/pull/755) [BUMP] Update dependency axios to v1.21.0 (dossier racine).
+- [#754](https://github.com/1024pix/pix-bot/pull/754) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to v2.2.8 (dossier racine).
+- [#753](https://github.com/1024pix/pix-bot/pull/753) [BUMP] Update Node.js to v24.22.2.
+- [#751](https://github.com/1024pix/pix-bot/pull/751) [BUMP] Update dependency dotenv to v18.0.9 (dossier racine).
+- [#750](https://github.com/1024pix/pix-bot/pull/750) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to v2.2.7 (dossier racine).
+- [#749](https://github.com/1024pix/pix-bot/pull/749) [BUMP] Update Node.js to v24 (dossier racine).
+- [#747](https://github.com/1024pix/pix-bot/pull/747) [BUMP] Update dependency @hapi/hapi to v21.4.11 (dossier racine).
+- [#746](https://github.com/1024pix/pix-bot/pull/746) [BUMP] Update Node.js to v22.23.4.
+- [#745](https://github.com/1024pix/pix-bot/pull/745) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to v2.2.6 (dossier racine).
+- [#739](https://github.com/1024pix/pix-bot/pull/739) [BUMP] Update dependency nock to v15 (dossier racine).
+- [#737](https://github.com/1024pix/pix-bot/pull/737) [BUMP] Update dependency eslint-plugin-mocha to v12 (dossier racine).
+- [#742](https://github.com/1024pix/pix-bot/pull/742) [BUMP] Update dependency scalingo to v0.23.1 (dossier racine).
+- [#738](https://github.com/1024pix/pix-bot/pull/738) [BUMP] Update dependency mocha to v12 (dossier racine).
+- [#741](https://github.com/1024pix/pix-bot/pull/741) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to v2.2.5 (dossier racine).
+- [#736](https://github.com/1024pix/pix-bot/pull/736) [BUMP] Update dependency dotenv to v18 (dossier racine).
+- [#740](https://github.com/1024pix/pix-bot/pull/740) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to v2.2.4 (dossier racine).
+- [#735](https://github.com/1024pix/pix-bot/pull/735) [BUMP] Update JS test packages (dossier racine).
+- [#720](https://github.com/1024pix/pix-bot/pull/720) [BUMP] Pin dependencies (dossier racine).
+- [#731](https://github.com/1024pix/pix-bot/pull/731) [BUMP] Update dependency scalingo to v0.23.0 (dossier racine).
+- [#734](https://github.com/1024pix/pix-bot/pull/734) [BUMP] Update dependency @1024pix/scalingo-review-app-manager to v2.2.2 (dossier racine).
+- [#733](https://github.com/1024pix/pix-bot/pull/733) [BUMP] Update dependency eslint-plugin-prettier to v5.5.7 (dossier racine).
+- [#710](https://github.com/1024pix/pix-bot/pull/710) [BUMP] Update dependency lint-staged to v17.6.0 (dossier racine).
+- [#730](https://github.com/1024pix/pix-bot/pull/730) [BUMP] Update dependency pg to v8.23.1 (dossier racine).
+- [#726](https://github.com/1024pix/pix-bot/pull/726) [BUMP] Update linters (dossier racine).
+- [#728](https://github.com/1024pix/pix-bot/pull/728) [BUMP] Update dependency knex to v3.3.0 (dossier racine).
+- [#727](https://github.com/1024pix/pix-bot/pull/727) [BUMP] Update dependency dotenv to v17.4.2 (dossier racine).
+- [#725](https://github.com/1024pix/pix-bot/pull/725) [BUMP] Update dependency dayjs to v1.11.23 (dossier racine).
+- [#722](https://github.com/1024pix/pix-bot/pull/722) [BUMP] Update dependency @hapi/hapi to v21.4.10 (dossier racine).
+- [#717](https://github.com/1024pix/pix-bot/pull/717) [BUMP] Pin dependencies (dossier racine).
+- [#714](https://github.com/1024pix/pix-bot/pull/714) [BUMP] Update dependency simple-git to v4 (dossier racine) [SECURITY].
+- [#713](https://github.com/1024pix/pix-bot/pull/713) [BUMP] Update dependency axios to v1.20.0 (dossier racine) [SECURITY].
+- [#721](https://github.com/1024pix/pix-bot/pull/721) [BUMP] Pin xt0rted/block-autosquash-commits-action action to v2.2.0 (workflows).
+- [#719](https://github.com/1024pix/pix-bot/pull/719) [BUMP] Update Node.js to v22.23.3.
+- [#709](https://github.com/1024pix/pix-bot/pull/709) [BUMP] Update dependency fs-extra to ^11.4.1 (dossier racine).
+- [#718](https://github.com/1024pix/pix-bot/pull/718) [BUMP] Pin dependencies (dossier racine).
+- [#707](https://github.com/1024pix/pix-bot/pull/707) [BUMP] Update dependency @babel/plugin-syntax-import-assertions to ^7.28.6 (dossier racine).
+
+### :coffee: Autre
+- [#724](https://github.com/1024pix/pix-bot/pull/724)  [TECH] Retirer les mentions de l'app pix-dbt-external-production (PIX-24741).
+
 ## v2.17.0 (08/10/2026)
 
 
