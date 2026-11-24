@@ -34,13 +34,13 @@ jobs:
       status: ${{ steps.riskscoreFromDT.outputs.status }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with: 
+        with:
           persist-credentials: false
 
       # Upload and wait for analysis result
       - name: Generates BoM and upload to OWASP DTrack
         id: riskscoreFromDT
-        uses:  1024pix/check-dependency-track-action/node@3f4ca48509e2e15b2f201e456d7f7e9fc2fe39f1 # v1.1.2
+        uses: 1024pix/check-dependency-track-action/node@3f4ca48509e2e15b2f201e456d7f7e9fc2fe39f1 # v1.1.2
         with:
           url: ${{ secrets.DEPENDENCYTRACK_URL }}
           key: '${{ secrets.DEPENDENCYTRACK_APIKEY }}'
