@@ -78,7 +78,7 @@
     "nodemon": "3.1.14",
     "oxfmt": "0.78.0",
     "oxlint": "1.93.0",
-    "simple-git": "4.0.2",
+    "simple-git": "4.1.0",
     "sinon": "22.1.0",
     "sinon-chai": "4.0.1"
   }
